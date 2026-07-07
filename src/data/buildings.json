@@ -1,0 +1,245 @@
+[
+  {
+    "id": "11111111-1111-4111-8111-111111111111",
+    "name": "Rathaus",
+    "category": "Hauptgebäude",
+    "unlockTownHall": 1,
+    "sortOrder": 10,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 1,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 450
+      },
+      {
+        "level": 2,
+        "townHall": 2,
+        "upgradeTimeHours": 1,
+        "goldCost": 1000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1600
+      },
+      {
+        "level": 3,
+        "townHall": 3,
+        "upgradeTimeHours": 3,
+        "goldCost": 4000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1850
+      }
+    ]
+  },
+  {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "name": "Clanburg",
+    "category": "Armee",
+    "unlockTownHall": 3,
+    "sortOrder": 20,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 3,
+        "upgradeTimeHours": 0,
+        "goldCost": 10000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1000
+      },
+      {
+        "level": 2,
+        "townHall": 4,
+        "upgradeTimeHours": 8,
+        "goldCost": 100000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1400
+      }
+    ]
+  },
+  {
+    "id": "33333333-3333-4333-8333-333333333333",
+    "name": "Labor",
+    "category": "Armee",
+    "unlockTownHall": 3,
+    "sortOrder": 30,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 3,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 25000,
+        "darkElixirCost": 0,
+        "hitpoints": 500
+      },
+      {
+        "level": 2,
+        "townHall": 4,
+        "upgradeTimeHours": 5,
+        "goldCost": 0,
+        "elixirCost": 50000,
+        "darkElixirCost": 0,
+        "hitpoints": 550
+      }
+    ]
+  },
+  {
+    "id": "44444444-4444-4444-8444-444444444444",
+    "name": "Adlerartillerie",
+    "category": "Verteidigung",
+    "unlockTownHall": 11,
+    "sortOrder": 100,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 11,
+        "upgradeTimeHours": 168,
+        "goldCost": 8000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 4000
+      },
+      {
+        "level": 2,
+        "townHall": 11,
+        "upgradeTimeHours": 240,
+        "goldCost": 10000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 4400
+      }
+    ]
+  },
+  {
+    "id": "55555555-5555-4555-8555-555555555555",
+    "name": "Infernoturm",
+    "category": "Verteidigung",
+    "unlockTownHall": 10,
+    "sortOrder": 110,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 10,
+        "upgradeTimeHours": 120,
+        "goldCost": 5000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1500
+      },
+      {
+        "level": 2,
+        "townHall": 10,
+        "upgradeTimeHours": 168,
+        "goldCost": 6500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1800
+      }
+    ]
+  },
+  {
+    "id": "66666666-6666-4666-8666-666666666666",
+    "name": "X-Bogen",
+    "category": "Verteidigung",
+    "unlockTownHall": 9,
+    "sortOrder": 120,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 72,
+        "goldCost": 3000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1500
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 96,
+        "goldCost": 5000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1900
+      }
+    ]
+  },
+  {
+    "id": "77777777-7777-4777-8777-777777777777",
+    "name": "Kanone",
+    "category": "Verteidigung",
+    "unlockTownHall": 1,
+    "sortOrder": 200,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 1,
+        "upgradeTimeHours": 0,
+        "goldCost": 250,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 420
+      },
+      {
+        "level": 2,
+        "townHall": 1,
+        "upgradeTimeHours": 1,
+        "goldCost": 1000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 470
+      },
+      {
+        "level": 3,
+        "townHall": 2,
+        "upgradeTimeHours": 1,
+        "goldCost": 4000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 520
+      }
+    ]
+  },
+  {
+    "id": "88888888-8888-4888-8888-888888888888",
+    "name": "Bogenschützenturm",
+    "category": "Verteidigung",
+    "unlockTownHall": 2,
+    "sortOrder": 210,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 2,
+        "upgradeTimeHours": 0,
+        "goldCost": 1000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 380
+      },
+      {
+        "level": 2,
+        "townHall": 2,
+        "upgradeTimeHours": 1,
+        "goldCost": 2000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 420
+      },
+      {
+        "level": 3,
+        "townHall": 3,
+        "upgradeTimeHours": 1,
+        "goldCost": 5000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 460
+      }
+    ]
+  }
+]

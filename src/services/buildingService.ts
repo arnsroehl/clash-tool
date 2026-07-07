@@ -2,12 +2,15 @@ import { getSupabaseClient } from "@/lib/supabase";
 import type {
   AccountBuildingRow,
   Building,
+  BuildingLevel,
   BuildingLevelMap,
+  BuildingLevelRow,
   BuildingRow,
 } from "@/types/building";
 
 const BUILDING_SELECT_FIELDS =
   "id, name, category, unlock_town_hall_level, max_level, sort_order";
+const BUILDING_LEVEL_SELECT_FIELDS = "building_id, level, town_hall_level";
 
 function mapBuilding(row: BuildingRow): Building {
   return {
@@ -17,6 +20,14 @@ function mapBuilding(row: BuildingRow): Building {
     unlockTownHallLevel: row.unlock_town_hall_level,
     maxLevel: row.max_level,
     sortOrder: row.sort_order,
+  };
+}
+
+function mapBuildingLevel(row: BuildingLevelRow): BuildingLevel {
+  return {
+    buildingId: row.building_id,
+    level: row.level,
+    townHallLevel: row.town_hall_level,
   };
 }
 
@@ -33,6 +44,20 @@ export async function fetchBuildings(): Promise<Building[]> {
   }
 
   return ((data || []) as BuildingRow[]).map(mapBuilding);
+}
+
+export async function fetchBuildingLevels(): Promise<BuildingLevel[]> {
+  const client = getSupabaseClient();
+
+  const { data, error } = await client
+    .from("building_levels")
+    .select(BUILDING_LEVEL_SELECT_FIELDS);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return ((data || []) as BuildingLevelRow[]).map(mapBuildingLevel);
 }
 
 export async function fetchAccountBuildingLevels(

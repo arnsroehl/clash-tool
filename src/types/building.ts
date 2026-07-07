@@ -16,6 +16,18 @@ export type BuildingRow = {
   sort_order: number;
 };
 
+export type BuildingLevel = {
+  buildingId: string;
+  level: number;
+  townHallLevel: number;
+};
+
+export type BuildingLevelRow = {
+  building_id: string;
+  level: number;
+  town_hall_level: number;
+};
+
 export type AccountBuildingRow = {
   building_id: string;
   current_level: number;

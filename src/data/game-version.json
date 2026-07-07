@@ -1,0 +1,6 @@
+{
+  "game": "Clash of Clans",
+  "dataVersion": "sample-2026-07-07",
+  "schemaVersion": 1,
+  "description": "Small curated sample dataset for the Clash Tool import pipeline."
+}
