@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Clash Tool
 
-## Getting Started
+Clash Tool ist eine Next.js-Anwendung zum Verwalten von Clash of Clans Accounts, Spielfortschritt und Upgrade-Empfehlungen. Das Projekt kombiniert Account-Daten aus Supabase, statische Game-Data-JSON-Dateien und eine framework-unabhängige Planner Engine.
 
-First, run the development server:
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Local Setup](#local-setup)
+- [Supabase](#supabase)
+- [Scripts](#scripts)
+- [Architecture](#architecture)
+- [CI](#ci)
+
+## Tech Stack
+
+| Area | Technology |
+| --- | --- |
+| Framework | Next.js 16 App Router |
+| UI | React 19 |
+| Styling | Tailwind CSS 4 |
+| Database | Supabase |
+| Language | TypeScript |
+| Scripts and tests | `tsx`, Node test runner |
+
+## Local Setup
+
+Install dependencies:
+
+```bash
+npm ci
+```
+
+Start the local development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app runs at:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Supabase
 
-## Learn More
+The app expects Supabase configuration through local environment variables:
 
-To learn more about Next.js, take a look at the following resources:
+```text
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Keep these values in `.env.local`. Do not commit secrets or local environment files.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+SQL helper files for selected modules live in:
 
-## Deploy on Vercel
+```text
+src/scripts/sql/
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+These SQL files are documentation/setup helpers and are not executed automatically by the app.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Starts the Next.js development server |
+| `npm run build` | Builds the production application |
+| `npm run lint` | Runs ESLint |
+| `npm test` | Runs planner tests |
+| `npm run import-game-data` | Imports JSON game data into Supabase using upserts |
+
+Run the game-data importer after Supabase tables and local environment variables are configured:
+
+```bash
+npm run import-game-data
+```
+
+## Architecture
+
+The current architecture separates UI, state orchestration, data access, game data, and planner logic:
+
+```text
+src/app/              Next.js app entry points
+src/components/       Presentational UI components
+src/hooks/            React hooks for state and actions
+src/services/         Supabase access and row mapping
+src/features/planner/ Framework-independent planner engine
+src/data/             JSON game-data source files
+src/scripts/          Import pipeline and SQL helper files
+src/types/            Shared TypeScript domain types
+docs/                 Project documentation
+```
+
+Start with `docs/PROJECT.md` for a project overview, then read:
+
+- `docs/ARCHITECTURE.md`
+- `docs/DATABASE.md`
+- `docs/GAME_DATA.md`
+- `docs/PLANNER.md`
+- `docs/IMPORT_PIPELINE.md`
+- `docs/DEVELOPMENT.md`
+- `docs/CODING_STANDARDS.md`
+- `docs/TESTING.md`
+- `docs/ROADMAP.md`
+- `docs/CONTRIBUTING.md`
+
+## CI
+
+GitHub Actions runs on `push` and `pull_request`.
+
+The CI workflow installs dependencies with `npm ci` and verifies:
+
+```bash
+npm run lint
+npm test
+npm run build
+```
