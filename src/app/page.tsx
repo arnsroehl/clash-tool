@@ -10,10 +10,14 @@ import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
 import { HeroList } from "@/components/heroes/HeroList";
+import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
 import { planUpgrades } from "@/features/planner/planner.service";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useBuildings } from "@/hooks/useBuildings";
 import { useHeroes } from "@/hooks/useHeroes";
+import { useSiegeMachines } from "@/hooks/useSiegeMachines";
+import { useSpells } from "@/hooks/useSpells";
+import { useTroops } from "@/hooks/useTroops";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type { PlannerResult } from "@/features/planner/planner.types";
 
@@ -61,6 +65,48 @@ export default function Home() {
     isSavingHeroId,
     updateHeroLevel,
   } = useHeroes({
+    selectedAccount,
+    onError: handleError,
+    clearError,
+  });
+
+  const {
+    troops,
+    availableTroops,
+    troopLevels,
+    progress: troopProgress,
+    isLoadingTroops,
+    isSavingTroopId,
+    updateTroopLevel,
+  } = useTroops({
+    selectedAccount,
+    onError: handleError,
+    clearError,
+  });
+
+  const {
+    spells,
+    availableSpells,
+    spellLevels,
+    progress: spellProgress,
+    isLoadingSpells,
+    isSavingSpellId,
+    updateSpellLevel,
+  } = useSpells({
+    selectedAccount,
+    onError: handleError,
+    clearError,
+  });
+
+  const {
+    siegeMachines,
+    availableSiegeMachines,
+    siegeMachineLevels,
+    progress: siegeMachineProgress,
+    isLoadingSiegeMachines,
+    isSavingSiegeMachineId,
+    updateSiegeMachineLevel,
+  } = useSiegeMachines({
     selectedAccount,
     onError: handleError,
     clearError,
@@ -176,6 +222,31 @@ export default function Home() {
           progress={heroProgress}
           selectedAccount={selectedAccount}
           onUpdateHeroLevel={updateHeroLevel}
+        />
+
+        <LaboratoryOverview
+          selectedAccount={selectedAccount}
+          troops={troops}
+          availableTroops={availableTroops}
+          troopLevels={troopLevels}
+          troopProgress={troopProgress}
+          isLoadingTroops={isLoadingTroops}
+          isSavingTroopId={isSavingTroopId}
+          onUpdateTroopLevel={updateTroopLevel}
+          spells={spells}
+          availableSpells={availableSpells}
+          spellLevels={spellLevels}
+          spellProgress={spellProgress}
+          isLoadingSpells={isLoadingSpells}
+          isSavingSpellId={isSavingSpellId}
+          onUpdateSpellLevel={updateSpellLevel}
+          siegeMachines={siegeMachines}
+          availableSiegeMachines={availableSiegeMachines}
+          siegeMachineLevels={siegeMachineLevels}
+          siegeMachineProgress={siegeMachineProgress}
+          isLoadingSiegeMachines={isLoadingSiegeMachines}
+          isSavingSiegeMachineId={isSavingSiegeMachineId}
+          onUpdateSiegeMachineLevel={updateSiegeMachineLevel}
         />
       </section>
     </main>

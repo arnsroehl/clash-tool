@@ -70,6 +70,21 @@ type HeroLevelUpsertRow = {
   hitpoints: number;
 };
 
+type LaboratoryUpsertRow = HeroUpsertRow;
+
+type LaboratoryLevelUpsertRow = {
+  troop_id?: string;
+  spell_id?: string;
+  siege_machine_id?: string;
+  level: number;
+  town_hall_level: number;
+  upgrade_time_hours: number;
+  gold_cost: number;
+  elixir_cost: number;
+  dark_elixir_cost: number;
+  hitpoints: number;
+};
+
 type ExistingBuildingRow = {
   id: string;
   name: string;
@@ -82,6 +97,12 @@ type ExistingHeroRow = {
 
 const BUILDINGS_FILE = path.join(process.cwd(), "src/data/buildings.json");
 const HEROES_FILE = path.join(process.cwd(), "src/data/heroes.json");
+const TROOPS_FILE = path.join(process.cwd(), "src/data/troops.json");
+const SPELLS_FILE = path.join(process.cwd(), "src/data/spells.json");
+const SIEGE_MACHINES_FILE = path.join(
+  process.cwd(),
+  "src/data/siege-machines.json",
+);
 const ENV_FILE = path.join(process.cwd(), ".env.local");
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -312,6 +333,13 @@ function validateHeroes(value: unknown): GameHero[] {
   return heroes;
 }
 
+function isMissingTableErrorMessage(message: string): boolean {
+  return (
+    message.includes("Could not find the table") ||
+    message.includes("does not exist")
+  );
+}
+
 async function readBuildings(): Promise<GameBuilding[]> {
   const fileContent = await readFile(BUILDINGS_FILE, "utf8");
   const parsedJson: unknown = JSON.parse(fileContent);
@@ -321,6 +349,13 @@ async function readBuildings(): Promise<GameBuilding[]> {
 
 async function readHeroes(): Promise<GameHero[]> {
   const fileContent = await readFile(HEROES_FILE, "utf8");
+  const parsedJson: unknown = JSON.parse(fileContent);
+
+  return validateHeroes(parsedJson);
+}
+
+async function readGameItems(filePath: string): Promise<GameHero[]> {
+  const fileContent = await readFile(filePath, "utf8");
   const parsedJson: unknown = JSON.parse(fileContent);
 
   return validateHeroes(parsedJson);
@@ -368,7 +403,7 @@ function resolveBuildingId(
 async function resolveHeroIds(
   supabase: ReturnType<typeof createScriptSupabaseClient>,
   heroes: GameHero[],
-): Promise<Map<string, string>> {
+): Promise<Map<string, string> | null> {
   const heroNames = heroes.map((hero) => hero.name);
   const { data, error } = await supabase
     .from("heroes")
@@ -376,6 +411,13 @@ async function resolveHeroIds(
     .in("name", heroNames);
 
   if (error) {
+    if (isMissingTableErrorMessage(error.message)) {
+      console.log(
+        "Überspringe heroes: Tabelle fehlt. SQL-Datei: src/scripts/sql/heroes.sql",
+      );
+      return null;
+    }
+
     throw new Error(`Bestehende Helden konnten nicht gelesen werden: ${error.message}`);
   }
 
@@ -459,6 +501,147 @@ function toHeroLevelRows(
   );
 }
 
+function toLaboratoryRows(
+  items: GameHero[],
+  existingItemIds: Map<string, string>,
+): LaboratoryUpsertRow[] {
+  return items.map((item) => ({
+    id: resolveHeroId(item, existingItemIds),
+    name: item.name,
+    category: item.category,
+    unlock_town_hall_level: item.unlockTownHall,
+    max_level: Math.max(...item.levels.map((level) => level.level)),
+    sort_order: item.sortOrder,
+  }));
+}
+
+function toLaboratoryLevelRows(params: {
+  items: GameHero[];
+  existingItemIds: Map<string, string>;
+  foreignKey: "troop_id" | "spell_id" | "siege_machine_id";
+}): LaboratoryLevelUpsertRow[] {
+  return params.items.flatMap((item) =>
+    item.levels.map((level) => ({
+      [params.foreignKey]: resolveHeroId(item, params.existingItemIds),
+      level: level.level,
+      town_hall_level: level.townHall,
+      upgrade_time_hours: level.upgradeTimeHours,
+      gold_cost: level.goldCost,
+      elixir_cost: level.elixirCost,
+      dark_elixir_cost: level.darkElixirCost,
+      hitpoints: level.hitpoints,
+    })),
+  );
+}
+
+async function resolveGenericItemIds(params: {
+  supabase: ReturnType<typeof createScriptSupabaseClient>;
+  tableName: string;
+  items: GameHero[];
+  sqlFile: string;
+}): Promise<Map<string, string> | null> {
+  const itemNames = params.items.map((item) => item.name);
+  const { data, error } = await params.supabase
+    .from(params.tableName)
+    .select("id, name")
+    .in("name", itemNames);
+
+  if (error) {
+    if (isMissingTableErrorMessage(error.message)) {
+      console.log(
+        `Überspringe ${params.tableName}: Tabelle fehlt. SQL-Datei: ${params.sqlFile}`,
+      );
+      return null;
+    }
+
+    throw new Error(
+      `Bestehende Daten aus ${params.tableName} konnten nicht gelesen werden: ${error.message}`,
+    );
+  }
+
+  return ((data || []) as ExistingHeroRow[]).reduce<Map<string, string>>(
+    (itemIds, row) => {
+      itemIds.set(row.name, row.id);
+      return itemIds;
+    },
+    new Map<string, string>(),
+  );
+}
+
+async function importLaboratoryItems(params: {
+  supabase: ReturnType<typeof createScriptSupabaseClient>;
+  label: string;
+  filePath: string;
+  tableName: string;
+  levelTableName: string;
+  foreignKey: "troop_id" | "spell_id" | "siege_machine_id";
+  levelConflict: string;
+  sqlFile: string;
+}): Promise<void> {
+  console.log(`Lese und validiere ${params.filePath.replace(process.cwd() + "/", "")}...`);
+  const items = await readGameItems(params.filePath);
+  const totalLevelCount = items.reduce(
+    (count, item) => count + item.levels.length,
+    0,
+  );
+
+  console.log(
+    `Validierung erfolgreich: ${items.length} ${params.label}, ${totalLevelCount} Level.`,
+  );
+
+  const existingItemIds = await resolveGenericItemIds({
+    supabase: params.supabase,
+    tableName: params.tableName,
+    items,
+    sqlFile: params.sqlFile,
+  });
+
+  if (!existingItemIds) {
+    return;
+  }
+
+  const itemRows = toLaboratoryRows(items, existingItemIds);
+  const levelRows = toLaboratoryLevelRows({
+    items,
+    existingItemIds,
+    foreignKey: params.foreignKey,
+  });
+
+  console.log(`Upsert ${params.tableName}...`);
+  const { error: itemError } = await params.supabase
+    .from(params.tableName)
+    .upsert(itemRows, { onConflict: "id" });
+
+  if (itemError) {
+    if (isMissingTableErrorMessage(itemError.message)) {
+      console.log(
+        `Überspringe ${params.tableName}: Tabelle fehlt. SQL-Datei: ${params.sqlFile}`,
+      );
+      return;
+    }
+
+    throw new Error(`${params.tableName} Import fehlgeschlagen: ${itemError.message}`);
+  }
+
+  console.log(`Upsert ${params.levelTableName}...`);
+  const { error: levelError } = await params.supabase
+    .from(params.levelTableName)
+    .upsert(levelRows, { onConflict: params.levelConflict });
+
+  if (levelError) {
+    if (isMissingTableErrorMessage(levelError.message)) {
+      console.log(
+        `Überspringe ${params.levelTableName}: Tabelle fehlt. SQL-Datei: ${params.sqlFile}`,
+      );
+      return;
+    }
+
+    throw new Error(
+      `${params.levelTableName} Import fehlgeschlagen: ${levelError.message}`,
+    );
+  }
+}
+
 async function runImport() {
   console.log("Lade lokale Supabase-Konfiguration...");
   await loadLocalEnv();
@@ -525,6 +708,9 @@ async function runImport() {
 
   console.log("Prüfe bestehende Helden...");
   const existingHeroIds = await resolveHeroIds(supabase, heroes);
+  if (!existingHeroIds) {
+    console.log("Hero-Import übersprungen.");
+  } else {
   const heroRows = toHeroRows(heroes, existingHeroIds);
   const heroLevelRows = toHeroLevelRows(heroes, existingHeroIds);
 
@@ -538,19 +724,65 @@ async function runImport() {
     .upsert(heroRows, { onConflict: "id" });
 
   if (heroesError) {
+    if (isMissingTableErrorMessage(heroesError.message)) {
+      console.log(
+        "Überspringe heroes: Tabelle fehlt. SQL-Datei: src/scripts/sql/heroes.sql",
+      );
+    } else {
     throw new Error(`heroes Import fehlgeschlagen: ${heroesError.message}`);
+    }
+  } else {
+    console.log("Upsert hero_levels...");
+    const { error: heroLevelsError } = await supabase
+      .from("hero_levels")
+      .upsert(heroLevelRows, { onConflict: "hero_id,level" });
+
+    if (heroLevelsError) {
+      if (isMissingTableErrorMessage(heroLevelsError.message)) {
+        console.log(
+          "Überspringe hero_levels: Tabelle fehlt. SQL-Datei: src/scripts/sql/heroes.sql",
+        );
+      } else {
+        throw new Error(
+          `hero_levels Import fehlgeschlagen: ${heroLevelsError.message}`,
+        );
+      }
+    }
+  }
   }
 
-  console.log("Upsert hero_levels...");
-  const { error: heroLevelsError } = await supabase
-    .from("hero_levels")
-    .upsert(heroLevelRows, { onConflict: "hero_id,level" });
+  await importLaboratoryItems({
+    supabase,
+    label: "Truppen",
+    filePath: TROOPS_FILE,
+    tableName: "troops",
+    levelTableName: "troop_levels",
+    foreignKey: "troop_id",
+    levelConflict: "troop_id,level",
+    sqlFile: "src/scripts/sql/troops.sql",
+  });
 
-  if (heroLevelsError) {
-    throw new Error(
-      `hero_levels Import fehlgeschlagen: ${heroLevelsError.message}`,
-    );
-  }
+  await importLaboratoryItems({
+    supabase,
+    label: "Zauber",
+    filePath: SPELLS_FILE,
+    tableName: "spells",
+    levelTableName: "spell_levels",
+    foreignKey: "spell_id",
+    levelConflict: "spell_id,level",
+    sqlFile: "src/scripts/sql/spells.sql",
+  });
+
+  await importLaboratoryItems({
+    supabase,
+    label: "Belagerungsmaschinen",
+    filePath: SIEGE_MACHINES_FILE,
+    tableName: "siege_machines",
+    levelTableName: "siege_machine_levels",
+    foreignKey: "siege_machine_id",
+    levelConflict: "siege_machine_id,level",
+    sqlFile: "src/scripts/sql/siege-machines.sql",
+  });
 
   console.log("Game-Data-Import erfolgreich abgeschlossen.");
 }

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "11111111-aaaa-4111-8111-aaaaaaaaaaaa",
+    "name": "Barbar",
+    "category": "Truppe",
+    "unlockTownHall": 1,
+    "sortOrder": 10,
+    "levels": [
+      { "level": 1, "townHall": 1, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 45 },
+      { "level": 2, "townHall": 3, "upgradeTimeHours": 6, "goldCost": 0, "elixirCost": 50000, "darkElixirCost": 0, "hitpoints": 54 }
+    ]
+  },
+  {
+    "id": "22222222-aaaa-4222-8222-aaaaaaaaaaaa",
+    "name": "Bogenschützin",
+    "category": "Truppe",
+    "unlockTownHall": 1,
+    "sortOrder": 20,
+    "levels": [
+      { "level": 1, "townHall": 1, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 20 },
+      { "level": 2, "townHall": 3, "upgradeTimeHours": 6, "goldCost": 0, "elixirCost": 80000, "darkElixirCost": 0, "hitpoints": 23 }
+    ]
+  },
+  {
+    "id": "33333333-aaaa-4333-8333-aaaaaaaaaaaa",
+    "name": "Riese",
+    "category": "Truppe",
+    "unlockTownHall": 2,
+    "sortOrder": 30,
+    "levels": [
+      { "level": 1, "townHall": 2, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 300 },
+      { "level": 2, "townHall": 4, "upgradeTimeHours": 12, "goldCost": 0, "elixirCost": 150000, "darkElixirCost": 0, "hitpoints": 360 }
+    ]
+  }
+]

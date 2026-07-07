@@ -1,0 +1,24 @@
+[
+  {
+    "id": "44444444-bbbb-4444-8444-bbbbbbbbbbbb",
+    "name": "Blitzzauber",
+    "category": "Zauber",
+    "unlockTownHall": 5,
+    "sortOrder": 10,
+    "levels": [
+      { "level": 1, "townHall": 5, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 0 },
+      { "level": 2, "townHall": 5, "upgradeTimeHours": 12, "goldCost": 0, "elixirCost": 200000, "darkElixirCost": 0, "hitpoints": 0 }
+    ]
+  },
+  {
+    "id": "55555555-bbbb-4555-8555-bbbbbbbbbbbb",
+    "name": "Heilzauber",
+    "category": "Zauber",
+    "unlockTownHall": 6,
+    "sortOrder": 20,
+    "levels": [
+      { "level": 1, "townHall": 6, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 0 },
+      { "level": 2, "townHall": 6, "upgradeTimeHours": 18, "goldCost": 0, "elixirCost": 300000, "darkElixirCost": 0, "hitpoints": 0 }
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "66666666-cccc-4666-8666-cccccccccccc",
+    "name": "Mauerbrecher",
+    "category": "Belagerungsmaschine",
+    "unlockTownHall": 12,
+    "sortOrder": 10,
+    "levels": [
+      { "level": 1, "townHall": 12, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 3500 },
+      { "level": 2, "townHall": 12, "upgradeTimeHours": 24, "goldCost": 0, "elixirCost": 5000000, "darkElixirCost": 0, "hitpoints": 3800 }
+    ]
+  },
+  {
+    "id": "77777777-cccc-4777-8777-cccccccccccc",
+    "name": "Kampfzeppelin",
+    "category": "Belagerungsmaschine",
+    "unlockTownHall": 12,
+    "sortOrder": 20,
+    "levels": [
+      { "level": 1, "townHall": 12, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 3000 },
+      { "level": 2, "townHall": 12, "upgradeTimeHours": 24, "goldCost": 0, "elixirCost": 5000000, "darkElixirCost": 0, "hitpoints": 3300 }
+    ]
+  }
+]
