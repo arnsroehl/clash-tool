@@ -2,45 +2,12 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-
-type ClashAccount = {
-  id: string;
-  name: string;
-  townHallLevel: number;
-  builderCount: number;
-  createdAt: string;
-};
-
-type AccountRow = {
-  id: string;
-  name: string;
-  town_hall_level: number;
-  builder_count: number;
-  created_at: string;
-};
-
-type Building = {
-  id: string;
-  name: string;
-  category: string;
-  unlockTownHallLevel: number;
-  maxLevel: number;
-  sortOrder: number;
-};
-
-type BuildingRow = {
-  id: string;
-  name: string;
-  category: string;
-  unlock_town_hall_level: number;
-  max_level: number;
-  sort_order: number;
-};
-
-type AccountBuildingRow = {
-  building_id: string;
-  current_level: number;
-};
+import type { AccountRow, ClashAccount } from "@/types/account";
+import type {
+  AccountBuildingRow,
+  Building,
+  BuildingRow,
+} from "@/types/building";
 
 const nextSteps = [
   "Mehr echte Gebäude eintragen",
