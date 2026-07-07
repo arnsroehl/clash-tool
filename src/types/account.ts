@@ -6,6 +6,12 @@ export type ClashAccount = {
   createdAt: string;
 };
 
+export type AccountFormValues = {
+  name: string;
+  townHallLevel: number;
+  builderCount: number;
+};
+
 export type AccountRow = {
   id: string;
   name: string;

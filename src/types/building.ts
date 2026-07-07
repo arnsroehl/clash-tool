@@ -20,3 +20,5 @@ export type AccountBuildingRow = {
   building_id: string;
   current_level: number;
 };
+
+export type BuildingLevelMap = Record<string, number>;
