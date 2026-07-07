@@ -160,6 +160,7 @@ export function useSiegeMachines({
   return {
     siegeMachines,
     availableSiegeMachines,
+    siegeMachineMaxLevels,
     siegeMachineLevels,
     progress,
     isLoadingSiegeMachines,

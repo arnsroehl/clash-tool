@@ -170,6 +170,7 @@ export function useBuildings({
   return {
     buildings,
     availableBuildings,
+    buildingMaxLevels,
     buildingLevels,
     progress,
     isLoadingBuildings,

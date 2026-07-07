@@ -140,6 +140,7 @@ export function useTroops({
   return {
     troops,
     availableTroops,
+    troopMaxLevels,
     troopLevels,
     progress,
     isLoadingTroops,

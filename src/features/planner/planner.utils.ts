@@ -11,8 +11,8 @@ import {
 import type {
   BuilderAvailability,
   BuildingProgress,
-  PlannerBuilding,
-  PlannerBuildingLevels,
+  PlannerItem,
+  PlannerItemLevels,
   PlannerUpgradeLevel,
   PriorityScore,
   UpgradeCandidate,
@@ -22,24 +22,24 @@ import type {
 
 /** Returns the stored account level for a building, defaulting to level 0. */
 export function getCurrentBuildingLevel(
-  buildingId: string,
-  buildingLevels: PlannerBuildingLevels,
+  itemId: string,
+  itemLevels: PlannerItemLevels,
 ): number {
-  return buildingLevels[buildingId] || ZERO_LEVEL;
+  return itemLevels[itemId] || ZERO_LEVEL;
 }
 
-/** Calculates how many levels are still missing for one building. */
+/** Calculates how many levels are still missing for one planner item. */
 export function calculateRemainingLevelsForBuilding(
-  building: PlannerBuilding,
+  building: PlannerItem,
   currentLevel: number,
 ): number {
   return Math.max(building.maxLevel - currentLevel, ZERO_LEVEL);
 }
 
-/** Calculates missing levels across all buildings in the input set. */
+/** Calculates missing levels across all planner items in the input set. */
 export function calculateRemainingLevels(
-  buildings: PlannerBuilding[],
-  buildingLevels: PlannerBuildingLevels,
+  buildings: PlannerItem[],
+  buildingLevels: PlannerItemLevels,
 ): number {
   return buildings.reduce((remainingLevels, building) => {
     return (
@@ -68,8 +68,8 @@ export function calculateCompletionPercentage(
 
 /** Builds progress records for every building without applying priority logic. */
 export function calculateProgress(
-  buildings: PlannerBuilding[],
-  buildingLevels: PlannerBuildingLevels,
+  buildings: PlannerItem[],
+  buildingLevels: PlannerItemLevels,
 ): BuildingProgress[] {
   return buildings.map((building) => {
     const currentLevel = getCurrentBuildingLevel(building.id, buildingLevels);
@@ -112,24 +112,24 @@ export function calculateProgressPercent(progress: BuildingProgress[]): number {
 
 /** Returns all level metadata for a building after the current account level. */
 export function getRemainingUpgradeLevels(
-  buildingId: string,
+  itemId: string,
   currentLevel: number,
   upgradeLevels: PlannerUpgradeLevel[],
 ): PlannerUpgradeLevel[] {
   return upgradeLevels.filter((level) => {
-    return level.buildingId === buildingId && level.level > currentLevel;
+    return level.itemId === itemId && level.level > currentLevel;
   });
 }
 
 /** Finds the immediate next level metadata for a building, if game data exists. */
 export function getNextUpgradeLevel(
-  buildingId: string,
+  itemId: string,
   nextLevel: number,
   upgradeLevels: PlannerUpgradeLevel[],
 ): PlannerUpgradeLevel | null {
   return (
     upgradeLevels.find((level) => {
-      return level.buildingId === buildingId && level.level === nextLevel;
+      return level.itemId === itemId && level.level === nextLevel;
     }) || null
   );
 }
@@ -211,16 +211,41 @@ export function calculateBuilderUsage(
 
 /** Provides a deterministic placeholder priority score for future ranking. */
 export function calculatePriorityScore(params: {
+  itemType?: string;
+  name?: string;
+  category?: string;
   currentLevel: number;
   missingLevels: number;
 }): PriorityScore {
+  const normalizedName = (params.name || "").toLowerCase();
+  const normalizedCategory = (params.category || "").toLowerCase();
+  const itemType = params.itemType || "building";
+  const typeBonus =
+    itemType === "troop" || itemType === "spell" || itemType === "siege_machine"
+      ? 35
+      : 0;
+  const heroBonus = itemType === "hero" ? 35 : 0;
+  const keyBuildingBonus =
+    normalizedName.includes("rathaus") ||
+    normalizedName.includes("town hall") ||
+    normalizedName.includes("clanburg") ||
+    normalizedName.includes("clan castle")
+      ? 35
+      : 0;
+  const defenseBonus = normalizedCategory.includes("verteidigung") ? 15 : 0;
+  const resourcePenalty = normalizedCategory.includes("ressource") ? -10 : 0;
   const rawScore =
     DEFAULT_PRIORITY * PRIORITY_WEIGHTS.default +
     params.missingLevels * PRIORITY_WEIGHTS.missingLevels -
-    params.currentLevel * PRIORITY_WEIGHTS.lowCurrentLevel;
+    params.currentLevel * PRIORITY_WEIGHTS.lowCurrentLevel +
+    typeBonus +
+    heroBonus +
+    keyBuildingBonus +
+    defenseBonus +
+    resourcePenalty;
 
   return {
     value: Math.min(Math.max(rawScore, MIN_PRIORITY), MAX_PRIORITY),
-    reasons: ["Basis-Priorität ohne intelligente Gewichtung."],
+    reasons: ["Priorität v1 aus Typ, Kategorie und fehlenden Leveln."],
   };
 }

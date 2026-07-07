@@ -31,11 +31,11 @@ export const TownHallRule: PlannerRule = {
   id: "town-hall",
   name: RULE_NAMES["town-hall"],
   enabledByDefault: true,
-  evaluate: ({ account, building }: RuleContext) => {
-    if (building.unlockTownHallLevel > account.townHallLevel) {
+  evaluate: ({ account, item }: RuleContext) => {
+    if (item.unlockTownHallLevel > account.townHallLevel) {
       return createBlockingResult(
         "town-hall",
-        `${building.name} wird erst ab Rathaus ${building.unlockTownHallLevel} freigeschaltet.`,
+        `${item.name} wird erst ab Rathaus ${item.unlockTownHallLevel} freigeschaltet.`,
       );
     }
 

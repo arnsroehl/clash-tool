@@ -171,6 +171,7 @@ export function useHeroes({
   return {
     heroes,
     availableHeroes,
+    heroMaxLevels,
     heroLevels,
     progress,
     isLoadingHeroes,

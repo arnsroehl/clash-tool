@@ -20,12 +20,22 @@ export type BuildingLevel = {
   buildingId: string;
   level: number;
   townHallLevel: number;
+  upgradeTimeHours: number;
+  goldCost: number;
+  elixirCost: number;
+  darkElixirCost: number;
+  hitpoints: number;
 };
 
 export type BuildingLevelRow = {
   building_id: string;
   level: number;
   town_hall_level: number;
+  upgrade_time_hours: number;
+  gold_cost: number;
+  elixir_cost: number;
+  dark_elixir_cost: number;
+  hitpoints: number;
 };
 
 export type AccountBuildingRow = {

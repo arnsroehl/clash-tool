@@ -20,12 +20,22 @@ export type HeroLevel = {
   heroId: string;
   level: number;
   townHallLevel: number;
+  upgradeTimeHours: number;
+  goldCost: number;
+  elixirCost: number;
+  darkElixirCost: number;
+  hitpoints: number;
 };
 
 export type HeroLevelRow = {
   hero_id: string;
   level: number;
   town_hall_level: number;
+  upgrade_time_hours: number;
+  gold_cost: number;
+  elixir_cost: number;
+  dark_elixir_cost: number;
+  hitpoints: number;
 };
 
 export type AccountHero = {

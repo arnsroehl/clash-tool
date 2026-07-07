@@ -5,6 +5,22 @@ type UpgradeRecommendationsProps = {
   plannerResult: PlannerResult | null;
 };
 
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat("de-DE").format(value);
+}
+
+function formatType(type: string): string {
+  const labels: Record<string, string> = {
+    building: "Gebäude",
+    hero: "Held",
+    troop: "Truppe",
+    spell: "Zauber",
+    siege_machine: "Belagerung",
+  };
+
+  return labels[type] || type;
+}
+
 export function UpgradeRecommendations({
   plannerResult,
 }: UpgradeRecommendationsProps) {
@@ -33,11 +49,18 @@ export function UpgradeRecommendations({
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="font-bold text-white">
-                    {recommendation.buildingName}
+                    {recommendation.name}
                   </p>
                   <p className="mt-1 text-sm text-slate-400">
-                    Level {recommendation.currentLevel} auf{" "}
-                    {recommendation.nextLevel}
+                    {formatType(recommendation.itemType)} · Level{" "}
+                    {recommendation.currentLevel} auf {recommendation.nextLevel}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Gold {formatNumber(recommendation.nextLevelCosts.gold)} ·
+                    Elixier{" "}
+                    {formatNumber(recommendation.nextLevelCosts.elixir)} · DE{" "}
+                    {formatNumber(recommendation.nextLevelCosts.darkElixir)} ·{" "}
+                    {formatNumber(recommendation.nextLevelTime.hours)} h
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/5 px-4 py-2 text-sm font-bold text-amber-300">

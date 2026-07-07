@@ -19,11 +19,21 @@ type LaboratoryEntityRow = {
 type LaboratoryLevel = {
   level: number;
   townHallLevel: number;
+  upgradeTimeHours: number;
+  goldCost: number;
+  elixirCost: number;
+  darkElixirCost: number;
+  hitpoints: number;
 };
 
 type LaboratoryLevelRow = {
   level: number;
   town_hall_level: number;
+  upgrade_time_hours: number;
+  gold_cost: number;
+  elixir_cost: number;
+  dark_elixir_cost: number;
+  hitpoints: number;
 };
 
 type AccountLaboratoryItem = {

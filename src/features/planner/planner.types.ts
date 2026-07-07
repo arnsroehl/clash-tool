@@ -11,6 +11,25 @@ export type PlannerBuilding = Building;
 
 export type PlannerBuildingLevels = BuildingLevelMap;
 
+export type PlannerItemType =
+  | "building"
+  | "hero"
+  | "troop"
+  | "spell"
+  | "siege_machine";
+
+export type PlannerItem = {
+  id: string;
+  type: PlannerItemType;
+  name: string;
+  category: string;
+  unlockTownHallLevel: number;
+  maxLevel: number;
+  sortOrder: number;
+};
+
+export type PlannerItemLevels = Record<string, number>;
+
 export type ResourceType = "gold" | "elixir" | "darkElixir";
 
 export type PlannerRuleId =
@@ -65,7 +84,9 @@ export type UpgradeQueue = {
 };
 
 export type PlannerUpgradeLevel = {
-  buildingId: string;
+  itemId: string;
+  itemType: PlannerItemType;
+  buildingId?: string;
   level: number;
   townHallLevel: number;
   costs: UpgradeCosts;
@@ -83,7 +104,8 @@ export type BuildingProgress = {
 
 export type RuleContext = {
   account: PlannerAccount;
-  building: PlannerBuilding;
+  item: PlannerItem;
+  building: PlannerItem;
   currentLevel: number;
   nextLevel: number;
   resourceSnapshot: ResourceSnapshot;
@@ -106,6 +128,9 @@ export type PlannerRule = {
 };
 
 export type UpgradeCandidate = {
+  itemId: string;
+  itemType: PlannerItemType;
+  name: string;
   buildingId: string;
   buildingName: string;
   category: string;
@@ -128,8 +153,10 @@ export type UpgradeRecommendation = UpgradeCandidate & {
 
 export type PlannerInput = {
   account: PlannerAccount;
-  buildings: PlannerBuilding[];
-  buildingLevels: PlannerBuildingLevels;
+  buildings?: PlannerBuilding[];
+  buildingLevels?: PlannerBuildingLevels;
+  items?: PlannerItem[];
+  itemLevels?: PlannerItemLevels;
   upgradeLevels?: PlannerUpgradeLevel[];
   resourceSnapshot?: ResourceSnapshot;
   builderAvailability?: BuilderAvailability;
@@ -138,6 +165,7 @@ export type PlannerInput = {
 };
 
 export type PlannerSummary = {
+  totalItems: number;
   totalBuildings: number;
   possibleUpgradeCount: number;
   blockedUpgradeCount: number;

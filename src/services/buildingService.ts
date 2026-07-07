@@ -10,7 +10,8 @@ import type {
 
 const BUILDING_SELECT_FIELDS =
   "id, name, category, unlock_town_hall_level, max_level, sort_order";
-const BUILDING_LEVEL_SELECT_FIELDS = "building_id, level, town_hall_level";
+const BUILDING_LEVEL_SELECT_FIELDS =
+  "building_id, level, town_hall_level, upgrade_time_hours, gold_cost, elixir_cost, dark_elixir_cost, hitpoints";
 
 function mapBuilding(row: BuildingRow): Building {
   return {
@@ -28,6 +29,11 @@ function mapBuildingLevel(row: BuildingLevelRow): BuildingLevel {
     buildingId: row.building_id,
     level: row.level,
     townHallLevel: row.town_hall_level,
+    upgradeTimeHours: row.upgrade_time_hours,
+    goldCost: row.gold_cost,
+    elixirCost: row.elixir_cost,
+    darkElixirCost: row.dark_elixir_cost,
+    hitpoints: row.hitpoints,
   };
 }
 

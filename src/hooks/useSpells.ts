@@ -140,6 +140,7 @@ export function useSpells({
   return {
     spells,
     availableSpells,
+    spellMaxLevels,
     spellLevels,
     progress,
     isLoadingSpells,

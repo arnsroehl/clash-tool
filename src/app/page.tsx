@@ -19,7 +19,63 @@ import { useSiegeMachines } from "@/hooks/useSiegeMachines";
 import { useSpells } from "@/hooks/useSpells";
 import { useTroops } from "@/hooks/useTroops";
 import type { StatCard } from "@/components/accounts/StatsCards";
-import type { PlannerResult } from "@/features/planner/planner.types";
+import type {
+  PlannerItem,
+  PlannerItemLevels,
+  PlannerResult,
+  PlannerUpgradeLevel,
+} from "@/features/planner/planner.types";
+import type { Building, BuildingLevel } from "@/types/building";
+import type { Hero, HeroLevel } from "@/types/hero";
+import type {
+  SiegeMachine,
+  SiegeMachineLevel,
+  Spell,
+  SpellLevel,
+  Troop,
+  TroopLevel,
+} from "@/types/laboratory";
+
+function toPlannerItems<TItem extends { id: string } & Omit<PlannerItem, "type">>(
+  items: TItem[],
+  type: PlannerItem["type"],
+): PlannerItem[] {
+  return items.map((item) => ({
+    ...item,
+    type,
+  }));
+}
+
+function toPlannerUpgradeLevel(params: {
+  itemId: string;
+  itemType: PlannerItem["type"];
+  level: number;
+  townHallLevel: number;
+  upgradeTimeHours: number;
+  goldCost: number;
+  elixirCost: number;
+  darkElixirCost: number;
+}): PlannerUpgradeLevel {
+  return {
+    itemId: params.itemId,
+    itemType: params.itemType,
+    buildingId: params.itemId,
+    level: params.level,
+    townHallLevel: params.townHallLevel,
+    costs: {
+      gold: params.goldCost,
+      elixir: params.elixirCost,
+      darkElixir: params.darkElixirCost,
+    },
+    time: {
+      hours: params.upgradeTimeHours,
+    },
+  };
+}
+
+function mergeLevelMaps(...levelMaps: PlannerItemLevels[]): PlannerItemLevels {
+  return Object.assign({}, ...levelMaps);
+}
 
 export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -45,6 +101,7 @@ export default function Home() {
   const {
     buildings,
     availableBuildings,
+    buildingMaxLevels,
     buildingLevels,
     progress,
     isLoadingBuildings,
@@ -59,6 +116,7 @@ export default function Home() {
   const {
     heroes,
     availableHeroes,
+    heroMaxLevels,
     heroLevels,
     progress: heroProgress,
     isLoadingHeroes,
@@ -73,6 +131,7 @@ export default function Home() {
   const {
     troops,
     availableTroops,
+    troopMaxLevels,
     troopLevels,
     progress: troopProgress,
     isLoadingTroops,
@@ -87,6 +146,7 @@ export default function Home() {
   const {
     spells,
     availableSpells,
+    spellMaxLevels,
     spellLevels,
     progress: spellProgress,
     isLoadingSpells,
@@ -101,6 +161,7 @@ export default function Home() {
   const {
     siegeMachines,
     availableSiegeMachines,
+    siegeMachineMaxLevels,
     siegeMachineLevels,
     progress: siegeMachineProgress,
     isLoadingSiegeMachines,
@@ -143,12 +204,85 @@ export default function Home() {
       return null;
     }
 
+    const plannerItems = [
+      ...toPlannerItems<Building>(availableBuildings, "building"),
+      ...toPlannerItems<Hero>(availableHeroes, "hero"),
+      ...toPlannerItems<Troop>(availableTroops, "troop"),
+      ...toPlannerItems<Spell>(availableSpells, "spell"),
+      ...toPlannerItems<SiegeMachine>(
+        availableSiegeMachines,
+        "siege_machine",
+      ),
+    ];
+    const plannerLevels = mergeLevelMaps(
+      buildingLevels,
+      heroLevels,
+      troopLevels,
+      spellLevels,
+      siegeMachineLevels,
+    );
+    const plannerUpgradeLevels: PlannerUpgradeLevel[] = [
+      ...buildingMaxLevels.map((level: BuildingLevel) =>
+        toPlannerUpgradeLevel({
+          itemId: level.buildingId,
+          itemType: "building",
+          ...level,
+        }),
+      ),
+      ...heroMaxLevels.map((level: HeroLevel) =>
+        toPlannerUpgradeLevel({
+          itemId: level.heroId,
+          itemType: "hero",
+          ...level,
+        }),
+      ),
+      ...troopMaxLevels.map((level: TroopLevel) =>
+        toPlannerUpgradeLevel({
+          itemId: level.troopId,
+          itemType: "troop",
+          ...level,
+        }),
+      ),
+      ...spellMaxLevels.map((level: SpellLevel) =>
+        toPlannerUpgradeLevel({
+          itemId: level.spellId,
+          itemType: "spell",
+          ...level,
+        }),
+      ),
+      ...siegeMachineMaxLevels.map((level: SiegeMachineLevel) =>
+        toPlannerUpgradeLevel({
+          itemId: level.siegeMachineId,
+          itemType: "siege_machine",
+          ...level,
+        }),
+      ),
+    ];
+
     return planUpgrades({
       account: selectedAccount,
-      buildings: availableBuildings,
-      buildingLevels,
+      items: plannerItems,
+      itemLevels: plannerLevels,
+      upgradeLevels: plannerUpgradeLevels,
     });
-  }, [availableBuildings, buildingLevels, selectedAccount]);
+  }, [
+    availableBuildings,
+    availableHeroes,
+    availableSiegeMachines,
+    availableSpells,
+    availableTroops,
+    buildingLevels,
+    buildingMaxLevels,
+    heroLevels,
+    heroMaxLevels,
+    siegeMachineLevels,
+    siegeMachineMaxLevels,
+    selectedAccount,
+    spellLevels,
+    spellMaxLevels,
+    troopLevels,
+    troopMaxLevels,
+  ]);
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
