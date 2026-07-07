@@ -5,9 +5,15 @@ import { AccountForm } from "@/components/accounts/AccountForm";
 import { AccountList } from "@/components/accounts/AccountList";
 import { StatsCards } from "@/components/accounts/StatsCards";
 import { BuildingList } from "@/components/buildings/BuildingList";
+import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
+import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
+import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
+import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
+import { planUpgrades } from "@/features/planner/planner.service";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useBuildings } from "@/hooks/useBuildings";
 import type { StatCard } from "@/components/accounts/StatsCards";
+import type { PlannerResult } from "@/features/planner/planner.types";
 
 export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -66,6 +72,18 @@ export default function Home() {
     [availableBuildings.length, progress, selectedAccount],
   );
 
+  const plannerResult = useMemo<PlannerResult | null>(() => {
+    if (!selectedAccount) {
+      return null;
+    }
+
+    return planUpgrades({
+      account: selectedAccount,
+      buildings: availableBuildings,
+      buildingLevels,
+    });
+  }, [availableBuildings, buildingLevels, selectedAccount]);
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <section className="mx-auto flex max-w-6xl flex-col gap-10">
@@ -87,6 +105,18 @@ export default function Home() {
         </div>
 
         <StatsCards stats={stats} />
+
+        <DashboardSummary
+          selectedAccount={selectedAccount}
+          plannerResult={plannerResult}
+        />
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <ProgressOverview plannerResult={plannerResult} />
+          <UpgradeRecommendations plannerResult={plannerResult} />
+        </div>
+
+        <ResourceSummary plannerResult={plannerResult} />
 
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <section className="flex flex-col gap-6">
