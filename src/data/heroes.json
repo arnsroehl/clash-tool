@@ -1,0 +1,137 @@
+[
+  {
+    "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    "name": "Barbarenkönig",
+    "category": "Held",
+    "unlockTownHall": 7,
+    "sortOrder": 10,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 7,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 10000,
+        "hitpoints": 1700
+      },
+      {
+        "level": 2,
+        "townHall": 7,
+        "upgradeTimeHours": 4,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 12500,
+        "hitpoints": 1742
+      }
+    ]
+  },
+  {
+    "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    "name": "Bogenschützenkönigin",
+    "category": "Held",
+    "unlockTownHall": 9,
+    "sortOrder": 20,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 20000,
+        "hitpoints": 725
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 22500,
+        "hitpoints": 740
+      }
+    ]
+  },
+  {
+    "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+    "name": "Großer Wächter",
+    "category": "Held",
+    "unlockTownHall": 11,
+    "sortOrder": 30,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 11,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 1000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1000
+      },
+      {
+        "level": 2,
+        "townHall": 11,
+        "upgradeTimeHours": 8,
+        "goldCost": 0,
+        "elixirCost": 1250000,
+        "darkElixirCost": 0,
+        "hitpoints": 1021
+      }
+    ]
+  },
+  {
+    "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+    "name": "Königliche Meisterin",
+    "category": "Held",
+    "unlockTownHall": 13,
+    "sortOrder": 40,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 13,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 60000,
+        "hitpoints": 2950
+      },
+      {
+        "level": 2,
+        "townHall": 13,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 70000,
+        "hitpoints": 3000
+      }
+    ]
+  },
+  {
+    "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+    "name": "Minion-Prinz",
+    "category": "Held",
+    "unlockTownHall": 9,
+    "sortOrder": 50,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 15000,
+        "hitpoints": 900
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 5,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 17500,
+        "hitpoints": 925
+      }
+    ]
+  }
+]

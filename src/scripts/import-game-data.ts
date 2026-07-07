@@ -21,6 +21,15 @@ type GameBuilding = {
   levels: GameBuildingLevel[];
 };
 
+type GameHero = {
+  id: string;
+  name: string;
+  category: string;
+  unlockTownHall: number;
+  sortOrder: number;
+  levels: GameBuildingLevel[];
+};
+
 type BuildingUpsertRow = {
   id: string;
   name: string;
@@ -41,12 +50,38 @@ type BuildingLevelUpsertRow = {
   hitpoints: number;
 };
 
+type HeroUpsertRow = {
+  id: string;
+  name: string;
+  category: string;
+  unlock_town_hall_level: number;
+  max_level: number;
+  sort_order: number;
+};
+
+type HeroLevelUpsertRow = {
+  hero_id: string;
+  level: number;
+  town_hall_level: number;
+  upgrade_time_hours: number;
+  gold_cost: number;
+  elixir_cost: number;
+  dark_elixir_cost: number;
+  hitpoints: number;
+};
+
 type ExistingBuildingRow = {
   id: string;
   name: string;
 };
 
+type ExistingHeroRow = {
+  id: string;
+  name: string;
+};
+
 const BUILDINGS_FILE = path.join(process.cwd(), "src/data/buildings.json");
+const HEROES_FILE = path.join(process.cwd(), "src/data/heroes.json");
 const ENV_FILE = path.join(process.cwd(), ".env.local");
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -216,11 +251,79 @@ function validateBuildings(value: unknown): GameBuilding[] {
   return buildings;
 }
 
+function validateHero(value: unknown): GameHero {
+  if (!isRecord(value)) {
+    throw new Error("Ein Helden-Eintrag ist kein Objekt.");
+  }
+
+  const { id, name, category, unlockTownHall, sortOrder, levels } = value;
+
+  if (!isUuid(id) || !isString(name) || !isString(category)) {
+    throw new Error(
+      "Helden brauchen gültige Felder id, name und category. id muss eine UUID sein.",
+    );
+  }
+
+  if (!isPositiveInteger(unlockTownHall) || !isPositiveInteger(sortOrder)) {
+    throw new Error(`"${id}" braucht positive Felder unlockTownHall und sortOrder.`);
+  }
+
+  if (!Array.isArray(levels) || levels.length === 0) {
+    throw new Error(`"${id}" braucht mindestens ein Level.`);
+  }
+
+  const validatedLevels = levels.map((level) => validateLevel(level, id));
+  const levelNumbers = new Set<number>();
+
+  validatedLevels.forEach((level) => {
+    if (levelNumbers.has(level.level)) {
+      throw new Error(`"${id}" enthält das Level ${level.level} mehrfach.`);
+    }
+
+    levelNumbers.add(level.level);
+  });
+
+  return {
+    id,
+    name,
+    category,
+    unlockTownHall,
+    sortOrder,
+    levels: validatedLevels,
+  };
+}
+
+function validateHeroes(value: unknown): GameHero[] {
+  if (!Array.isArray(value)) {
+    throw new Error("heroes.json muss ein Array enthalten.");
+  }
+
+  const heroes = value.map(validateHero);
+  const heroIds = new Set<string>();
+
+  heroes.forEach((hero) => {
+    if (heroIds.has(hero.id)) {
+      throw new Error(`Helden-ID "${hero.id}" ist doppelt vorhanden.`);
+    }
+
+    heroIds.add(hero.id);
+  });
+
+  return heroes;
+}
+
 async function readBuildings(): Promise<GameBuilding[]> {
   const fileContent = await readFile(BUILDINGS_FILE, "utf8");
   const parsedJson: unknown = JSON.parse(fileContent);
 
   return validateBuildings(parsedJson);
+}
+
+async function readHeroes(): Promise<GameHero[]> {
+  const fileContent = await readFile(HEROES_FILE, "utf8");
+  const parsedJson: unknown = JSON.parse(fileContent);
+
+  return validateHeroes(parsedJson);
 }
 
 async function resolveBuildingIds(
@@ -262,6 +365,36 @@ function resolveBuildingId(
   return existingBuildingIds.get(building.name) || building.id;
 }
 
+async function resolveHeroIds(
+  supabase: ReturnType<typeof createScriptSupabaseClient>,
+  heroes: GameHero[],
+): Promise<Map<string, string>> {
+  const heroNames = heroes.map((hero) => hero.name);
+  const { data, error } = await supabase
+    .from("heroes")
+    .select("id, name")
+    .in("name", heroNames);
+
+  if (error) {
+    throw new Error(`Bestehende Helden konnten nicht gelesen werden: ${error.message}`);
+  }
+
+  return ((data || []) as ExistingHeroRow[]).reduce<Map<string, string>>(
+    (heroIds, row) => {
+      heroIds.set(row.name, row.id);
+      return heroIds;
+    },
+    new Map<string, string>(),
+  );
+}
+
+function resolveHeroId(
+  hero: GameHero,
+  existingHeroIds: Map<string, string>,
+): string {
+  return existingHeroIds.get(hero.name) || hero.id;
+}
+
 function toBuildingRows(
   buildings: GameBuilding[],
   existingBuildingIds: Map<string, string>,
@@ -283,6 +416,38 @@ function toBuildingLevelRows(
   return buildings.flatMap((building) =>
     building.levels.map((level) => ({
       building_id: resolveBuildingId(building, existingBuildingIds),
+      level: level.level,
+      town_hall_level: level.townHall,
+      upgrade_time_hours: level.upgradeTimeHours,
+      gold_cost: level.goldCost,
+      elixir_cost: level.elixirCost,
+      dark_elixir_cost: level.darkElixirCost,
+      hitpoints: level.hitpoints,
+    })),
+  );
+}
+
+function toHeroRows(
+  heroes: GameHero[],
+  existingHeroIds: Map<string, string>,
+): HeroUpsertRow[] {
+  return heroes.map((hero) => ({
+    id: resolveHeroId(hero, existingHeroIds),
+    name: hero.name,
+    category: hero.category,
+    unlock_town_hall_level: hero.unlockTownHall,
+    max_level: Math.max(...hero.levels.map((level) => level.level)),
+    sort_order: hero.sortOrder,
+  }));
+}
+
+function toHeroLevelRows(
+  heroes: GameHero[],
+  existingHeroIds: Map<string, string>,
+): HeroLevelUpsertRow[] {
+  return heroes.flatMap((hero) =>
+    hero.levels.map((level) => ({
+      hero_id: resolveHeroId(hero, existingHeroIds),
       level: level.level,
       town_hall_level: level.townHall,
       upgrade_time_hours: level.upgradeTimeHours,
@@ -344,6 +509,46 @@ async function runImport() {
   if (levelsError) {
     throw new Error(
       `building_levels Import fehlgeschlagen: ${levelsError.message}`,
+    );
+  }
+
+  console.log("Lese und validiere src/data/heroes.json...");
+  const heroes = await readHeroes();
+  const totalHeroLevelCount = heroes.reduce(
+    (count, hero) => count + hero.levels.length,
+    0,
+  );
+
+  console.log(
+    `Validierung erfolgreich: ${heroes.length} Helden, ${totalHeroLevelCount} Level.`,
+  );
+
+  console.log("Prüfe bestehende Helden...");
+  const existingHeroIds = await resolveHeroIds(supabase, heroes);
+  const heroRows = toHeroRows(heroes, existingHeroIds);
+  const heroLevelRows = toHeroLevelRows(heroes, existingHeroIds);
+
+  console.log(
+    `${existingHeroIds.size} vorhandene Helden erkannt, ${heroRows.length - existingHeroIds.size} neue Helden vorbereitet.`,
+  );
+
+  console.log("Upsert heroes...");
+  const { error: heroesError } = await supabase
+    .from("heroes")
+    .upsert(heroRows, { onConflict: "id" });
+
+  if (heroesError) {
+    throw new Error(`heroes Import fehlgeschlagen: ${heroesError.message}`);
+  }
+
+  console.log("Upsert hero_levels...");
+  const { error: heroLevelsError } = await supabase
+    .from("hero_levels")
+    .upsert(heroLevelRows, { onConflict: "hero_id,level" });
+
+  if (heroLevelsError) {
+    throw new Error(
+      `hero_levels Import fehlgeschlagen: ${heroLevelsError.message}`,
     );
   }
 

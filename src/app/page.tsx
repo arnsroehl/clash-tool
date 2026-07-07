@@ -9,9 +9,11 @@ import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
+import { HeroList } from "@/components/heroes/HeroList";
 import { planUpgrades } from "@/features/planner/planner.service";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useBuildings } from "@/hooks/useBuildings";
+import { useHeroes } from "@/hooks/useHeroes";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type { PlannerResult } from "@/features/planner/planner.types";
 
@@ -50,6 +52,20 @@ export default function Home() {
     clearError,
   });
 
+  const {
+    heroes,
+    availableHeroes,
+    heroLevels,
+    progress: heroProgress,
+    isLoadingHeroes,
+    isSavingHeroId,
+    updateHeroLevel,
+  } = useHeroes({
+    selectedAccount,
+    onError: handleError,
+    clearError,
+  });
+
   const stats = useMemo<StatCard[]>(
     () => [
       {
@@ -68,8 +84,12 @@ export default function Home() {
         label: "Gebäude",
         value: `${availableBuildings.length} verfügbar`,
       },
+      {
+        label: "Helden",
+        value: `${availableHeroes.length} verfügbar`,
+      },
     ],
-    [availableBuildings.length, progress, selectedAccount],
+    [availableBuildings.length, availableHeroes.length, progress, selectedAccount],
   );
 
   const plannerResult = useMemo<PlannerResult | null>(() => {
@@ -146,6 +166,17 @@ export default function Home() {
             onUpdateBuildingLevel={updateBuildingLevel}
           />
         </div>
+
+        <HeroList
+          availableHeroes={availableHeroes}
+          heroLevels={heroLevels}
+          heroesCount={heroes.length}
+          isLoadingHeroes={isLoadingHeroes}
+          isSavingHeroId={isSavingHeroId}
+          progress={heroProgress}
+          selectedAccount={selectedAccount}
+          onUpdateHeroLevel={updateHeroLevel}
+        />
       </section>
     </main>
   );
