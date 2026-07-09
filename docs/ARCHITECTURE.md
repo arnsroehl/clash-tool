@@ -18,12 +18,13 @@ Clash Tool uses a layered frontend architecture. Components receive props, hooks
 
 ```mermaid
 flowchart LR
-  Components --> Hooks
-  Hooks --> Services
+  Page[src/app/page.tsx] --> Hooks[src/hooks]
+  Hooks --> Services[src/services]
   Services --> Supabase[(Supabase)]
-  Page --> Planner
-  Planner --> Dashboard
-  DataJSON[src/data JSON] --> Importer
+  Page --> Planner[src/features/planner]
+  DecisionEngine[src/features/decision-engine] --> Planner
+  Planner --> Dashboard[src/components/dashboard]
+  DataJSON[src/data/*.json] --> Importer[src/scripts/import-game-data.ts]
   Importer --> Supabase
 ```
 
@@ -36,6 +37,7 @@ flowchart LR
 | `src/hooks/` | React hooks for loading and mutating domain state |
 | `src/services/` | Supabase access and row mapping |
 | `src/features/planner/` | Planner business logic |
+| `src/features/decision-engine/` | Decision orchestration foundation |
 | `src/data/` | JSON game-data source files |
 | `src/scripts/` | Import pipeline and SQL helper files |
 | `src/types/` | Shared TypeScript types |
@@ -46,9 +48,10 @@ flowchart LR
 | Layer | Owns | Must not own |
 | --- | --- | --- |
 | Components | Markup, display states, buttons | Supabase queries |
-| Hooks | React state, effects, optimistic updates | SQL schemas |
+| Hooks | React state, effects, loading states, save states, optimistic updates | SQL schemas |
 | Services | Supabase queries and row mapping | JSX |
-| Planner | Upgrade business logic | React/Next/Supabase |
+| Planner | Upgrade candidate business logic | React, Next.js, Supabase |
+| Decision Engine | Recommendation orchestration across planner and future modules | React, Next.js, Supabase |
 | Scripts | Import validation and upsert flow | App UI |
 
 ## Data Flow
@@ -59,8 +62,9 @@ Runtime app:
 2. Hooks call services.
 3. Services query Supabase.
 4. Hooks return data and actions.
-5. `page.tsx` passes account state and game state into `planUpgrades`.
-6. Dashboard components render `PlannerResult`.
+5. `page.tsx` converts loaded domain data into planner input.
+6. `page.tsx` calls `planUpgrades`.
+7. Dashboard components render `PlannerResult`.
 
 ## Components
 
@@ -99,11 +103,11 @@ Services currently present:
 - `spellService`
 - `siegeMachineService`
 
-All Supabase table access belongs here or in import scripts.
+All runtime Supabase table access belongs here. Import scripts are the exception for data-import workflows.
 
 ## Features
 
-`src/features/planner` is the only feature module currently present. It contains:
+`src/features/planner` contains:
 
 - types
 - constants
@@ -114,6 +118,10 @@ All Supabase table access belongs here or in import scripts.
 - tests
 - README
 
+`src/features/decision-engine` contains the first orchestration layer. It currently calls the Planner, maps planner recommendations into Decision Engine recommendations, selects a strategy from `PlayerGoal`, and returns placeholders for queue, builder simulation, and progress forecast.
+
+Dedicated modules for upgrade queue, builder simulation, and progress forecast are not present on this branch.
+
 ## Scripts and Data
 
-The importer is `src/scripts/import-game-data.ts`. It reads JSON files from `src/data/` and writes to Supabase with upserts.
+The importer is `src/scripts/import-game-data.ts`. It reads JSON files from `src/data/`, validates them, and writes to Supabase with upserts.

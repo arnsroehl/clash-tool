@@ -8,140 +8,119 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Table of Contents
 
-- [Project Goal](#project-goal)
-- [Tech Stack](#tech-stack)
-- [Current Modules](#current-modules)
+- [Purpose](#purpose)
+- [Current Stack](#current-stack)
+- [Current Project State](#current-project-state)
 - [Architecture](#architecture)
-- [Data Flow](#data-flow)
-- [Important Rules](#important-rules)
+- [Layer Rules](#layer-rules)
 - [Game Data](#game-data)
 - [Supabase](#supabase)
-- [Planner Engine](#planner-engine)
-- [Development Workflow](#development-workflow)
-- [Roadmap](#roadmap)
+- [Planner](#planner)
+- [Decision Engine](#decision-engine)
+- [Git Workflow](#git-workflow)
+- [Coding Standards](#coding-standards)
+- [Commands](#commands)
+- [Roadmap Snapshot](#roadmap-snapshot)
 - [Documentation Map](#documentation-map)
 
-## Project Goal
+## Purpose
 
-Clash Tool is a Next.js application for tracking Clash of Clans account progress. It currently manages accounts, buildings, heroes, laboratory items, a dashboard, game-data import files, and an upgrade planner foundation.
+Clash Tool is a Next.js application for tracking Clash of Clans account progress and generating deterministic upgrade recommendations from account state plus imported game data.
 
-The long-term direction is an upgrade-planning tool that combines user account state, static game data, and deterministic planner rules.
+The current product direction is a planner-centered tool: account data lives in Supabase, sample game data lives in JSON, React hooks load runtime state, and framework-independent planner logic calculates progress and recommendations.
 
-## Tech Stack
+## Current Stack
 
 | Area | Current choice |
 | --- | --- |
-| App framework | Next.js 16 App Router |
-| UI | React 19, Tailwind CSS 4 |
-| Data backend | Supabase |
+| Framework | Next.js 16 App Router |
+| UI | React 19 |
+| Styling | Tailwind CSS 4 |
+| Runtime database | Supabase |
 | Language | TypeScript strict |
-| Scripts | `tsx` for TypeScript scripts/tests |
-| Tests | Node test runner via `tsx --test` |
+| Scripts/tests | `tsx`, Node test runner |
+| CI | GitHub Actions |
 
-## Current Modules
+## Current Project State
 
-| Module | Status | Main files |
+| Area | Status | Evidence |
 | --- | --- | --- |
-| Accounts | Implemented | `src/hooks/useAccounts.ts`, `src/services/accountService.ts`, `src/components/accounts/` |
-| Buildings | Implemented | `useBuildings`, `buildingService`, `components/buildings` |
-| Dashboard | Implemented | `src/components/dashboard/` |
-| Heroes | Implemented | `useHeroes`, `heroService`, `components/heroes`, `src/data/heroes.json` |
-| Laboratory | Implemented | troops, spells, siege machines hooks/services/components/data |
-| Game-data importer | Implemented | `src/scripts/import-game-data.ts` |
-| Planner | Implemented foundation plus v1 recommendations | `src/features/planner/` |
+| Foundation | Done | `src/app`, `src/components`, `src/hooks`, `src/services`, `src/types` |
+| Accounts | Done | `accountService`, `useAccounts`, account components |
+| Buildings | Done | `buildingService`, `useBuildings`, building components |
+| Dashboard | Done | `src/components/dashboard/` |
+| Heroes | Done | hero data, SQL helper, service, hook, components |
+| Laboratory | Done | troops, spells, siege machines data/services/hooks/components |
+| Planner V1 | Done | `src/features/planner/` |
+| Decision Engine foundation | In progress | `src/features/decision-engine/` coordinates Planner and placeholder modules |
+| CI/CD foundation | Done | `.github/workflows/ci.yml` |
+| Planner V2 | In progress | planner accepts multiple item types; queue/simulation modules are not present on this branch |
+| Upgrade Queue | In progress | planner types include queue concepts; no dedicated `src/features/upgrade-queue/` module yet |
+| Builder Simulation | In progress | builder availability exists in planner types; no dedicated feature module yet |
+| Progress Forecast | In progress | dashboard shows planner progress; no dedicated forecast module yet |
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-  UI[Components] --> Hooks[Hooks]
-  Hooks --> Services[Services]
+  Page[src/app/page.tsx] --> Hooks[src/hooks]
+  Hooks --> Services[src/services]
   Services --> Supabase[(Supabase)]
-  JSON[src/data/*.json] --> Importer[src/scripts/import-game-data.ts]
-  Importer --> Supabase
-  Hooks --> Page[src/app/page.tsx]
   Page --> Planner[src/features/planner]
-  Planner --> Dashboard[Dashboard Components]
+  DecisionEngine[src/features/decision-engine] --> Planner
+  Planner --> Dashboard[src/components/dashboard]
+  Data[src/data/*.json] --> Importer[src/scripts/import-game-data.ts]
+  Importer --> Supabase
 ```
 
-Layer responsibilities:
+## Layer Rules
 
-- `src/components`: presentational UI only. No direct Supabase queries.
-- `src/hooks`: React state/effects and user actions.
-- `src/services`: Supabase reads/writes and row mapping.
-- `src/features/planner`: framework-independent business logic.
-- `src/data`: JSON source of truth for game-data samples.
-- `src/scripts`: import pipeline and SQL helper files.
-- `src/types`: shared TypeScript domain types.
-
-## Data Flow
-
-Runtime app flow:
-
-```mermaid
-sequenceDiagram
-  participant Page as src/app/page.tsx
-  participant Hook as React Hooks
-  participant Service as Services
-  participant DB as Supabase
-  participant Planner as Planner Engine
-  participant UI as Components
-
-  Page->>Hook: call useAccounts/useBuildings/useHeroes/useTroops/useSpells/useSiegeMachines
-  Hook->>Service: fetch or upsert data
-  Service->>DB: Supabase query
-  Hook-->>Page: state and actions
-  Page->>Planner: planUpgrades(...)
-  Planner-->>Page: PlannerResult
-  Page->>UI: props
-```
-
-## Important Rules
-
-- Do not edit `.env.local` unless explicitly requested.
-- Do not change database structure from app code.
-- SQL helper files in `src/scripts/sql/` are not executed automatically.
-- Keep TypeScript strict and avoid `any`.
-- UI components must not contain business logic or direct Supabase queries.
-- Hooks may contain React orchestration.
-- Services own Supabase access.
-- Planner must remain independent of React, Next.js, and Supabase.
-- JSON files under `src/data/` are the source of truth for imported game data.
-- Before changing Next.js code, read the relevant local docs in `node_modules/next/dist/docs/`.
+| Layer | Responsibility | Must not do |
+| --- | --- | --- |
+| `src/components` | Render UI from props | Query Supabase directly |
+| `src/hooks` | Own React state, effects, loading/saving state, user actions | Define SQL schema |
+| `src/services` | Own Supabase reads/writes and row mapping | Render JSX |
+| `src/features` | Own framework-independent business logic | Import React, Next.js, or Supabase |
+| `src/scripts` | Run import/maintenance workflows | Change app UI |
+| `src/data` | Store importable game-data samples | Store runtime account state |
 
 ## Game Data
 
-Game data lives in:
+Current game-data source files are array-based JSON files:
 
-- `src/data/buildings.json`
-- `src/data/heroes.json`
-- `src/data/troops.json`
-- `src/data/spells.json`
-- `src/data/siege-machines.json`
-- `src/data/game-version.json`
+| File | Domain |
+| --- | --- |
+| `src/data/buildings.json` | Buildings |
+| `src/data/heroes.json` | Heroes |
+| `src/data/troops.json` | Troops |
+| `src/data/spells.json` | Spells |
+| `src/data/siege-machines.json` | Siege machines |
+| `src/data/game-version.json` | Dataset metadata |
 
-The importer reads these files, validates their shape, maps them to Supabase rows, and uses upserts.
+Current IDs in these files are UUIDs because the importer maps directly to existing Supabase primary keys. Localized display names are stored in `name`.
+
+Future game-data work is planned to move toward English stable IDs with localized display names, but that folder-based structure is not implemented on this branch.
 
 ## Supabase
 
-The browser app uses `src/lib/supabase.ts`. Services call `getSupabaseClient()`.
+The app uses `src/lib/supabase.ts` for browser Supabase setup. Services call `getSupabaseClient()`.
 
-Runtime tables referenced by code:
+Runtime tables referenced by current code:
 
-- accounts and account progress tables
-- buildings, building_levels, account_buildings
-- heroes, hero_levels, account_heroes
-- troops, troop_levels, account_troops
-- spells, spell_levels, account_spells
-- siege_machines, siege_machine_levels, account_siege_machines
+| Domain | Tables |
+| --- | --- |
+| Accounts | `accounts` |
+| Buildings | `buildings`, `building_levels`, `account_buildings` |
+| Heroes | `heroes`, `hero_levels`, `account_heroes` |
+| Troops | `troops`, `troop_levels`, `account_troops` |
+| Spells | `spells`, `spell_levels`, `account_spells` |
+| Siege machines | `siege_machines`, `siege_machine_levels`, `account_siege_machines` |
 
-Only heroes and laboratory table SQL helper files are present in `src/scripts/sql/`. No SQL helper file for accounts/buildings is currently present in the repository.
+SQL helper files exist for heroes and laboratory tables in `src/scripts/sql/`. They are not executed automatically.
 
-## Planner Engine
+## Planner
 
-The planner module lives in `src/features/planner/`.
-
-It currently accepts account state plus planner items, current levels, and optional upgrade level metadata. It outputs possible upgrades, recommendations, progress, aggregate costs, aggregate time, and simple priority scores.
+The planner lives in `src/features/planner/` and is framework-independent.
 
 Current planner item types:
 
@@ -151,9 +130,43 @@ Current planner item types:
 - `spell`
 - `siege_machine`
 
-## Development Workflow
+The planner currently returns possible upgrades, blocked upgrades, recommendations, progress, aggregate costs, aggregate time, and simple priority scores.
 
-Common commands:
+## Decision Engine
+
+The Decision Engine lives in `src/features/decision-engine/` and is framework-independent. It currently:
+
+- accepts a `DecisionContext`
+- supports `PlayerGoal` values `MAX`, `FARMING`, `WAR`, `LEGENDS`, and `SMART_RUSH`
+- selects an initial strategy from the player goal
+- calls the Planner
+- maps planner recommendations into Decision Engine recommendations with multiple reasons
+- returns placeholder queue, simulation, and forecast results
+
+## Git Workflow
+
+| Practice | Current convention |
+| --- | --- |
+| Branches | Work happens on scoped branches such as `feature/<topic>`, `docs/<topic>`, or `infrastructure/<topic>` |
+| Commits | No formal commit convention file is present; keep messages concise and scoped |
+| Pull requests | CI should run lint, tests, and build |
+| Review focus | Scope control, no `.env.local` changes, no accidental schema changes, no direct Supabase calls in components |
+
+## Coding Standards
+
+| Topic | Standard |
+| --- | --- |
+| TypeScript | Strict TypeScript; do not use `any` |
+| Imports | Prefer existing aliases such as `@/` |
+| Components | UI-only, props in, callbacks out |
+| Hooks | React orchestration only |
+| Services | Supabase access and database row mapping |
+| Features | Pure business logic where possible |
+| Scripts | Validate before writing to Supabase |
+| Environment | Do not edit `.env.local` unless explicitly requested |
+| Next.js | Read local docs under `node_modules/next/dist/docs/` before changing Next.js code |
+
+## Commands
 
 ```bash
 npm run dev
@@ -165,38 +178,37 @@ npm run import-game-data
 
 Notes:
 
+- `npm test` uses `tsx`, which may require permission to open a local IPC pipe in sandboxed environments.
 - `npm run build` may need network access because `next/font` fetches Google Fonts.
-- `npm test` uses `tsx`, which may need permission to open a local IPC socket in sandboxed environments.
-- `npm run import-game-data` reads `.env.local` but does not modify it.
+- `npm run import-game-data` reads `.env.local` into the Node process but does not modify it.
 
-## Roadmap
+## Roadmap Snapshot
 
-| Status | Area |
+| Status | Areas |
 | --- | --- |
-| DONE | Foundation |
-| DONE | Accounts |
-| DONE | Buildings |
-| DONE | Dashboard |
-| DONE | Heroes |
-| DONE | Laboratory |
-| IN PROGRESS | Intelligent Planner |
-| PLANNED | Pets |
-| PLANNED | Equipment |
-| PLANNED | Walls |
-| PLANNED | Upgrade Queue |
-| PLANNED | AI Import |
+| Done | Foundation, Dashboard, Heroes, Laboratory, Planner V1, CI/CD, GitHub workflow, Vercel-compatible Next.js build |
+| In progress | Planner V2, Decision Engine, Upgrade Queue, Builder Simulation, Progress Forecast |
+| Planned | Complete Game Data, Screenshot Import, Pets, Hero Equipment, Walls, AI Assistant |
 
 ## Documentation Map
 
-Read `docs/PROJECT.md` first, then:
+Start with:
 
+- `README.md`
+- `docs/PROJECT.md`
+- `docs/PRODUCT_VISION.md`
 - `docs/ARCHITECTURE.md`
+- `docs/DECISIONS.md`
+
+Then use the focused docs:
+
 - `docs/DATABASE.md`
 - `docs/GAME_DATA.md`
-- `docs/PLANNER.md`
 - `docs/IMPORT_PIPELINE.md`
+- `docs/PLANNER.md`
+- `docs/DECISION_ENGINE.md`
+- `docs/ROADMAP.md`
 - `docs/DEVELOPMENT.md`
 - `docs/CODING_STANDARDS.md`
 - `docs/TESTING.md`
-- `docs/ROADMAP.md`
 - `docs/CONTRIBUTING.md`

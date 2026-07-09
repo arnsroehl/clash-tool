@@ -5,6 +5,7 @@
 - [Current Tests](#current-tests)
 - [Command](#command)
 - [Strategy](#strategy)
+- [CI](#ci)
 - [Planned Tests](#planned-tests)
 
 ## Current Tests
@@ -41,6 +42,10 @@ tsx --test src/features/planner/planner.test.ts
 
 Current test coverage is focused on framework-independent planner logic. This is appropriate because planner behavior is core business logic and can be tested without a browser or database.
 
+## CI
+
+The GitHub Actions workflow runs tests after lint and before build.
+
 ## Planned Tests
 
 Tests not currently present but natural next steps:
@@ -49,3 +54,6 @@ Tests not currently present but natural next steps:
 - hook behavior tests
 - importer validation tests
 - component smoke tests
+- upgrade queue tests when a dedicated queue module exists
+- builder simulation tests when a dedicated simulation module exists
+- progress forecast tests when a dedicated forecast module exists

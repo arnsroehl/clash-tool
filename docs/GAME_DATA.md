@@ -3,36 +3,40 @@
 ## Table of Contents
 
 - [Source of Truth](#source-of-truth)
-- [Files](#files)
-- [Shape](#shape)
-- [ID Convention](#id-convention)
-- [Importer](#importer)
+- [Current Files](#current-files)
+- [Current Schema](#current-schema)
+- [Validation](#validation)
+- [Import Process](#import-process)
+- [ID and Naming Conventions](#id-and-naming-conventions)
+- [Planned Structure](#planned-structure)
 - [Versioning](#versioning)
 
 ## Source of Truth
 
-JSON files under `src/data/` are the source of truth for imported game-data samples.
+The current source of truth for importable sample game data is JSON under `src/data/`.
 
-## Files
+The repository does not contain complete Clash of Clans game data. Current files are small sample datasets used by the import pipeline and app modules.
+
+## Current Files
 
 | File | Domain |
 | --- | --- |
-| `buildings.json` | Buildings |
-| `heroes.json` | Heroes |
-| `troops.json` | Troops |
-| `spells.json` | Spells |
-| `siege-machines.json` | Siege machines |
-| `game-version.json` | Game data metadata |
+| `src/data/buildings.json` | Buildings |
+| `src/data/heroes.json` | Heroes |
+| `src/data/troops.json` | Troops |
+| `src/data/spells.json` | Spells |
+| `src/data/siege-machines.json` | Siege machines |
+| `src/data/game-version.json` | Dataset metadata |
 
-## Shape
+## Current Schema
 
-Current item JSON shape:
+Current domain files contain arrays of items:
 
 ```json
 {
-  "id": "uuid",
-  "name": "Name",
-  "category": "Category",
+  "id": "11111111-1111-4111-8111-111111111111",
+  "name": "Rathaus",
+  "category": "Hauptgebäude",
   "unlockTownHall": 1,
   "sortOrder": 10,
   "levels": [
@@ -43,29 +47,76 @@ Current item JSON shape:
       "goldCost": 0,
       "elixirCost": 0,
       "darkElixirCost": 0,
-      "hitpoints": 0
+      "hitpoints": 450
     }
   ]
 }
 ```
 
-## ID Convention
+## Validation
 
-The importer validates item IDs as UUIDs. Existing rows are resolved by name where implemented, so imports can reuse current database IDs.
+`src/scripts/import-game-data.ts` validates:
 
-## Importer
+- each item is an object
+- `id` is a UUID
+- `name` and `category` are non-empty strings
+- `unlockTownHall` and `sortOrder` are positive integers
+- `levels` is a non-empty array
+- duplicate level numbers are rejected
+- level, town hall, costs, upgrade time, and hitpoints are valid integers
+- costs, upgrade time, and hitpoints are not negative
 
-`src/scripts/import-game-data.ts`:
+## Import Process
+
+```mermaid
+flowchart LR
+  JSON[src/data/*.json] --> Validate[Validate shape]
+  Validate --> Resolve[Resolve existing rows by name]
+  Resolve --> Parents[Upsert parent tables]
+  Parents --> Levels[Upsert level tables]
+  Levels --> Supabase[(Supabase)]
+```
+
+The importer:
 
 1. Loads `.env.local` values into the Node process.
-2. Reads JSON files.
+2. Reads the current hard-coded JSON files.
 3. Validates item and level structure.
-4. Resolves existing rows by name.
-5. Upserts game-data rows.
+4. Resolves existing rows by name where implemented.
+5. Upserts parent rows.
 6. Upserts level rows.
+7. Logs and skips optional missing laboratory tables with SQL helper pointers.
 
-Missing laboratory tables are logged and skipped with a pointer to SQL files.
+## ID and Naming Conventions
+
+Current JSON IDs are UUIDs because they map directly to current Supabase table primary keys.
+
+Display names are localized in `name`, for example German building and hero names. Future stable technical IDs should be English, while display names can remain localized.
+
+## Planned Structure
+
+A folder-per-domain structure is planned but not implemented on this branch:
+
+```text
+src/data/
+  game-version.json
+  buildings/
+  heroes/
+  troops/
+  spells/
+  siege-machines/
+  pets/
+  equipment/
+  walls/
+```
+
+In that future structure, each item can live in its own JSON file with an English stable ID such as `town_hall`, `inferno_tower`, or `archer_queen`.
 
 ## Versioning
 
-`src/data/game-version.json` currently stores game, data version, schema version, and description metadata.
+`src/data/game-version.json` stores dataset metadata:
+
+- game name
+- data version
+- schema version
+- description

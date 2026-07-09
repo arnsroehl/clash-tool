@@ -6,7 +6,7 @@
 - [Vision](#vision)
 - [Audience](#audience)
 - [Tech Stack](#tech-stack)
-- [Features](#features)
+- [Implemented Features](#implemented-features)
 - [Current Status](#current-status)
 
 ## Goal
@@ -15,7 +15,7 @@ Clash Tool is a web application for tracking Clash of Clans account progress and
 
 ## Vision
 
-The repository is evolving toward a planner-centered tool. Static game data is stored as JSON, imported into Supabase, loaded through services and hooks, and passed into a framework-independent planner engine.
+The project is evolving toward a planner-centered tool. Static sample game data is stored as JSON, imported into Supabase, loaded through services and hooks, and passed into a framework-independent planner engine.
 
 ## Audience
 
@@ -37,10 +37,11 @@ The current application serves users who manage one or more Clash of Clans accou
 | UI | React 19 |
 | Styling | Tailwind CSS 4 |
 | Runtime database | Supabase |
-| Language | TypeScript |
+| Language | TypeScript strict |
 | Scripts/tests | `tsx`, Node test runner |
+| CI | GitHub Actions |
 
-## Features
+## Implemented Features
 
 Implemented features visible in the repository:
 
@@ -48,12 +49,16 @@ Implemented features visible in the repository:
 - Building tracking per account.
 - Hero tracking per account.
 - Laboratory tracking for troops, spells, and siege machines.
-- Dashboard summary cards and recommendation list.
-- JSON game-data files.
-- Game-data importer using upserts.
+- Dashboard summary cards, progress overview, resources summary, and recommendation list.
+- JSON sample game-data files.
+- Game-data importer using validation and upserts.
 - SQL helper files for heroes and laboratory tables.
-- Planner engine with simple priority scoring.
+- Planner V1 with simple priority scoring and tests.
+- Decision Engine foundation that calls the Planner and returns recommendation orchestration placeholders.
+- CI workflow for lint, tests, and build.
 
 ## Current Status
 
 The project is under active feature development. The main page composes hooks, dashboard components, account components, building manager, hero manager, laboratory manager, and planner output.
+
+Planner V2, upgrade queue, builder simulation, and progress forecast are in progress or planned depending on the branch. The Decision Engine foundation is present on this branch; dedicated feature modules for queue, builder simulation, and progress forecast are not present on this branch.

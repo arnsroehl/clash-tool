@@ -8,34 +8,36 @@
 - [Commits](#commits)
 - [Reviews](#reviews)
 - [Environment](#environment)
+- [CI](#ci)
 
 ## Workflow
 
-1. Work on a feature branch.
+1. Work on a scoped branch.
 2. Read relevant local Next.js documentation before changing Next.js code.
-3. Keep changes scoped.
+3. Keep changes scoped to the request.
 4. Run lint, tests, and build where relevant.
 5. Do not modify `.env.local` unless explicitly requested.
+6. Update documentation when architecture, data flow, scripts, commands, or roadmap status changes.
 
 ## Commands
 
-```bash
-npm run dev
-npm run lint
-npm test
-npm run build
-npm run import-game-data
-```
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the local Next.js dev server |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run planner tests |
+| `npm run build` | Build the app |
+| `npm run import-game-data` | Import current JSON game data into Supabase |
 
 ## Branches
 
-Feature branch names used in the repository include:
+Branch names visible in project work follow scoped prefixes:
 
-- `feature/game-data`
-- `feature/dashboard-v1`
-- `feature/heroes`
-- `feature/laboratory`
-- `feature/intelligent-planner-v1`
+| Prefix | Use |
+| --- | --- |
+| `feature/` | Product or architecture feature work |
+| `docs/` | Documentation-only work |
+| `infrastructure/` | CI, deployment, or project setup |
 
 ## Commits
 
@@ -49,8 +51,20 @@ Review focus:
 - no `any`
 - no accidental `.env.local` changes
 - no database structure changes outside SQL helper files
+- planner remains framework-independent
 - app still runs
 
 ## Environment
 
 Next.js reads `.env.local`. The import script also reads `.env.local` into the Node process, but does not modify it.
+
+## CI
+
+GitHub Actions runs on `push` and `pull_request`. The workflow uses Node.js 20 and runs:
+
+```bash
+npm ci
+npm run lint
+npm test
+npm run build
+```

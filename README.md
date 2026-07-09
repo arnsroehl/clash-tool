@@ -1,15 +1,24 @@
 # Clash Tool
 
-Clash Tool ist eine Next.js-Anwendung zum Verwalten von Clash of Clans Accounts, Spielfortschritt und Upgrade-Empfehlungen. Das Projekt kombiniert Account-Daten aus Supabase, statische Game-Data-JSON-Dateien und eine framework-unabhängige Planner Engine.
+Clash Tool ist eine Next.js-Anwendung zum Verwalten von Clash of Clans Accounts, Spielfortschritt und Upgrade-Empfehlungen. Das Projekt kombiniert Account-Daten aus Supabase, importierbare JSON-Game-Data und eine framework-unabhängige Planner Engine.
 
 ## Table of Contents
 
+- [Product Vision](#product-vision)
 - [Tech Stack](#tech-stack)
 - [Local Setup](#local-setup)
 - [Supabase](#supabase)
 - [Scripts](#scripts)
 - [Architecture](#architecture)
+- [Development Workflow](#development-workflow)
+- [Documentation](#documentation)
 - [CI](#ci)
+
+## Product Vision
+
+Clash Tool entwickelt sich zu einem planner-zentrierten Fortschrittstool für Clash of Clans. Der aktuelle Fokus liegt darauf, Account-Zustand, statische Game-Data und deterministische Planner-Logik sauber zu trennen.
+
+Mehr Kontext steht in `docs/PRODUCT_VISION.md`.
 
 ## Tech Stack
 
@@ -19,8 +28,9 @@ Clash Tool ist eine Next.js-Anwendung zum Verwalten von Clash of Clans Accounts,
 | UI | React 19 |
 | Styling | Tailwind CSS 4 |
 | Database | Supabase |
-| Language | TypeScript |
+| Language | TypeScript strict |
 | Scripts and tests | `tsx`, Node test runner |
+| CI | GitHub Actions |
 
 ## Local Setup
 
@@ -59,7 +69,7 @@ SQL helper files for selected modules live in:
 src/scripts/sql/
 ```
 
-These SQL files are documentation/setup helpers and are not executed automatically by the app.
+These SQL files are setup helpers and are not executed automatically by the app.
 
 ## Scripts
 
@@ -79,8 +89,6 @@ npm run import-game-data
 
 ## Architecture
 
-The current architecture separates UI, state orchestration, data access, game data, and planner logic:
-
 ```text
 src/app/              Next.js app entry points
 src/components/       Presentational UI components
@@ -93,17 +101,40 @@ src/types/            Shared TypeScript domain types
 docs/                 Project documentation
 ```
 
-Start with `docs/PROJECT.md` for a project overview, then read:
+Core rule: components render UI, hooks orchestrate React state, services access Supabase, and business logic belongs in `src/features`.
 
+## Development Workflow
+
+1. Work on a scoped branch such as `feature/<topic>`, `docs/<topic>`, or `infrastructure/<topic>`.
+2. Keep changes focused.
+3. Do not edit `.env.local`.
+4. Run relevant checks before handing off:
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+## Documentation
+
+Start here:
+
+- `docs/PROJECT.md`
+- `docs/PRODUCT_VISION.md`
 - `docs/ARCHITECTURE.md`
+- `docs/DECISIONS.md`
+
+Focused references:
+
 - `docs/DATABASE.md`
 - `docs/GAME_DATA.md`
-- `docs/PLANNER.md`
 - `docs/IMPORT_PIPELINE.md`
+- `docs/PLANNER.md`
+- `docs/ROADMAP.md`
 - `docs/DEVELOPMENT.md`
 - `docs/CODING_STANDARDS.md`
 - `docs/TESTING.md`
-- `docs/ROADMAP.md`
 - `docs/CONTRIBUTING.md`
 
 ## CI

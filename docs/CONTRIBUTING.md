@@ -10,18 +10,21 @@
 
 ## Feature Workflow
 
-1. Start from the intended feature branch.
+1. Start from the intended branch.
 2. Keep changes scoped to the request.
 3. Preserve existing behavior unless explicitly asked to change it.
-4. Update documentation when architecture, data flow, scripts, or commands change.
+4. Update documentation when architecture, data flow, scripts, commands, or roadmap status changes.
+5. Do not modify `.env.local`.
 
 ## Branches
 
-Use feature branches for feature work. Existing branch names show the pattern:
+Use scoped branches:
 
-```text
-feature/<topic>
-```
+| Prefix | Example |
+| --- | --- |
+| `feature/` | `feature/laboratory` |
+| `docs/` | `docs/finalize-project-docs` |
+| `infrastructure/` | `infrastructure/ci-deployment` |
 
 ## Development Checklist
 
@@ -52,3 +55,4 @@ No PR template is present in the repository. A useful PR description should incl
 - No direct Supabase queries in components.
 - Planner remains framework-independent.
 - Importer remains idempotent.
+- Documentation does not claim planned features are implemented.
