@@ -10,6 +10,7 @@
 - [Priority V1](#priority-v1)
 - [Current Limits](#current-limits)
 - [Decision Engine Relationship](#decision-engine-relationship)
+- [Builder Simulation](#builder-simulation)
 - [Extensibility](#extensibility)
 
 ## Purpose
@@ -78,10 +79,9 @@ Current priority scoring is simple and deterministic:
 
 ## Current Limits
 
-The repository now contains `src/features/decision-engine` as an orchestration foundation. It does not currently contain dedicated feature modules for:
+The repository now contains `src/features/decision-engine` as an orchestration foundation and `src/features/builder-simulation` for live queue scheduling. It does not currently contain dedicated feature modules for:
 
 - upgrade queue
-- builder simulation
 - progress forecast
 
 Planner V2 is listed as in progress because the planner already supports multiple item types, level metadata, simple rule evaluation, and priority scoring, but the full queue/simulation/forecast stack is not present on this branch.
@@ -91,6 +91,10 @@ Planner V2 is listed as in progress because the planner already supports multipl
 The Planner remains framework-independent and focused on upgrade candidates, progress, costs, and simple recommendations.
 
 The Decision Engine is the future orchestration layer. It currently calls the Planner and maps planner recommendations into Decision Engine recommendations with multiple reasons. Future queue, simulation, forecast, strategy, recommendation, and resource modules should be coordinated there instead of expanding the Planner into an all-purpose system.
+
+## Builder Simulation
+
+Builder Simulation V1 lives in `src/features/builder-simulation`. It consumes persisted `UpgradeQueueItem[]` data from the existing queue hook and calculates a live, non-persisted assignment plan across the active account's builders.
 
 ## Extensibility
 

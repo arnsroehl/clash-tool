@@ -5,6 +5,7 @@ import { AccountForm } from "@/components/accounts/AccountForm";
 import { AccountList } from "@/components/accounts/AccountList";
 import { StatsCards } from "@/components/accounts/StatsCards";
 import { BuildingList } from "@/components/buildings/BuildingList";
+import { BuilderSimulationOverview } from "@/components/builder-simulation/BuilderSimulationOverview";
 import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
@@ -12,6 +13,7 @@ import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommenda
 import { HeroList } from "@/components/heroes/HeroList";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
+import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useBuildings } from "@/hooks/useBuildings";
@@ -27,6 +29,7 @@ import type {
   PlannerResult,
   PlannerUpgradeLevel,
 } from "@/features/planner/planner.types";
+import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
 import type { Building, BuildingLevel } from "@/types/building";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
@@ -304,6 +307,13 @@ export default function Home() {
     return plannerResult?.recommendations.slice(0, 5) || [];
   }, [plannerResult]);
 
+  const builderSimulation = useMemo<BuilderSimulationResult>(() => {
+    return simulateBuilderQueue({
+      builderCount: selectedAccount?.builderCount || 0,
+      queueItems,
+    });
+  }, [queueItems, selectedAccount]);
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <section className="mx-auto flex max-w-6xl flex-col gap-10">
@@ -349,6 +359,8 @@ export default function Home() {
           onAddRecommendation={addRecommendationToQueue}
           onDeleteItem={removeQueueItem}
         />
+
+        <BuilderSimulationOverview simulation={builderSimulation} />
 
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <section className="flex flex-col gap-6">
