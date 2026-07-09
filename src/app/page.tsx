@@ -11,6 +11,7 @@ import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
 import { HeroList } from "@/components/heroes/HeroList";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
+import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { planUpgrades } from "@/features/planner/planner.service";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useBuildings } from "@/hooks/useBuildings";
@@ -18,6 +19,7 @@ import { useHeroes } from "@/hooks/useHeroes";
 import { useSiegeMachines } from "@/hooks/useSiegeMachines";
 import { useSpells } from "@/hooks/useSpells";
 import { useTroops } from "@/hooks/useTroops";
+import { useUpgradeQueue } from "@/hooks/useUpgradeQueue";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type {
   PlannerItem,
@@ -173,6 +175,20 @@ export default function Home() {
     clearError,
   });
 
+  const {
+    queueItems,
+    queueErrorMessage,
+    isLoadingQueue,
+    isSavingQueueItem,
+    deletingQueueItemId,
+    addRecommendationToQueue,
+    removeQueueItem,
+  } = useUpgradeQueue({
+    selectedAccount,
+    onError: handleError,
+    clearError,
+  });
+
   const stats = useMemo<StatCard[]>(
     () => [
       {
@@ -284,6 +300,10 @@ export default function Home() {
     troopMaxLevels,
   ]);
 
+  const upgradeRecommendations = useMemo(() => {
+    return plannerResult?.recommendations.slice(0, 5) || [];
+  }, [plannerResult]);
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <section className="mx-auto flex max-w-6xl flex-col gap-10">
@@ -317,6 +337,18 @@ export default function Home() {
         </div>
 
         <ResourceSummary plannerResult={plannerResult} />
+
+        <UpgradeQueueList
+          selectedAccount={selectedAccount}
+          queueItems={queueItems}
+          recommendations={upgradeRecommendations}
+          errorMessage={queueErrorMessage}
+          isLoading={isLoadingQueue}
+          isSaving={isSavingQueueItem}
+          deletingItemId={deletingQueueItemId}
+          onAddRecommendation={addRecommendationToQueue}
+          onDeleteItem={removeQueueItem}
+        />
 
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <section className="flex flex-col gap-6">
