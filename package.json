@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "import-game-data": "tsx src/scripts/import-game-data.ts",
-    "test": "tsx --test src/features/planner/planner.test.ts src/features/decision-engine/decision-engine.test.ts src/features/builder-simulation/builder-simulation.test.ts src/services/upgradeQueueService.test.ts",
+    "test": "tsx --test src/features/planner/planner.test.ts src/features/decision-engine/decision-engine.test.ts src/features/builder-simulation/builder-simulation.test.ts src/features/progress-forecast/progress-forecast.test.ts src/services/upgradeQueueService.test.ts",
     "start": "next start",
     "lint": "eslint"
   },

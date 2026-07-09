@@ -12,9 +12,11 @@ import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
 import { HeroList } from "@/components/heroes/HeroList";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
+import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
+import { createProgressForecast } from "@/features/progress-forecast/progress-forecast.engine";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useBuildings } from "@/hooks/useBuildings";
 import { useHeroes } from "@/hooks/useHeroes";
@@ -30,6 +32,7 @@ import type {
   PlannerUpgradeLevel,
 } from "@/features/planner/planner.types";
 import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
+import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
 import type { Building, BuildingLevel } from "@/types/building";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
@@ -314,6 +317,14 @@ export default function Home() {
     });
   }, [queueItems, selectedAccount]);
 
+  const progressForecast = useMemo<ProgressForecastResult>(() => {
+    return createProgressForecast({
+      plannerResult,
+      queueItems,
+      builderSimulation,
+    });
+  }, [builderSimulation, plannerResult, queueItems]);
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <section className="mx-auto flex max-w-6xl flex-col gap-10">
@@ -361,6 +372,8 @@ export default function Home() {
         />
 
         <BuilderSimulationOverview simulation={builderSimulation} />
+
+        <ProgressForecastOverview forecast={progressForecast} />
 
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <section className="flex flex-col gap-6">

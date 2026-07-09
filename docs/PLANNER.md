@@ -11,6 +11,7 @@
 - [Current Limits](#current-limits)
 - [Decision Engine Relationship](#decision-engine-relationship)
 - [Builder Simulation](#builder-simulation)
+- [Progress Forecast](#progress-forecast)
 - [Extensibility](#extensibility)
 
 ## Purpose
@@ -79,10 +80,9 @@ Current priority scoring is simple and deterministic:
 
 ## Current Limits
 
-The repository now contains `src/features/decision-engine` as an orchestration foundation and `src/features/builder-simulation` for live queue scheduling. It does not currently contain dedicated feature modules for:
+The repository now contains `src/features/decision-engine` as an orchestration foundation, `src/features/builder-simulation` for live queue scheduling, and `src/features/progress-forecast` for simple progress projection. It does not currently contain dedicated feature modules for:
 
 - upgrade queue
-- progress forecast
 
 Planner V2 is listed as in progress because the planner already supports multiple item types, level metadata, simple rule evaluation, and priority scoring, but the full queue/simulation/forecast stack is not present on this branch.
 
@@ -95,6 +95,10 @@ The Decision Engine is the future orchestration layer. It currently calls the Pl
 ## Builder Simulation
 
 Builder Simulation V1 lives in `src/features/builder-simulation`. It consumes persisted `UpgradeQueueItem[]` data from the existing queue hook and calculates a live, non-persisted assignment plan across the active account's builders.
+
+## Progress Forecast
+
+Progress Forecast V1 lives in `src/features/progress-forecast`. It consumes `PlannerResult`, persisted queue items, and `BuilderSimulationResult` to estimate progress after the current queue. The result is live-only and is not persisted in Supabase.
 
 ## Extensibility
 
