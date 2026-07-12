@@ -61,7 +61,7 @@ export function UpgradeQueueItemCard({
 
         <div className="flex items-center gap-3">
           <span className="rounded-xl bg-white/5 px-3 py-2 text-sm font-bold text-amber-300">
-            {item.priorityScore}
+            Priorität {item.queueOrder}
           </span>
           <button type="button" aria-label={`${item.name} nach oben`} disabled={!canMoveUp} onClick={() => onMove(item.id, "up")} className="rounded-xl border border-white/10 px-3 py-2 font-bold disabled:opacity-30">↑</button>
           <button type="button" aria-label={`${item.name} nach unten`} disabled={!canMoveDown} onClick={() => onMove(item.id, "down")} className="rounded-xl border border-white/10 px-3 py-2 font-bold disabled:opacity-30">↓</button>

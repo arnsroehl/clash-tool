@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { UpgradeQueueItemCard } from "@/components/upgrade-queue/UpgradeQueueItemCard";
 import type { UpgradeRecommendation } from "@/features/planner/planner.types";
 import type { ClashAccount } from "@/types/account";
@@ -30,9 +31,16 @@ export function UpgradeQueueList({
   onMoveItem,
   onStatusChange,
 }: UpgradeQueueListProps) {
+  const [visibleRecommendationCount, setVisibleRecommendationCount] = useState(4);
+  const [manualRecommendationKey, setManualRecommendationKey] = useState("");
   const queuedKeys = new Set(queueItems.map((item) => `${item.itemType}:${item.itemId}:${item.toLevel}`));
   const availableRecommendations = recommendations.filter(
     (item) => !queuedKeys.has(`${item.itemType}:${item.itemId}:${item.nextLevel}`),
+  );
+  const visibleRecommendations = availableRecommendations.slice(0, visibleRecommendationCount);
+  const manualCandidates = availableRecommendations.slice(4);
+  const selectedManualRecommendation = manualCandidates.find(
+    (item) => `${item.itemType}:${item.itemId}:${item.nextLevel}` === manualRecommendationKey,
   );
   const openItems = queueItems.filter((item) => item.status === "planned" || item.status === "active");
   const resourceTotals = openItems.reduce((total, item) => ({
@@ -64,7 +72,7 @@ export function UpgradeQueueList({
           </div>
           {availableRecommendations.length > 0 ? (
             <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {availableRecommendations.map((recommendation, index) => (
+              {visibleRecommendations.map((recommendation, index) => (
                 <button
                   key={`${recommendation.itemType}-${recommendation.itemId}-${recommendation.nextLevel}`}
                   type="button"
@@ -80,6 +88,34 @@ export function UpgradeQueueList({
               ))}
             </div>
           ) : <p className="mt-3 text-sm text-slate-400">Die angezeigten Empfehlungen sind bereits eingeplant.</p>}
+          {visibleRecommendationCount < availableRecommendations.length ? (
+            <button type="button" onClick={() => setVisibleRecommendationCount((count) => count + 4)} className="mt-3 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-amber-200 hover:bg-white/5">
+              Weitere Empfehlungen ({availableRecommendations.length - visibleRecommendationCount})
+            </button>
+          ) : null}
+
+          <div className="mt-5 border-t border-white/10 pt-5">
+            <h4 className="font-bold text-white">Anderes Upgrade manuell einplanen</h4>
+            <p className="mt-1 text-xs text-slate-400">Hier findest du alle möglichen Upgrades außerhalb der ersten vier Empfehlungen.</p>
+            <div className="mt-3 flex flex-col gap-3 md:flex-row">
+              <select value={manualRecommendationKey} onChange={(event) => setManualRecommendationKey(event.target.value)} className="min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
+                <option value="">Upgrade auswählen …</option>
+                {manualCandidates.map((item) => (
+                  <option key={`${item.itemType}:${item.itemId}:${item.nextLevel}`} value={`${item.itemType}:${item.itemId}:${item.nextLevel}`}>
+                    {item.name}: Level {item.currentLevel} → {item.nextLevel}
+                  </option>
+                ))}
+              </select>
+              <button type="button" disabled={!selectedManualRecommendation || isSaving} onClick={() => {
+                if (selectedManualRecommendation) {
+                  onAddRecommendation(selectedManualRecommendation);
+                  setManualRecommendationKey("");
+                }
+              }} className="rounded-xl bg-amber-400 px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-40">
+                Manuell hinzufügen
+              </button>
+            </div>
+          </div>
         </div>
       ) : null}
 

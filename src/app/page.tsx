@@ -318,7 +318,7 @@ export default function Home() {
   ]);
 
   const upgradeRecommendations = useMemo(() => {
-    return rankRecommendations(plannerResult?.recommendations || [], planningStrategy).slice(0, 5);
+    return rankRecommendations(plannerResult?.recommendations || [], planningStrategy);
   }, [plannerResult, planningStrategy]);
 
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {

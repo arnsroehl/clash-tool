@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { PlannerResult, UpgradeRecommendation } from "@/features/planner/planner.types";
 
 /** Renders the first planner recommendations without adding planner logic. */
@@ -26,7 +29,8 @@ export function UpgradeRecommendations({
   plannerResult,
   recommendations: suppliedRecommendations,
 }: UpgradeRecommendationsProps) {
-  const recommendations = suppliedRecommendations || plannerResult?.recommendations.slice(0, 5) || [];
+  const recommendations = suppliedRecommendations || plannerResult?.recommendations || [];
+  const [visibleCount, setVisibleCount] = useState(4);
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
@@ -43,7 +47,7 @@ export function UpgradeRecommendations({
         </div>
       ) : (
         <div className="mt-5 flex flex-col gap-3">
-          {recommendations.map((recommendation) => (
+          {recommendations.slice(0, visibleCount).map((recommendation, index) => (
             <div
               key={`${recommendation.buildingId}-${recommendation.nextLevel}`}
               className="rounded-2xl border border-white/10 bg-slate-900 p-5"
@@ -66,11 +70,16 @@ export function UpgradeRecommendations({
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/5 px-4 py-2 text-sm font-bold text-amber-300">
-                  Priorität {recommendation.priorityScore.value}
+                  Priorität {index + 1}
                 </div>
               </div>
             </div>
           ))}
+          {visibleCount < recommendations.length ? (
+            <button type="button" onClick={() => setVisibleCount((count) => count + 4)} className="rounded-2xl border border-amber-400/30 px-4 py-3 text-sm font-bold text-amber-200 transition hover:bg-amber-400/10">
+              Weitere Empfehlungen anzeigen ({recommendations.length - visibleCount})
+            </button>
+          ) : null}
         </div>
       )}
     </section>
