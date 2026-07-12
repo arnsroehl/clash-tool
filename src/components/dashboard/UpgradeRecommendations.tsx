@@ -1,8 +1,9 @@
-import type { PlannerResult } from "@/features/planner/planner.types";
+import type { PlannerResult, UpgradeRecommendation } from "@/features/planner/planner.types";
 
 /** Renders the first planner recommendations without adding planner logic. */
 type UpgradeRecommendationsProps = {
   plannerResult: PlannerResult | null;
+  recommendations?: UpgradeRecommendation[];
 };
 
 function formatNumber(value: number): string {
@@ -23,8 +24,9 @@ function formatType(type: string): string {
 
 export function UpgradeRecommendations({
   plannerResult,
+  recommendations: suppliedRecommendations,
 }: UpgradeRecommendationsProps) {
-  const recommendations = plannerResult?.recommendations.slice(0, 5) || [];
+  const recommendations = suppliedRecommendations || plannerResult?.recommendations.slice(0, 5) || [];
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8">

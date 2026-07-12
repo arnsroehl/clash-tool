@@ -12,11 +12,13 @@ import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
 import { HeroList } from "@/components/heroes/HeroList";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
+import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
+import { rankRecommendations, type PlanningStrategy } from "@/features/planning-control/planning-control";
 import { createProgressForecast } from "@/features/progress-forecast/progress-forecast.engine";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useBuildings } from "@/hooks/useBuildings";
@@ -31,6 +33,7 @@ import type {
   PlannerItemLevels,
   PlannerResult,
   PlannerUpgradeLevel,
+  ResourceSnapshot,
 } from "@/features/planner/planner.types";
 import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
@@ -88,6 +91,10 @@ function mergeLevelMaps(...levelMaps: PlannerItemLevels[]): PlannerItemLevels {
 
 export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [planningStrategy, setPlanningStrategy] = useState<PlanningStrategy>("balanced");
+  const [resources, setResources] = useState<ResourceSnapshot>({ gold: 0, elixir: 0, darkElixir: 0 });
+  const [horizonDays, setHorizonDays] = useState(30);
+  const [goalPercent, setGoalPercent] = useState(75);
   const clearError = useCallback(() => setErrorMessage(null), []);
   const handleError = useCallback((message: string) => {
     setErrorMessage(message);
@@ -309,8 +316,8 @@ export default function Home() {
   ]);
 
   const upgradeRecommendations = useMemo(() => {
-    return plannerResult?.recommendations.slice(0, 5) || [];
-  }, [plannerResult]);
+    return rankRecommendations(plannerResult?.recommendations || [], planningStrategy).slice(0, 5);
+  }, [plannerResult, planningStrategy]);
 
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
     return simulateBuilderQueue({
@@ -349,6 +356,22 @@ export default function Home() {
 
         <CollapsibleSection title="Übersicht"><StatsCards stats={stats} /></CollapsibleSection>
 
+        <CollapsibleSection title="Planungszentrale">
+          <PlanningControlCenter
+            plannerResult={plannerResult}
+            recommendations={upgradeRecommendations}
+            simulation={builderSimulation}
+            strategy={planningStrategy}
+            resources={resources}
+            horizonDays={horizonDays}
+            goalPercent={goalPercent}
+            onStrategyChange={setPlanningStrategy}
+            onResourcesChange={setResources}
+            onHorizonChange={setHorizonDays}
+            onGoalPercentChange={setGoalPercent}
+          />
+        </CollapsibleSection>
+
         <CollapsibleSection title="Planer & Fortschritt">
         <DashboardSummary
           selectedAccount={selectedAccount}
@@ -357,7 +380,7 @@ export default function Home() {
 
         <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
           <ProgressOverview plannerResult={plannerResult} />
-          <UpgradeRecommendations plannerResult={plannerResult} />
+          <UpgradeRecommendations plannerResult={plannerResult} recommendations={upgradeRecommendations} />
         </div>
 
         <ResourceSummary plannerResult={plannerResult} />
