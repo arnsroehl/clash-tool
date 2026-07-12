@@ -28,6 +28,10 @@ export type UpgradeQueueItemRow = {
   priority_score: number;
   queue_order: number;
   status: UpgradeQueueItemStatus;
+  is_locked: boolean;
+  slot_type: string | null;
+  planned_start_at: string | null;
+  planned_finish_at: string | null;
 };
 
 export type UpgradeQueueItem = {
@@ -47,6 +51,10 @@ export type UpgradeQueueItem = {
   priorityScore: number;
   queueOrder: number;
   status: UpgradeQueueItemStatus;
+  isLocked: boolean;
+  slotType: string | null;
+  plannedStartAt: string | null;
+  plannedFinishAt: string | null;
 };
 
 export type CreateUpgradeQueueItemInput = {

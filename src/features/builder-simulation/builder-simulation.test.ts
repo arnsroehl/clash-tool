@@ -28,6 +28,10 @@ function createQueueItem(params: {
     priorityScore: 50,
     queueOrder: params.queueOrder,
     status: "planned",
+    isLocked: false,
+    slotType: null,
+    plannedStartAt: null,
+    plannedFinishAt: null,
   };
 }
 

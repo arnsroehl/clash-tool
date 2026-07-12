@@ -17,6 +17,7 @@ type UpgradeQueueListProps = {
   onMoveItem: (id: string, direction: "up" | "down") => void;
   onStatusChange: (id: string, status: UpgradeQueueItemStatus) => void;
   onReorderItems: (draggedId: string, targetId: string) => void;
+  onToggleLock: (id: string) => void;
 };
 
 export function UpgradeQueueList({
@@ -32,10 +33,10 @@ export function UpgradeQueueList({
   onMoveItem,
   onStatusChange,
   onReorderItems,
+  onToggleLock,
 }: UpgradeQueueListProps) {
   const [visibleRecommendationCount, setVisibleRecommendationCount] = useState(4);
   const [manualRecommendationKey, setManualRecommendationKey] = useState("");
-  const [lockedIds, setLockedIds] = useState<Set<string>>(new Set());
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const queuedKeys = new Set(queueItems.map((item) => `${item.itemType}:${item.itemId}:${item.toLevel}`));
   const availableRecommendations = recommendations.filter(
@@ -160,8 +161,8 @@ export function UpgradeQueueList({
       {queueItems.length > 0 ? (
         <div className="mt-5 flex flex-col gap-3">
           {queueItems.map((item, index) => (
-            <div key={item.id} draggable={!lockedIds.has(item.id)} onDragStart={() => setDraggedId(item.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => {
-              if (draggedId && !lockedIds.has(item.id)) onReorderItems(draggedId, item.id);
+            <div key={item.id} draggable={!item.isLocked} onDragStart={() => setDraggedId(item.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => {
+              if (draggedId && !item.isLocked) onReorderItems(draggedId, item.id);
               setDraggedId(null);
             }} className={draggedId === item.id ? "opacity-50" : "opacity-100"}>
             <UpgradeQueueItemCard
@@ -173,12 +174,8 @@ export function UpgradeQueueList({
               canMoveUp={index > 0}
               canMoveDown={index < queueItems.length - 1}
               onStatusChange={onStatusChange}
-              isLocked={lockedIds.has(item.id)}
-              onToggleLock={(id) => setLockedIds((current) => {
-                const next = new Set(current);
-                if (next.has(id)) next.delete(id); else next.add(id);
-                return next;
-              })}
+              isLocked={item.isLocked}
+              onToggleLock={onToggleLock}
             />
             </div>
           ))}

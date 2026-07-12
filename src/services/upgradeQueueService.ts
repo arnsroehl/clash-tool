@@ -7,7 +7,7 @@ import type {
 } from "@/types/upgradeQueue";
 
 const UPGRADE_QUEUE_SELECT_FIELDS =
-  "id, created_at, updated_at, account_id, item_type, item_id, name, from_level, to_level, gold_cost, elixir_cost, dark_elixir_cost, duration_hours, priority_score, queue_order, status";
+  "id, created_at, updated_at, account_id, item_type, item_id, name, from_level, to_level, gold_cost, elixir_cost, dark_elixir_cost, duration_hours, priority_score, queue_order, status, is_locked, slot_type, planned_start_at, planned_finish_at";
 
 function isMissingTableMessage(message: string): boolean {
   return (
@@ -46,6 +46,10 @@ export function mapUpgradeQueueItem(
     priorityScore: row.priority_score,
     queueOrder: row.queue_order,
     status: row.status,
+    isLocked: row.is_locked,
+    slotType: row.slot_type,
+    plannedStartAt: row.planned_start_at,
+    plannedFinishAt: row.planned_finish_at,
   };
 }
 
@@ -143,5 +147,11 @@ export async function updateUpgradeQueueItemStatus(
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id);
 
+  if (error) throw toUpgradeQueueError(error.message);
+}
+
+export async function updateUpgradeQueueItemLock(id: string, isLocked: boolean): Promise<void> {
+  const client = getSupabaseClient();
+  const { error } = await client.from("upgrade_queue_items").update({ is_locked: isLocked, updated_at: new Date().toISOString() }).eq("id", id);
   if (error) throw toUpgradeQueueError(error.message);
 }

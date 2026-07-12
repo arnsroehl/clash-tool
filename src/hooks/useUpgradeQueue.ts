@@ -7,6 +7,7 @@ import {
   getUpgradeQueueItems,
   updateUpgradeQueueItemOrder,
   updateUpgradeQueueItemStatus,
+  updateUpgradeQueueItemLock,
 } from "@/services/upgradeQueueService";
 import type { ClashAccount } from "@/types/account";
 import type { UpgradeRecommendation } from "@/features/planner/planner.types";
@@ -219,6 +220,23 @@ export function useUpgradeQueue({
     }
   }, [onError, queueItems]);
 
+  const toggleQueueItemLock = useCallback(async (id: string) => {
+    const previousItems = queueItems;
+    const current = queueItems.find((item) => item.id === id);
+    if (!current) return;
+    const isLocked = !current.isLocked;
+    setQueueItems((items) => items.map((item) => item.id === id ? { ...item, isLocked } : item));
+    try {
+      await updateUpgradeQueueItemLock(id, isLocked);
+      setQueueErrorMessage(null);
+    } catch (error) {
+      setQueueItems(previousItems);
+      const message = error instanceof Error ? error.message : "Sperre konnte nicht gespeichert werden.";
+      setQueueErrorMessage(message);
+      onError(message);
+    }
+  }, [onError, queueItems]);
+
   return {
     queueItems,
     queueErrorMessage,
@@ -231,5 +249,6 @@ export function useUpgradeQueue({
     moveQueueItem,
     changeQueueItemStatus,
     reorderQueueItems,
+    toggleQueueItemLock,
   };
 }

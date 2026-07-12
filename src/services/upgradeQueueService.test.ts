@@ -22,6 +22,10 @@ describe("Upgrade Queue Service", () => {
       priority_score: 90,
       queue_order: 1,
       status: "planned",
+      is_locked: false,
+      slot_type: null,
+      planned_start_at: null,
+      planned_finish_at: null,
     };
 
     const item = mapUpgradeQueueItem(row);
@@ -33,5 +37,6 @@ describe("Upgrade Queue Service", () => {
     assert.equal(item.toLevel, row.to_level);
     assert.equal(item.elixirCost, row.elixir_cost);
     assert.equal(item.queueOrder, row.queue_order);
+    assert.equal(item.isLocked, false);
   });
 });

@@ -206,6 +206,7 @@ export default function Home() {
     moveQueueItem,
     changeQueueItemStatus,
     reorderQueueItems,
+    toggleQueueItemLock,
   } = useUpgradeQueue({
     selectedAccount,
     onError: handleError,
@@ -412,6 +413,7 @@ export default function Home() {
           onMoveItem={moveQueueItem}
           onStatusChange={changeQueueItemStatus}
           onReorderItems={reorderQueueItems}
+          onToggleLock={toggleQueueItemLock}
         />
         </CollapsibleSection>
 
