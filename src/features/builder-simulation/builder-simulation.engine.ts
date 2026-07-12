@@ -17,14 +17,17 @@ export function simulateBuilderQueue(
 ): BuilderSimulationResult {
   const builderAvailability = createInitialBuilderAvailability(input.builderCount);
   const builderCount = builderAvailability.length;
+  const laboratoryAvailability = [0];
 
-  if (builderCount === 0 || input.queueItems.length === 0) {
+  if (input.queueItems.length === 0) {
     return {
       assignments: [],
       totalDurationHours: 0,
       totalDurationDays: 0,
       builderCount,
       idleTimeHours: 0,
+      builderAssignmentCount: 0,
+      laboratoryAssignmentCount: 0,
     };
   }
 
@@ -34,12 +37,15 @@ export function simulateBuilderQueue(
   const assignments = sortQueueByOrder(schedulableItems).reduce<
     BuilderAssignment[]
   >((currentAssignments, queueItem) => {
-    const builderIndex = findNextAvailableBuilder(builderAvailability);
-    const startHour = builderAvailability[builderIndex] || 0;
+    const usesLaboratory = queueItem.itemType === "troop" || queueItem.itemType === "spell" || queueItem.itemType === "siege_machine";
+    const availability = usesLaboratory ? laboratoryAvailability : builderAvailability;
+    const builderIndex = findNextAvailableBuilder(availability);
+    if (builderIndex < 0) return currentAssignments;
+    const startHour = availability[builderIndex] || 0;
     const durationHours = Math.max(queueItem.durationHours, 0);
     const endHour = startHour + durationHours;
 
-    builderAvailability[builderIndex] = endHour;
+    availability[builderIndex] = endHour;
 
     return [
       ...currentAssignments,
@@ -53,10 +59,14 @@ export function simulateBuilderQueue(
         startHour,
         endHour,
         durationHours,
+        slotType: usesLaboratory ? "laboratory" : "builder",
+        slotLabel: usesLaboratory ? "Labor" : `Builder ${builderIndex + 1}`,
       },
     ];
   }, []);
   const totalDurationHours = calculateTotalDurationHours(assignments);
+  const builderAssignments = assignments.filter((assignment) => assignment.slotType === "builder");
+  const laboratoryAssignments = assignments.filter((assignment) => assignment.slotType === "laboratory");
 
   return {
     assignments,
@@ -64,9 +74,11 @@ export function simulateBuilderQueue(
     totalDurationDays: hoursToDays(totalDurationHours),
     builderCount,
     idleTimeHours: calculateIdleTimeHours({
-      assignments,
+      assignments: builderAssignments,
       builderCount,
       totalDurationHours,
     }),
+    builderAssignmentCount: builderAssignments.length,
+    laboratoryAssignmentCount: laboratoryAssignments.length,
   };
 }

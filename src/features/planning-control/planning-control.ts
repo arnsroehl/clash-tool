@@ -7,7 +7,10 @@ export type PlanningStrategy =
   | "farming"
   | "fastest"
   | "rush_recovery"
-  | "town_hall_push";
+  | "town_hall_push"
+  | "custom";
+
+export type StrategyWeights = Record<UpgradeRecommendation["itemType"], number>;
 
 export const strategyLabels: Record<PlanningStrategy, string> = {
   balanced: "Ausgewogen",
@@ -17,13 +20,16 @@ export const strategyLabels: Record<PlanningStrategy, string> = {
   fastest: "Schnellstmöglich maxen",
   rush_recovery: "Rush ausgleichen",
   town_hall_push: "Rathaus-Push",
+  custom: "Eigene Strategie",
 };
 
-function strategyBonus(item: UpgradeRecommendation, strategy: PlanningStrategy): number {
+function strategyBonus(item: UpgradeRecommendation, strategy: PlanningStrategy, weights?: StrategyWeights): number {
   const haystack = `${item.name} ${item.category}`.toLocaleLowerCase("de");
   const includes = (...terms: string[]) => terms.some((term) => haystack.includes(term));
 
   switch (strategy) {
+    case "custom":
+      return weights?.[item.itemType] ?? 0;
     case "offense":
       return item.itemType === "hero" || item.itemType === "troop" || item.itemType === "spell" || item.itemType === "siege_machine" ? 45 : includes("labor", "kaserne", "armeelager") ? 35 : 0;
     case "war":
@@ -44,11 +50,12 @@ function strategyBonus(item: UpgradeRecommendation, strategy: PlanningStrategy):
 export function rankRecommendations(
   recommendations: UpgradeRecommendation[],
   strategy: PlanningStrategy,
+  weights?: StrategyWeights,
 ): UpgradeRecommendation[] {
   return [...recommendations].sort(
     (a, b) =>
-      b.priorityScore.value + strategyBonus(b, strategy) -
-      (a.priorityScore.value + strategyBonus(a, strategy)),
+      b.priorityScore.value + strategyBonus(b, strategy, weights) -
+      (a.priorityScore.value + strategyBonus(a, strategy, weights)),
   );
 }
 

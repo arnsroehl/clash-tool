@@ -29,6 +29,11 @@ export function BuilderSimulationOverview({
         </span>
       </div>
 
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl bg-white/5 p-4"><p className="text-xs text-slate-400">Bauarbeiter-Upgrades</p><p className="mt-1 text-2xl font-bold">{simulation.builderAssignmentCount}</p></div>
+        <div className="rounded-2xl bg-white/5 p-4"><p className="text-xs text-slate-400">Labor-Upgrades</p><p className="mt-1 text-2xl font-bold">{simulation.laboratoryAssignmentCount}</p></div>
+      </div>
+
       {assignments.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
           Keine Queue-Einträge für die Simulation vorhanden.

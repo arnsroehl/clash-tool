@@ -9,13 +9,14 @@ function createQueueItem(params: {
   queueOrder: number;
   durationHours: number;
   createdAt?: string;
+  itemType?: UpgradeQueueItem["itemType"];
 }): UpgradeQueueItem {
   return {
     id: params.id,
     createdAt: params.createdAt || "2026-07-09T00:00:00.000Z",
     updatedAt: params.createdAt || "2026-07-09T00:00:00.000Z",
     accountId: "account-1",
-    itemType: "building",
+    itemType: params.itemType || "building",
     itemId: params.id,
     name: params.id,
     fromLevel: 1,
@@ -104,5 +105,19 @@ describe("Builder Simulation", () => {
     assert.equal(hoursToDays(0), 0);
     assert.equal(hoursToDays(24), 1);
     assert.equal(hoursToDays(36), 1.5);
+  });
+
+  it("Labor läuft unabhängig von den Bauarbeitern", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      queueItems: [
+        createQueueItem({ id: "building", queueOrder: 1, durationHours: 10 }),
+        createQueueItem({ id: "troop", queueOrder: 2, durationHours: 8, itemType: "troop" }),
+        createQueueItem({ id: "spell", queueOrder: 3, durationHours: 4, itemType: "spell" }),
+      ],
+    });
+    assert.equal(result.assignments[1].startHour, 0);
+    assert.equal(result.assignments[2].startHour, 8);
+    assert.equal(result.laboratoryAssignmentCount, 2);
   });
 });

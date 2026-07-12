@@ -28,7 +28,7 @@ export function BuilderAssignmentCard({
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-bold text-amber-300">
-            Builder {assignment.builderIndex + 1} · {formatType(assignment.itemType)}
+            {assignment.slotLabel} · {formatType(assignment.itemType)}
           </p>
           <h3 className="mt-1 font-bold text-white">{assignment.name}</h3>
           <p className="mt-1 text-sm text-slate-400">

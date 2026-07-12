@@ -5,6 +5,8 @@ export type BuilderSimulationInput = {
   queueItems: UpgradeQueueItem[];
 };
 
+export type UpgradeSlotType = "builder" | "laboratory";
+
 export type BuilderAssignment = {
   builderIndex: number;
   queueItemId: string;
@@ -15,6 +17,8 @@ export type BuilderAssignment = {
   startHour: number;
   endHour: number;
   durationHours: number;
+  slotType: UpgradeSlotType;
+  slotLabel: string;
 };
 
 export type BuilderSimulationResult = {
@@ -23,4 +27,6 @@ export type BuilderSimulationResult = {
   totalDurationDays: number;
   builderCount: number;
   idleTimeHours: number;
+  builderAssignmentCount: number;
+  laboratoryAssignmentCount: number;
 };

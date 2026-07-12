@@ -18,7 +18,7 @@ import { ProgressForecastOverview } from "@/components/progress-forecast/Progres
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
-import { rankRecommendations, type PlanningStrategy } from "@/features/planning-control/planning-control";
+import { rankRecommendations, type PlanningStrategy, type StrategyWeights } from "@/features/planning-control/planning-control";
 import { createProgressForecast } from "@/features/progress-forecast/progress-forecast.engine";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useBuildings } from "@/hooks/useBuildings";
@@ -95,6 +95,8 @@ export default function Home() {
   const [resources, setResources] = useState<ResourceSnapshot>({ gold: 0, elixir: 0, darkElixir: 0 });
   const [horizonDays, setHorizonDays] = useState(30);
   const [goalPercent, setGoalPercent] = useState(75);
+  const [dailyIncome, setDailyIncome] = useState<ResourceSnapshot>({ gold: 0, elixir: 0, darkElixir: 0 });
+  const [strategyWeights, setStrategyWeights] = useState<StrategyWeights>({ building: 50, hero: 50, troop: 50, spell: 50, siege_machine: 50 });
   const clearError = useCallback(() => setErrorMessage(null), []);
   const handleError = useCallback((message: string) => {
     setErrorMessage(message);
@@ -318,8 +320,8 @@ export default function Home() {
   ]);
 
   const upgradeRecommendations = useMemo(() => {
-    return rankRecommendations(plannerResult?.recommendations || [], planningStrategy);
-  }, [plannerResult, planningStrategy]);
+    return rankRecommendations(plannerResult?.recommendations || [], planningStrategy, strategyWeights);
+  }, [plannerResult, planningStrategy, strategyWeights]);
 
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
     return simulateBuilderQueue({
@@ -367,10 +369,14 @@ export default function Home() {
             resources={resources}
             horizonDays={horizonDays}
             goalPercent={goalPercent}
+            dailyIncome={dailyIncome}
+            strategyWeights={strategyWeights}
             onStrategyChange={setPlanningStrategy}
             onResourcesChange={setResources}
             onHorizonChange={setHorizonDays}
             onGoalPercentChange={setGoalPercent}
+            onDailyIncomeChange={setDailyIncome}
+            onStrategyWeightsChange={setStrategyWeights}
           />
         </CollapsibleSection>
 

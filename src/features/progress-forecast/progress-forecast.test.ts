@@ -35,6 +35,8 @@ const builderSimulation: BuilderSimulationResult = {
   totalDurationDays: 1.5,
   builderCount: 2,
   idleTimeHours: 0,
+  builderAssignmentCount: 0,
+  laboratoryAssignmentCount: 0,
 };
 
 describe("Progress Forecast", () => {
