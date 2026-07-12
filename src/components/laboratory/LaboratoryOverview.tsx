@@ -83,8 +83,9 @@ export function LaboratoryOverview({
       </div>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-3">
-        <div className="flex flex-col gap-4">
-          <h3 className="text-lg font-bold">Truppen · {troopProgress} %</h3>
+        <details open className="rounded-2xl border border-white/10 p-4">
+          <summary className="cursor-pointer text-lg font-bold">Truppen · {troopProgress} %</summary>
+          <div className="mt-4">
           <TroopList
             availableTroops={availableTroops}
             troopLevels={troopLevels}
@@ -94,10 +95,12 @@ export function LaboratoryOverview({
             selectedAccount={selectedAccount}
             onUpdateTroopLevel={onUpdateTroopLevel}
           />
-        </div>
+          </div>
+        </details>
 
-        <div className="flex flex-col gap-4">
-          <h3 className="text-lg font-bold">Zauber · {spellProgress} %</h3>
+        <details open className="rounded-2xl border border-white/10 p-4">
+          <summary className="cursor-pointer text-lg font-bold">Zauber · {spellProgress} %</summary>
+          <div className="mt-4">
           <SpellList
             availableSpells={availableSpells}
             spellLevels={spellLevels}
@@ -107,12 +110,14 @@ export function LaboratoryOverview({
             selectedAccount={selectedAccount}
             onUpdateSpellLevel={onUpdateSpellLevel}
           />
-        </div>
+          </div>
+        </details>
 
-        <div className="flex flex-col gap-4">
-          <h3 className="text-lg font-bold">
+        <details open className="rounded-2xl border border-white/10 p-4">
+          <summary className="cursor-pointer text-lg font-bold">
             Belagerungsmaschinen · {siegeMachineProgress} %
-          </h3>
+          </summary>
+          <div className="mt-4">
           <SiegeMachineList
             availableSiegeMachines={availableSiegeMachines}
             siegeMachineLevels={siegeMachineLevels}
@@ -122,7 +127,8 @@ export function LaboratoryOverview({
             selectedAccount={selectedAccount}
             onUpdateSiegeMachineLevel={onUpdateSiegeMachineLevel}
           />
-        </div>
+          </div>
+        </details>
       </div>
     </section>
   );

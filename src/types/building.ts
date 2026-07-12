@@ -59,4 +59,10 @@ export type AccountBuildingRow = {
   current_level: number;
 };
 
+export type AccountBuildingInstanceRow = AccountBuildingRow & {
+  instance_index: number;
+};
+
+export type BuildingInstanceLevelMap = Record<string, number[]>;
+
 export type BuildingLevelMap = Record<string, number>;

@@ -1,29 +1,22 @@
 import { BuildingCard } from "@/components/buildings/BuildingCard";
 import { BuildingProgress } from "@/components/buildings/BuildingProgress";
 import type { ClashAccount } from "@/types/account";
-import type { Building, BuildingLevelMap } from "@/types/building";
-
-const nextSteps = [
-  "Mehr echte Gebäude eintragen",
-  "Max-Level je Rathaus berücksichtigen",
-  "Fortschritt automatisch berechnen",
-  "Upgrade-Kosten und Bauzeiten ergänzen",
-];
+import type { Building, BuildingInstanceLevelMap } from "@/types/building";
 
 type BuildingListProps = {
   availableBuildings: Building[];
-  buildingLevels: BuildingLevelMap;
+  buildingInstanceLevels: BuildingInstanceLevelMap;
   buildingsCount: number;
   isLoadingBuildings: boolean;
   isSavingBuildingId: string | null;
   progress: number;
   selectedAccount: ClashAccount | null;
-  onUpdateBuildingLevel: (building: Building, nextLevel: number) => void;
+  onUpdateBuildingLevel: (building: Building, instanceIndex: number, nextLevel: number) => void;
 };
 
 export function BuildingList({
   availableBuildings,
-  buildingLevels,
+  buildingInstanceLevels,
   buildingsCount,
   isLoadingBuildings,
   isSavingBuildingId,
@@ -60,32 +53,26 @@ export function BuildingList({
           Für dieses Rathauslevel sind noch keine Gebäude hinterlegt.
         </div>
       ) : (
-        <div className="mt-8 flex flex-col gap-3">
-          {availableBuildings.map((building) => (
+        <div className="mt-8 flex flex-col gap-4">
+          {Object.entries(Object.groupBy(availableBuildings, (building) => building.category)).map(([category, categoryBuildings]) => (
+            <details key={category} className="rounded-2xl border border-white/10 bg-white/5" open>
+              <summary className="cursor-pointer p-5 text-lg font-bold">{category} ({categoryBuildings?.length || 0})</summary>
+              <div className="space-y-3 border-t border-white/10 p-4">
+              {(categoryBuildings || []).map((building) => (
             <BuildingCard
               key={building.id}
               building={building}
-              currentLevel={buildingLevels[building.id] || 0}
+              instanceLevels={buildingInstanceLevels[building.id] || []}
               isSaving={isSavingBuildingId === building.id}
               onUpdateLevel={onUpdateBuildingLevel}
             />
+              ))}
+              </div>
+            </details>
           ))}
         </div>
       )}
 
-      <div className="mt-8 border-t border-white/10 pt-8">
-        <h3 className="text-lg font-bold">Nächste Entwicklungsschritte</h3>
-        <ul className="mt-5 space-y-4">
-          {nextSteps.map((step, index) => (
-            <li key={step} className="flex items-center gap-3 text-slate-300">
-              <span className="flex size-8 items-center justify-center rounded-full bg-amber-400 font-bold text-slate-950">
-                {index + 1}
-              </span>
-              {step}
-            </li>
-          ))}
-        </ul>
-      </div>
     </section>
   );
 }

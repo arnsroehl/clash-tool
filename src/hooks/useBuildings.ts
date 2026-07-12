@@ -13,6 +13,7 @@ import type {
   Building,
   BuildingLevel,
   BuildingLevelMap,
+  BuildingInstanceLevelMap,
   BuildingTownHallAvailability,
 } from "@/types/building";
 
@@ -28,10 +29,10 @@ function clampBuildingLevel(building: Building, nextLevel: number): number {
 
 function calculateProgress(
   availableBuildings: Building[],
-  buildingLevels: BuildingLevelMap,
+  instanceLevels: BuildingInstanceLevelMap,
 ): number {
   const completedBuildingLevels = availableBuildings.reduce((sum, building) => {
-    return sum + (buildingLevels[building.id] || 0) * (building.countAfterMerges || 1);
+    return sum + (instanceLevels[building.id] || []).reduce((levelSum, level) => levelSum + level, 0);
   }, 0);
 
   const maxBuildingLevels = availableBuildings.reduce((sum, building) => {
@@ -74,7 +75,7 @@ export function useBuildings({
   const [buildingMaxLevels, setBuildingMaxLevels] = useState<BuildingLevel[]>(
     [],
   );
-  const [buildingLevels, setBuildingLevels] = useState<BuildingLevelMap>({});
+  const [buildingInstanceLevels, setBuildingInstanceLevels] = useState<BuildingInstanceLevelMap>({});
   const [buildingAvailability, setBuildingAvailability] = useState<BuildingTownHallAvailability[]>([]);
   const [isLoadingBuildings, setIsLoadingBuildings] = useState(true);
   const [isSavingBuildingId, setIsSavingBuildingId] = useState<string | null>(
@@ -106,13 +107,13 @@ export function useBuildings({
   useEffect(() => {
     async function loadAccountBuildings() {
       if (!selectedAccount) {
-        setBuildingLevels({});
+        setBuildingInstanceLevels({});
         return;
       }
 
       try {
         const loadedLevels = await fetchAccountBuildingLevels(selectedAccount.id);
-        setBuildingLevels(loadedLevels);
+        setBuildingInstanceLevels(loadedLevels);
       } catch (error) {
         onError(error instanceof Error ? error.message : "Gebäudelevel konnten nicht geladen werden.");
       }
@@ -151,11 +152,30 @@ export function useBuildings({
       }));
   }, [buildingAvailability, buildingMaxLevels, buildings, selectedAccount]);
 
-  const progress = useMemo(() => {
-    return calculateProgress(availableBuildings, buildingLevels);
-  }, [availableBuildings, buildingLevels]);
+  const effectiveBuildingInstanceLevels = useMemo(() => {
+    if (!selectedAccount) return buildingInstanceLevels;
+    const townHall = buildings.find((building) => building.name === "Rathaus");
+    if (!townHall) return buildingInstanceLevels;
+    return {
+      ...buildingInstanceLevels,
+      [townHall.id]: [selectedAccount.townHallLevel],
+    };
+  }, [buildingInstanceLevels, buildings, selectedAccount]);
 
-  async function updateBuildingLevel(building: Building, nextLevel: number) {
+  const progress = useMemo(() => {
+    return calculateProgress(availableBuildings, effectiveBuildingInstanceLevels);
+  }, [availableBuildings, effectiveBuildingInstanceLevels]);
+
+  const buildingLevels = useMemo<BuildingLevelMap>(() => {
+    return Object.fromEntries(
+      Object.entries(effectiveBuildingInstanceLevels).map(([buildingId, levels]) => [
+        buildingId,
+        levels.length > 0 ? Math.min(...levels) : 0,
+      ]),
+    );
+  }, [effectiveBuildingInstanceLevels]);
+
+  async function updateBuildingLevel(building: Building, instanceIndex: number, nextLevel: number) {
     if (!selectedAccount) {
       return;
     }
@@ -164,15 +184,17 @@ export function useBuildings({
 
     clearError();
     setIsSavingBuildingId(building.id);
-    setBuildingLevels((currentLevels) => ({
-      ...currentLevels,
-      [building.id]: safeLevel,
-    }));
+    setBuildingInstanceLevels((currentLevels) => {
+      const nextLevels = [...(currentLevels[building.id] || [])];
+      nextLevels[instanceIndex - 1] = safeLevel;
+      return { ...currentLevels, [building.id]: nextLevels };
+    });
 
     try {
       await upsertAccountBuildingLevel({
         accountId: selectedAccount.id,
         buildingId: building.id,
+        instanceIndex,
         currentLevel: safeLevel,
       });
     } catch (error) {
@@ -187,6 +209,7 @@ export function useBuildings({
     availableBuildings,
     buildingMaxLevels,
     buildingLevels,
+    buildingInstanceLevels: effectiveBuildingInstanceLevels,
     progress,
     isLoadingBuildings,
     isSavingBuildingId,

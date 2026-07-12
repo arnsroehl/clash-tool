@@ -12,6 +12,7 @@ import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
 import { HeroList } from "@/components/heroes/HeroList";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
+import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
@@ -111,6 +112,7 @@ export default function Home() {
     availableBuildings,
     buildingMaxLevels,
     buildingLevels,
+    buildingInstanceLevels,
     progress,
     isLoadingBuildings,
     isSavingBuildingId,
@@ -345,8 +347,9 @@ export default function Home() {
           </div>
         </div>
 
-        <StatsCards stats={stats} />
+        <CollapsibleSection title="Übersicht"><StatsCards stats={stats} /></CollapsibleSection>
 
+        <CollapsibleSection title="Planer & Fortschritt">
         <DashboardSummary
           selectedAccount={selectedAccount}
           plannerResult={plannerResult}
@@ -358,7 +361,9 @@ export default function Home() {
         </div>
 
         <ResourceSummary plannerResult={plannerResult} />
+        </CollapsibleSection>
 
+        <CollapsibleSection title="Upgrade Queue">
         <UpgradeQueueList
           selectedAccount={selectedAccount}
           queueItems={queueItems}
@@ -370,11 +375,17 @@ export default function Home() {
           onAddRecommendation={addRecommendationToQueue}
           onDeleteItem={removeQueueItem}
         />
+        </CollapsibleSection>
 
+        <CollapsibleSection title="Builder Simulation">
         <BuilderSimulationOverview simulation={builderSimulation} />
+        </CollapsibleSection>
 
+        <CollapsibleSection title="Fortschrittsprognose">
         <ProgressForecastOverview forecast={progressForecast} />
+        </CollapsibleSection>
 
+        <CollapsibleSection title="Accounts & Gebäude">
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <section className="flex flex-col gap-6">
             <AccountForm
@@ -394,7 +405,7 @@ export default function Home() {
 
           <BuildingList
             availableBuildings={availableBuildings}
-            buildingLevels={buildingLevels}
+            buildingInstanceLevels={buildingInstanceLevels}
             buildingsCount={buildings.length}
             isLoadingBuildings={isLoadingBuildings}
             isSavingBuildingId={isSavingBuildingId}
@@ -403,7 +414,9 @@ export default function Home() {
             onUpdateBuildingLevel={updateBuildingLevel}
           />
         </div>
+        </CollapsibleSection>
 
+        <CollapsibleSection title="Helden & Beschützer">
         <HeroList
           availableHeroes={availableHeroes}
           heroLevels={heroLevels}
@@ -414,7 +427,9 @@ export default function Home() {
           selectedAccount={selectedAccount}
           onUpdateHeroLevel={updateHeroLevel}
         />
+        </CollapsibleSection>
 
+        <CollapsibleSection title="Truppen, Zauber & Belagerungsmaschinen">
         <LaboratoryOverview
           selectedAccount={selectedAccount}
           troops={troops}
@@ -439,6 +454,7 @@ export default function Home() {
           isSavingSiegeMachineId={isSavingSiegeMachineId}
           onUpdateSiegeMachineLevel={updateSiegeMachineLevel}
         />
+        </CollapsibleSection>
       </section>
     </main>
   );

@@ -1,13 +1,13 @@
 import { getSupabaseClient } from "@/lib/supabase";
 import type {
-  AccountBuildingRow,
+  AccountBuildingInstanceRow,
   Building,
   BuildingLevel,
-  BuildingLevelMap,
   BuildingLevelRow,
   BuildingRow,
   BuildingTownHallAvailability,
   BuildingTownHallAvailabilityRow,
+  BuildingInstanceLevelMap,
 } from "@/types/building";
 
 const BUILDING_SELECT_FIELDS =
@@ -88,21 +88,23 @@ export async function fetchBuildingAvailability(): Promise<BuildingTownHallAvail
 
 export async function fetchAccountBuildingLevels(
   accountId: string,
-): Promise<BuildingLevelMap> {
+): Promise<BuildingInstanceLevelMap> {
   const client = getSupabaseClient();
 
   const { data, error } = await client
-    .from("account_buildings")
-    .select("building_id, current_level")
+    .from("account_building_instances")
+    .select("building_id, instance_index, current_level")
     .eq("account_id", accountId);
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return ((data || []) as AccountBuildingRow[]).reduce<BuildingLevelMap>(
+  return ((data || []) as AccountBuildingInstanceRow[]).reduce<BuildingInstanceLevelMap>(
     (result, row) => {
-      result[row.building_id] = row.current_level;
+      const levels = result[row.building_id] || [];
+      levels[row.instance_index - 1] = row.current_level;
+      result[row.building_id] = levels;
       return result;
     },
     {},
@@ -112,18 +114,20 @@ export async function fetchAccountBuildingLevels(
 export async function upsertAccountBuildingLevel(params: {
   accountId: string;
   buildingId: string;
+  instanceIndex: number;
   currentLevel: number;
 }): Promise<void> {
   const client = getSupabaseClient();
 
-  const { error } = await client.from("account_buildings").upsert(
+  const { error } = await client.from("account_building_instances").upsert(
     {
       account_id: params.accountId,
       building_id: params.buildingId,
+      instance_index: params.instanceIndex,
       current_level: params.currentLevel,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "account_id,building_id" },
+    { onConflict: "account_id,building_id,instance_index" },
   );
 
   if (error) {
