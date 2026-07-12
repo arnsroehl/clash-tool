@@ -12,7 +12,7 @@ function formatNumber(value: number): string {
 export function BuilderSimulationOverview({
   simulation,
 }: BuilderSimulationOverviewProps) {
-  const assignments = simulation.assignments.slice(0, 5);
+  const assignments = simulation.assignments;
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8">

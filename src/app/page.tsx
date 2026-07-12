@@ -198,6 +198,8 @@ export default function Home() {
     deletingQueueItemId,
     addRecommendationToQueue,
     removeQueueItem,
+    moveQueueItem,
+    changeQueueItemStatus,
   } = useUpgradeQueue({
     selectedAccount,
     onError: handleError,
@@ -397,6 +399,8 @@ export default function Home() {
           deletingItemId={deletingQueueItemId}
           onAddRecommendation={addRecommendationToQueue}
           onDeleteItem={removeQueueItem}
+          onMoveItem={moveQueueItem}
+          onStatusChange={changeQueueItemStatus}
         />
         </CollapsibleSection>
 

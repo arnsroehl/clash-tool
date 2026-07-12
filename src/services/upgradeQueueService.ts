@@ -3,6 +3,7 @@ import type {
   CreateUpgradeQueueItemInput,
   UpgradeQueueItem,
   UpgradeQueueItemRow,
+  UpgradeQueueItemStatus,
 } from "@/types/upgradeQueue";
 
 const UPGRADE_QUEUE_SELECT_FIELDS =
@@ -130,4 +131,17 @@ export async function updateUpgradeQueueItemOrder(
   if (failedResult?.error) {
     throw toUpgradeQueueError(failedResult.error.message);
   }
+}
+
+export async function updateUpgradeQueueItemStatus(
+  id: string,
+  status: UpgradeQueueItemStatus,
+): Promise<void> {
+  const client = getSupabaseClient();
+  const { error } = await client
+    .from("upgrade_queue_items")
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) throw toUpgradeQueueError(error.message);
 }

@@ -5,12 +5,15 @@ import {
   createUpgradeQueueItem,
   deleteUpgradeQueueItem,
   getUpgradeQueueItems,
+  updateUpgradeQueueItemOrder,
+  updateUpgradeQueueItemStatus,
 } from "@/services/upgradeQueueService";
 import type { ClashAccount } from "@/types/account";
 import type { UpgradeRecommendation } from "@/features/planner/planner.types";
 import type {
   CreateUpgradeQueueItemInput,
   UpgradeQueueItem,
+  UpgradeQueueItemStatus,
 } from "@/types/upgradeQueue";
 
 type UseUpgradeQueueOptions = {
@@ -157,6 +160,44 @@ export function useUpgradeQueue({
     [clearError, onError],
   );
 
+  const moveQueueItem = useCallback(
+    async (id: string, direction: "up" | "down") => {
+      const currentIndex = queueItems.findIndex((item) => item.id === id);
+      const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+      if (currentIndex < 0 || targetIndex < 0 || targetIndex >= queueItems.length) return;
+
+      const reordered = [...queueItems];
+      [reordered[currentIndex], reordered[targetIndex]] = [reordered[targetIndex], reordered[currentIndex]];
+      const normalized = reordered.map((item, index) => ({ ...item, queueOrder: index + 1 }));
+      setQueueItems(normalized);
+
+      try {
+        await updateUpgradeQueueItemOrder(normalized.map(({ id: itemId, queueOrder }) => ({ id: itemId, queueOrder })));
+        setQueueErrorMessage(null);
+      } catch (error) {
+        setQueueItems(queueItems);
+        const message = error instanceof Error ? error.message : "Queue-Reihenfolge konnte nicht gespeichert werden.";
+        setQueueErrorMessage(message);
+        onError(message);
+      }
+    },
+    [onError, queueItems],
+  );
+
+  const changeQueueItemStatus = useCallback(async (id: string, status: UpgradeQueueItemStatus) => {
+    const previousItems = queueItems;
+    setQueueItems((items) => items.map((item) => item.id === id ? { ...item, status } : item));
+    try {
+      await updateUpgradeQueueItemStatus(id, status);
+      setQueueErrorMessage(null);
+    } catch (error) {
+      setQueueItems(previousItems);
+      const message = error instanceof Error ? error.message : "Upgrade-Status konnte nicht gespeichert werden.";
+      setQueueErrorMessage(message);
+      onError(message);
+    }
+  }, [onError, queueItems]);
+
   return {
     queueItems,
     queueErrorMessage,
@@ -166,5 +207,7 @@ export function useUpgradeQueue({
     addQueueItem,
     addRecommendationToQueue,
     removeQueueItem,
+    moveQueueItem,
+    changeQueueItemStatus,
   };
 }

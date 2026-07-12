@@ -28,7 +28,10 @@ export function simulateBuilderQueue(
     };
   }
 
-  const assignments = sortQueueByOrder(input.queueItems).reduce<
+  const schedulableItems = input.queueItems.filter(
+    (item) => item.status === "planned" || item.status === "active",
+  );
+  const assignments = sortQueueByOrder(schedulableItems).reduce<
     BuilderAssignment[]
   >((currentAssignments, queueItem) => {
     const builderIndex = findNextAvailableBuilder(builderAvailability);
