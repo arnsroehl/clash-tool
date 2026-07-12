@@ -4,6 +4,7 @@ export type ClashAccount = {
   townHallLevel: number;
   builderCount: number;
   createdAt: string;
+  userId: string;
 };
 
 export type AccountFormValues = {
@@ -18,4 +19,5 @@ export type AccountRow = {
   town_hall_level: number;
   builder_count: number;
   created_at: string;
+  user_id: string;
 };

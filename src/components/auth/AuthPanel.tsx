@@ -1,0 +1,43 @@
+"use client";
+
+import { type FormEvent, useState } from "react";
+
+type Props = {
+  isLoading: boolean;
+  message: string | null;
+  onSignIn: (email: string, password: string) => Promise<void>;
+  onSignUp: (email: string, password: string) => Promise<void>;
+  onMessage: (message: string | null) => void;
+};
+
+export function AuthPanel({ isLoading, message, onSignIn, onSignUp, onMessage }: Props) {
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const email = String(form.get("email") || "").trim();
+    const password = String(form.get("password") || "");
+    setIsSubmitting(true);
+    onMessage(null);
+    try {
+      if (mode === "login") await onSignIn(email, password); else await onSignUp(email, password);
+    } catch (error) {
+      onMessage(error instanceof Error ? error.message : "Anmeldung fehlgeschlagen.");
+    } finally { setIsSubmitting(false); }
+  };
+  return <main className="flex min-h-screen items-center justify-center bg-slate-950 p-6 text-white">
+    <section className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8">
+      <p className="text-sm font-bold uppercase tracking-[0.3em] text-amber-400">Clash Tool</p>
+      <h1 className="mt-3 text-3xl font-bold">{mode === "login" ? "Anmelden" : "Account erstellen"}</h1>
+      <p className="mt-2 text-sm text-slate-400">Deine Clash-Accounts und Planungen werden sicher deinem Benutzer zugeordnet.</p>
+      <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
+        <input required name="email" type="email" autoComplete="email" placeholder="E-Mail-Adresse" className="rounded-xl border border-white/10 bg-slate-900 p-3" />
+        <input required minLength={8} name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Passwort (mindestens 8 Zeichen)" className="rounded-xl border border-white/10 bg-slate-900 p-3" />
+        {message ? <p className="rounded-xl bg-amber-400/10 p-3 text-sm text-amber-100">{message}</p> : null}
+        <button disabled={isLoading || isSubmitting} className="rounded-xl bg-amber-400 p-3 font-bold text-slate-950 disabled:opacity-50">{isSubmitting ? "Bitte warten …" : mode === "login" ? "Anmelden" : "Registrieren"}</button>
+      </form>
+      <button type="button" onClick={() => { setMode(mode === "login" ? "register" : "login"); onMessage(null); }} className="mt-4 w-full text-sm text-slate-300">{mode === "login" ? "Noch keinen Account? Registrieren" : "Bereits registriert? Anmelden"}</button>
+    </section>
+  </main>;
+}

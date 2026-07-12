@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { AccountForm } from "@/components/accounts/AccountForm";
+import { AuthPanel } from "@/components/auth/AuthPanel";
 import { AccountList } from "@/components/accounts/AccountList";
 import { StatsCards } from "@/components/accounts/StatsCards";
 import { BuildingList } from "@/components/buildings/BuildingList";
@@ -24,6 +25,7 @@ import { planUpgrades } from "@/features/planner/planner.service";
 import { rankRecommendations, type PlanningStrategy, type StrategyWeights } from "@/features/planning-control/planning-control";
 import { createProgressForecast } from "@/features/progress-forecast/progress-forecast.engine";
 import { useAccounts } from "@/hooks/useAccounts";
+import { useAuth } from "@/hooks/useAuth";
 import { useBuildings } from "@/hooks/useBuildings";
 import { useHeroes } from "@/hooks/useHeroes";
 import { useSiegeMachines } from "@/hooks/useSiegeMachines";
@@ -104,6 +106,7 @@ export default function Home() {
   const handleError = useCallback((message: string) => {
     setErrorMessage(message);
   }, []);
+  const { user, isLoadingAuth, authMessage, setAuthMessage, signIn, signUp, signOut } = useAuth();
 
   const {
     accounts,
@@ -117,6 +120,7 @@ export default function Home() {
   } = useAccounts({
     onError: handleError,
     clearError,
+    enabled: Boolean(user),
   });
 
   const {
@@ -343,6 +347,10 @@ export default function Home() {
     });
   }, [builderSimulation, plannerResult, queueItems]);
 
+  if (isLoadingAuth || !user) {
+    return <AuthPanel isLoading={isLoadingAuth} message={authMessage} onSignIn={signIn} onSignUp={signUp} onMessage={setAuthMessage} />;
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <section className="mx-auto flex max-w-6xl flex-col gap-10">
@@ -359,6 +367,10 @@ export default function Home() {
                 Verwalte Clash-Accounts und erfasse die ersten Gebäudelevel als
                 Grundlage für Fortschritt, Planung und KI-Erkennung.
               </p>
+            </div>
+            <div className="flex flex-col items-start gap-2 md:items-end">
+              <span className="text-sm text-slate-400">{user.email}</span>
+              <button type="button" onClick={() => signOut().catch((error) => handleError(error instanceof Error ? error.message : "Abmelden fehlgeschlagen."))} className="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/5">Abmelden</button>
             </div>
           </div>
         </div>

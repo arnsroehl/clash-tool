@@ -14,6 +14,7 @@ import type {
 type UseAccountsOptions = {
   onError: (message: string) => void;
   clearError: () => void;
+  enabled?: boolean;
 };
 
 function getAccountFormValues(form: HTMLFormElement): AccountFormValues {
@@ -30,7 +31,7 @@ function isValidAccountForm(values: AccountFormValues): boolean {
   return Boolean(values.name && values.townHallLevel && values.builderCount);
 }
 
-export function useAccounts({ onError, clearError }: UseAccountsOptions) {
+export function useAccounts({ onError, clearError, enabled = true }: UseAccountsOptions) {
   const [accounts, setAccounts] = useState<ClashAccount[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<ClashAccount | null>(
     null,
@@ -41,6 +42,13 @@ export function useAccounts({ onError, clearError }: UseAccountsOptions) {
 
   useEffect(() => {
     async function loadAccounts() {
+      if (!enabled) {
+        setAccounts([]);
+        setSelectedAccount(null);
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
       try {
         const loadedAccounts = await fetchAccounts();
         setAccounts(loadedAccounts);
@@ -53,7 +61,7 @@ export function useAccounts({ onError, clearError }: UseAccountsOptions) {
     }
 
     loadAccounts();
-  }, [onError]);
+  }, [enabled, onError]);
 
   async function handleCreateAccount(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

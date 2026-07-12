@@ -6,7 +6,7 @@ import type {
 } from "@/types/account";
 
 const ACCOUNT_SELECT_FIELDS =
-  "id, name, town_hall_level, builder_count, created_at";
+  "id, name, town_hall_level, builder_count, created_at, user_id";
 
 function mapAccount(row: AccountRow): ClashAccount {
   return {
@@ -15,6 +15,7 @@ function mapAccount(row: AccountRow): ClashAccount {
     townHallLevel: row.town_hall_level,
     builderCount: row.builder_count,
     createdAt: row.created_at,
+    userId: row.user_id,
   };
 }
 
@@ -37,6 +38,8 @@ export async function createAccount(
   values: AccountFormValues,
 ): Promise<ClashAccount> {
   const client = getSupabaseClient();
+  const { data: { user }, error: userError } = await client.auth.getUser();
+  if (userError || !user) throw new Error("Bitte melde dich an.");
 
   const { data, error } = await client
     .from("accounts")
@@ -44,6 +47,7 @@ export async function createAccount(
       name: values.name,
       town_hall_level: values.townHallLevel,
       builder_count: values.builderCount,
+      user_id: user.id,
     })
     .select(ACCOUNT_SELECT_FIELDS)
     .single();
@@ -53,6 +57,12 @@ export async function createAccount(
   }
 
   return mapAccount(data as AccountRow);
+}
+
+export async function claimLegacyAccounts(userId: string): Promise<void> {
+  const client = getSupabaseClient();
+  const { error } = await client.from("accounts").update({ user_id: userId }).is("user_id", null);
+  if (error) throw new Error(error.message);
 }
 
 export async function deleteAccount(accountId: string): Promise<void> {
