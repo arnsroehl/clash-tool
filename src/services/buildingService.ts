@@ -6,6 +6,8 @@ import type {
   BuildingLevelMap,
   BuildingLevelRow,
   BuildingRow,
+  BuildingTownHallAvailability,
+  BuildingTownHallAvailabilityRow,
 } from "@/types/building";
 
 const BUILDING_SELECT_FIELDS =
@@ -64,6 +66,24 @@ export async function fetchBuildingLevels(): Promise<BuildingLevel[]> {
   }
 
   return ((data || []) as BuildingLevelRow[]).map(mapBuildingLevel);
+}
+
+export async function fetchBuildingAvailability(): Promise<BuildingTownHallAvailability[]> {
+  const client = getSupabaseClient();
+  const { data, error } = await client
+    .from("building_town_hall_availability")
+    .select("building_id, town_hall_level, building_count, count_after_merges");
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return ((data || []) as BuildingTownHallAvailabilityRow[]).map((row) => ({
+    buildingId: row.building_id,
+    townHallLevel: row.town_hall_level,
+    buildingCount: row.building_count,
+    countAfterMerges: row.count_after_merges,
+  }));
 }
 
 export async function fetchAccountBuildingLevels(

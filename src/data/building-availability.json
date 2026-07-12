@@ -1,0 +1,3080 @@
+[
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 1,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 2,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 3,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 4,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 5,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 6,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 7,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 8,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 9,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 10,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 11,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 12,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 13,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 14,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 15,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 16,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 17,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 18,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 1,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 2,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 3,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 4,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 5,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 6,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 5,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 6,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 7,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 5,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 6,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 5,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 6,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 7,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 5,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 6,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 3,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 4,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 5,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 6,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 5,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 6,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 7,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 8,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 9,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 10,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 11,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 12,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 13,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 5,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 6,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 5,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 6,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 7,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 8,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 9,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 10,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 11,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 1,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 2,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 3,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 4,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 5,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 6,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 5,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 6,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 8,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 9,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 10,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 11,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 12,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 13,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 14,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 15,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 16,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 17,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 18,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 2,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 3,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 4,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 5,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 6,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 1,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 2,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 3,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 4,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 5,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 6,
+    "count": 6,
+    "countAfterMerges": 6
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 7,
+    "count": 6,
+    "countAfterMerges": 6
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 8,
+    "count": 6,
+    "countAfterMerges": 6
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 9,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 10,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 11,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 12,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 13,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 14,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 15,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 16,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 17,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 18,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 1,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 2,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 3,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 4,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 5,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 6,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 7,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 8,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 9,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 10,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 11,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 12,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 13,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 14,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 15,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 16,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 17,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 18,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 1,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 2,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 3,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 4,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 5,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 6,
+    "count": 6,
+    "countAfterMerges": 6
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 7,
+    "count": 6,
+    "countAfterMerges": 6
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 8,
+    "count": 6,
+    "countAfterMerges": 6
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 9,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 10,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 11,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 12,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 13,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 14,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 15,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 16,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 17,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 18,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 1,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 2,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 3,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 4,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 5,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 6,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 7,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 8,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 9,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 10,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 11,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 12,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 13,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 14,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 15,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 16,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 17,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 18,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 4,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 5,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 6,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 7,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 8,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 9,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 10,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 11,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 12,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 13,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 14,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 15,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 16,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 17,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 18,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 6,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 7,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 9,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 10,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 11,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 12,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 13,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 14,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 15,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 16,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 17,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 18,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 2,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 3,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 4,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 5,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 6,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 7,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 8,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 9,
+    "count": 6,
+    "countAfterMerges": 6
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 10,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 11,
+    "count": 8,
+    "countAfterMerges": 8
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 12,
+    "count": 8,
+    "countAfterMerges": 8
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 13,
+    "count": 8,
+    "countAfterMerges": 8
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 14,
+    "count": 8,
+    "countAfterMerges": 8
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 15,
+    "count": 8,
+    "countAfterMerges": 8
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 16,
+    "count": 8,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 17,
+    "count": 9,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 18,
+    "count": 9,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 10,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 11,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 12,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 13,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 14,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 15,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 16,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 17,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 18,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 1,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 2,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 3,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 4,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 5,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 6,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 7,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 8,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 9,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 10,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 11,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 12,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 13,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 14,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 15,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 16,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 17,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 18,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 1,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 2,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 3,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 4,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 5,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 6,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 7,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 8,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 9,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 10,
+    "count": 6,
+    "countAfterMerges": 6
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 11,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 12,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 13,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 14,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 15,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 16,
+    "count": 7,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 17,
+    "count": 7,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 18,
+    "count": 7,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "crafting-station",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 17,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 18,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "firespitter",
+    "townHallLevel": 17,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "firespitter",
+    "townHallLevel": 18,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 7,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 8,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 9,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 10,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 11,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 12,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 13,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 14,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 15,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 16,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 17,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 18,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 10,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 11,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 12,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 13,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 14,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 15,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 16,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 17,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 18,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "monolith",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "monolith",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "monolith",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "monolith",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "monolith",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 3,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 4,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 5,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 6,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 7,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 8,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 9,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 10,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 11,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 12,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 13,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 14,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 15,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 16,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 17,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 18,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "multi-archer-tower",
+    "townHallLevel": 16,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "multi-archer-tower",
+    "townHallLevel": 17,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "multi-archer-tower",
+    "townHallLevel": 18,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "multi-gear-tower",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "multi-gear-tower",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "revenge-tower",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "ricochet-cannon",
+    "townHallLevel": 16,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "ricochet-cannon",
+    "townHallLevel": 17,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "ricochet-cannon",
+    "townHallLevel": 18,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "scattershot",
+    "townHallLevel": 13,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "scattershot",
+    "townHallLevel": 14,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "scattershot",
+    "townHallLevel": 15,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "scattershot",
+    "townHallLevel": 16,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "scattershot",
+    "townHallLevel": 17,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "scattershot",
+    "townHallLevel": 18,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "spell-tower",
+    "townHallLevel": 15,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "spell-tower",
+    "townHallLevel": 16,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "spell-tower",
+    "townHallLevel": 17,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "spell-tower",
+    "townHallLevel": 18,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "super-wizard-tower",
+    "townHallLevel": 18,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 5,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 6,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 7,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 8,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 9,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 10,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 11,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 12,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 13,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 14,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 15,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 16,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 17,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 18,
+    "count": 6,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 9,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 10,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 11,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 12,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 13,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 14,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 15,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 16,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 17,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 18,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 1,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 2,
+    "count": 25,
+    "countAfterMerges": 25
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 3,
+    "count": 50,
+    "countAfterMerges": 50
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 4,
+    "count": 75,
+    "countAfterMerges": 75
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 5,
+    "count": 100,
+    "countAfterMerges": 100
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 6,
+    "count": 125,
+    "countAfterMerges": 125
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 7,
+    "count": 175,
+    "countAfterMerges": 175
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 8,
+    "count": 225,
+    "countAfterMerges": 225
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 9,
+    "count": 250,
+    "countAfterMerges": 250
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 10,
+    "count": 275,
+    "countAfterMerges": 275
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 11,
+    "count": 300,
+    "countAfterMerges": 300
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 12,
+    "count": 300,
+    "countAfterMerges": 300
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 13,
+    "count": 300,
+    "countAfterMerges": 300
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 14,
+    "count": 325,
+    "countAfterMerges": 325
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 15,
+    "count": 325,
+    "countAfterMerges": 325
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 16,
+    "count": 325,
+    "countAfterMerges": 325
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 17,
+    "count": 325,
+    "countAfterMerges": 325
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 18,
+    "count": 325,
+    "countAfterMerges": 325
+  }
+]

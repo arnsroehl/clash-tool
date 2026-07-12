@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   fetchAccountBuildingLevels,
+  fetchBuildingAvailability,
   fetchBuildingLevels,
   fetchBuildings,
   upsertAccountBuildingLevel,
@@ -12,6 +13,7 @@ import type {
   Building,
   BuildingLevel,
   BuildingLevelMap,
+  BuildingTownHallAvailability,
 } from "@/types/building";
 
 type UseBuildingsOptions = {
@@ -29,11 +31,11 @@ function calculateProgress(
   buildingLevels: BuildingLevelMap,
 ): number {
   const completedBuildingLevels = availableBuildings.reduce((sum, building) => {
-    return sum + (buildingLevels[building.id] || 0);
+    return sum + (buildingLevels[building.id] || 0) * (building.countAfterMerges || 1);
   }, 0);
 
   const maxBuildingLevels = availableBuildings.reduce((sum, building) => {
-    return sum + building.maxLevel;
+    return sum + building.maxLevel * (building.countAfterMerges || 1);
   }, 0);
 
   return maxBuildingLevels > 0
@@ -73,6 +75,7 @@ export function useBuildings({
     [],
   );
   const [buildingLevels, setBuildingLevels] = useState<BuildingLevelMap>({});
+  const [buildingAvailability, setBuildingAvailability] = useState<BuildingTownHallAvailability[]>([]);
   const [isLoadingBuildings, setIsLoadingBuildings] = useState(true);
   const [isSavingBuildingId, setIsSavingBuildingId] = useState<string | null>(
     null,
@@ -81,13 +84,15 @@ export function useBuildings({
   useEffect(() => {
     async function loadBuildings() {
       try {
-        const [loadedBuildings, loadedBuildingLevels] = await Promise.all([
+        const [loadedBuildings, loadedBuildingLevels, loadedAvailability] = await Promise.all([
           fetchBuildings(),
           fetchBuildingLevels(),
+          fetchBuildingAvailability(),
         ]);
 
         setBuildings(loadedBuildings);
         setBuildingMaxLevels(loadedBuildingLevels);
+        setBuildingAvailability(loadedAvailability);
       } catch (error) {
         onError(error instanceof Error ? error.message : "Gebäude konnten nicht geladen werden.");
       } finally {
@@ -121,20 +126,30 @@ export function useBuildings({
       return [];
     }
 
+    const availabilityByBuilding = new Map(
+      buildingAvailability
+        .filter((row) => row.townHallLevel === selectedAccount.townHallLevel)
+        .map((row) => [row.buildingId, row]),
+    );
+
     return buildings
-      .filter(
-        (building) =>
-          building.unlockTownHallLevel <= selectedAccount.townHallLevel,
-      )
+      .filter((building) => {
+        const availability = availabilityByBuilding.get(building.id);
+        return availability
+          ? availability.countAfterMerges > 0
+          : building.unlockTownHallLevel <= selectedAccount.townHallLevel;
+      })
       .map((building) => ({
         ...building,
+        buildingCount: availabilityByBuilding.get(building.id)?.buildingCount ?? 1,
+        countAfterMerges: availabilityByBuilding.get(building.id)?.countAfterMerges ?? 1,
         maxLevel: calculateAvailableMaxLevel(
           building,
           buildingMaxLevels,
           selectedAccount.townHallLevel,
         ),
       }));
-  }, [buildingMaxLevels, buildings, selectedAccount]);
+  }, [buildingAvailability, buildingMaxLevels, buildings, selectedAccount]);
 
   const progress = useMemo(() => {
     return calculateProgress(availableBuildings, buildingLevels);

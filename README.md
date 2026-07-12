@@ -59,6 +59,8 @@ The app expects Supabase configuration through local environment variables:
 ```text
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+# Nur für das lokale Import-Script; niemals mit NEXT_PUBLIC_ präfixen:
+SUPABASE_SECRET_KEY=
 ```
 
 Keep these values in `.env.local`. Do not commit secrets or local environment files.
@@ -79,7 +81,7 @@ These SQL files are setup helpers and are not executed automatically by the app.
 | `npm run build` | Builds the production application |
 | `npm run lint` | Runs ESLint |
 | `npm test` | Runs planner tests |
-| `npm run import-game-data` | Imports JSON game data into Supabase using upserts |
+| `npm run import-game-data` | Imports validated JSON game data with a server-only Supabase secret key |
 
 Run the game-data importer after Supabase tables and local environment variables are configured:
 

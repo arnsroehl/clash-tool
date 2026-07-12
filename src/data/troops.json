@@ -1,35 +1,2931 @@
 [
   {
-    "id": "11111111-aaaa-4111-8111-aaaaaaaaaaaa",
-    "name": "Barbar",
+    "id": "55610c07-7f33-45b0-8214-bdb660a4f997",
+    "sourceId": "apprentice-warden",
+    "name": "Apprentice Warden",
     "category": "Truppe",
-    "unlockTownHall": 1,
+    "unlockTownHall": 13,
     "sortOrder": 10,
     "levels": [
-      { "level": 1, "townHall": 1, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 45 },
-      { "level": 2, "townHall": 3, "upgradeTimeHours": 6, "goldCost": 0, "elixirCost": 50000, "darkElixirCost": 0, "hitpoints": 54 }
+      {
+        "level": 1,
+        "townHall": 13,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1500
+      },
+      {
+        "level": 2,
+        "townHall": 13,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 90000,
+        "hitpoints": 1650
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "upgradeTimeHours": 180,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 135000,
+        "hitpoints": 1800
+      },
+      {
+        "level": 4,
+        "townHall": 15,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 160000,
+        "hitpoints": 1950
+      }
     ]
   },
   {
     "id": "22222222-aaaa-4222-8222-aaaaaaaaaaaa",
+    "sourceId": "archer",
     "name": "Bogenschützin",
     "category": "Truppe",
     "unlockTownHall": 1,
     "sortOrder": 20,
     "levels": [
-      { "level": 1, "townHall": 1, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 20 },
-      { "level": 2, "townHall": 3, "upgradeTimeHours": 6, "goldCost": 0, "elixirCost": 80000, "darkElixirCost": 0, "hitpoints": 23 }
+      {
+        "level": 1,
+        "townHall": 1,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 22
+      },
+      {
+        "level": 2,
+        "townHall": 3,
+        "upgradeTimeHours": 1,
+        "goldCost": 0,
+        "elixirCost": 20000,
+        "darkElixirCost": 0,
+        "hitpoints": 26
+      },
+      {
+        "level": 3,
+        "townHall": 5,
+        "upgradeTimeHours": 2,
+        "goldCost": 0,
+        "elixirCost": 80000,
+        "darkElixirCost": 0,
+        "hitpoints": 29
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 3,
+        "goldCost": 0,
+        "elixirCost": 200000,
+        "darkElixirCost": 0,
+        "hitpoints": 33
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 8,
+        "goldCost": 0,
+        "elixirCost": 500000,
+        "darkElixirCost": 0,
+        "hitpoints": 40
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 1000000,
+        "darkElixirCost": 0,
+        "hitpoints": 44
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1500000,
+        "darkElixirCost": 0,
+        "hitpoints": 48
+      },
+      {
+        "level": 8,
+        "townHall": 11,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2300000,
+        "darkElixirCost": 0,
+        "hitpoints": 52
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 3000000,
+        "darkElixirCost": 0,
+        "hitpoints": 56
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 4500000,
+        "darkElixirCost": 0,
+        "hitpoints": 60
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 6500000,
+        "darkElixirCost": 0,
+        "hitpoints": 64
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 9000000,
+        "darkElixirCost": 0,
+        "hitpoints": 68
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 14000000,
+        "darkElixirCost": 0,
+        "hitpoints": 72
+      },
+      {
+        "level": 14,
+        "townHall": 18,
+        "upgradeTimeHours": 324,
+        "goldCost": 0,
+        "elixirCost": 25000000,
+        "darkElixirCost": 0,
+        "hitpoints": 76
+      }
+    ]
+  },
+  {
+    "id": "f6544e24-236c-4602-8307-2db36df7348a",
+    "sourceId": "baby-dragon",
+    "name": "Baby Dragon",
+    "category": "Truppe",
+    "unlockTownHall": 9,
+    "sortOrder": 30,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1200
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 30,
+        "goldCost": 0,
+        "elixirCost": 1500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1300
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1400
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2800000,
+        "darkElixirCost": 0,
+        "hitpoints": 1500
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 66,
+        "goldCost": 0,
+        "elixirCost": 3700000,
+        "darkElixirCost": 0,
+        "hitpoints": 1600
+      },
+      {
+        "level": 6,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 4800000,
+        "darkElixirCost": 0,
+        "hitpoints": 1700
+      },
+      {
+        "level": 7,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 6200000,
+        "darkElixirCost": 0,
+        "hitpoints": 1800
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 9500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1900
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 11000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2000
+      },
+      {
+        "level": 10,
+        "townHall": 16,
+        "upgradeTimeHours": 174,
+        "goldCost": 0,
+        "elixirCost": 13500000,
+        "darkElixirCost": 0,
+        "hitpoints": 2100
+      },
+      {
+        "level": 11,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 16500000,
+        "darkElixirCost": 0,
+        "hitpoints": 2200
+      },
+      {
+        "level": 12,
+        "townHall": 18,
+        "upgradeTimeHours": 366,
+        "goldCost": 0,
+        "elixirCost": 29000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2350
+      }
+    ]
+  },
+  {
+    "id": "73cdd7ab-7815-4502-8929-2b1ac1b19935",
+    "sourceId": "balloon",
+    "name": "Balloon",
+    "category": "Truppe",
+    "unlockTownHall": 4,
+    "sortOrder": 40,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 4,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 150
+      },
+      {
+        "level": 2,
+        "townHall": 4,
+        "upgradeTimeHours": 4,
+        "goldCost": 0,
+        "elixirCost": 100000,
+        "darkElixirCost": 0,
+        "hitpoints": 180
+      },
+      {
+        "level": 3,
+        "townHall": 6,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 400000,
+        "darkElixirCost": 0,
+        "hitpoints": 216
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 18,
+        "goldCost": 0,
+        "elixirCost": 720000,
+        "darkElixirCost": 0,
+        "hitpoints": 280
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1300000,
+        "darkElixirCost": 0,
+        "hitpoints": 390
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 2750000,
+        "darkElixirCost": 0,
+        "hitpoints": 545
+      },
+      {
+        "level": 7,
+        "townHall": 11,
+        "upgradeTimeHours": 78,
+        "goldCost": 0,
+        "elixirCost": 4400000,
+        "darkElixirCost": 0,
+        "hitpoints": 690
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 840
+      },
+      {
+        "level": 9,
+        "townHall": 13,
+        "upgradeTimeHours": 108,
+        "goldCost": 0,
+        "elixirCost": 7000000,
+        "darkElixirCost": 0,
+        "hitpoints": 940
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1040
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "upgradeTimeHours": 204,
+        "goldCost": 0,
+        "elixirCost": 14000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1140
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "upgradeTimeHours": 264,
+        "goldCost": 0,
+        "elixirCost": 17500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1240
+      }
+    ]
+  },
+  {
+    "id": "11111111-aaaa-4111-8111-aaaaaaaaaaaa",
+    "sourceId": "barbarian",
+    "name": "Barbar",
+    "category": "Truppe",
+    "unlockTownHall": 1,
+    "sortOrder": 50,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 1,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 45
+      },
+      {
+        "level": 2,
+        "townHall": 3,
+        "upgradeTimeHours": 0.5,
+        "goldCost": 0,
+        "elixirCost": 10000,
+        "darkElixirCost": 0,
+        "hitpoints": 54
+      },
+      {
+        "level": 3,
+        "townHall": 5,
+        "upgradeTimeHours": 1,
+        "goldCost": 0,
+        "elixirCost": 50000,
+        "darkElixirCost": 0,
+        "hitpoints": 65
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 2,
+        "goldCost": 0,
+        "elixirCost": 130000,
+        "darkElixirCost": 0,
+        "hitpoints": 85
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 4,
+        "goldCost": 0,
+        "elixirCost": 300000,
+        "darkElixirCost": 0,
+        "hitpoints": 105
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 8,
+        "goldCost": 0,
+        "elixirCost": 800000,
+        "darkElixirCost": 0,
+        "hitpoints": 125
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 1000000,
+        "darkElixirCost": 0,
+        "hitpoints": 160
+      },
+      {
+        "level": 8,
+        "townHall": 11,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1500000,
+        "darkElixirCost": 0,
+        "hitpoints": 205
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 230
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 4300000,
+        "darkElixirCost": 0,
+        "hitpoints": 250
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 6000000,
+        "darkElixirCost": 0,
+        "hitpoints": 270
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "upgradeTimeHours": 108,
+        "goldCost": 0,
+        "elixirCost": 8000000,
+        "darkElixirCost": 0,
+        "hitpoints": 290
+      }
+    ]
+  },
+  {
+    "id": "fe99b221-fc77-4458-8607-f6ce9fccebfa",
+    "sourceId": "bowler",
+    "name": "Bowler",
+    "category": "Truppe",
+    "unlockTownHall": 10,
+    "sortOrder": 60,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 10,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 325
+      },
+      {
+        "level": 2,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 32500,
+        "hitpoints": 375
+      },
+      {
+        "level": 3,
+        "townHall": 11,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 44000,
+        "hitpoints": 420
+      },
+      {
+        "level": 4,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 62500,
+        "hitpoints": 470
+      },
+      {
+        "level": 5,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 85000,
+        "hitpoints": 505
+      },
+      {
+        "level": 6,
+        "townHall": 14,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 110000,
+        "hitpoints": 530
+      },
+      {
+        "level": 7,
+        "townHall": 15,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 145000,
+        "hitpoints": 565
+      },
+      {
+        "level": 8,
+        "townHall": 16,
+        "upgradeTimeHours": 180,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 175000,
+        "hitpoints": 600
+      },
+      {
+        "level": 9,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 260000,
+        "hitpoints": 700
+      },
+      {
+        "level": 10,
+        "townHall": 18,
+        "upgradeTimeHours": 360,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 360000,
+        "hitpoints": 850
+      }
+    ]
+  },
+  {
+    "id": "f532795e-6b24-45f7-8ef1-143c3dcebbfb",
+    "sourceId": "dragon-rider",
+    "name": "Dragon Rider",
+    "category": "Truppe",
+    "unlockTownHall": 13,
+    "sortOrder": 70,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 13,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 4100
+      },
+      {
+        "level": 2,
+        "townHall": 13,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 7500000,
+        "darkElixirCost": 0,
+        "hitpoints": 4400
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 12000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4700
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 14500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5100
+      },
+      {
+        "level": 5,
+        "townHall": 17,
+        "upgradeTimeHours": 246,
+        "goldCost": 0,
+        "elixirCost": 19000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5600
+      },
+      {
+        "level": 6,
+        "townHall": 18,
+        "upgradeTimeHours": 372,
+        "goldCost": 0,
+        "elixirCost": 29500000,
+        "darkElixirCost": 0,
+        "hitpoints": 6200
+      }
+    ]
+  },
+  {
+    "id": "daae700b-5d4d-40aa-873e-a4a6597b1a6c",
+    "sourceId": "dragon",
+    "name": "Dragon",
+    "category": "Truppe",
+    "unlockTownHall": 7,
+    "sortOrder": 80,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 7,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1900
+      },
+      {
+        "level": 2,
+        "townHall": 7,
+        "upgradeTimeHours": 18,
+        "goldCost": 0,
+        "elixirCost": 1000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2100
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2300
+      },
+      {
+        "level": 4,
+        "townHall": 9,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 3000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2700
+      },
+      {
+        "level": 5,
+        "townHall": 10,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 3800000,
+        "darkElixirCost": 0,
+        "hitpoints": 3100
+      },
+      {
+        "level": 6,
+        "townHall": 11,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 4900000,
+        "darkElixirCost": 0,
+        "hitpoints": 3400
+      },
+      {
+        "level": 7,
+        "townHall": 12,
+        "upgradeTimeHours": 108,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 3900
+      },
+      {
+        "level": 8,
+        "townHall": 13,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 7500000,
+        "darkElixirCost": 0,
+        "hitpoints": 4200
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 10500000,
+        "darkElixirCost": 0,
+        "hitpoints": 4500
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "upgradeTimeHours": 180,
+        "goldCost": 0,
+        "elixirCost": 12000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4900
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "upgradeTimeHours": 204,
+        "goldCost": 0,
+        "elixirCost": 14000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5300
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 18500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5700
+      }
+    ]
+  },
+  {
+    "id": "41006785-a01c-45e2-8ada-be8a577511a7",
+    "sourceId": "druid",
+    "name": "Druid",
+    "category": "Truppe",
+    "unlockTownHall": 14,
+    "sortOrder": 90,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 14,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1300
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 125000,
+        "hitpoints": 1400
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "upgradeTimeHours": 228,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 175000,
+        "hitpoints": 1500
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "upgradeTimeHours": 264,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 187500,
+        "hitpoints": 1600
+      },
+      {
+        "level": 5,
+        "townHall": 17,
+        "upgradeTimeHours": 288,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 300000,
+        "hitpoints": 1700
+      }
+    ]
+  },
+  {
+    "id": "1dd8eaed-6125-409b-8d72-5c0ed7a078f8",
+    "sourceId": "electro-dragon",
+    "name": "Electro Dragon",
+    "category": "Truppe",
+    "unlockTownHall": 11,
+    "sortOrder": 100,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 11,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 3400
+      },
+      {
+        "level": 2,
+        "townHall": 11,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 6000000,
+        "darkElixirCost": 0,
+        "hitpoints": 3900
+      },
+      {
+        "level": 3,
+        "townHall": 12,
+        "upgradeTimeHours": 108,
+        "goldCost": 0,
+        "elixirCost": 7000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4400
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 9000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4700
+      },
+      {
+        "level": 5,
+        "townHall": 14,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 11000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5000
+      },
+      {
+        "level": 6,
+        "townHall": 15,
+        "upgradeTimeHours": 204,
+        "goldCost": 0,
+        "elixirCost": 14000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5400
+      },
+      {
+        "level": 7,
+        "townHall": 16,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 16000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5700
+      },
+      {
+        "level": 8,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 20000000,
+        "darkElixirCost": 0,
+        "hitpoints": 6200
+      },
+      {
+        "level": 9,
+        "townHall": 18,
+        "upgradeTimeHours": 384,
+        "goldCost": 0,
+        "elixirCost": 30000000,
+        "darkElixirCost": 0,
+        "hitpoints": 6700
+      }
+    ]
+  },
+  {
+    "id": "e3c2bda4-b158-442a-81c0-44bc3f2c3880",
+    "sourceId": "electro-titan",
+    "name": "Electro Titan",
+    "category": "Truppe",
+    "unlockTownHall": 14,
+    "sortOrder": 110,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 14,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 7200
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 14000000,
+        "darkElixirCost": 0,
+        "hitpoints": 7700
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "upgradeTimeHours": 228,
+        "goldCost": 0,
+        "elixirCost": 16000000,
+        "darkElixirCost": 0,
+        "hitpoints": 8200
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "upgradeTimeHours": 264,
+        "goldCost": 0,
+        "elixirCost": 18500000,
+        "darkElixirCost": 0,
+        "hitpoints": 8700
+      },
+      {
+        "level": 5,
+        "townHall": 18,
+        "upgradeTimeHours": 384,
+        "goldCost": 0,
+        "elixirCost": 30000000,
+        "darkElixirCost": 0,
+        "hitpoints": 9200
+      }
+    ]
+  },
+  {
+    "id": "4ad72821-7b83-49ae-852a-613de2e26a95",
+    "sourceId": "furnace",
+    "name": "Furnace",
+    "category": "Truppe",
+    "unlockTownHall": 15,
+    "sortOrder": 120,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 15,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1530
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "upgradeTimeHours": 288,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 200000,
+        "hitpoints": 1620
+      },
+      {
+        "level": 3,
+        "townHall": 16,
+        "upgradeTimeHours": 336,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 260000,
+        "hitpoints": 1710
+      },
+      {
+        "level": 4,
+        "townHall": 17,
+        "upgradeTimeHours": 384,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 320000,
+        "hitpoints": 1800
+      }
     ]
   },
   {
     "id": "33333333-aaaa-4333-8333-aaaaaaaaaaaa",
+    "sourceId": "giant",
     "name": "Riese",
     "category": "Truppe",
-    "unlockTownHall": 2,
-    "sortOrder": 30,
+    "unlockTownHall": 1,
+    "sortOrder": 130,
     "levels": [
-      { "level": 1, "townHall": 2, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 300 },
-      { "level": 2, "townHall": 4, "upgradeTimeHours": 12, "goldCost": 0, "elixirCost": 150000, "darkElixirCost": 0, "hitpoints": 360 }
+      {
+        "level": 1,
+        "townHall": 1,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 400
+      },
+      {
+        "level": 2,
+        "townHall": 4,
+        "upgradeTimeHours": 2,
+        "goldCost": 0,
+        "elixirCost": 40000,
+        "darkElixirCost": 0,
+        "hitpoints": 500
+      },
+      {
+        "level": 3,
+        "townHall": 6,
+        "upgradeTimeHours": 4,
+        "goldCost": 0,
+        "elixirCost": 150000,
+        "darkElixirCost": 0,
+        "hitpoints": 600
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 400000,
+        "darkElixirCost": 0,
+        "hitpoints": 700
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 800000,
+        "darkElixirCost": 0,
+        "hitpoints": 900
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1100
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2300000,
+        "darkElixirCost": 0,
+        "hitpoints": 1300
+      },
+      {
+        "level": 8,
+        "townHall": 11,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2600000,
+        "darkElixirCost": 0,
+        "hitpoints": 1500
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 3400000,
+        "darkElixirCost": 0,
+        "hitpoints": 1850
+      },
+      {
+        "level": 10,
+        "townHall": 13,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2000
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 7500000,
+        "darkElixirCost": 0,
+        "hitpoints": 2200
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "upgradeTimeHours": 132,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2400
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "upgradeTimeHours": 228,
+        "goldCost": 0,
+        "elixirCost": 15000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2700
+      },
+      {
+        "level": 14,
+        "townHall": 18,
+        "upgradeTimeHours": 324,
+        "goldCost": 0,
+        "elixirCost": 25000000,
+        "darkElixirCost": 0,
+        "hitpoints": 3000
+      }
+    ]
+  },
+  {
+    "id": "775e0e60-d4e3-4fd8-80b5-0dc4afe8b281",
+    "sourceId": "goblin",
+    "name": "Goblin",
+    "category": "Truppe",
+    "unlockTownHall": 2,
+    "sortOrder": 140,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 2,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 25
+      },
+      {
+        "level": 2,
+        "townHall": 3,
+        "upgradeTimeHours": 2,
+        "goldCost": 0,
+        "elixirCost": 45000,
+        "darkElixirCost": 0,
+        "hitpoints": 30
+      },
+      {
+        "level": 3,
+        "townHall": 5,
+        "upgradeTimeHours": 3,
+        "goldCost": 0,
+        "elixirCost": 100000,
+        "darkElixirCost": 0,
+        "hitpoints": 36
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 500000,
+        "darkElixirCost": 0,
+        "hitpoints": 50
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 700000,
+        "darkElixirCost": 0,
+        "hitpoints": 65
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1600000,
+        "darkElixirCost": 0,
+        "hitpoints": 80
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2200000,
+        "darkElixirCost": 0,
+        "hitpoints": 105
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 3700000,
+        "darkElixirCost": 0,
+        "hitpoints": 126
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 8000000,
+        "darkElixirCost": 0,
+        "hitpoints": 146
+      }
+    ]
+  },
+  {
+    "id": "f9a3927c-e476-42f4-8f56-8f116bf076bd",
+    "sourceId": "golem",
+    "name": "Golem",
+    "category": "Truppe",
+    "unlockTownHall": 8,
+    "sortOrder": 150,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 5100
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "upgradeTimeHours": 16,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 4000,
+        "hitpoints": 5400
+      },
+      {
+        "level": 3,
+        "townHall": 9,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 6000,
+        "hitpoints": 5700
+      },
+      {
+        "level": 4,
+        "townHall": 9,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 10000,
+        "hitpoints": 6000
+      },
+      {
+        "level": 5,
+        "townHall": 10,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 18500,
+        "hitpoints": 6300
+      },
+      {
+        "level": 6,
+        "townHall": 11,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 26500,
+        "hitpoints": 6600
+      },
+      {
+        "level": 7,
+        "townHall": 11,
+        "upgradeTimeHours": 66,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 38500,
+        "hitpoints": 7000
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 50000,
+        "hitpoints": 7500
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 62500,
+        "hitpoints": 7900
+      },
+      {
+        "level": 10,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 80000,
+        "hitpoints": 8200
+      },
+      {
+        "level": 11,
+        "townHall": 14,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 105000,
+        "hitpoints": 8500
+      },
+      {
+        "level": 12,
+        "townHall": 15,
+        "upgradeTimeHours": 132,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 122500,
+        "hitpoints": 8800
+      },
+      {
+        "level": 13,
+        "townHall": 16,
+        "upgradeTimeHours": 154,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 175000,
+        "hitpoints": 9200
+      },
+      {
+        "level": 14,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 230000,
+        "hitpoints": 9600
+      }
+    ]
+  },
+  {
+    "id": "4bfefb14-96d5-4f0e-80ce-c560915070c2",
+    "sourceId": "headhunter",
+    "name": "Headhunter",
+    "category": "Truppe",
+    "unlockTownHall": 12,
+    "sortOrder": 160,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 12,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 360
+      },
+      {
+        "level": 2,
+        "townHall": 12,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 57500,
+        "hitpoints": 400
+      },
+      {
+        "level": 3,
+        "townHall": 13,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 90000,
+        "hitpoints": 440
+      }
+    ]
+  },
+  {
+    "id": "402a5eea-be12-4f56-8eb2-f876a443288c",
+    "sourceId": "healer",
+    "name": "Healer",
+    "category": "Truppe",
+    "unlockTownHall": 6,
+    "sortOrder": 170,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 6,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 500
+      },
+      {
+        "level": 2,
+        "townHall": 7,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 450000,
+        "darkElixirCost": 0,
+        "hitpoints": 700
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 900000,
+        "darkElixirCost": 0,
+        "hitpoints": 900
+      },
+      {
+        "level": 4,
+        "townHall": 9,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1200
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 4000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1500
+      },
+      {
+        "level": 6,
+        "townHall": 13,
+        "upgradeTimeHours": 108,
+        "goldCost": 0,
+        "elixirCost": 6000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1600
+      },
+      {
+        "level": 7,
+        "townHall": 14,
+        "upgradeTimeHours": 156,
+        "goldCost": 0,
+        "elixirCost": 9500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1700
+      },
+      {
+        "level": 8,
+        "townHall": 15,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 11000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1800
+      },
+      {
+        "level": 9,
+        "townHall": 16,
+        "upgradeTimeHours": 174,
+        "goldCost": 0,
+        "elixirCost": 13000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1900
+      },
+      {
+        "level": 10,
+        "townHall": 17,
+        "upgradeTimeHours": 264,
+        "goldCost": 0,
+        "elixirCost": 17000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2000
+      },
+      {
+        "level": 11,
+        "townHall": 18,
+        "upgradeTimeHours": 360,
+        "goldCost": 0,
+        "elixirCost": 28500000,
+        "darkElixirCost": 0,
+        "hitpoints": 2100
+      }
+    ]
+  },
+  {
+    "id": "e74343b5-fcb4-4065-8f29-2a8772ba04f8",
+    "sourceId": "hog-rider",
+    "name": "Hog Rider",
+    "category": "Truppe",
+    "unlockTownHall": 7,
+    "sortOrder": 180,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 7,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 270
+      },
+      {
+        "level": 2,
+        "townHall": 7,
+        "upgradeTimeHours": 10,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 2000,
+        "hitpoints": 312
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "upgradeTimeHours": 18,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 3500,
+        "hitpoints": 370
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 5000,
+        "hitpoints": 430
+      },
+      {
+        "level": 5,
+        "townHall": 9,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 10000,
+        "hitpoints": 500
+      },
+      {
+        "level": 6,
+        "townHall": 10,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 18500,
+        "hitpoints": 590
+      },
+      {
+        "level": 7,
+        "townHall": 11,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 35000,
+        "hitpoints": 700
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 47500,
+        "hitpoints": 810
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 50000,
+        "hitpoints": 890
+      },
+      {
+        "level": 10,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 85000,
+        "hitpoints": 970
+      },
+      {
+        "level": 11,
+        "townHall": 14,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 107500,
+        "hitpoints": 1080
+      },
+      {
+        "level": 12,
+        "townHall": 15,
+        "upgradeTimeHours": 132,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 125000,
+        "hitpoints": 1230
+      },
+      {
+        "level": 13,
+        "townHall": 16,
+        "upgradeTimeHours": 156,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 175000,
+        "hitpoints": 1380
+      },
+      {
+        "level": 14,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 240000,
+        "hitpoints": 1500
+      },
+      {
+        "level": 15,
+        "townHall": 18,
+        "upgradeTimeHours": 348,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 340000,
+        "hitpoints": 1750
+      }
+    ]
+  },
+  {
+    "id": "26e59a48-b808-415d-8fd1-1c36f55a94a2",
+    "sourceId": "ice-golem",
+    "name": "Ice Golem",
+    "category": "Truppe",
+    "unlockTownHall": 11,
+    "sortOrder": 190,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 11,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 2600
+      },
+      {
+        "level": 2,
+        "townHall": 11,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 27500,
+        "hitpoints": 2800
+      },
+      {
+        "level": 3,
+        "townHall": 11,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 42500,
+        "hitpoints": 3000
+      },
+      {
+        "level": 4,
+        "townHall": 12,
+        "upgradeTimeHours": 78,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 50000,
+        "hitpoints": 3200
+      },
+      {
+        "level": 5,
+        "townHall": 12,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 62500,
+        "hitpoints": 3400
+      },
+      {
+        "level": 6,
+        "townHall": 14,
+        "upgradeTimeHours": 156,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 110000,
+        "hitpoints": 3600
+      },
+      {
+        "level": 7,
+        "townHall": 15,
+        "upgradeTimeHours": 180,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 140000,
+        "hitpoints": 3900
+      },
+      {
+        "level": 8,
+        "townHall": 16,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 180000,
+        "hitpoints": 4200
+      },
+      {
+        "level": 9,
+        "townHall": 17,
+        "upgradeTimeHours": 254,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 280000,
+        "hitpoints": 4350
+      }
+    ]
+  },
+  {
+    "id": "571cee03-5f47-4ef6-800a-42b94a7b67fc",
+    "sourceId": "lava-hound",
+    "name": "Lava Hound",
+    "category": "Truppe",
+    "unlockTownHall": 9,
+    "sortOrder": 200,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 6100
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 14000,
+        "hitpoints": 6500
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 21500,
+        "hitpoints": 6800
+      },
+      {
+        "level": 4,
+        "townHall": 11,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 42500,
+        "hitpoints": 7200
+      },
+      {
+        "level": 5,
+        "townHall": 12,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 60000,
+        "hitpoints": 7600
+      },
+      {
+        "level": 6,
+        "townHall": 13,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 80000,
+        "hitpoints": 8000
+      },
+      {
+        "level": 7,
+        "townHall": 16,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 200000,
+        "hitpoints": 8500
+      },
+      {
+        "level": 8,
+        "townHall": 18,
+        "upgradeTimeHours": 366,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 345000,
+        "hitpoints": 9500
+      }
+    ]
+  },
+  {
+    "id": "9391f7e6-64c9-432d-8248-6a688274a725",
+    "sourceId": "meteor-golem",
+    "name": "Meteor Golem",
+    "category": "Truppe",
+    "unlockTownHall": 17,
+    "sortOrder": 210,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 17,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 13000
+      },
+      {
+        "level": 2,
+        "townHall": 17,
+        "upgradeTimeHours": 336,
+        "goldCost": 0,
+        "elixirCost": 28000000,
+        "darkElixirCost": 0,
+        "hitpoints": 14500
+      },
+      {
+        "level": 3,
+        "townHall": 18,
+        "upgradeTimeHours": 384,
+        "goldCost": 0,
+        "elixirCost": 30000000,
+        "darkElixirCost": 0,
+        "hitpoints": 16000
+      }
+    ]
+  },
+  {
+    "id": "753660eb-2630-485a-8346-3d50a978bf68",
+    "sourceId": "miner",
+    "name": "Miner",
+    "category": "Truppe",
+    "unlockTownHall": 10,
+    "sortOrder": 220,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 10,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 550
+      },
+      {
+        "level": 2,
+        "townHall": 10,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1500000,
+        "darkElixirCost": 0,
+        "hitpoints": 610
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2600000,
+        "darkElixirCost": 0,
+        "hitpoints": 670
+      },
+      {
+        "level": 4,
+        "townHall": 11,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 3000000,
+        "darkElixirCost": 0,
+        "hitpoints": 730
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 4000000,
+        "darkElixirCost": 0,
+        "hitpoints": 800
+      },
+      {
+        "level": 6,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 4800000,
+        "darkElixirCost": 0,
+        "hitpoints": 900
+      },
+      {
+        "level": 7,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 6000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1000
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 8600000,
+        "darkElixirCost": 0,
+        "hitpoints": 1150
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "upgradeTimeHours": 156,
+        "goldCost": 0,
+        "elixirCost": 10500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1350
+      },
+      {
+        "level": 10,
+        "townHall": 16,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 12500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1550
+      },
+      {
+        "level": 11,
+        "townHall": 17,
+        "upgradeTimeHours": 236,
+        "goldCost": 0,
+        "elixirCost": 16500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1750
+      },
+      {
+        "level": 12,
+        "townHall": 18,
+        "upgradeTimeHours": 348,
+        "goldCost": 0,
+        "elixirCost": 28000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2050
+      }
+    ]
+  },
+  {
+    "id": "d9055acf-13ea-41b3-89b3-ba15797dd16e",
+    "sourceId": "minion",
+    "name": "Minion",
+    "category": "Truppe",
+    "unlockTownHall": 7,
+    "sortOrder": 230,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 7,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 58
+      },
+      {
+        "level": 2,
+        "townHall": 7,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 1000,
+        "hitpoints": 63
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "upgradeTimeHours": 8,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 2500,
+        "hitpoints": 68
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 5000,
+        "hitpoints": 73
+      },
+      {
+        "level": 5,
+        "townHall": 9,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 10000,
+        "hitpoints": 78
+      },
+      {
+        "level": 6,
+        "townHall": 10,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 15000,
+        "hitpoints": 84
+      },
+      {
+        "level": 7,
+        "townHall": 11,
+        "upgradeTimeHours": 42,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 31500,
+        "hitpoints": 90
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 47500,
+        "hitpoints": 96
+      },
+      {
+        "level": 9,
+        "townHall": 13,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 75000,
+        "hitpoints": 102
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 100000,
+        "hitpoints": 108
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "upgradeTimeHours": 108,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 115000,
+        "hitpoints": 114
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 160000,
+        "hitpoints": 120
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 220000,
+        "hitpoints": 130
+      },
+      {
+        "level": 14,
+        "townHall": 18,
+        "upgradeTimeHours": 336,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 335000,
+        "hitpoints": 140
+      }
+    ]
+  },
+  {
+    "id": "7c0967b0-470b-404a-863e-8a861ecf2b89",
+    "sourceId": "pekka",
+    "name": "P.E.K.K.A",
+    "category": "Truppe",
+    "unlockTownHall": 8,
+    "sortOrder": 240,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 3000
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 600000,
+        "darkElixirCost": 0,
+        "hitpoints": 3500
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1300000,
+        "darkElixirCost": 0,
+        "hitpoints": 4000
+      },
+      {
+        "level": 4,
+        "townHall": 9,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4500
+      },
+      {
+        "level": 5,
+        "townHall": 10,
+        "upgradeTimeHours": 40,
+        "goldCost": 0,
+        "elixirCost": 2100000,
+        "darkElixirCost": 0,
+        "hitpoints": 5000
+      },
+      {
+        "level": 6,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5500
+      },
+      {
+        "level": 7,
+        "townHall": 11,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 4500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5900
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 6300
+      },
+      {
+        "level": 9,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 5800000,
+        "darkElixirCost": 0,
+        "hitpoints": 6700
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "upgradeTimeHours": 132,
+        "goldCost": 0,
+        "elixirCost": 10500000,
+        "darkElixirCost": 0,
+        "hitpoints": 7200
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 12000000,
+        "darkElixirCost": 0,
+        "hitpoints": 7700
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 16000000,
+        "darkElixirCost": 0,
+        "hitpoints": 8200
+      },
+      {
+        "level": 13,
+        "townHall": 18,
+        "upgradeTimeHours": 348,
+        "goldCost": 0,
+        "elixirCost": 28000000,
+        "darkElixirCost": 0,
+        "hitpoints": 8800
+      }
+    ]
+  },
+  {
+    "id": "4d3beee7-1d95-4003-825d-61a06ed9e17c",
+    "sourceId": "root-rider",
+    "name": "Root Rider",
+    "category": "Truppe",
+    "unlockTownHall": 15,
+    "sortOrder": 250,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 15,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 6200
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 15000000,
+        "darkElixirCost": 0,
+        "hitpoints": 6350
+      },
+      {
+        "level": 3,
+        "townHall": 16,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 17600000,
+        "darkElixirCost": 0,
+        "hitpoints": 6500
+      }
+    ]
+  },
+  {
+    "id": "260c4246-c715-4d22-8773-1691c990c7ed",
+    "sourceId": "thrower",
+    "name": "Thrower",
+    "category": "Truppe",
+    "unlockTownHall": 16,
+    "sortOrder": 260,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 16,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 2200
+      },
+      {
+        "level": 2,
+        "townHall": 16,
+        "upgradeTimeHours": 228,
+        "goldCost": 0,
+        "elixirCost": 16000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2350
+      },
+      {
+        "level": 3,
+        "townHall": 17,
+        "upgradeTimeHours": 252,
+        "goldCost": 0,
+        "elixirCost": 18000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2600
+      },
+      {
+        "level": 4,
+        "townHall": 18,
+        "upgradeTimeHours": 360,
+        "goldCost": 0,
+        "elixirCost": 27000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2800
+      }
+    ]
+  },
+  {
+    "id": "bf7653d9-1b88-4400-835c-296bf0d98b9d",
+    "sourceId": "valkyrie",
+    "name": "Valkyrie",
+    "category": "Truppe",
+    "unlockTownHall": 8,
+    "sortOrder": 270,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 750
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "upgradeTimeHours": 8,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 3000,
+        "hitpoints": 850
+      },
+      {
+        "level": 3,
+        "townHall": 9,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 5000,
+        "hitpoints": 950
+      },
+      {
+        "level": 4,
+        "townHall": 9,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 10000,
+        "hitpoints": 1050
+      },
+      {
+        "level": 5,
+        "townHall": 10,
+        "upgradeTimeHours": 42,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 16000,
+        "hitpoints": 1300
+      },
+      {
+        "level": 6,
+        "townHall": 11,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 31500,
+        "hitpoints": 1500
+      },
+      {
+        "level": 7,
+        "townHall": 12,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 55000,
+        "hitpoints": 1650
+      },
+      {
+        "level": 8,
+        "townHall": 13,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 77500,
+        "hitpoints": 1800
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "upgradeTimeHours": 108,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 105000,
+        "hitpoints": 2000
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 120000,
+        "hitpoints": 2400
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 170000,
+        "hitpoints": 2600
+      }
+    ]
+  },
+  {
+    "id": "ff41152c-b1f6-4d3d-85a5-2b365c294d3b",
+    "sourceId": "wall-breaker",
+    "name": "Wall Breaker",
+    "category": "Truppe",
+    "unlockTownHall": 3,
+    "sortOrder": 280,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 3,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 20
+      },
+      {
+        "level": 2,
+        "townHall": 4,
+        "upgradeTimeHours": 3,
+        "goldCost": 0,
+        "elixirCost": 80000,
+        "darkElixirCost": 0,
+        "hitpoints": 24
+      },
+      {
+        "level": 3,
+        "townHall": 6,
+        "upgradeTimeHours": 4,
+        "goldCost": 0,
+        "elixirCost": 200000,
+        "darkElixirCost": 0,
+        "hitpoints": 29
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 450000,
+        "darkElixirCost": 0,
+        "hitpoints": 35
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 16,
+        "goldCost": 0,
+        "elixirCost": 1000000,
+        "darkElixirCost": 0,
+        "hitpoints": 53
+      },
+      {
+        "level": 6,
+        "townHall": 10,
+        "upgradeTimeHours": 30,
+        "goldCost": 0,
+        "elixirCost": 2400000,
+        "darkElixirCost": 0,
+        "hitpoints": 72
+      },
+      {
+        "level": 7,
+        "townHall": 11,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2800000,
+        "darkElixirCost": 0,
+        "hitpoints": 82
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 3800000,
+        "darkElixirCost": 0,
+        "hitpoints": 92
+      },
+      {
+        "level": 9,
+        "townHall": 13,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 5200000,
+        "darkElixirCost": 0,
+        "hitpoints": 112
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 6500000,
+        "darkElixirCost": 0,
+        "hitpoints": 130
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "upgradeTimeHours": 132,
+        "goldCost": 0,
+        "elixirCost": 9500000,
+        "darkElixirCost": 0,
+        "hitpoints": 140
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 11000000,
+        "darkElixirCost": 0,
+        "hitpoints": 150
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 15500000,
+        "darkElixirCost": 0,
+        "hitpoints": 160
+      },
+      {
+        "level": 14,
+        "townHall": 18,
+        "upgradeTimeHours": 336,
+        "goldCost": 0,
+        "elixirCost": 26000000,
+        "darkElixirCost": 0,
+        "hitpoints": 170
+      }
+    ]
+  },
+  {
+    "id": "c56ef721-a973-49b3-876f-fcdb7f9ec89c",
+    "sourceId": "witch",
+    "name": "Witch",
+    "category": "Truppe",
+    "unlockTownHall": 9,
+    "sortOrder": 290,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 300
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 20000,
+        "hitpoints": 320
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 29000,
+        "hitpoints": 400
+      },
+      {
+        "level": 4,
+        "townHall": 11,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 45000,
+        "hitpoints": 470
+      },
+      {
+        "level": 5,
+        "townHall": 12,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 62500,
+        "hitpoints": 520
+      },
+      {
+        "level": 6,
+        "townHall": 15,
+        "upgradeTimeHours": 132,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 150000,
+        "hitpoints": 540
+      },
+      {
+        "level": 7,
+        "townHall": 16,
+        "upgradeTimeHours": 174,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 180000,
+        "hitpoints": 560
+      },
+      {
+        "level": 8,
+        "townHall": 18,
+        "upgradeTimeHours": 372,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 355000,
+        "hitpoints": 650
+      }
+    ]
+  },
+  {
+    "id": "bd216e92-f5c6-4d5a-8243-02125f0b0790",
+    "sourceId": "wizard",
+    "name": "Wizard",
+    "category": "Truppe",
+    "unlockTownHall": 5,
+    "sortOrder": 300,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 5,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 75
+      },
+      {
+        "level": 2,
+        "townHall": 5,
+        "upgradeTimeHours": 4,
+        "goldCost": 0,
+        "elixirCost": 120000,
+        "darkElixirCost": 0,
+        "hitpoints": 90
+      },
+      {
+        "level": 3,
+        "townHall": 6,
+        "upgradeTimeHours": 5,
+        "goldCost": 0,
+        "elixirCost": 300000,
+        "darkElixirCost": 0,
+        "hitpoints": 108
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 600000,
+        "darkElixirCost": 0,
+        "hitpoints": 135
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 18,
+        "goldCost": 0,
+        "elixirCost": 1200000,
+        "darkElixirCost": 0,
+        "hitpoints": 165
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 2000000,
+        "darkElixirCost": 0,
+        "hitpoints": 180
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 195
+      },
+      {
+        "level": 8,
+        "townHall": 11,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 3100000,
+        "darkElixirCost": 0,
+        "hitpoints": 210
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 4000000,
+        "darkElixirCost": 0,
+        "hitpoints": 230
+      },
+      {
+        "level": 10,
+        "townHall": 13,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 5500000,
+        "darkElixirCost": 0,
+        "hitpoints": 250
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "upgradeTimeHours": 132,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 270
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 11500000,
+        "darkElixirCost": 0,
+        "hitpoints": 290
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "upgradeTimeHours": 252,
+        "goldCost": 0,
+        "elixirCost": 16000000,
+        "darkElixirCost": 0,
+        "hitpoints": 310
+      },
+      {
+        "level": 14,
+        "townHall": 18,
+        "upgradeTimeHours": 336,
+        "goldCost": 0,
+        "elixirCost": 27000000,
+        "darkElixirCost": 0,
+        "hitpoints": 330
+      }
+    ]
+  },
+  {
+    "id": "7333b259-d09d-46fe-84ad-c216befd4429",
+    "sourceId": "yeti",
+    "name": "Yeti",
+    "category": "Truppe",
+    "unlockTownHall": 12,
+    "sortOrder": 310,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 12,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 2900
+      },
+      {
+        "level": 2,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 3200
+      },
+      {
+        "level": 3,
+        "townHall": 13,
+        "upgradeTimeHours": 108,
+        "goldCost": 0,
+        "elixirCost": 6500000,
+        "darkElixirCost": 0,
+        "hitpoints": 3500
+      },
+      {
+        "level": 4,
+        "townHall": 14,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 3700
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "upgradeTimeHours": 180,
+        "goldCost": 0,
+        "elixirCost": 12000000,
+        "darkElixirCost": 0,
+        "hitpoints": 3900
+      },
+      {
+        "level": 6,
+        "townHall": 16,
+        "upgradeTimeHours": 198,
+        "goldCost": 0,
+        "elixirCost": 14500000,
+        "darkElixirCost": 0,
+        "hitpoints": 4100
+      },
+      {
+        "level": 7,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 17000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4300
+      }
     ]
   }
 ]

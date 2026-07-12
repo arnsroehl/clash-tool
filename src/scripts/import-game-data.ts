@@ -14,6 +14,7 @@ type GameBuildingLevel = {
 
 type GameBuilding = {
   id: string;
+  sourceId: string;
   name: string;
   category: string;
   unlockTownHall: number;
@@ -23,6 +24,7 @@ type GameBuilding = {
 
 type GameHero = {
   id: string;
+  sourceId: string;
   name: string;
   category: string;
   unlockTownHall: number;
@@ -32,6 +34,7 @@ type GameHero = {
 
 type BuildingUpsertRow = {
   id: string;
+  source_id: string;
   name: string;
   category: string;
   unlock_town_hall_level: number;
@@ -52,6 +55,7 @@ type BuildingLevelUpsertRow = {
 
 type HeroUpsertRow = {
   id: string;
+  source_id: string;
   name: string;
   category: string;
   unlock_town_hall_level: number;
@@ -88,11 +92,13 @@ type LaboratoryLevelUpsertRow = {
 type ExistingBuildingRow = {
   id: string;
   name: string;
+  source_id: string | null;
 };
 
 type ExistingHeroRow = {
   id: string;
   name: string;
+  source_id: string | null;
 };
 
 const BUILDINGS_FILE = path.join(process.cwd(), "src/data/buildings.json");
@@ -124,6 +130,10 @@ function isUuid(value: unknown): value is string {
 
 function isNonNegativeInteger(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
+function isNonNegativeNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
 
 function isPositiveInteger(value: unknown): value is number {
@@ -189,7 +199,7 @@ function validateLevel(value: unknown, buildingId: string): GameBuildingLevel {
   }
 
   if (
-    !isNonNegativeInteger(upgradeTimeHours) ||
+    !isNonNegativeNumber(upgradeTimeHours) ||
     !isNonNegativeInteger(goldCost) ||
     !isNonNegativeInteger(elixirCost) ||
     !isNonNegativeInteger(darkElixirCost) ||
@@ -216,11 +226,11 @@ function validateBuilding(value: unknown): GameBuilding {
     throw new Error("Ein Gebäude-Eintrag ist kein Objekt.");
   }
 
-  const { id, name, category, unlockTownHall, sortOrder, levels } = value;
+  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels } = value;
 
-  if (!isUuid(id) || !isString(name) || !isString(category)) {
+  if (!isUuid(id) || !isString(sourceId) || !isString(name) || !isString(category)) {
     throw new Error(
-      "Gebäude brauchen gültige Felder id, name und category. id muss eine UUID sein.",
+      "Gebäude brauchen gültige Felder id, sourceId, name und category. id muss eine UUID sein.",
     );
   }
 
@@ -245,6 +255,7 @@ function validateBuilding(value: unknown): GameBuilding {
 
   return {
     id,
+    sourceId,
     name,
     category,
     unlockTownHall,
@@ -277,11 +288,11 @@ function validateHero(value: unknown): GameHero {
     throw new Error("Ein Helden-Eintrag ist kein Objekt.");
   }
 
-  const { id, name, category, unlockTownHall, sortOrder, levels } = value;
+  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels } = value;
 
-  if (!isUuid(id) || !isString(name) || !isString(category)) {
+  if (!isUuid(id) || !isString(sourceId) || !isString(name) || !isString(category)) {
     throw new Error(
-      "Helden brauchen gültige Felder id, name und category. id muss eine UUID sein.",
+      "Game Items brauchen gültige Felder id, sourceId, name und category. id muss eine UUID sein.",
     );
   }
 
@@ -306,6 +317,7 @@ function validateHero(value: unknown): GameHero {
 
   return {
     id,
+    sourceId,
     name,
     category,
     unlockTownHall,
@@ -363,13 +375,10 @@ async function readGameItems(filePath: string): Promise<GameHero[]> {
 
 async function resolveBuildingIds(
   supabase: ReturnType<typeof createScriptSupabaseClient>,
-  buildings: GameBuilding[],
 ): Promise<Map<string, string>> {
-  const buildingNames = buildings.map((building) => building.name);
   const { data, error } = await supabase
     .from("buildings")
-    .select("id, name")
-    .in("name", buildingNames);
+    .select("id, name, source_id");
 
   if (error) {
     throw new Error(`Bestehende Gebäude konnten nicht gelesen werden: ${error.message}`);
@@ -378,14 +387,17 @@ async function resolveBuildingIds(
   return ((data || []) as ExistingBuildingRow[]).reduce<Map<string, string>>(
     (buildingIds, row) => {
       buildingIds.set(row.name, row.id);
+      if (row.source_id) {
+        buildingIds.set(row.source_id, row.id);
+      }
       return buildingIds;
     },
     new Map<string, string>(),
   );
 }
 
-function createScriptSupabaseClient(supabaseUrl: string, supabaseAnonKey: string) {
-  return createClient(supabaseUrl, supabaseAnonKey, {
+function createScriptSupabaseClient(supabaseUrl: string, supabaseSecretKey: string) {
+  return createClient(supabaseUrl, supabaseSecretKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
@@ -397,18 +409,19 @@ function resolveBuildingId(
   building: GameBuilding,
   existingBuildingIds: Map<string, string>,
 ): string {
-  return existingBuildingIds.get(building.name) || building.id;
+  return (
+    existingBuildingIds.get(building.sourceId) ||
+    existingBuildingIds.get(building.name) ||
+    building.id
+  );
 }
 
 async function resolveHeroIds(
   supabase: ReturnType<typeof createScriptSupabaseClient>,
-  heroes: GameHero[],
 ): Promise<Map<string, string> | null> {
-  const heroNames = heroes.map((hero) => hero.name);
   const { data, error } = await supabase
     .from("heroes")
-    .select("id, name")
-    .in("name", heroNames);
+    .select("id, name, source_id");
 
   if (error) {
     if (isMissingTableErrorMessage(error.message)) {
@@ -424,6 +437,9 @@ async function resolveHeroIds(
   return ((data || []) as ExistingHeroRow[]).reduce<Map<string, string>>(
     (heroIds, row) => {
       heroIds.set(row.name, row.id);
+      if (row.source_id) {
+        heroIds.set(row.source_id, row.id);
+      }
       return heroIds;
     },
     new Map<string, string>(),
@@ -434,7 +450,11 @@ function resolveHeroId(
   hero: GameHero,
   existingHeroIds: Map<string, string>,
 ): string {
-  return existingHeroIds.get(hero.name) || hero.id;
+  return (
+    existingHeroIds.get(hero.sourceId) ||
+    existingHeroIds.get(hero.name) ||
+    hero.id
+  );
 }
 
 function toBuildingRows(
@@ -443,6 +463,7 @@ function toBuildingRows(
 ): BuildingUpsertRow[] {
   return buildings.map((building) => ({
     id: resolveBuildingId(building, existingBuildingIds),
+    source_id: building.sourceId,
     name: building.name,
     category: building.category,
     unlock_town_hall_level: building.unlockTownHall,
@@ -475,6 +496,7 @@ function toHeroRows(
 ): HeroUpsertRow[] {
   return heroes.map((hero) => ({
     id: resolveHeroId(hero, existingHeroIds),
+    source_id: hero.sourceId,
     name: hero.name,
     category: hero.category,
     unlock_town_hall_level: hero.unlockTownHall,
@@ -507,6 +529,7 @@ function toLaboratoryRows(
 ): LaboratoryUpsertRow[] {
   return items.map((item) => ({
     id: resolveHeroId(item, existingItemIds),
+    source_id: item.sourceId,
     name: item.name,
     category: item.category,
     unlock_town_hall_level: item.unlockTownHall,
@@ -540,11 +563,9 @@ async function resolveGenericItemIds(params: {
   items: GameHero[];
   sqlFile: string;
 }): Promise<Map<string, string> | null> {
-  const itemNames = params.items.map((item) => item.name);
   const { data, error } = await params.supabase
     .from(params.tableName)
-    .select("id, name")
-    .in("name", itemNames);
+    .select("id, name, source_id");
 
   if (error) {
     if (isMissingTableErrorMessage(error.message)) {
@@ -562,6 +583,9 @@ async function resolveGenericItemIds(params: {
   return ((data || []) as ExistingHeroRow[]).reduce<Map<string, string>>(
     (itemIds, row) => {
       itemIds.set(row.name, row.id);
+      if (row.source_id) {
+        itemIds.set(row.source_id, row.id);
+      }
       return itemIds;
     },
     new Map<string, string>(),
@@ -647,11 +671,12 @@ async function runImport() {
   await loadLocalEnv();
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseSecretKey =
+    process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabaseSecretKey) {
     throw new Error(
-      "NEXT_PUBLIC_SUPABASE_URL und NEXT_PUBLIC_SUPABASE_ANON_KEY müssen gesetzt sein.",
+      "NEXT_PUBLIC_SUPABASE_URL und ein serverseitiger SUPABASE_SECRET_KEY müssen gesetzt sein.",
     );
   }
 
@@ -664,15 +689,20 @@ async function runImport() {
 
   console.log(`Validierung erfolgreich: ${buildings.length} Gebäude, ${totalLevelCount} Level.`);
 
-  const supabase = createScriptSupabaseClient(supabaseUrl, supabaseAnonKey);
+  const supabase = createScriptSupabaseClient(supabaseUrl, supabaseSecretKey);
 
   console.log("Prüfe bestehende Gebäude...");
-  const existingBuildingIds = await resolveBuildingIds(supabase, buildings);
+  const existingBuildingIds = await resolveBuildingIds(supabase);
   const buildingRows = toBuildingRows(buildings, existingBuildingIds);
   const buildingLevelRows = toBuildingLevelRows(buildings, existingBuildingIds);
+  const existingBuildingCount = buildings.filter(
+    (building) =>
+      existingBuildingIds.has(building.sourceId) ||
+      existingBuildingIds.has(building.name),
+  ).length;
 
   console.log(
-    `${existingBuildingIds.size} vorhandene Gebäude erkannt, ${buildingRows.length - existingBuildingIds.size} neue Gebäude vorbereitet.`,
+    `${existingBuildingCount} vorhandene Gebäude erkannt, ${buildingRows.length - existingBuildingCount} neue Gebäude vorbereitet.`,
   );
 
   console.log("Upsert buildings...");
@@ -707,7 +737,7 @@ async function runImport() {
   );
 
   console.log("Prüfe bestehende Helden...");
-  const existingHeroIds = await resolveHeroIds(supabase, heroes);
+  const existingHeroIds = await resolveHeroIds(supabase);
   if (!existingHeroIds) {
     console.log("Hero-Import übersprungen.");
   } else {

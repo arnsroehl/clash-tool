@@ -1,24 +1,451 @@
 [
   {
-    "id": "66666666-cccc-4666-8666-cccccccccccc",
-    "name": "Mauerbrecher",
+    "id": "77777777-cccc-4777-8777-cccccccccccc",
+    "sourceId": "battle-blimp",
+    "name": "Kampfzeppelin",
     "category": "Belagerungsmaschine",
     "unlockTownHall": 12,
     "sortOrder": 10,
     "levels": [
-      { "level": 1, "townHall": 12, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 3500 },
-      { "level": 2, "townHall": 12, "upgradeTimeHours": 24, "goldCost": 0, "elixirCost": 5000000, "darkElixirCost": 0, "hitpoints": 3800 }
+      {
+        "level": 1,
+        "townHall": 12,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 3000
+      },
+      {
+        "level": 2,
+        "townHall": 12,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 3500
+      },
+      {
+        "level": 3,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 3500000,
+        "darkElixirCost": 0,
+        "hitpoints": 4000
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 6500000,
+        "darkElixirCost": 0,
+        "hitpoints": 4500
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5000
+      }
     ]
   },
   {
-    "id": "77777777-cccc-4777-8777-cccccccccccc",
-    "name": "Kampfzeppelin",
+    "id": "d0a15403-f8c5-4a00-8e6b-5af65b37f648",
+    "sourceId": "battle-drill",
+    "name": "Battle Drill",
     "category": "Belagerungsmaschine",
-    "unlockTownHall": 12,
+    "unlockTownHall": 16,
     "sortOrder": 20,
     "levels": [
-      { "level": 1, "townHall": 12, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 3000 },
-      { "level": 2, "townHall": 12, "upgradeTimeHours": 24, "goldCost": 0, "elixirCost": 5000000, "darkElixirCost": 0, "hitpoints": 3300 }
+      {
+        "level": 1,
+        "townHall": 16,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 4800
+      },
+      {
+        "level": 2,
+        "townHall": 16,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 6000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5100
+      },
+      {
+        "level": 3,
+        "townHall": 16,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 8500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5400
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5800
+      },
+      {
+        "level": 5,
+        "townHall": 17,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 17000000,
+        "darkElixirCost": 0,
+        "hitpoints": 6300
+      }
+    ]
+  },
+  {
+    "id": "d7613e3f-cb5c-4e83-8336-078b5e982682",
+    "sourceId": "flame-flinger",
+    "name": "Flame Flinger",
+    "category": "Belagerungsmaschine",
+    "unlockTownHall": 15,
+    "sortOrder": 30,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 15,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1700
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 5500000,
+        "darkElixirCost": 0,
+        "hitpoints": 1800
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 8000000,
+        "darkElixirCost": 0,
+        "hitpoints": 1900
+      },
+      {
+        "level": 4,
+        "townHall": 15,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2000
+      },
+      {
+        "level": 5,
+        "townHall": 16,
+        "upgradeTimeHours": 288,
+        "goldCost": 0,
+        "elixirCost": 18000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2100
+      }
+    ]
+  },
+  {
+    "id": "b098329a-6542-4c1f-8185-8650d01dbe14",
+    "sourceId": "log-launcher",
+    "name": "Log Launcher",
+    "category": "Belagerungsmaschine",
+    "unlockTownHall": 14,
+    "sortOrder": 40,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 14,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 4000
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 3200000,
+        "darkElixirCost": 0,
+        "hitpoints": 4400
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 4500000,
+        "darkElixirCost": 0,
+        "hitpoints": 4800
+      },
+      {
+        "level": 4,
+        "townHall": 14,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 7500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5200
+      },
+      {
+        "level": 5,
+        "townHall": 16,
+        "upgradeTimeHours": 288,
+        "goldCost": 0,
+        "elixirCost": 18000000,
+        "darkElixirCost": 0,
+        "hitpoints": 5500
+      }
+    ]
+  },
+  {
+    "id": "b6a76660-245a-4f91-8ce8-d871bf747dae",
+    "sourceId": "siege-barracks",
+    "name": "Siege Barracks",
+    "category": "Belagerungsmaschine",
+    "unlockTownHall": 13,
+    "sortOrder": 50,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 13,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 3300
+      },
+      {
+        "level": 2,
+        "townHall": 13,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 3500000,
+        "darkElixirCost": 0,
+        "hitpoints": 3700
+      },
+      {
+        "level": 3,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4100
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 8000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4500
+      },
+      {
+        "level": 5,
+        "townHall": 16,
+        "upgradeTimeHours": 288,
+        "goldCost": 0,
+        "elixirCost": 18000000,
+        "darkElixirCost": 0,
+        "hitpoints": 4800
+      }
+    ]
+  },
+  {
+    "id": "ad24f3fb-8a95-4a27-87ab-252eb85eddd0",
+    "sourceId": "stone-slammer",
+    "name": "Stone Slammer",
+    "category": "Belagerungsmaschine",
+    "unlockTownHall": 13,
+    "sortOrder": 60,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 13,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 5600
+      },
+      {
+        "level": 2,
+        "townHall": 13,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5900
+      },
+      {
+        "level": 3,
+        "townHall": 13,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 3500000,
+        "darkElixirCost": 0,
+        "hitpoints": 6200
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 6500000,
+        "darkElixirCost": 0,
+        "hitpoints": 6500
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 6800
+      },
+      {
+        "level": 6,
+        "townHall": 17,
+        "upgradeTimeHours": 324,
+        "goldCost": 0,
+        "elixirCost": 26000000,
+        "darkElixirCost": 0,
+        "hitpoints": 7200
+      }
+    ]
+  },
+  {
+    "id": "3ece8b9b-ed3d-44a3-8c99-a3fbad74af77",
+    "sourceId": "troop-launcher",
+    "name": "Troop Launcher",
+    "category": "Belagerungsmaschine",
+    "unlockTownHall": 17,
+    "sortOrder": 70,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 17,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 2000
+      },
+      {
+        "level": 2,
+        "townHall": 17,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 8500000,
+        "darkElixirCost": 0,
+        "hitpoints": 2200
+      },
+      {
+        "level": 3,
+        "townHall": 17,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2400
+      },
+      {
+        "level": 4,
+        "townHall": 17,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 17000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2600
+      }
+    ]
+  },
+  {
+    "id": "66666666-cccc-4666-8666-cccccccccccc",
+    "sourceId": "wall-wrecker",
+    "name": "Mauerbrecher",
+    "category": "Belagerungsmaschine",
+    "unlockTownHall": 12,
+    "sortOrder": 80,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 12,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 5500
+      },
+      {
+        "level": 2,
+        "townHall": 12,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 6000
+      },
+      {
+        "level": 3,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 3500000,
+        "darkElixirCost": 0,
+        "hitpoints": 6500
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 6500000,
+        "darkElixirCost": 0,
+        "hitpoints": 7000
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 8500
+      },
+      {
+        "level": 6,
+        "townHall": 17,
+        "upgradeTimeHours": 324,
+        "goldCost": 0,
+        "elixirCost": 26000000,
+        "darkElixirCost": 0,
+        "hitpoints": 10000
+      }
     ]
   }
 ]

@@ -5,6 +5,22 @@ export type Building = {
   unlockTownHallLevel: number;
   maxLevel: number;
   sortOrder: number;
+  buildingCount?: number;
+  countAfterMerges?: number;
+};
+
+export type BuildingTownHallAvailability = {
+  buildingId: string;
+  townHallLevel: number;
+  buildingCount: number;
+  countAfterMerges: number;
+};
+
+export type BuildingTownHallAvailabilityRow = {
+  building_id: string;
+  town_hall_level: number;
+  building_count: number;
+  count_after_merges: number;
 };
 
 export type BuildingRow = {

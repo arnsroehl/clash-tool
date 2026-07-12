@@ -1,24 +1,1270 @@
 [
   {
-    "id": "44444444-bbbb-4444-8444-bbbbbbbbbbbb",
-    "name": "Blitzzauber",
+    "id": "7cdc35c2-5db3-4470-8c04-23b0b3ba8233",
+    "sourceId": "bat-spell",
+    "name": "Bat Spell",
     "category": "Zauber",
-    "unlockTownHall": 5,
+    "unlockTownHall": 10,
     "sortOrder": 10,
     "levels": [
-      { "level": 1, "townHall": 5, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 0 },
-      { "level": 2, "townHall": 5, "upgradeTimeHours": 12, "goldCost": 0, "elixirCost": 200000, "darkElixirCost": 0, "hitpoints": 0 }
+      {
+        "level": 1,
+        "townHall": 10,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 10,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 13000,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 25500,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 11,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 35000,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 12,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 47500,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 15,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 140000,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 17,
+        "upgradeTimeHours": 204,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 220000,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 17,
+        "upgradeTimeHours": 312,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 300000,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "b7c475c6-23ed-4384-8f0e-05e9ed63e9a7",
+    "sourceId": "clone-spell",
+    "name": "Clone Spell",
+    "category": "Zauber",
+    "unlockTownHall": 9,
+    "sortOrder": 20,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 10,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1500000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 11,
+        "upgradeTimeHours": 54,
+        "goldCost": 0,
+        "elixirCost": 3000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 4000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 14,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 8000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 15,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 9000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "aab81980-3cc2-468a-8803-1ff3cc4733c2",
+    "sourceId": "earthquake-spell",
+    "name": "Earthquake Spell",
+    "category": "Zauber",
+    "unlockTownHall": 8,
+    "sortOrder": 30,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 6000,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 9,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 12000,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 25500,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 42000,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 14,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 120000,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 16,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 200000,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 17,
+        "upgradeTimeHours": 324,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 330000,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "1fd061f5-cad9-4867-8eb6-f693a924828e",
+    "sourceId": "freeze-spell",
+    "name": "Freeze Spell",
+    "category": "Zauber",
+    "unlockTownHall": 8,
+    "sortOrder": 40,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1200000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 1700000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 3000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 10,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 4200000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 11,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 6000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 12,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 7000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "71ed5419-6bb2-4e11-85aa-9300f80ce5b9",
+    "sourceId": "haste-spell",
+    "name": "Haste Spell",
+    "category": "Zauber",
+    "unlockTownHall": 9,
+    "sortOrder": 50,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 8000,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 17000,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 30000,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 38500,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 17,
+        "upgradeTimeHours": 216,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 200000,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 17,
+        "upgradeTimeHours": 300,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 320000,
+        "hitpoints": 0
+      }
     ]
   },
   {
     "id": "55555555-bbbb-4555-8555-bbbbbbbbbbbb",
+    "sourceId": "healing-spell",
     "name": "Heilzauber",
     "category": "Zauber",
     "unlockTownHall": 6,
-    "sortOrder": 20,
+    "sortOrder": 60,
     "levels": [
-      { "level": 1, "townHall": 6, "upgradeTimeHours": 0, "goldCost": 0, "elixirCost": 0, "darkElixirCost": 0, "hitpoints": 0 },
-      { "level": 2, "townHall": 6, "upgradeTimeHours": 18, "goldCost": 0, "elixirCost": 300000, "darkElixirCost": 0, "hitpoints": 0 }
+      {
+        "level": 1,
+        "townHall": 6,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 6,
+        "upgradeTimeHours": 3,
+        "goldCost": 0,
+        "elixirCost": 75000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 6,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 150000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 300000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 900000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 1800000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 3000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 13,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 6000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "upgradeTimeHours": 156,
+        "goldCost": 0,
+        "elixirCost": 11000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 10,
+        "townHall": 16,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 14000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 11,
+        "townHall": 17,
+        "upgradeTimeHours": 252,
+        "goldCost": 0,
+        "elixirCost": 19000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "upgradeTimeHours": 360,
+        "goldCost": 0,
+        "elixirCost": 29000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "bf86542f-88b8-4ab9-83da-ebd9e4a134ad",
+    "sourceId": "ice-block-spell",
+    "name": "Ice Block Spell",
+    "category": "Zauber",
+    "unlockTownHall": 12,
+    "sortOrder": 70,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 12,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 140000,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "upgradeTimeHours": 264,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 200000,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "upgradeTimeHours": 336,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 280000,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 17,
+        "upgradeTimeHours": 384,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 320000,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "5d65be18-927e-4027-89e1-14dfbc35bae2",
+    "sourceId": "invisibility-spell",
+    "name": "Invisibility Spell",
+    "category": "Zauber",
+    "unlockTownHall": 10,
+    "sortOrder": 80,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 10,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 11,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 12,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 6000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 7000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "42ac9e2d-b24e-4ae5-8d4c-c8486d863bd1",
+    "sourceId": "jump-spell",
+    "name": "Jump Spell",
+    "category": "Zauber",
+    "unlockTownHall": 8,
+    "sortOrder": 90,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "upgradeTimeHours": 156,
+        "goldCost": 0,
+        "elixirCost": 8000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "44444444-bbbb-4444-8444-bbbbbbbbbbbb",
+    "sourceId": "lightning-spell",
+    "name": "Blitzzauber",
+    "category": "Zauber",
+    "unlockTownHall": 5,
+    "sortOrder": 100,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 5,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 5,
+        "upgradeTimeHours": 2,
+        "goldCost": 0,
+        "elixirCost": 50000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 5,
+        "upgradeTimeHours": 4,
+        "goldCost": 0,
+        "elixirCost": 100000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 5,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 200000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 600000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 1500000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 2500000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 11,
+        "upgradeTimeHours": 84,
+        "goldCost": 0,
+        "elixirCost": 4200000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 6300000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "upgradeTimeHours": 144,
+        "goldCost": 0,
+        "elixirCost": 10000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 13500000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 18500000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "upgradeTimeHours": 336,
+        "goldCost": 0,
+        "elixirCost": 27000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "239a3196-4e2c-4bac-8b57-40637e01ccdd",
+    "sourceId": "overgrowth-spell",
+    "name": "Overgrowth Spell",
+    "category": "Zauber",
+    "unlockTownHall": 11,
+    "sortOrder": 110,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 11,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 12,
+        "upgradeTimeHours": 132,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 62500,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "upgradeTimeHours": 204,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 125000,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "upgradeTimeHours": 240,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 175000,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "73d6ffb9-4478-4869-8f80-834fb460f1b2",
+    "sourceId": "poison-spell",
+    "name": "Poison Spell",
+    "category": "Zauber",
+    "unlockTownHall": 8,
+    "sortOrder": 120,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 5000,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 9,
+        "upgradeTimeHours": 18,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 10000,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 21500,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 35000,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 12,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 55000,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 13,
+        "upgradeTimeHours": 120,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 77500,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "upgradeTimeHours": 156,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 100000,
+        "hitpoints": 0
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 135000,
+        "hitpoints": 0
+      },
+      {
+        "level": 10,
+        "townHall": 16,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 175000,
+        "hitpoints": 0
+      },
+      {
+        "level": 11,
+        "townHall": 17,
+        "upgradeTimeHours": 232,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 230000,
+        "hitpoints": 0
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "upgradeTimeHours": 348,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 350000,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "e40a416d-bc8c-4ff1-8a19-c9779775ef58",
+    "sourceId": "rage-spell",
+    "name": "Rage Spell",
+    "category": "Zauber",
+    "unlockTownHall": 7,
+    "sortOrder": 130,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 7,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 7,
+        "upgradeTimeHours": 6,
+        "goldCost": 0,
+        "elixirCost": 400000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 7,
+        "upgradeTimeHours": 12,
+        "goldCost": 0,
+        "elixirCost": 800000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 1000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 2000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 12,
+        "upgradeTimeHours": 96,
+        "goldCost": 0,
+        "elixirCost": 5000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "9ec7446d-147f-423b-84fa-6925a91b755d",
+    "sourceId": "recall-spell",
+    "name": "Recall Spell",
+    "category": "Zauber",
+    "unlockTownHall": 11,
+    "sortOrder": 140,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 11,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 13,
+        "upgradeTimeHours": 168,
+        "goldCost": 0,
+        "elixirCost": 7500000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "upgradeTimeHours": 204,
+        "goldCost": 0,
+        "elixirCost": 8000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 15,
+        "upgradeTimeHours": 228,
+        "goldCost": 0,
+        "elixirCost": 9000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 16,
+        "upgradeTimeHours": 276,
+        "goldCost": 0,
+        "elixirCost": 13000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 17,
+        "upgradeTimeHours": 300,
+        "goldCost": 0,
+        "elixirCost": 19000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "5a27eb01-a4c4-46a8-8623-c2dc10e20e60",
+    "sourceId": "revive-spell",
+    "name": "Revive Spell",
+    "category": "Zauber",
+    "unlockTownHall": 12,
+    "sortOrder": 150,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 12,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "upgradeTimeHours": 192,
+        "goldCost": 0,
+        "elixirCost": 18000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 16,
+        "upgradeTimeHours": 252,
+        "goldCost": 0,
+        "elixirCost": 19000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 17,
+        "upgradeTimeHours": 276,
+        "goldCost": 0,
+        "elixirCost": 20000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 17,
+        "upgradeTimeHours": 384,
+        "goldCost": 0,
+        "elixirCost": 29500000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "0e55d37e-85a5-4956-8859-0963dca6e7fc",
+    "sourceId": "skeleton-spell",
+    "name": "Skeleton Spell",
+    "category": "Zauber",
+    "unlockTownHall": 9,
+    "sortOrder": 160,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 10,
+        "upgradeTimeHours": 24,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 11000,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 36,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 17000,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 11,
+        "upgradeTimeHours": 48,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 25000,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 12,
+        "upgradeTimeHours": 60,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 40000,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 12,
+        "upgradeTimeHours": 72,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 50000,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 13,
+        "upgradeTimeHours": 102,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 75000,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 15,
+        "upgradeTimeHours": 156,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 135000,
+        "hitpoints": 0
+      }
+    ]
+  },
+  {
+    "id": "d9b9659c-fb08-4b58-8fce-42662507b259",
+    "sourceId": "totem-spell",
+    "name": "Totem Spell",
+    "category": "Zauber",
+    "unlockTownHall": 13,
+    "sortOrder": 170,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 13,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 16,
+        "upgradeTimeHours": 288,
+        "goldCost": 0,
+        "elixirCost": 21000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 17,
+        "upgradeTimeHours": 336,
+        "goldCost": 0,
+        "elixirCost": 22000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 17,
+        "upgradeTimeHours": 384,
+        "goldCost": 0,
+        "elixirCost": 23000000,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
     ]
   }
 ]

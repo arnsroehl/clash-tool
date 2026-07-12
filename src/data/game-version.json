@@ -1,6 +1,7 @@
 {
   "game": "Clash of Clans",
-  "dataVersion": "sample-2026-07-07",
-  "schemaVersion": 1,
-  "description": "Small curated sample dataset for the Clash Tool import pipeline."
+  "dataVersion": "clash-of-clans-data-0.16.0",
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-12",
+  "description": "Home Village game data synchronized from clash-of-clans-data 0.16.0."
 }

@@ -69,6 +69,13 @@ For optional hero and laboratory tables, missing tables are logged and skipped w
 npm run import-game-data
 ```
 
+Der Import benötigt zusätzlich zu `NEXT_PUBLIC_SUPABASE_URL` einen
+serverseitigen `SUPABASE_SECRET_KEY` (alternativ den älteren
+`SUPABASE_SERVICE_ROLE_KEY`). Dieser Schlüssel darf niemals mit
+`NEXT_PUBLIC_` beginnen oder in Browser-Code verwendet werden. Die App selbst
+verwendet weiterhin ausschließlich den öffentlichen Schlüssel und besitzt nur
+Leserechte auf den Game-Data-Tabellen.
+
 ## Current Limits
 
 The importer currently reads hard-coded JSON file paths. Folder discovery and one-file-per-item game-data imports are planned, but not implemented on this branch.

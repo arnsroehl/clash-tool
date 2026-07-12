@@ -19,6 +19,12 @@ export function BuildingCard({
         <p className="font-bold text-white">{building.name}</p>
         <p className="mt-1 text-sm text-slate-400">
           {building.category} · Max Level {building.maxLevel}
+          {building.countAfterMerges && building.countAfterMerges > 1
+            ? ` · ${building.countAfterMerges}× vorhanden`
+            : ""}
+          {building.buildingCount !== building.countAfterMerges
+            ? ` · vor Merge ${building.buildingCount}×`
+            : ""}
         </p>
       </div>
 
