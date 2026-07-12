@@ -11,6 +11,7 @@ import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
 import { HeroList } from "@/components/heroes/HeroList";
+import { GoalPlanner } from "@/components/goals/GoalPlanner";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
 import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
@@ -416,6 +417,15 @@ export default function Home() {
 
         <CollapsibleSection title="Fortschrittsprognose">
         <ProgressForecastOverview forecast={progressForecast} />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Ziele & Meilensteine">
+          <GoalPlanner
+            recommendations={upgradeRecommendations}
+            queuedKeys={new Set(queueItems.map((item) => `${item.itemType}:${item.itemId}:${item.toLevel}`))}
+            onAddToQueue={addRecommendationToQueue}
+            isSaving={isSavingQueueItem}
+          />
         </CollapsibleSection>
 
         <CollapsibleSection title="Accounts & Gebäude">
