@@ -16,6 +16,7 @@ type UpgradeQueueListProps = {
   onDeleteItem: (id: string) => void;
   onMoveItem: (id: string, direction: "up" | "down") => void;
   onStatusChange: (id: string, status: UpgradeQueueItemStatus) => void;
+  onReorderItems: (draggedId: string, targetId: string) => void;
 };
 
 export function UpgradeQueueList({
@@ -30,9 +31,12 @@ export function UpgradeQueueList({
   onDeleteItem,
   onMoveItem,
   onStatusChange,
+  onReorderItems,
 }: UpgradeQueueListProps) {
   const [visibleRecommendationCount, setVisibleRecommendationCount] = useState(4);
   const [manualRecommendationKey, setManualRecommendationKey] = useState("");
+  const [lockedIds, setLockedIds] = useState<Set<string>>(new Set());
+  const [draggedId, setDraggedId] = useState<string | null>(null);
   const queuedKeys = new Set(queueItems.map((item) => `${item.itemType}:${item.itemId}:${item.toLevel}`));
   const availableRecommendations = recommendations.filter(
     (item) => !queuedKeys.has(`${item.itemType}:${item.itemId}:${item.nextLevel}`),
@@ -127,6 +131,8 @@ export function UpgradeQueueList({
         </div>
       ) : null}
 
+      {selectedAccount && queueItems.length > 0 ? <p className="mt-4 text-xs text-slate-500">Einträge können per Drag-and-drop oder mit den Pfeilen sortiert werden. Gesperrte Einträge bleiben geschützt.</p> : null}
+
       {errorMessage ? (
         <div className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
           {errorMessage}
@@ -154,6 +160,10 @@ export function UpgradeQueueList({
       {queueItems.length > 0 ? (
         <div className="mt-5 flex flex-col gap-3">
           {queueItems.map((item, index) => (
+            <div key={item.id} draggable={!lockedIds.has(item.id)} onDragStart={() => setDraggedId(item.id)} onDragOver={(event) => event.preventDefault()} onDrop={() => {
+              if (draggedId && !lockedIds.has(item.id)) onReorderItems(draggedId, item.id);
+              setDraggedId(null);
+            }} className={draggedId === item.id ? "opacity-50" : "opacity-100"}>
             <UpgradeQueueItemCard
               key={item.id}
               item={item}
@@ -163,7 +173,14 @@ export function UpgradeQueueList({
               canMoveUp={index > 0}
               canMoveDown={index < queueItems.length - 1}
               onStatusChange={onStatusChange}
+              isLocked={lockedIds.has(item.id)}
+              onToggleLock={(id) => setLockedIds((current) => {
+                const next = new Set(current);
+                if (next.has(id)) next.delete(id); else next.add(id);
+                return next;
+              })}
             />
+            </div>
           ))}
         </div>
       ) : null}

@@ -37,6 +37,11 @@ export function PlanningControlCenter(props: Props) {
       props.resources.elixir >= top.nextLevelCosts.elixir &&
       props.resources.darkElixir >= top.nextLevelCosts.darkElixir
     : false;
+  const affordableAlternative = props.recommendations.slice(1).find((item) =>
+    props.resources.gold >= item.nextLevelCosts.gold &&
+    props.resources.elixir >= item.nextLevelCosts.elixir &&
+    props.resources.darkElixir >= item.nextLevelCosts.darkElixir,
+  );
   const currentProgress = props.plannerResult?.summary.progressPercent ?? 0;
   const goalReached = currentProgress >= props.goalPercent;
   const resourceKeys = ["gold", "elixir", "darkElixir"] as const;
@@ -95,6 +100,14 @@ export function PlanningControlCenter(props: Props) {
             {Number.isFinite(waitDays) ? `Bei diesem Farming-Profil ist das Upgrade voraussichtlich in ${waitDays} Tagen finanzierbar.` : "Für mindestens eine fehlende Ressource ist noch kein tägliches Farming eingetragen."}
           </p>
         ) : null}
+        {top && !affordable && affordableAlternative ? (
+          <div className="mt-3 rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3 text-sm text-emerald-200">
+            Finanzierbare Alternative: {affordableAlternative.name} auf Level {affordableAlternative.nextLevel}.
+          </div>
+        ) : null}
+        <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+          {resourceKeys.map((key) => <div key={key} className="rounded-lg bg-white/5 p-2"><span className="block text-slate-500">7 Tage</span><span className="font-bold">{numberFormat.format(props.dailyIncome[key] * 7)}</span></div>)}
+        </div>
       </div>
 
       <div className="rounded-3xl border border-white/10 bg-slate-900 p-6">

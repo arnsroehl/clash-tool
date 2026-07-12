@@ -8,6 +8,8 @@ type UpgradeQueueItemCardProps = {
   canMoveUp: boolean;
   canMoveDown: boolean;
   onStatusChange: (id: string, status: UpgradeQueueItemStatus) => void;
+  isLocked: boolean;
+  onToggleLock: (id: string) => void;
 };
 
 function formatNumber(value: number): string {
@@ -34,6 +36,8 @@ export function UpgradeQueueItemCard({
   canMoveUp,
   canMoveDown,
   onStatusChange,
+  isLocked,
+  onToggleLock,
 }: UpgradeQueueItemCardProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
@@ -63,11 +67,12 @@ export function UpgradeQueueItemCard({
           <span className="rounded-xl bg-white/5 px-3 py-2 text-sm font-bold text-amber-300">
             Priorität {item.queueOrder}
           </span>
-          <button type="button" aria-label={`${item.name} nach oben`} disabled={!canMoveUp} onClick={() => onMove(item.id, "up")} className="rounded-xl border border-white/10 px-3 py-2 font-bold disabled:opacity-30">↑</button>
-          <button type="button" aria-label={`${item.name} nach unten`} disabled={!canMoveDown} onClick={() => onMove(item.id, "down")} className="rounded-xl border border-white/10 px-3 py-2 font-bold disabled:opacity-30">↓</button>
+          <button type="button" onClick={() => onToggleLock(item.id)} className={`rounded-xl border px-3 py-2 text-sm font-bold ${isLocked ? "border-amber-400/40 bg-amber-400/10 text-amber-200" : "border-white/10 text-slate-300"}`}>{isLocked ? "Gesperrt" : "Sperren"}</button>
+          <button type="button" aria-label={`${item.name} nach oben`} disabled={!canMoveUp || isLocked} onClick={() => onMove(item.id, "up")} className="rounded-xl border border-white/10 px-3 py-2 font-bold disabled:opacity-30">↑</button>
+          <button type="button" aria-label={`${item.name} nach unten`} disabled={!canMoveDown || isLocked} onClick={() => onMove(item.id, "down")} className="rounded-xl border border-white/10 px-3 py-2 font-bold disabled:opacity-30">↓</button>
           <button
             type="button"
-            disabled={isDeleting}
+            disabled={isDeleting || isLocked}
             onClick={() => onDelete(item.id)}
             className="rounded-xl border border-red-400/30 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-50"
           >

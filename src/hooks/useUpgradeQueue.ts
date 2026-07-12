@@ -184,6 +184,27 @@ export function useUpgradeQueue({
     [onError, queueItems],
   );
 
+  const reorderQueueItems = useCallback(async (draggedId: string, targetId: string) => {
+    if (draggedId === targetId) return;
+    const from = queueItems.findIndex((item) => item.id === draggedId);
+    const to = queueItems.findIndex((item) => item.id === targetId);
+    if (from < 0 || to < 0) return;
+    const reordered = [...queueItems];
+    const [dragged] = reordered.splice(from, 1);
+    reordered.splice(to, 0, dragged);
+    const normalized = reordered.map((item, index) => ({ ...item, queueOrder: index + 1 }));
+    setQueueItems(normalized);
+    try {
+      await updateUpgradeQueueItemOrder(normalized.map(({ id, queueOrder }) => ({ id, queueOrder })));
+      setQueueErrorMessage(null);
+    } catch (error) {
+      setQueueItems(queueItems);
+      const message = error instanceof Error ? error.message : "Queue-Reihenfolge konnte nicht gespeichert werden.";
+      setQueueErrorMessage(message);
+      onError(message);
+    }
+  }, [onError, queueItems]);
+
   const changeQueueItemStatus = useCallback(async (id: string, status: UpgradeQueueItemStatus) => {
     const previousItems = queueItems;
     setQueueItems((items) => items.map((item) => item.id === id ? { ...item, status } : item));
@@ -209,5 +230,6 @@ export function useUpgradeQueue({
     removeQueueItem,
     moveQueueItem,
     changeQueueItemStatus,
+    reorderQueueItems,
   };
 }

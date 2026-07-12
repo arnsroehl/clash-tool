@@ -14,8 +14,10 @@ import { HeroList } from "@/components/heroes/HeroList";
 import { GoalPlanner } from "@/components/goals/GoalPlanner";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
 import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
+import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
+import { FutureAccountView } from "@/components/progress-forecast/FutureAccountView";
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
@@ -203,6 +205,7 @@ export default function Home() {
     removeQueueItem,
     moveQueueItem,
     changeQueueItemStatus,
+    reorderQueueItems,
   } = useUpgradeQueue({
     selectedAccount,
     onError: handleError,
@@ -408,6 +411,7 @@ export default function Home() {
           onDeleteItem={removeQueueItem}
           onMoveItem={moveQueueItem}
           onStatusChange={changeQueueItemStatus}
+          onReorderItems={reorderQueueItems}
         />
         </CollapsibleSection>
 
@@ -417,6 +421,11 @@ export default function Home() {
 
         <CollapsibleSection title="Fortschrittsprognose">
         <ProgressForecastOverview forecast={progressForecast} />
+        <FutureAccountView simulation={builderSimulation} horizonDays={horizonDays} />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Strategievergleich" defaultOpen={false}>
+          <StrategyComparison recommendations={plannerResult?.recommendations || []} weights={strategyWeights} />
         </CollapsibleSection>
 
         <CollapsibleSection title="Ziele & Meilensteine">
