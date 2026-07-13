@@ -44,3 +44,17 @@ test("assigns an OCR level to the exact building instance", () => {
     [["cannon:2", 20]],
   );
 });
+
+test("matches official English API aliases to localized catalog entries", () => {
+  const result = parseScreenshotLevels("Barbarian King 95", [
+    {
+      id: "king",
+      name: "Barbarenkönig",
+      aliases: ["Barbarian King"],
+      currentLevel: 90,
+      type: "hero",
+    },
+  ]);
+  assert.equal(result[0].id, "king");
+  assert.equal(result[0].detectedLevel, 95);
+});

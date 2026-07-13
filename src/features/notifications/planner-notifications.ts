@@ -1,4 +1,9 @@
 import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
+import { estimateGoalRemainingHours } from "@/features/goal-planning/goal-estimation";
+import {
+  getActivePlanningEffects,
+  type ScheduledResourcePayout,
+} from "@/features/planning-events/planning-events";
 import type {
   ResourceSnapshot,
   UpgradeRecommendation,
@@ -18,6 +23,7 @@ type Input = {
   dailyIncome?: ResourceSnapshot;
   currentLevels?: Record<string, number>;
   dailySummaryEnabled?: boolean;
+  scheduledResourcePayouts?: ScheduledResourcePayout[];
   language?: "de" | "en";
   now?: Date;
 };
@@ -35,6 +41,7 @@ export function createPlannerNotifications({
   dailyIncome = emptyResources,
   currentLevels = {},
   dailySummaryEnabled = true,
+  scheduledResourcePayouts = [],
   language = "de",
   now = new Date(),
 }: Input): PlannerNotificationDraft[] {
@@ -43,22 +50,33 @@ export function createPlannerNotifications({
     new Date(now.getTime() + hours * 3_600_000).toISOString();
   const drafts: PlannerNotificationDraft[] = [];
   const nextBySlot = new Map<string, (typeof simulation.assignments)[number]>();
+  const spendableResources = { ...resources };
 
   for (const assignment of [...simulation.assignments].sort(
     (a, b) => a.endHour - b.endHour,
   )) {
     if (!nextBySlot.has(assignment.slotLabel))
       nextBySlot.set(assignment.slotLabel, assignment);
-    if (assignment.startHour === 0) {
+    const costs = assignment.effectiveCosts || emptyResources;
+    const affordableNow =
+      spendableResources.gold >= costs.gold &&
+      spendableResources.elixir >= costs.elixir &&
+      spendableResources.darkElixir >= costs.darkElixir;
+    if (assignment.startHour > 0 || affordableNow) {
       drafts.push({
         accountId,
         type: "upgrade_ready",
-        notifyAt: now.toISOString(),
+        notifyAt: atHour(assignment.startHour),
         title: en
           ? `${assignment.name} can be started`
           : `${assignment.name} kann gestartet werden`,
         message: `${assignment.slotLabel}: Level ${assignment.fromLevel} → ${assignment.toLevel}`,
       });
+      if (assignment.startHour === 0) {
+        spendableResources.gold -= costs.gold;
+        spendableResources.elixir -= costs.elixir;
+        spendableResources.darkElixir -= costs.darkElixir;
+      }
     }
   }
 
@@ -93,6 +111,44 @@ export function createPlannerNotifications({
     });
   });
 
+  const topRecommendation = recommendations[0];
+  if (topRecommendation && scheduledResourcePayouts.length) {
+    const projected = { ...resources };
+    const isAffordableAt = (date: Date) => {
+      const discount = getActivePlanningEffects(events, date).costPercent;
+      const factor = 1 - discount / 100;
+      return (
+        projected.gold >=
+          Math.ceil(topRecommendation.nextLevelCosts.gold * factor) &&
+        projected.elixir >=
+          Math.ceil(topRecommendation.nextLevelCosts.elixir * factor) &&
+        projected.darkElixir >=
+          Math.ceil(topRecommendation.nextLevelCosts.darkElixir * factor)
+      );
+    };
+    const affordableNow = isAffordableAt(now);
+    for (const payout of scheduledResourcePayouts) {
+      projected.gold += payout.resources.gold;
+      projected.elixir += payout.resources.elixir;
+      projected.darkElixir += payout.resources.darkElixir;
+      const payoutDate = new Date(payout.availableAt);
+      if (!affordableNow && isAffordableAt(payoutDate)) {
+        drafts.push({
+          accountId,
+          type: "upgrade_ready",
+          notifyAt: payout.availableAt,
+          title: en
+            ? `${topRecommendation.name} becomes affordable`
+            : `${topRecommendation.name} wird finanzierbar`,
+          message: en
+            ? `${payout.eventName} provides the planned resources for the next recommendation.`
+            : `${payout.eventName} liefert die eingeplanten Ressourcen für die nächste Empfehlung.`,
+        });
+        break;
+      }
+    }
+  }
+
   const resourceNames = en
     ? { gold: "Gold", elixir: "Elixir", darkElixir: "Dark elixir" }
     : { gold: "Gold", elixir: "Elixier", darkElixir: "Dunkles Elixier" };
@@ -122,10 +178,11 @@ export function createPlannerNotifications({
     const current =
       currentLevels[`${goal.itemType}:${goal.itemId}`] ?? goal.currentLevel;
     if (current >= goal.targetLevel) continue;
-    const totalLevels = Math.max(1, goal.targetLevel - goal.currentLevel);
-    const remainingLevels = Math.max(0, goal.targetLevel - current);
-    const remainingHours =
-      goal.estimatedHours * (remainingLevels / totalLevels);
+    const remainingHours = estimateGoalRemainingHours(
+      goal,
+      recommendations,
+      current,
+    );
     const finish = now.getTime() + remainingHours * 3_600_000;
     if (finish > new Date(`${goal.targetDate}T23:59:59`).getTime()) {
       drafts.push({

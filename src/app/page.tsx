@@ -42,7 +42,10 @@ import {
 } from "@/features/planning-control/planning-control";
 import { createProgressForecast } from "@/features/progress-forecast/progress-forecast.engine";
 import { createPlannerNotifications } from "@/features/notifications/planner-notifications";
-import { getActivePlanningEffects } from "@/features/planning-events/planning-events";
+import {
+  getActivePlanningEffects,
+  getScheduledResourcePayouts,
+} from "@/features/planning-events/planning-events";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useAuth } from "@/hooks/useAuth";
 import { usePlanningGoals } from "@/hooks/usePlanningGoals";
@@ -503,9 +506,31 @@ export default function Home() {
     addEvent,
     removeEvent,
   } = useMagicItems(selectedAccount?.id, handleError);
+  const simulationStartsAt = useMemo(() => new Date().toISOString(), []);
   const activeEffects = useMemo(
-    () => getActivePlanningEffects(events),
-    [events],
+    () => getActivePlanningEffects(events, new Date(simulationStartsAt)),
+    [events, simulationStartsAt],
+  );
+  const scheduledResourcePayouts = useMemo(
+    () =>
+      getScheduledResourcePayouts(
+        events,
+        new Date(simulationStartsAt),
+        horizonDays,
+      ),
+    [events, horizonDays, simulationStartsAt],
+  );
+  const scheduledResourceBonus = useMemo<ResourceSnapshot>(
+    () =>
+      scheduledResourcePayouts.reduce<ResourceSnapshot>(
+        (total, payout) => ({
+          gold: total.gold + payout.resources.gold,
+          elixir: total.elixir + payout.resources.elixir,
+          darkElixir: total.darkElixir + payout.resources.darkElixir,
+        }),
+        { gold: 0, elixir: 0, darkElixir: 0 },
+      ),
+    [scheduledResourcePayouts],
   );
   const effectivePlanningResources = useMemo<ResourceSnapshot>(
     () => ({
@@ -525,8 +550,6 @@ export default function Home() {
       addRawGoalRecommendationsToQueue(recommendations),
     [addRawGoalRecommendationsToQueue],
   );
-  const simulationStartsAt = useMemo(() => new Date().toISOString(), []);
-
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
     return simulateBuilderQueue({
       builderCount: selectedAccount?.builderCount || 0,
@@ -586,6 +609,7 @@ export default function Home() {
             currentLevels: currentItemLevels,
             language: notificationLanguage,
             dailySummaryEnabled,
+            scheduledResourcePayouts,
           })
         : [],
     [
@@ -597,6 +621,7 @@ export default function Home() {
       notificationLanguage,
       dailySummaryEnabled,
       remindersEnabled,
+      scheduledResourcePayouts,
       effectivePlanningResources,
       selectedAccount,
       storageCapacities,
@@ -755,6 +780,7 @@ export default function Home() {
             strategy={planningStrategy}
             resources={resources}
             resourceBonus={activeEffects.resourceBonus}
+            scheduledResourceBonus={scheduledResourceBonus}
             storageCapacities={storageCapacities}
             horizonDays={horizonDays}
             goalPercent={goalPercent}
@@ -960,6 +986,16 @@ export default function Home() {
             data={{
               exportedAt: new Date().toISOString(),
               account: selectedAccount,
+              levels: {
+                buildingInstances: buildingInstanceLevels,
+                heroes: heroLevels,
+                troops: troopLevels,
+                spells: spellLevels,
+                siegeMachines: siegeMachineLevels,
+              },
+              resources,
+              storageCapacities,
+              dailyIncome,
               queue: queueItems,
               goals,
               events,

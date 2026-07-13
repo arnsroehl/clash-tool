@@ -67,24 +67,28 @@ export function PlayerImportCenter(props: Props) {
       ...props.heroes.map((item) => ({
         id: item.id,
         name: item.name,
+        aliases: [item.apiName],
         type: "hero" as const,
         currentLevel: props.heroLevels[item.id] || 0,
       })),
       ...props.troops.map((item) => ({
         id: item.id,
         name: item.name,
+        aliases: [item.apiName],
         type: "troop" as const,
         currentLevel: props.troopLevels[item.id] || 0,
       })),
       ...props.spells.map((item) => ({
         id: item.id,
         name: item.name,
+        aliases: [item.apiName],
         type: "spell" as const,
         currentLevel: props.spellLevels[item.id] || 0,
       })),
       ...props.siegeMachines.map((item) => ({
         id: item.id,
         name: item.name,
+        aliases: [item.apiName],
         type: "siege_machine" as const,
         currentLevel: props.siegeLevels[item.id] || 0,
       })),
@@ -103,7 +107,15 @@ export function PlayerImportCenter(props: Props) {
     ],
   );
   const entityMap = useMemo(
-    () => new Map(entities.map((entity) => [normalize(entity.name), entity])),
+    () =>
+      new Map(
+        entities.flatMap((entity) =>
+          [entity.name, ...(entity.aliases || [])].map((name) => [
+            normalize(name),
+            entity,
+          ]),
+        ),
+      ),
     [entities],
   );
   const changesFromItems = useCallback(

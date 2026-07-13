@@ -75,3 +75,15 @@ test("runes calculate the missing storage amount", () => {
   );
   assert.equal(uses[0].resourceSaved, 300);
 });
+
+test("potions calculate exact savings for upgrades shorter than the boost", () => {
+  const uses = calculateMagicItemUses(
+    item({
+      itemKey: "builder_potion",
+      effectType: "speed_boost",
+      effectValue: 10,
+    }),
+    [queueItem({ durationHours: 5 })],
+  );
+  assert.equal(uses[0].timeSavedHours, 4.5);
+});

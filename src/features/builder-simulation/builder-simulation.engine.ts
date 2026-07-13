@@ -120,6 +120,8 @@ export function simulateBuilderQueue(
         startHour,
         endHour,
         durationHours,
+        originalDurationHours: queueItem.durationHours,
+        timeDiscountPercent: discount,
         costDiscountPercent,
         originalCosts,
         effectiveCosts,

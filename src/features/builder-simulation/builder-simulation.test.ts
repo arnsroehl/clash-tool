@@ -175,6 +175,8 @@ describe("Builder Simulation", () => {
     assert.equal(result.assignments[0].durationHours, 6);
     assert.equal(result.assignments[1].startHour, 6);
     assert.equal(result.assignments[1].durationHours, 5);
+    assert.equal(result.assignments[1].originalDurationHours, 10);
+    assert.equal(result.assignments[1].timeDiscountPercent, 50);
     assert.equal(result.totalDurationHours, 11);
   });
 

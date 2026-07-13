@@ -187,3 +187,135 @@ test("omits the daily summary when the profile preference is disabled", () => {
     false,
   );
 });
+
+test("schedules an upgrade reminder when an event payout makes it affordable", () => {
+  const notifications = createPlannerNotifications({
+    accountId: "account",
+    now: new Date("2026-07-14T00:00:00.000Z"),
+    recommendations: [
+      {
+        itemId: "cannon",
+        itemType: "building",
+        name: "Kanone",
+        category: "defense",
+        currentLevel: 1,
+        nextLevel: 2,
+        maxLevel: 2,
+        missingLevels: 1,
+        nextLevelCosts: { gold: 1_000, elixir: 0, darkElixir: 0 },
+        nextLevelTime: { hours: 1 },
+        remainingCosts: { gold: 1_000, elixir: 0, darkElixir: 0 },
+        remainingTime: { hours: 1 },
+        priorityScore: { value: 1, reasons: [] },
+      },
+    ],
+    resources: { gold: 100, elixir: 0, darkElixir: 0 },
+    goals: [],
+    events: [],
+    scheduledResourcePayouts: [
+      {
+        eventId: "season",
+        eventName: "Season Bank",
+        availableAt: "2026-07-20T00:00:00.000Z",
+        resources: { gold: 1_000, elixir: 0, darkElixir: 0 },
+      },
+    ],
+    simulation: {
+      assignments: [],
+      totalDurationHours: 0,
+      totalDurationDays: 0,
+      builderCount: 1,
+      idleTimeHours: 0,
+      builderAssignmentCount: 0,
+      laboratoryAssignmentCount: 0,
+    },
+  });
+  const ready = notifications.find(
+    (notification) =>
+      notification.type === "upgrade_ready" &&
+      notification.notifyAt === "2026-07-20T00:00:00.000Z",
+  );
+  assert.match(ready?.message || "", /Season Bank/);
+});
+
+test("does not claim multiple immediate upgrades can start with the same resources", () => {
+  const assignment = (id: string) => ({
+    builderIndex: Number(id),
+    queueItemId: id,
+    name: `Kanone ${id}`,
+    itemType: "building" as const,
+    fromLevel: 1,
+    toLevel: 2,
+    startHour: 0,
+    endHour: 4,
+    durationHours: 4,
+    costDiscountPercent: 0,
+    originalCosts: { gold: 800, elixir: 0, darkElixir: 0 },
+    effectiveCosts: { gold: 800, elixir: 0, darkElixir: 0 },
+    slotType: "builder" as const,
+    slotLabel: `Builder ${id}`,
+  });
+  const notifications = createPlannerNotifications({
+    accountId: "account",
+    resources: { gold: 1_000, elixir: 0, darkElixir: 0 },
+    recommendations: [],
+    goals: [],
+    events: [],
+    simulation: {
+      assignments: [assignment("1"), assignment("2")],
+      totalDurationHours: 4,
+      totalDurationDays: 1,
+      builderCount: 2,
+      idleTimeHours: 0,
+      builderAssignmentCount: 2,
+      laboratoryAssignmentCount: 0,
+    },
+  });
+  assert.equal(
+    notifications.filter((item) => item.type === "upgrade_ready").length,
+    1,
+  );
+});
+
+test("schedules a queued upgrade reminder at its simulated start", () => {
+  const notifications = createPlannerNotifications({
+    accountId: "account",
+    now: new Date("2026-07-14T00:00:00.000Z"),
+    recommendations: [],
+    goals: [],
+    events: [],
+    simulation: {
+      assignments: [
+        {
+          builderIndex: 0,
+          queueItemId: "later",
+          name: "Kanone",
+          itemType: "building",
+          fromLevel: 1,
+          toLevel: 2,
+          startHour: 12,
+          endHour: 16,
+          durationHours: 4,
+          costDiscountPercent: 0,
+          originalCosts: { gold: 800, elixir: 0, darkElixir: 0 },
+          effectiveCosts: { gold: 800, elixir: 0, darkElixir: 0 },
+          slotType: "builder",
+          slotLabel: "Builder 1",
+        },
+      ],
+      totalDurationHours: 16,
+      totalDurationDays: 1,
+      builderCount: 1,
+      idleTimeHours: 12,
+      builderAssignmentCount: 1,
+      laboratoryAssignmentCount: 0,
+    },
+  });
+  assert.ok(
+    notifications.some(
+      (item) =>
+        item.type === "upgrade_ready" &&
+        item.notifyAt === "2026-07-14T12:00:00.000Z",
+    ),
+  );
+});

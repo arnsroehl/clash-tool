@@ -9,7 +9,7 @@ import type {
 } from "@/types/laboratory";
 
 const SIEGE_MACHINE_SELECT_FIELDS =
-  "id, name, category, unlock_town_hall_level, max_level, sort_order";
+  "id, name, api_name, category, unlock_town_hall_level, max_level, sort_order";
 const SIEGE_MACHINE_LEVEL_SELECT_FIELDS =
   "siege_machine_id, level, town_hall_level, upgrade_time_hours, gold_cost, elixir_cost, dark_elixir_cost, hitpoints";
 
@@ -17,6 +17,7 @@ function mapSiegeMachine(row: SiegeMachineRow): SiegeMachine {
   return {
     id: row.id,
     name: row.name,
+    apiName: row.api_name,
     category: row.category,
     unlockTownHallLevel: row.unlock_town_hall_level,
     maxLevel: row.max_level,

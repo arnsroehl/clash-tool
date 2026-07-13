@@ -22,6 +22,7 @@ type Props = {
   strategy: PlanningStrategy;
   resources: ResourceSnapshot;
   resourceBonus: ResourceSnapshot;
+  scheduledResourceBonus: ResourceSnapshot;
   storageCapacities: ResourceSnapshot;
   horizonDays: number;
   goalPercent: number;
@@ -59,6 +60,9 @@ export function PlanningControlCenter(props: Props) {
   const hasResourceBonus = Object.values(props.resourceBonus).some(
     (value) => value > 0,
   );
+  const hasScheduledResourceBonus = Object.values(
+    props.scheduledResourceBonus,
+  ).some((value) => value > 0);
   const completedInHorizon = props.simulation.assignments.filter(
     (assignment) => assignment.endHour <= props.horizonDays * 24,
   ).length;
@@ -153,6 +157,18 @@ export function PlanningControlCenter(props: Props) {
               {numberFormat.format(props.resourceBonus.elixir)}{" "}
               {en ? "Elixir" : "Elixier"} · +
               {numberFormat.format(props.resourceBonus.darkElixir)}{" "}
+              {en ? "Dark elixir" : "Dunkles Elixier"}
+            </p>
+          ) : null}
+          {hasScheduledResourceBonus ? (
+            <p className="mt-2 rounded-xl bg-violet-400/10 p-3 text-xs text-violet-200">
+              {en
+                ? `Scheduled within ${props.horizonDays} days`
+                : `In den nächsten ${props.horizonDays} Tagen eingeplant`}
+              : +{numberFormat.format(props.scheduledResourceBonus.gold)} Gold · +
+              {numberFormat.format(props.scheduledResourceBonus.elixir)}{" "}
+              {en ? "Elixir" : "Elixier"} · +
+              {numberFormat.format(props.scheduledResourceBonus.darkElixir)}{" "}
               {en ? "Dark elixir" : "Dunkles Elixier"}
             </p>
           ) : null}

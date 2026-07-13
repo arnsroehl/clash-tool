@@ -28,6 +28,8 @@ export type BuilderAssignment = {
   startHour: number;
   endHour: number;
   durationHours: number;
+  originalDurationHours?: number;
+  timeDiscountPercent?: number;
   costDiscountPercent: number;
   originalCosts: ResourceSnapshot;
   effectiveCosts: ResourceSnapshot;

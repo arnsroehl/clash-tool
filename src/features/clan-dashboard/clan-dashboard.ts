@@ -1,4 +1,43 @@
-import type { ClanMember } from "@/types/clan";
+import type { ClanMember, OfficialClan } from "@/types/clan";
+
+export type ExistingClanMemberLink = {
+  player_tag: string;
+  account_id: string | null;
+  progress_percent: number | null;
+};
+
+export function buildClanMemberSyncRows(
+  clanId: string,
+  members: OfficialClan["members"],
+  existingMembers: ExistingClanMemberLink[],
+  now: string,
+) {
+  const existingByTag = new Map(
+    existingMembers.map((member) => [member.player_tag, member]),
+  );
+  return members.map((member) => {
+    const existing = existingByTag.get(member.playerTag);
+    return {
+      clan_id: clanId,
+      player_tag: member.playerTag,
+      account_id: existing?.account_id || null,
+      name: member.name,
+      role: member.role,
+      town_hall_level: member.townHallLevel,
+      trophies: member.trophies,
+      donations: member.donations,
+      donations_received: member.donationsReceived,
+      activity_score: Math.min(
+        100,
+        Math.round(member.donations / 10 + member.trophies / 100),
+      ),
+      progress_percent: existing?.progress_percent ?? null,
+      cwl_ready: member.townHallLevel >= 15 && member.trophies >= 3000,
+      last_synced_at: now,
+      updated_at: now,
+    };
+  });
+}
 
 export type ClanDashboardMetrics = {
   memberCount: number;

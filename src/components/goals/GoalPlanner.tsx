@@ -2,6 +2,10 @@
 
 import { useMemo, useState } from "react";
 import type { UpgradeRecommendation } from "@/features/planner/planner.types";
+import {
+  estimateGoalRemainingHours,
+  estimateMilestoneElapsedHours,
+} from "@/features/goal-planning/goal-estimation";
 import type { PlanningGoal } from "@/types/planningProfile";
 
 type Props = {
@@ -99,7 +103,12 @@ export function GoalPlanner({
       )
     : false;
   const milestonePrograms = useMemo(() => {
-    const definitions = [
+    const definitions: Array<{
+      name: string;
+      description: string;
+      filter: (item: UpgradeRecommendation) => boolean;
+      nextLevelOnly?: boolean;
+    }> = [
       {
         name: en ? "Finish the laboratory" : "Labor fertigstellen",
         description: en
@@ -109,11 +118,14 @@ export function GoalPlanner({
           ["troop", "spell", "siege_machine"].includes(item.itemType),
       },
       {
-        name: en ? "CWL-ready heroes" : "Helden-Offensive für CWL",
+        name: en ? "CWL-ready offense" : "Offensive für CWL vorbereiten",
         description: en
-          ? "All remaining hero upgrades"
-          : "Alle noch offenen Helden-Upgrades",
-        filter: (item: UpgradeRecommendation) => item.itemType === "hero",
+          ? "Heroes, troops, spells and siege machines"
+          : "Helden, Truppen, Zauber und Belagerungsmaschinen",
+        filter: (item: UpgradeRecommendation) =>
+          ["hero", "troop", "spell", "siege_machine"].includes(
+            item.itemType,
+          ),
       },
       {
         name: en
@@ -124,6 +136,7 @@ export function GoalPlanner({
           : "Jedes einzelne Mauersegment wird berücksichtigt",
         filter: (item: UpgradeRecommendation) =>
           item.itemType === "building" && /wall|mauer/i.test(item.name),
+        nextLevelOnly: true,
       },
       {
         name: en ? "Max defenses" : "Verteidigungen maxen",
@@ -147,18 +160,15 @@ export function GoalPlanner({
     ];
     return definitions.map((definition) => {
       const items = recommendations.filter(definition.filter);
-      const builderHours = items
-        .filter(
-          (item) => item.itemType === "building" || item.itemType === "hero",
-        )
-        .reduce((sum, item) => sum + item.remainingTime.hours, 0);
-      const laboratoryHours = items
-        .filter((item) =>
-          ["troop", "spell", "siege_machine"].includes(item.itemType),
-        )
-        .reduce((sum, item) => sum + item.remainingTime.hours, 0);
-      const elapsedHours = Math.ceil(
-        Math.max(builderHours / Math.max(1, builderCount), laboratoryHours),
+      const scheduledItems = definition.nextLevelOnly
+        ? items.map((item) => ({
+            ...item,
+            remainingTime: item.nextLevelTime,
+          }))
+        : items;
+      const elapsedHours = estimateMilestoneElapsedHours(
+        scheduledItems,
+        builderCount,
       );
       const date = new Date();
       date.setHours(date.getHours() + elapsedHours);
@@ -405,6 +415,11 @@ export function GoalPlanner({
                       Math.round(((current - goal.currentLevel) / total) * 100),
                     ),
                   );
+                  const remainingHours = estimateGoalRemainingHours(
+                    goal,
+                    recommendations,
+                    current,
+                  );
                   return (
                     <>
                       <p className="font-bold">
@@ -428,8 +443,8 @@ export function GoalPlanner({
                             : "ohne Termin"}{" "}
                         ·{" "}
                         {en
-                          ? `about ${Math.ceil(goal.estimatedHours / 24)} days`
-                          : `ca. ${Math.ceil(goal.estimatedHours / 24)} Tage`}
+                          ? `about ${Math.ceil(remainingHours / 24)} days remaining`
+                          : `noch ca. ${Math.ceil(remainingHours / 24)} Tage`}
                       </p>
                       <button
                         type="button"

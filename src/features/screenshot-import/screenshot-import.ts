@@ -1,6 +1,7 @@
 export type ScreenshotEntity = {
   id: string;
   name: string;
+  aliases?: string[];
   currentLevel: number;
   type: "building" | "hero" | "troop" | "spell" | "siege_machine";
 };
@@ -27,7 +28,9 @@ export function parseScreenshotLevels(
     const numbers = line.match(/\d+/g)?.map(Number) || [];
     if (!numbers.length) continue;
     for (const entity of entities) {
-      if (!normalizedLine.includes(normalize(entity.name))) continue;
+      const names = [entity.name, ...(entity.aliases || [])];
+      if (!names.some((name) => normalizedLine.includes(normalize(name))))
+        continue;
       const detectedLevel = numbers[numbers.length - 1];
       if (detectedLevel >= 0 && detectedLevel <= 150)
         matches.set(entity.id, { ...entity, detectedLevel });

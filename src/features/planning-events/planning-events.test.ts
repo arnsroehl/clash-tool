@@ -4,6 +4,7 @@ import {
   applyPlanningCostDiscount,
   getActivePlanningDiscounts,
   getActivePlanningEffects,
+  getScheduledResourcePayouts,
 } from "./planning-events";
 import type { PlanningEvent } from "@/types/magicItems";
 
@@ -84,4 +85,55 @@ test("applies an event cost discount to queue-ready recommendation data", () => 
   );
   assert.equal(discounted.nextLevelCosts.gold, 51);
   assert.equal(discounted.upgradePath?.[0].costs.gold, 51);
+});
+
+test("schedules season resources at the event end inside the horizon", () => {
+  const payouts = getScheduledResourcePayouts(
+    [
+      event({
+        id: "season",
+        eventType: "season_bank",
+        rewardType: "season_bank",
+        resourceGold: 5_000_000,
+        startsAt: "2026-07-01T00:00:00.000Z",
+        endsAt: "2026-07-20T00:00:00.000Z",
+      }),
+    ],
+    new Date("2026-07-14T00:00:00.000Z"),
+    7,
+  );
+  assert.equal(payouts.length, 1);
+  assert.equal(payouts[0].availableAt, "2026-07-20T00:00:00.000Z");
+  assert.equal(payouts[0].resources.gold, 5_000_000);
+});
+
+test("does not count a future season payout as currently available", () => {
+  const effects = getActivePlanningEffects(
+    [
+      event({
+        eventType: "season_bank",
+        rewardType: "season_bank",
+        resourceGold: 5_000_000,
+        startsAt: "2026-07-01T00:00:00.000Z",
+        endsAt: "2026-07-20T00:00:00.000Z",
+      }),
+    ],
+    new Date("2026-07-14T00:00:00.000Z"),
+  );
+  assert.equal(effects.resourceBonus.gold, 0);
+});
+
+test("excludes resource payouts outside the planning horizon", () => {
+  const payouts = getScheduledResourcePayouts(
+    [
+      event({
+        id: "future",
+        resourceElixir: 1_000,
+        startsAt: "2026-08-01T00:00:00.000Z",
+      }),
+    ],
+    new Date("2026-07-14T00:00:00.000Z"),
+    7,
+  );
+  assert.deepEqual(payouts, []);
 });

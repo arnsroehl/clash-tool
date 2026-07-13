@@ -64,7 +64,10 @@ export function calculateMagicItemUses(
       const timeSavedHours =
         item.effectType === "finish_upgrade"
           ? upgrade.durationHours
-          : Math.min(upgrade.durationHours, Math.max(0, item.effectValue - 1));
+          : item.effectType === "speed_boost" && item.effectValue > 1
+            ? Math.min(upgrade.durationHours, item.effectValue) *
+              (1 - 1 / item.effectValue)
+            : 0;
       return {
         queueItemId: upgrade.id,
         name: upgrade.name,

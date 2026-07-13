@@ -1,4 +1,5 @@
 import { getSupabaseClient } from "@/lib/supabase";
+import { buildClanMemberSyncRows } from "@/features/clan-dashboard/clan-dashboard";
 import type {
   Clan,
   ClanCollaborator,
@@ -188,33 +189,37 @@ export async function saveClan(
   if (error) throw new Error(error.message);
 
   const clan = toClan(data as ClanRow);
-  const { error: deleteError } = await client
+  const { data: existingMembers, error: existingError } = await client
     .from("clan_members")
-    .delete()
+    .select("player_tag,account_id,progress_percent")
     .eq("clan_id", clan.id);
-  if (deleteError) throw new Error(deleteError.message);
+  if (existingError) throw new Error(existingError.message);
+  const existingByTag = new Map(
+    (existingMembers || []).map((member) => [member.player_tag, member]),
+  );
   if (input.members.length) {
-    const rows = input.members.map((member) => ({
-      clan_id: clan.id,
-      player_tag: member.playerTag,
-      name: member.name,
-      role: member.role,
-      town_hall_level: member.townHallLevel,
-      trophies: member.trophies,
-      donations: member.donations,
-      donations_received: member.donationsReceived,
-      activity_score: Math.min(
-        100,
-        Math.round(member.donations / 10 + member.trophies / 100),
-      ),
-      cwl_ready: member.townHallLevel >= 15 && member.trophies >= 3000,
-      last_synced_at: now,
-      updated_at: now,
-    }));
+    const rows = buildClanMemberSyncRows(
+      clan.id,
+      input.members,
+      existingMembers || [],
+      now,
+    );
     const { error: memberError } = await client
       .from("clan_members")
-      .insert(rows);
+      .upsert(rows, { onConflict: "clan_id,player_tag" });
     if (memberError) throw new Error(memberError.message);
+  }
+  const currentTags = new Set(input.members.map((member) => member.playerTag));
+  const removedTags = [...existingByTag.keys()].filter(
+    (playerTag) => !currentTags.has(playerTag),
+  );
+  if (removedTags.length) {
+    const { error: deleteError } = await client
+      .from("clan_members")
+      .delete()
+      .eq("clan_id", clan.id)
+      .in("player_tag", removedTags);
+    if (deleteError) throw new Error(deleteError.message);
   }
   return clan;
 }

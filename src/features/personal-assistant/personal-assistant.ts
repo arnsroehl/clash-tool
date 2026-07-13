@@ -42,19 +42,32 @@ function calculateTwoWeekSaving(c: AssistantContext) {
   const magic = c.inventory
     .flatMap((item) =>
       item.quantity > 0
-        ? calculateMagicItemUses(item, c.queue)
-            .slice(0, item.quantity)
-            .map((use) => ({ name: item.name, hours: use.timeSavedHours }))
+        ? (item.effectType === "speed_boost"
+            ? Array.from(
+                { length: item.quantity },
+                () => calculateMagicItemUses(item, c.queue)[0],
+              ).filter(Boolean)
+            : calculateMagicItemUses(item, c.queue).slice(0, item.quantity)
+          ).map((use) => ({ name: item.name, hours: use.timeSavedHours }))
         : [],
     )
     .filter((item) => item.hours > 0);
   const eventPercent = Math.max(
     0,
-    ...c.events
-      .filter((event) => event.enabled)
-      .map((event) => event.timeDiscountPercent),
+    ...c.simulation.assignments.map(
+      (assignment) => assignment.timeDiscountPercent || 0,
+    ),
   );
-  const eventHours = (c.simulation.totalDurationHours * eventPercent) / 100;
+  const eventHours = c.simulation.assignments.reduce(
+    (sum, assignment) =>
+      sum +
+      Math.max(
+        0,
+        (assignment.originalDurationHours ?? assignment.durationHours) -
+          assignment.durationHours,
+      ),
+    0,
+  );
   const magicHours = magic.reduce((sum, item) => sum + item.hours, 0);
   return {
     magic,

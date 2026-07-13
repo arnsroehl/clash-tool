@@ -1,6 +1,7 @@
 type LaboratoryEntity = {
   id: string;
   name: string;
+  apiName: string;
   category: string;
   unlockTownHallLevel: number;
   maxLevel: number;
@@ -10,6 +11,7 @@ type LaboratoryEntity = {
 type LaboratoryEntityRow = {
   id: string;
   name: string;
+  api_name: string;
   category: string;
   unlock_town_hall_level: number;
   max_level: number;

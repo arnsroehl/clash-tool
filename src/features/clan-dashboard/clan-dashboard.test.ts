@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { calculateClanDashboard, isLikelyRushed } from "./clan-dashboard";
+import {
+  buildClanMemberSyncRows,
+  calculateClanDashboard,
+  isLikelyRushed,
+} from "./clan-dashboard";
 import type { ClanMember } from "@/types/clan";
 
 const member = (overrides: Partial<ClanMember>): ClanMember => ({
@@ -65,4 +69,32 @@ test("flags low-progress high Town Hall accounts as likely rushed", () => {
     ),
     true,
   );
+});
+
+test("preserves linked account progress during an official clan sync", () => {
+  const rows = buildClanMemberSyncRows(
+    "clan",
+    [
+      {
+        playerTag: "#ABC",
+        name: "Spieler neu",
+        role: "member",
+        townHallLevel: 16,
+        trophies: 4000,
+        donations: 200,
+        donationsReceived: 50,
+      },
+    ],
+    [
+      {
+        player_tag: "#ABC",
+        account_id: "account-1",
+        progress_percent: 72.5,
+      },
+    ],
+    "2026-07-14T00:00:00.000Z",
+  );
+  assert.equal(rows[0].account_id, "account-1");
+  assert.equal(rows[0].progress_percent, 72.5);
+  assert.equal(rows[0].name, "Spieler neu");
 });

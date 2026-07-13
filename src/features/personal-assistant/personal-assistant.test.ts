@@ -94,3 +94,59 @@ it("calculates whether magic items reach the two-week saving target", () => {
   assert.match(result.answer, /400 Stunden/);
   assert.match(result.answer, /zwei Wochen/);
 });
+
+it("uses exact simulated event savings instead of discounting the whole queue", () => {
+  const queueItem = {
+    id: "queue-event",
+    createdAt: "2026-07-13T00:00:00.000Z",
+    updatedAt: "2026-07-13T00:00:00.000Z",
+    accountId: "account-1",
+    itemType: "building" as const,
+    itemId: "cannon:1",
+    name: "Kanone 1",
+    fromLevel: 1,
+    toLevel: 2,
+    goldCost: 1_000,
+    elixirCost: 0,
+    darkElixirCost: 0,
+    durationHours: 100,
+    priorityScore: 1,
+    queueOrder: 1,
+    status: "planned" as const,
+    isLocked: false,
+    slotType: "builder",
+    plannedStartAt: null,
+    plannedFinishAt: null,
+  };
+  const result = answerAssistant("save_time", {
+    ...context,
+    queue: [queueItem],
+    simulation: {
+      ...context.simulation,
+      totalDurationHours: 50,
+      assignments: [
+        {
+          builderIndex: 0,
+          queueItemId: queueItem.id,
+          name: queueItem.name,
+          itemType: "building",
+          fromLevel: 1,
+          toLevel: 2,
+          startHour: 0,
+          endHour: 50,
+          durationHours: 50,
+          originalDurationHours: 100,
+          timeDiscountPercent: 50,
+          costDiscountPercent: 0,
+          originalCosts: { gold: 1_000, elixir: 0, darkElixir: 0 },
+          effectiveCosts: { gold: 1_000, elixir: 0, darkElixir: 0 },
+          slotType: "builder",
+          slotLabel: "Builder 1",
+        },
+      ],
+      builderAssignmentCount: 1,
+    },
+  });
+  assert.match(result.answer, /50 Stunden/);
+  assert.doesNotMatch(result.answer, /25 Stunden/);
+});
