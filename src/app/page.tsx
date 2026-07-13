@@ -3,6 +3,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { AccountForm } from "@/components/accounts/AccountForm";
 import { AuthPanel } from "@/components/auth/AuthPanel";
+import { PersonalAssistant } from "@/components/assistant/PersonalAssistant";
+import { ClanDashboard } from "@/components/clan/ClanDashboard";
 import { AccountList } from "@/components/accounts/AccountList";
 import { StatsCards } from "@/components/accounts/StatsCards";
 import { BuildingList } from "@/components/buildings/BuildingList";
@@ -15,8 +17,11 @@ import { HeroList } from "@/components/heroes/HeroList";
 import { PlayerImportCenter } from "@/components/import/PlayerImportCenter";
 import { GoalPlanner } from "@/components/goals/GoalPlanner";
 import { DailyCompanion } from "@/components/notifications/DailyCompanion";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { PlanningProfileSettings } from "@/components/profile/PlanningProfileSettings";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
+import { MagicItemsAndEvents } from "@/components/magic-items/MagicItemsAndEvents";
+import { DataPortability } from "@/components/export/DataPortability";
 import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
@@ -27,11 +32,16 @@ import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simu
 import { planUpgrades } from "@/features/planner/planner.service";
 import { rankRecommendations, type PlanningStrategy, type StrategyWeights } from "@/features/planning-control/planning-control";
 import { createProgressForecast } from "@/features/progress-forecast/progress-forecast.engine";
+import { createPlannerNotifications } from "@/features/notifications/planner-notifications";
+import { getActivePlanningDiscounts } from "@/features/planning-events/planning-events";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useAuth } from "@/hooks/useAuth";
 import { usePlanningGoals } from "@/hooks/usePlanningGoals";
 import { usePlanningProfile } from "@/hooks/usePlanningProfile";
+import { usePlannerNotifications } from "@/hooks/usePlannerNotifications";
 import { useBuildings } from "@/hooks/useBuildings";
+import { useMagicItems } from "@/hooks/useMagicItems";
+import { useClanDashboard } from "@/hooks/useClanDashboard";
 import { useHeroes } from "@/hooks/useHeroes";
 import { useSiegeMachines } from "@/hooks/useSiegeMachines";
 import { useSpells } from "@/hooks/useSpells";
@@ -338,12 +348,16 @@ export default function Home() {
     return rankRecommendations(plannerResult?.recommendations || [], planningStrategy, strategyWeights);
   }, [plannerResult, planningStrategy, strategyWeights]);
 
+  const { inventory, events, updateItem, addEvent, removeEvent } = useMagicItems(selectedAccount?.id, handleError);
+  const activeDiscounts = getActivePlanningDiscounts(events);
+
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
     return simulateBuilderQueue({
       builderCount: selectedAccount?.builderCount || 0,
       queueItems,
+      timeDiscountPercent: activeDiscounts.timePercent,
     });
-  }, [queueItems, selectedAccount]);
+  }, [activeDiscounts.timePercent, queueItems, selectedAccount]);
 
   const progressForecast = useMemo<ProgressForecastResult>(() => {
     return createProgressForecast({
@@ -353,10 +367,15 @@ export default function Home() {
     });
   }, [builderSimulation, plannerResult, queueItems]);
   const { goals, addGoal, removeGoal } = usePlanningGoals(selectedAccount?.id, handleError);
+  const clanDashboard = useClanDashboard(user?.id, handleError);
+  const notificationDrafts = useMemo(() => selectedAccount ? createPlannerNotifications({ accountId: selectedAccount.id, simulation: builderSimulation, recommendations: upgradeRecommendations, goals, events }) : [], [builderSimulation, events, goals, selectedAccount, upgradeRecommendations]);
+  const plannerNotifications = usePlannerNotifications(selectedAccount?.id, notificationDrafts, handleError);
 
   if (isLoadingAuth || !user) {
     return <AuthPanel isLoading={isLoadingAuth} message={authMessage} onSignIn={signIn} onSignUp={signUp} onMessage={setAuthMessage} />;
   }
+  const isCasualProfile = profile?.playStyle === "casual";
+  const isHardcoreProfile = profile?.playStyle === "hardcore";
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
@@ -390,11 +409,19 @@ export default function Home() {
           <DailyCompanion simulation={builderSimulation} recommendations={upgradeRecommendations} enabled={profile?.dailySummaryEnabled ?? true} />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Import & Synchronisierung" defaultOpen={false}>
+        <CollapsibleSection title="Benachrichtigungen">
+          <NotificationCenter notifications={plannerNotifications.notifications} isBusy={plannerNotifications.isBusy} enabled={profile?.remindersEnabled ?? true} onRefresh={plannerNotifications.refresh} onRead={plannerNotifications.markRead} onEnableBrowser={plannerNotifications.enableBrowser} onError={handleError} />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Persönlicher Assistent">
+          <PersonalAssistant context={{ planner: plannerResult, recommendations: upgradeRecommendations, queue: queueItems, simulation: builderSimulation, resources, inventory, events, profile }} onAdd={addRecommendationToQueue} />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Import & Synchronisierung" defaultOpen={isHardcoreProfile}>
           <PlayerImportCenter account={selectedAccount} heroes={availableHeroes} heroLevels={heroLevels} troops={availableTroops} troopLevels={troopLevels} spells={availableSpells} spellLevels={spellLevels} siegeMachines={availableSiegeMachines} siegeLevels={siegeMachineLevels} />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Planungszentrale">
+        <CollapsibleSection title="Planungszentrale" defaultOpen={!isCasualProfile}>
           <PlanningControlCenter
             plannerResult={plannerResult}
             recommendations={upgradeRecommendations}
@@ -405,6 +432,7 @@ export default function Home() {
             goalPercent={goalPercent}
             dailyIncome={dailyIncome}
             strategyWeights={strategyWeights}
+            costDiscountPercent={activeDiscounts.costPercent}
             onStrategyChange={setPlanningStrategy}
             onResourcesChange={setResources}
             onHorizonChange={setHorizonDays}
@@ -414,7 +442,7 @@ export default function Home() {
           />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Planer & Fortschritt">
+        <CollapsibleSection title="Planer & Fortschritt" defaultOpen={!isCasualProfile}>
         <DashboardSummary
           selectedAccount={selectedAccount}
           plannerResult={plannerResult}
@@ -428,7 +456,7 @@ export default function Home() {
         <ResourceSummary plannerResult={plannerResult} />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Upgrade Queue">
+        <CollapsibleSection title="Upgrade Queue" defaultOpen={!isCasualProfile}>
         <UpgradeQueueList
           selectedAccount={selectedAccount}
           queueItems={queueItems}
@@ -446,17 +474,34 @@ export default function Home() {
         />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Builder Simulation">
+        <CollapsibleSection title="Builder Simulation" defaultOpen={isHardcoreProfile}>
         <BuilderSimulationOverview simulation={builderSimulation} />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Fortschrittsprognose">
+        <CollapsibleSection title="Fortschrittsprognose" defaultOpen={!isCasualProfile}>
         <ProgressForecastOverview forecast={progressForecast} />
         <FutureAccountView simulation={builderSimulation} horizonDays={horizonDays} />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Strategievergleich" defaultOpen={false}>
+        <CollapsibleSection title="Strategievergleich" defaultOpen={isHardcoreProfile}>
           <StrategyComparison recommendations={plannerResult?.recommendations || []} weights={strategyWeights} />
+        </CollapsibleSection>
+
+        {selectedAccount ? <CollapsibleSection title="Magic Items, Saison & Events" defaultOpen={isHardcoreProfile}><MagicItemsAndEvents accountId={selectedAccount.id} inventory={inventory} events={events} queue={queueItems} onUpdateItem={updateItem} onAddEvent={addEvent} onDeleteEvent={removeEvent} /></CollapsibleSection> : null}
+
+        <CollapsibleSection title="Clan-Zentrale" defaultOpen={isHardcoreProfile}>
+          <ClanDashboard
+            clans={clanDashboard.clans}
+            selectedClan={clanDashboard.selectedClan}
+            members={clanDashboard.members}
+            goals={clanDashboard.goals}
+            isBusy={clanDashboard.isBusy}
+            onSelect={clanDashboard.selectClan}
+            onSync={clanDashboard.syncClan}
+            onCreateManual={clanDashboard.addManual}
+            onCreateGoal={clanDashboard.createGoal}
+            onDeleteGoal={clanDashboard.removeGoal}
+          />
         </CollapsibleSection>
 
         <CollapsibleSection title="Ziele & Meilensteine">
@@ -470,6 +515,14 @@ export default function Home() {
             onSaveGoal={addGoal}
             onDeleteGoal={removeGoal}
           /> : <p className="p-5 text-slate-400">Wähle zuerst einen Clash-Account aus.</p>}
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Export & Teilen">
+          <DataPortability
+            fileName={`clash-tool-${selectedAccount?.name || "planung"}.json`}
+            summary={selectedAccount ? `${selectedAccount.name} · Rathaus ${selectedAccount.townHallLevel} · ${queueItems.length} Upgrades in der Queue · ${goals.length} aktive Ziele` : "Clash-Tool-Planung ohne ausgewählten Account"}
+            data={{ exportedAt: new Date().toISOString(), account: selectedAccount, queue: queueItems, goals, events, magicItems: inventory, planningProfile: profile, clans: clanDashboard.clans, selectedClanMembers: clanDashboard.members, clanGoals: clanDashboard.goals }}
+          />
         </CollapsibleSection>
 
         <CollapsibleSection title="Accounts & Gebäude">

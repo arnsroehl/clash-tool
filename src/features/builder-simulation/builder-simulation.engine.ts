@@ -42,7 +42,8 @@ export function simulateBuilderQueue(
     const builderIndex = findNextAvailableBuilder(availability);
     if (builderIndex < 0) return currentAssignments;
     const startHour = availability[builderIndex] || 0;
-    const durationHours = Math.max(queueItem.durationHours, 0);
+    const discount = Math.min(100, Math.max(0, input.timeDiscountPercent || 0));
+    const durationHours = Math.max(Math.ceil(queueItem.durationHours * (1 - discount / 100)), 0);
     const endHour = startHour + durationHours;
 
     availability[builderIndex] = endHour;

@@ -124,4 +124,14 @@ describe("Builder Simulation", () => {
     assert.equal(result.assignments[2].startHour, 8);
     assert.equal(result.laboratoryAssignmentCount, 2);
   });
+
+  it("Event-Zeitbonus verkürzt geplante Upgrades", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      timeDiscountPercent: 20,
+      queueItems: [createQueueItem({ id: "discounted", queueOrder: 1, durationHours: 10 })],
+    });
+    assert.equal(result.assignments[0].durationHours, 8);
+    assert.equal(result.totalDurationHours, 8);
+  });
 });

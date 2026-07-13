@@ -40,12 +40,32 @@ export function GoalPlanner({ recommendations, queuedKeys, onAddToQueue, isSavin
   const estimatedDays = Math.ceil(estimatedHours / 24);
   const feasible = Boolean(selected) && estimatedDays <= daysAvailable;
   const alreadyQueued = selected ? queuedKeys.has(`${selected.itemType}:${selected.itemId}:${selected.nextLevel}`) : false;
+  const milestonePrograms = useMemo(() => {
+    const definitions = [
+      { name: "Labor fertigstellen", description: "Alle Truppen, Zauber und Belagerungsmaschinen", filter: (item: UpgradeRecommendation) => ["troop", "spell", "siege_machine"].includes(item.itemType) },
+      { name: "Helden-Offensive für CWL", description: "Alle noch offenen Helden-Upgrades", filter: (item: UpgradeRecommendation) => item.itemType === "hero" },
+      { name: "Verteidigungen maxen", description: "Alle noch offenen Gebäude-Upgrades", filter: (item: UpgradeRecommendation) => item.itemType === "building" && !/wall|mauer|town hall|rathaus/i.test(item.name) },
+      { name: "Bereit fürs nächste Rathaus", description: "Alle aktuell verfügbaren Rest-Upgrades", filter: () => true },
+    ];
+    return definitions.map((definition) => {
+      const items = recommendations.filter(definition.filter);
+      const hours = Math.ceil(items.reduce((sum, item) => sum + item.remainingTime.hours, 0));
+      const date = new Date(); date.setHours(date.getHours() + hours);
+      return { ...definition, items, hours, realisticDate: toDateInput(date) };
+    });
+  }, [recommendations]);
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
       <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-bold">Konkretes Ziel planen</h2>
         <p className="text-sm text-slate-400">Definiere ein Ziellevel und einen Termin. Die Schätzung verwendet die echten verbleibenden Upgradezeiten.</p>
+      </div>
+      <div className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+        {milestonePrograms.map((program) => {
+          const next = program.items.find((item) => !queuedKeys.has(`${item.itemType}:${item.itemId}:${item.nextLevel}`));
+          return <article key={program.name} className="rounded-2xl bg-slate-900 p-4"><h3 className="font-bold">{program.name}</h3><p className="mt-1 text-xs text-slate-400">{program.description}</p><p className="mt-3 text-sm"><b>{program.items.length}</b> Upgrade-Reihen · {Math.ceil(program.hours / 24)} Tage reine Zeit</p><p className="mt-1 text-xs text-slate-500">Frühester rechnerischer Termin: {new Intl.DateTimeFormat("de-DE").format(new Date(`${program.realisticDate}T00:00:00`))}</p><button type="button" disabled={!next || isSaving} onClick={() => next && onAddToQueue(next)} className="mt-3 rounded-lg border border-amber-400/30 px-3 py-2 text-xs font-bold text-amber-200 disabled:opacity-40">{next ? "Plan auf Ziel optimieren" : "Alle Schritte eingeplant"}</button></article>;
+        })}
       </div>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <label className="text-sm font-semibold text-slate-300">Upgrade-Ziel

@@ -3,6 +3,7 @@ import type { UpgradeItemType, UpgradeQueueItem } from "@/types/upgradeQueue";
 export type BuilderSimulationInput = {
   builderCount: number;
   queueItems: UpgradeQueueItem[];
+  timeDiscountPercent?: number;
 };
 
 export type UpgradeSlotType = "builder" | "laboratory";

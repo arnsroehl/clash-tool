@@ -17,6 +17,7 @@ type Props = {
   goalPercent: number;
   dailyIncome: ResourceSnapshot;
   strategyWeights: StrategyWeights;
+  costDiscountPercent: number;
   onStrategyChange: (value: PlanningStrategy) => void;
   onResourcesChange: (value: ResourceSnapshot) => void;
   onHorizonChange: (value: number) => void;
@@ -29,24 +30,25 @@ const numberFormat = new Intl.NumberFormat("de-DE");
 
 export function PlanningControlCenter(props: Props) {
   const top = props.recommendations[0];
+  const effectiveCost = (value: number) => Math.ceil(value * (1 - Math.min(100, Math.max(0, props.costDiscountPercent)) / 100));
   const completedInHorizon = props.simulation.assignments.filter(
     (assignment) => assignment.endHour <= props.horizonDays * 24,
   ).length;
   const affordable = top
-    ? props.resources.gold >= top.nextLevelCosts.gold &&
-      props.resources.elixir >= top.nextLevelCosts.elixir &&
-      props.resources.darkElixir >= top.nextLevelCosts.darkElixir
+    ? props.resources.gold >= effectiveCost(top.nextLevelCosts.gold) &&
+      props.resources.elixir >= effectiveCost(top.nextLevelCosts.elixir) &&
+      props.resources.darkElixir >= effectiveCost(top.nextLevelCosts.darkElixir)
     : false;
   const affordableAlternative = props.recommendations.slice(1).find((item) =>
-    props.resources.gold >= item.nextLevelCosts.gold &&
-    props.resources.elixir >= item.nextLevelCosts.elixir &&
-    props.resources.darkElixir >= item.nextLevelCosts.darkElixir,
+    props.resources.gold >= effectiveCost(item.nextLevelCosts.gold) &&
+    props.resources.elixir >= effectiveCost(item.nextLevelCosts.elixir) &&
+    props.resources.darkElixir >= effectiveCost(item.nextLevelCosts.darkElixir),
   );
   const currentProgress = props.plannerResult?.summary.progressPercent ?? 0;
   const goalReached = currentProgress >= props.goalPercent;
   const resourceKeys = ["gold", "elixir", "darkElixir"] as const;
   const waitDays = top ? Math.ceil(Math.max(0, ...resourceKeys.map((key) => {
-    const deficit = Math.max(0, top.nextLevelCosts[key] - props.resources[key]);
+    const deficit = Math.max(0, effectiveCost(top.nextLevelCosts[key]) - props.resources[key]);
     return deficit === 0 ? 0 : props.dailyIncome[key] > 0 ? deficit / props.dailyIncome[key] : Number.POSITIVE_INFINITY;
   }))) : 0;
 
@@ -59,6 +61,7 @@ export function PlanningControlCenter(props: Props) {
     <section className="grid gap-5 lg:grid-cols-2">
       <div className="rounded-3xl border border-white/10 bg-slate-900 p-6">
         <h2 className="text-xl font-bold">Strategie & Ressourcen</h2>
+        {props.costDiscountPercent > 0 ? <p className="mt-2 text-sm font-bold text-emerald-300">Aktiver Event-/Gold-Pass-Rabatt: −{props.costDiscountPercent}% auf berücksichtigte Kosten</p> : null}
         <label className="mt-5 block text-sm font-semibold text-slate-300">
           Planungsstrategie
           <select className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950 p-3" value={props.strategy} onChange={(event) => props.onStrategyChange(event.target.value as PlanningStrategy)}>
