@@ -10,7 +10,36 @@ import type {
   BuilderAssignment,
   BuilderSimulationInput,
   BuilderSimulationResult,
+  SimulationDiscountWindow,
 } from "@/features/builder-simulation/builder-simulation.types";
+
+function getDiscountPercent(
+  windows: SimulationDiscountWindow[] | undefined,
+  simulationStartsAt: string | undefined,
+  startHour: number,
+  baseDiscountPercent = 0,
+): number {
+  const base = Math.min(
+    100,
+    Math.max(0, Number(baseDiscountPercent) || 0),
+  );
+  if (!windows?.length || !simulationStartsAt) return base;
+  const simulationStart = new Date(simulationStartsAt).getTime();
+  if (!Number.isFinite(simulationStart)) return base;
+  const upgradeStartsAt = simulationStart + startHour * 3_600_000;
+  const windowDiscount = windows.reduce((maximum, window) => {
+    const startsAt = window.startsAt
+      ? new Date(window.startsAt).getTime()
+      : Number.NEGATIVE_INFINITY;
+    const endsAt = window.endsAt
+      ? new Date(window.endsAt).getTime()
+      : Number.POSITIVE_INFINITY;
+    return upgradeStartsAt >= startsAt && upgradeStartsAt <= endsAt
+      ? Math.max(maximum, window.percent)
+      : maximum;
+  }, 0);
+  return Math.min(100, Math.max(base, windowDiscount));
+}
 
 export function simulateBuilderQueue(
   input: BuilderSimulationInput,
@@ -49,12 +78,33 @@ export function simulateBuilderQueue(
     const builderIndex = findNextAvailableBuilder(availability);
     if (builderIndex < 0) return currentAssignments;
     const startHour = availability[builderIndex] || 0;
-    const discount = Math.min(100, Math.max(0, input.timeDiscountPercent || 0));
+    const discount = getDiscountPercent(
+      input.timeDiscountWindows,
+      input.simulationStartsAt,
+      startHour,
+      input.timeDiscountPercent,
+    );
+    const costDiscountPercent = getDiscountPercent(
+      input.costDiscountWindows,
+      input.simulationStartsAt,
+      startHour,
+    );
     const durationHours = Math.max(
       Math.ceil(queueItem.durationHours * (1 - discount / 100)),
       0,
     );
     const endHour = startHour + durationHours;
+    const originalCosts = {
+      gold: queueItem.goldCost,
+      elixir: queueItem.elixirCost,
+      darkElixir: queueItem.darkElixirCost,
+    };
+    const costMultiplier = 1 - costDiscountPercent / 100;
+    const effectiveCosts = {
+      gold: Math.ceil(originalCosts.gold * costMultiplier),
+      elixir: Math.ceil(originalCosts.elixir * costMultiplier),
+      darkElixir: Math.ceil(originalCosts.darkElixir * costMultiplier),
+    };
 
     availability[builderIndex] = endHour;
 
@@ -70,6 +120,9 @@ export function simulateBuilderQueue(
         startHour,
         endHour,
         durationHours,
+        costDiscountPercent,
+        originalCosts,
+        effectiveCosts,
         slotType: usesLaboratory ? "laboratory" : "builder",
         slotLabel: usesLaboratory ? "Labor" : `Builder ${builderIndex + 1}`,
       },

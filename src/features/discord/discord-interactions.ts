@@ -13,6 +13,19 @@ type DiscordResponse = {
   data?: { content: string; flags?: number };
 };
 
+export function isDiscordTimestampFresh(
+  timestamp: string,
+  nowMs = Date.now(),
+  toleranceMs = 5 * 60 * 1000,
+): boolean {
+  if (!/^\d{10,13}$/.test(timestamp)) return false;
+  const numeric = Number(timestamp);
+  const timestampMs = timestamp.length === 10 ? numeric * 1000 : numeric;
+  return (
+    Number.isFinite(timestampMs) && Math.abs(nowMs - timestampMs) <= toleranceMs
+  );
+}
+
 function optionValue(
   options: DiscordOption[] | undefined,
   name: string,

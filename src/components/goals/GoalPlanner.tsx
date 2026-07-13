@@ -8,6 +8,7 @@ type Props = {
   recommendations: UpgradeRecommendation[];
   queuedKeys: Set<string>;
   onAddToQueue: (recommendation: UpgradeRecommendation) => void;
+  onOptimizeQueue: (recommendations: UpgradeRecommendation[]) => void;
   isSaving: boolean;
   accountId: string;
   builderCount: number;
@@ -43,6 +44,7 @@ export function GoalPlanner({
   recommendations,
   queuedKeys,
   onAddToQueue,
+  onOptimizeQueue,
   isSaving,
   accountId,
   builderCount,
@@ -183,7 +185,7 @@ export function GoalPlanner({
       </div>
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {milestonePrograms.map((program) => {
-          const next = program.items.find(
+          const missingNextSteps = program.items.filter(
             (item) =>
               !queuedKeys.has(
                 `${item.itemType}:${item.itemId}:${item.nextLevel}`,
@@ -215,14 +217,14 @@ export function GoalPlanner({
               </p>
               <button
                 type="button"
-                disabled={!next || isSaving}
-                onClick={() => next && onAddToQueue(next)}
+                disabled={!missingNextSteps.length || isSaving}
+                onClick={() => onOptimizeQueue(missingNextSteps)}
                 className="mt-3 rounded-lg border border-amber-400/30 px-3 py-2 text-xs font-bold text-amber-200 disabled:opacity-40"
               >
-                {next
+                {missingNextSteps.length
                   ? en
-                    ? "Optimize plan for goal"
-                    : "Plan auf Ziel optimieren"
+                    ? `Prioritize ${missingNextSteps.length} next steps`
+                    : `${missingNextSteps.length} nächste Schritte priorisieren`
                   : en
                     ? "All steps scheduled"
                     : "Alle Schritte eingeplant"}

@@ -2,6 +2,7 @@ import { createPublicKey, verify } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   buildDiscordInteractionResponse,
+  isDiscordTimestampFresh,
   type DiscordInteraction,
 } from "@/features/discord/discord-interactions";
 
@@ -45,6 +46,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "Discord public key is not configured." },
       { status: 503 },
+    );
+  if (!isDiscordTimestampFresh(timestamp))
+    return NextResponse.json(
+      { error: "Expired request timestamp." },
+      { status: 401 },
     );
   if (!verifyDiscordRequest(body, signature, timestamp, publicKey))
     return NextResponse.json(

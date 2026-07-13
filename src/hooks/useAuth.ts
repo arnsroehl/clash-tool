@@ -19,7 +19,9 @@ export function useAuth() {
   useEffect(() => {
     const client = getSupabaseClient();
     client.auth.getUser().then(({ data, error }) => {
-      if (error) setAuthMessage(error.message);
+      if (error && error.name !== "AuthSessionMissingError") {
+        setAuthMessage(error.message);
+      }
       acceptUser(data.user).catch((claimError) => {
         setAuthMessage(
           claimError instanceof Error

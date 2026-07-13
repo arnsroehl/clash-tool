@@ -144,3 +144,46 @@ test("uses live goal progress when deciding whether a target is delayed", () => 
     false,
   );
 });
+
+test("omits the daily summary when the profile preference is disabled", () => {
+  const notifications = createPlannerNotifications({
+    accountId: "account",
+    dailySummaryEnabled: false,
+    recommendations: [
+      {
+        itemId: "cannon:1",
+        buildingId: "cannon:1",
+        itemType: "building",
+        name: "Kanone 1",
+        category: "defense",
+        currentLevel: 1,
+        nextLevel: 2,
+        maxLevel: 3,
+        missingLevels: 2,
+        sortOrder: 1,
+        nextLevelCosts: { gold: 1, elixir: 0, darkElixir: 0 },
+        nextLevelTime: { hours: 1 },
+        remainingCosts: { gold: 2, elixir: 0, darkElixir: 0 },
+        remainingTime: { hours: 2 },
+        priorityScore: { value: 1, reasons: [] },
+        blockingReasons: [],
+        recommendationReason: "test",
+      },
+    ],
+    goals: [],
+    events: [],
+    simulation: {
+      assignments: [],
+      totalDurationHours: 0,
+      totalDurationDays: 0,
+      builderCount: 1,
+      idleTimeHours: 0,
+      builderAssignmentCount: 0,
+      laboratoryAssignmentCount: 0,
+    },
+  });
+  assert.equal(
+    notifications.some((notification) => notification.type === "daily_summary"),
+    false,
+  );
+});

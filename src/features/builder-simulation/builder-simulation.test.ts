@@ -10,6 +10,7 @@ function createQueueItem(params: {
   durationHours: number;
   createdAt?: string;
   itemType?: UpgradeQueueItem["itemType"];
+  goldCost?: number;
 }): UpgradeQueueItem {
   return {
     id: params.id,
@@ -21,7 +22,7 @@ function createQueueItem(params: {
     name: params.id,
     fromLevel: 1,
     toLevel: 2,
-    goldCost: 0,
+    goldCost: params.goldCost || 0,
     elixirCost: 0,
     darkElixirCost: 0,
     durationHours: params.durationHours,
@@ -145,5 +146,67 @@ describe("Builder Simulation", () => {
     });
     assert.equal(result.assignments[0].durationHours, 8);
     assert.equal(result.totalDurationHours, 8);
+  });
+
+  it("wendet zukünftige Event-Rabatte nach geplantem Upgrade-Start an", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      simulationStartsAt: "2026-07-14T00:00:00.000Z",
+      timeDiscountWindows: [
+        {
+          startsAt: "2026-07-14T05:00:00.000Z",
+          endsAt: "2026-07-15T00:00:00.000Z",
+          percent: 50,
+        },
+      ],
+      queueItems: [
+        createQueueItem({
+          id: "before-event",
+          queueOrder: 1,
+          durationHours: 6,
+        }),
+        createQueueItem({
+          id: "during-event",
+          queueOrder: 2,
+          durationHours: 10,
+        }),
+      ],
+    });
+    assert.equal(result.assignments[0].durationHours, 6);
+    assert.equal(result.assignments[1].startHour, 6);
+    assert.equal(result.assignments[1].durationHours, 5);
+    assert.equal(result.totalDurationHours, 11);
+  });
+
+  it("berechnet zukünftige Event-Kosten pro geplantem Upgrade-Start", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      simulationStartsAt: "2026-07-14T00:00:00.000Z",
+      costDiscountWindows: [
+        {
+          startsAt: "2026-07-14T05:00:00.000Z",
+          endsAt: "2026-07-15T00:00:00.000Z",
+          percent: 50,
+        },
+      ],
+      queueItems: [
+        createQueueItem({
+          id: "before-event",
+          queueOrder: 1,
+          durationHours: 6,
+          goldCost: 1_000,
+        }),
+        createQueueItem({
+          id: "during-event",
+          queueOrder: 2,
+          durationHours: 10,
+          goldCost: 2_000,
+        }),
+      ],
+    });
+    assert.equal(result.assignments[0].costDiscountPercent, 0);
+    assert.equal(result.assignments[0].effectiveCosts.gold, 1_000);
+    assert.equal(result.assignments[1].costDiscountPercent, 50);
+    assert.equal(result.assignments[1].effectiveCosts.gold, 1_000);
   });
 });

@@ -17,6 +17,7 @@ type Input = {
   storageCapacities?: ResourceSnapshot;
   dailyIncome?: ResourceSnapshot;
   currentLevels?: Record<string, number>;
+  dailySummaryEnabled?: boolean;
   language?: "de" | "en";
   now?: Date;
 };
@@ -33,6 +34,7 @@ export function createPlannerNotifications({
   storageCapacities = emptyResources,
   dailyIncome = emptyResources,
   currentLevels = {},
+  dailySummaryEnabled = true,
   language = "de",
   now = new Date(),
 }: Input): PlannerNotificationDraft[] {
@@ -168,7 +170,7 @@ export function createPlannerNotifications({
     });
   }
 
-  if (recommendations.length) {
+  if (dailySummaryEnabled && recommendations.length) {
     const next = recommendations
       .slice(0, 3)
       .map((item) => item.name)

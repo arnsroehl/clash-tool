@@ -11,6 +11,7 @@ import {
 } from "@/services/upgradeQueueService";
 import type { ClashAccount } from "@/types/account";
 import type { UpgradeRecommendation } from "@/features/planner/planner.types";
+import { prioritizeGoalQueueItems } from "@/features/goal-planning/goal-queue-optimization";
 import type {
   CreateUpgradeQueueItemInput,
   UpgradeQueueItem,
@@ -134,6 +135,66 @@ export function useUpgradeQueue({
       );
     },
     [addQueueItem, queueItems, selectedAccount],
+  );
+
+  const addGoalRecommendationsToQueue = useCallback(
+    async (recommendations: UpgradeRecommendation[]) => {
+      if (!selectedAccount || !recommendations.length) return;
+      const existingKeys = new Set(
+        queueItems.map(
+          (item) => `${item.itemType}:${item.itemId}:${item.toLevel}`,
+        ),
+      );
+      const unique = recommendations.filter((recommendation, index, items) => {
+        const key = `${recommendation.itemType}:${recommendation.itemId}:${recommendation.nextLevel}`;
+        return (
+          !existingKeys.has(key) &&
+          items.findIndex(
+            (item) =>
+              `${item.itemType}:${item.itemId}:${item.nextLevel}` === key,
+          ) === index
+        );
+      });
+      if (!unique.length) return;
+
+      clearError();
+      setIsSavingQueueItem(true);
+      const created: UpgradeQueueItem[] = [];
+      try {
+        const firstOrder = getNextQueueOrder(queueItems);
+        for (const [index, recommendation] of unique.entries()) {
+          created.push(
+            await createUpgradeQueueItem(
+              createInputFromRecommendation({
+                accountId: selectedAccount.id,
+                recommendation,
+                queueOrder: firstOrder + index,
+              }),
+            ),
+          );
+        }
+        const prioritized = prioritizeGoalQueueItems(queueItems, created);
+        setQueueItems(prioritized);
+        await updateUpgradeQueueItemOrder(
+          prioritized.map(({ id, queueOrder }) => ({ id, queueOrder })),
+        );
+        setQueueErrorMessage(null);
+      } catch (error) {
+        const refreshed = await getUpgradeQueueItems(selectedAccount.id).catch(
+          () => [...queueItems, ...created],
+        );
+        setQueueItems(refreshed);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Ziel-Upgrades konnten nicht vollständig eingeplant werden.";
+        setQueueErrorMessage(message);
+        onError(message);
+      } finally {
+        setIsSavingQueueItem(false);
+      }
+    },
+    [clearError, onError, queueItems, selectedAccount],
   );
 
   const removeQueueItem = useCallback(
@@ -292,6 +353,7 @@ export function useUpgradeQueue({
     deletingQueueItemId,
     addQueueItem,
     addRecommendationToQueue,
+    addGoalRecommendationsToQueue,
     removeQueueItem,
     moveQueueItem,
     changeQueueItemStatus,

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDiscordInteractionResponse } from "./discord-interactions";
+import {
+  buildDiscordInteractionResponse,
+  isDiscordTimestampFresh,
+} from "./discord-interactions";
 
 test("answers Discord verification pings", () => {
   assert.deepEqual(buildDiscordInteractionResponse({ type: 1 }), { type: 1 });
@@ -25,4 +28,13 @@ test("keeps missing command data private", () => {
     data: { name: "clash-plan" },
   });
   assert.equal(response.data?.flags, 64);
+});
+
+test("rejects stale Discord interaction timestamps", () => {
+  const now = Date.parse("2026-07-14T12:00:00Z");
+  assert.equal(isDiscordTimestampFresh(String(now / 1000), now), true);
+  assert.equal(
+    isDiscordTimestampFresh(String((now - 6 * 60 * 1000) / 1000), now),
+    false,
+  );
 });

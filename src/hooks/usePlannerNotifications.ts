@@ -19,20 +19,35 @@ export function usePlannerNotifications(
   accountId: string | undefined,
   drafts: PlannerNotificationDraft[],
   onError: (message: string) => void,
+  enabled: boolean | undefined,
 ) {
   const [notifications, setNotifications] = useState<PlannerNotification[]>([]);
   const [isBusy, setIsBusy] = useState(false);
   useEffect(() => {
-    if (accountId)
-      getPlannerNotifications(accountId)
+    if (!accountId) {
+      const timeout = window.setTimeout(() => setNotifications([]), 0);
+      return () => window.clearTimeout(timeout);
+    }
+    getPlannerNotifications(accountId)
+      .then(setNotifications)
+      .catch((error) => onError(error.message));
+  }, [accountId, onError]);
+  useEffect(() => {
+    if (!accountId || enabled === undefined) return;
+    const timeout = window.setTimeout(() => {
+      replacePlannerNotifications(accountId, enabled ? drafts : [])
         .then(setNotifications)
         .catch((error) => onError(error.message));
-  }, [accountId, onError]);
+    }, 750);
+    return () => window.clearTimeout(timeout);
+  }, [accountId, drafts, enabled, onError]);
   const refresh = async () => {
-    if (!accountId) return;
+    if (!accountId || enabled === undefined) return;
     setIsBusy(true);
     try {
-      setNotifications(await replacePlannerNotifications(accountId, drafts));
+      setNotifications(
+        await replacePlannerNotifications(accountId, enabled ? drafts : []),
+      );
     } catch (error) {
       onError(
         error instanceof Error

@@ -41,6 +41,20 @@ export function BuilderAssignmentCard({
       dateStyle: "short",
       timeStyle: "short",
     }).format(date);
+  const costs = Object.entries(assignment.effectiveCosts)
+    .filter(([, value]) => value > 0)
+    .map(([resource, value]) => {
+      const labels = en
+        ? { gold: "Gold", elixir: "Elixir", darkElixir: "Dark Elixir" }
+        : {
+            gold: "Gold",
+            elixir: "Elixier",
+            darkElixir: "Dunkles Elixier",
+          };
+      return `${labels[resource as keyof typeof labels]} ${new Intl.NumberFormat(
+        en ? "en-US" : "de-DE",
+      ).format(value)}`;
+    });
   return (
     <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -53,6 +67,17 @@ export function BuilderAssignmentCard({
             Level {assignment.fromLevel} {en ? "to" : "auf"}{" "}
             {assignment.toLevel}
           </p>
+          {costs.length > 0 ? (
+            <p className="mt-2 text-xs text-slate-400">
+              {costs.join(" · ")}
+              {assignment.costDiscountPercent > 0 ? (
+                <span className="ml-2 font-bold text-emerald-300">
+                  −{assignment.costDiscountPercent}%{" "}
+                  {en ? "event cost" : "Eventkosten"}
+                </span>
+              ) : null}
+            </p>
+          ) : null}
         </div>
         <div className="rounded-xl bg-white/5 px-4 py-2 text-sm font-bold text-amber-200">
           <span className="block">

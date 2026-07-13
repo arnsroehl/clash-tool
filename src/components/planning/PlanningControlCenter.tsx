@@ -21,6 +21,7 @@ type Props = {
   simulation: BuilderSimulationResult;
   strategy: PlanningStrategy;
   resources: ResourceSnapshot;
+  resourceBonus: ResourceSnapshot;
   storageCapacities: ResourceSnapshot;
   horizonDays: number;
   goalPercent: number;
@@ -50,21 +51,31 @@ export function PlanningControlCenter(props: Props) {
     Math.ceil(
       value * (1 - Math.min(100, Math.max(0, props.costDiscountPercent)) / 100),
     );
+  const effectiveResources: ResourceSnapshot = {
+    gold: props.resources.gold + props.resourceBonus.gold,
+    elixir: props.resources.elixir + props.resourceBonus.elixir,
+    darkElixir: props.resources.darkElixir + props.resourceBonus.darkElixir,
+  };
+  const hasResourceBonus = Object.values(props.resourceBonus).some(
+    (value) => value > 0,
+  );
   const completedInHorizon = props.simulation.assignments.filter(
     (assignment) => assignment.endHour <= props.horizonDays * 24,
   ).length;
   const affordable = top
-    ? props.resources.gold >= effectiveCost(top.nextLevelCosts.gold) &&
-      props.resources.elixir >= effectiveCost(top.nextLevelCosts.elixir) &&
-      props.resources.darkElixir >= effectiveCost(top.nextLevelCosts.darkElixir)
+    ? effectiveResources.gold >= effectiveCost(top.nextLevelCosts.gold) &&
+      effectiveResources.elixir >= effectiveCost(top.nextLevelCosts.elixir) &&
+      effectiveResources.darkElixir >=
+        effectiveCost(top.nextLevelCosts.darkElixir)
     : false;
   const affordableAlternative = props.recommendations
     .slice(1)
     .find(
       (item) =>
-        props.resources.gold >= effectiveCost(item.nextLevelCosts.gold) &&
-        props.resources.elixir >= effectiveCost(item.nextLevelCosts.elixir) &&
-        props.resources.darkElixir >=
+        effectiveResources.gold >= effectiveCost(item.nextLevelCosts.gold) &&
+        effectiveResources.elixir >=
+          effectiveCost(item.nextLevelCosts.elixir) &&
+        effectiveResources.darkElixir >=
           effectiveCost(item.nextLevelCosts.darkElixir),
     );
   const currentProgress = props.plannerResult?.summary.progressPercent ?? 0;
@@ -77,7 +88,7 @@ export function PlanningControlCenter(props: Props) {
           ...resourceKeys.map((key) => {
             const deficit = Math.max(
               0,
-              effectiveCost(top.nextLevelCosts[key]) - props.resources[key],
+              effectiveCost(top.nextLevelCosts[key]) - effectiveResources[key],
             );
             return deficit === 0
               ? 0
@@ -131,6 +142,18 @@ export function PlanningControlCenter(props: Props) {
                 : "Aktiver Event-/Gold-Pass-Rabatt"}
               : −{props.costDiscountPercent}%{" "}
               {en ? "on included costs" : "auf berücksichtigte Kosten"}
+            </p>
+          ) : null}
+          {hasResourceBonus ? (
+            <p className="mt-2 rounded-xl bg-sky-400/10 p-3 text-xs text-sky-200">
+              {en
+                ? "Active planned event resources"
+                : "Aktive eingeplante Event-Ressourcen"}
+              : +{numberFormat.format(props.resourceBonus.gold)} Gold · +
+              {numberFormat.format(props.resourceBonus.elixir)}{" "}
+              {en ? "Elixir" : "Elixier"} · +
+              {numberFormat.format(props.resourceBonus.darkElixir)}{" "}
+              {en ? "Dark elixir" : "Dunkles Elixier"}
             </p>
           ) : null}
           <label className="mt-5 block text-sm font-semibold text-slate-300">

@@ -18,6 +18,30 @@ export function BuilderSimulationOverview({
 }: BuilderSimulationOverviewProps) {
   const en = language === "en";
   const assignments = simulation.assignments;
+  const eventSavings = assignments.reduce(
+    (total, assignment) => ({
+      gold:
+        total.gold +
+        assignment.originalCosts.gold -
+        assignment.effectiveCosts.gold,
+      elixir:
+        total.elixir +
+        assignment.originalCosts.elixir -
+        assignment.effectiveCosts.elixir,
+      darkElixir:
+        total.darkElixir +
+        assignment.originalCosts.darkElixir -
+        assignment.effectiveCosts.darkElixir,
+    }),
+    { gold: 0, elixir: 0, darkElixir: 0 },
+  );
+  const formattedSavings = [
+    [en ? "gold" : "Gold", eventSavings.gold],
+    [en ? "elixir" : "Elixier", eventSavings.elixir],
+    [en ? "dark elixir" : "Dunkles Elixier", eventSavings.darkElixir],
+  ]
+    .filter(([, value]) => Number(value) > 0)
+    .map(([label, value]) => `${formatNumber(Number(value), language)} ${label}`);
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
@@ -55,6 +79,15 @@ export function BuilderSimulationOverview({
           </p>
         </div>
       </div>
+
+      {formattedSavings.length > 0 ? (
+        <p className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
+          {en
+            ? "Event savings in this plan: "
+            : "Event-Ersparnis in diesem Plan: "}
+          <b>{formattedSavings.join(" · ")}</b>
+        </p>
+      ) : null}
 
       {assignments.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">

@@ -1,6 +1,6 @@
 # Continuing feature-list audit
 
-Last reviewed: 2026-07-13
+Last reviewed: 2026-07-14
 
 This document maps sections 10–18 of `Plannung Clash tool Weiterführend.rtf` to executable functionality. “Activation required” means the code and schema are present, but a credential owned by the app owner must still be configured outside the repository.
 
@@ -10,14 +10,14 @@ This document maps sections 10–18 of `Plannung Clash tool Weiterführend.rtf` 
 - Programs cover laboratory completion, CWL heroes, every individual wall, all defenses and next-Town-Hall readiness.
 - Calculations use the actual remaining level path. Group dates account for parallel builders and the independent laboratory.
 - Saved goals show live progress, complete automatically and trigger delay warnings from remaining—not original—work.
-- “Optimize” schedules the next missing, not-yet-queued step without creating duplicates.
+- “Optimize” prioritizes every currently missing next step, preserves locked queue positions and avoids duplicates.
 
 ## 11. Notifications and daily companion — implemented
 
 - Builder/laboratory completion, immediately startable upgrades, recommendation, goal delay, empty-queue adjustment and event-change notifications are derived from the live plan.
 - Storage warnings forecast the 90% threshold from current resources, capacity and daily income.
 - Daily summary is limited to the next three upgrades; the UI also shows today, the next seven days and a weekly outlook.
-- Browser Push subscriptions, a test route and a token-protected daily Cron delivery route are implemented. Production receipt verification requires an HTTPS deployment.
+- Browser Push subscriptions, automatic preference-driven schedule synchronization, a test route and a token-protected daily Cron delivery route are implemented. Production receipt verification requires an HTTPS deployment.
 
 ## 12. Import and synchronization — implemented; official API activation required
 
@@ -31,13 +31,13 @@ This document maps sections 10–18 of `Plannung Clash tool Weiterführend.rtf` 
 - Books, hammers, builder/research potions, Wall Rings and runes are stored in Supabase inventory.
 - Best use and up to three alternatives compare time and/or resource savings against the actual queue.
 - Reservations only offer applicable upgrades; Wall Rings only offer walls and runes use the missing storage amount.
-- Active Gold Pass/event settings feed the queue affordability and time simulations.
+- Active Gold Pass/event settings feed queue affordability; current and future event windows are evaluated separately for every simulated upgrade.
 
 ## 14. Seasons and events — implemented
 
 - Supabase holds versioned presets for Gold Pass, Hoggy Bank (formerly Season Bank), Hammer Jam, Clan Games, CWL, custom discounts and boosts.
 - Presets expose data version, maintenance note and official source where available, while dates and player-dependent rewards remain editable.
-- Active time and cost effects change simulations, recommendations, notifications and assistant answers.
+- Active time, cost and resource effects change recommendations, notifications and assistant answers. Current and future cost/time windows are evaluated at each simulated upgrade start, with plan-wide resource savings shown separately.
 
 ## 15. Data-grounded assistant — implemented
 
@@ -65,12 +65,12 @@ This document maps sections 10–18 of `Plannung Clash tool Weiterführend.rtf` 
 - Supabase stores account and planning state for device synchronization.
 - German and English cover authentication, data entry and planning features.
 - JSON export, system share and authenticated Discord webhook delivery are available.
-- A signature-verified Discord interactions route implements `/clash-help` and `/clash-plan`; the repository includes command registration. A Discord application public key and bot token are required for activation.
+- A signature-verified, replay-protected Discord interactions route implements `/clash-help` and `/clash-plan`; the repository includes command registration. A Discord application public key and bot token are required for activation.
 
 ## Verification evidence
 
 - ESLint: pass, zero warnings.
-- Node/TypeScript tests: 51 pass, 0 fail.
+- Node/TypeScript tests: 58 pass, 0 fail.
 - Next.js production build: pass, including all API routes and manifest.
 - Supabase migrations applied: planning scenarios, building-instance planner IDs, own clan progress synchronization and versioned event presets.
 - Browser smoke test: local page returns 200 and renders the authentication UI without a visible Next.js error overlay.

@@ -42,7 +42,7 @@ import {
 } from "@/features/planning-control/planning-control";
 import { createProgressForecast } from "@/features/progress-forecast/progress-forecast.engine";
 import { createPlannerNotifications } from "@/features/notifications/planner-notifications";
-import { getActivePlanningDiscounts } from "@/features/planning-events/planning-events";
+import { getActivePlanningEffects } from "@/features/planning-events/planning-events";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useAuth } from "@/hooks/useAuth";
 import { usePlanningGoals } from "@/hooks/usePlanningGoals";
@@ -64,6 +64,7 @@ import type {
   PlannerResult,
   PlannerUpgradeLevel,
   ResourceSnapshot,
+  UpgradeRecommendation,
 } from "@/features/planner/planner.types";
 import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
@@ -325,7 +326,8 @@ export default function Home() {
     isLoadingQueue,
     isSavingQueueItem,
     deletingQueueItemId,
-    addRecommendationToQueue,
+    addRecommendationToQueue: addRawRecommendationToQueue,
+    addGoalRecommendationsToQueue: addRawGoalRecommendationsToQueue,
     removeQueueItem,
     moveQueueItem,
     changeQueueItemStatus,
@@ -501,15 +503,51 @@ export default function Home() {
     addEvent,
     removeEvent,
   } = useMagicItems(selectedAccount?.id, handleError);
-  const activeDiscounts = getActivePlanningDiscounts(events);
+  const activeEffects = useMemo(
+    () => getActivePlanningEffects(events),
+    [events],
+  );
+  const effectivePlanningResources = useMemo<ResourceSnapshot>(
+    () => ({
+      gold: resources.gold + activeEffects.resourceBonus.gold,
+      elixir: resources.elixir + activeEffects.resourceBonus.elixir,
+      darkElixir: resources.darkElixir + activeEffects.resourceBonus.darkElixir,
+    }),
+    [activeEffects.resourceBonus, resources],
+  );
+  const addRecommendationToQueue = useCallback(
+    (recommendation: UpgradeRecommendation) =>
+      addRawRecommendationToQueue(recommendation),
+    [addRawRecommendationToQueue],
+  );
+  const optimizeGoalQueue = useCallback(
+    (recommendations: UpgradeRecommendation[]) =>
+      addRawGoalRecommendationsToQueue(recommendations),
+    [addRawGoalRecommendationsToQueue],
+  );
+  const simulationStartsAt = useMemo(() => new Date().toISOString(), []);
 
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
     return simulateBuilderQueue({
       builderCount: selectedAccount?.builderCount || 0,
       queueItems,
-      timeDiscountPercent: activeDiscounts.timePercent,
+      simulationStartsAt,
+      timeDiscountWindows: events
+        .filter((event) => event.enabled && event.timeDiscountPercent > 0)
+        .map((event) => ({
+          startsAt: event.startsAt,
+          endsAt: event.endsAt,
+          percent: event.timeDiscountPercent,
+        })),
+      costDiscountWindows: events
+        .filter((event) => event.enabled && event.costDiscountPercent > 0)
+        .map((event) => ({
+          startsAt: event.startsAt,
+          endsAt: event.endsAt,
+          percent: event.costDiscountPercent,
+        })),
     });
-  }, [activeDiscounts.timePercent, queueItems, selectedAccount]);
+  }, [events, queueItems, selectedAccount, simulationStartsAt]);
 
   const progressForecast = useMemo<ProgressForecastResult>(() => {
     return createProgressForecast({
@@ -530,20 +568,24 @@ export default function Home() {
     if (!selectedAccount?.playerTag || !selectedClanForProgress) return;
     void syncOwnClanProgress(selectedAccount.id, progress);
   }, [progress, selectedAccount, selectedClanForProgress, syncOwnClanProgress]);
+  const remindersEnabled = profile?.remindersEnabled;
+  const dailySummaryEnabled = profile?.dailySummaryEnabled ?? false;
+  const notificationLanguage = profile?.language || "de";
   const notificationDrafts = useMemo(
     () =>
-      selectedAccount
+      selectedAccount && remindersEnabled
         ? createPlannerNotifications({
             accountId: selectedAccount.id,
             simulation: builderSimulation,
             recommendations: upgradeRecommendations,
             goals,
             events,
-            resources,
+            resources: effectivePlanningResources,
             storageCapacities,
             dailyIncome,
             currentLevels: currentItemLevels,
-            language: profile?.language || "de",
+            language: notificationLanguage,
+            dailySummaryEnabled,
           })
         : [],
     [
@@ -552,8 +594,10 @@ export default function Home() {
       goals,
       dailyIncome,
       currentItemLevels,
-      profile?.language,
-      resources,
+      notificationLanguage,
+      dailySummaryEnabled,
+      remindersEnabled,
+      effectivePlanningResources,
       selectedAccount,
       storageCapacities,
       upgradeRecommendations,
@@ -563,6 +607,7 @@ export default function Home() {
     selectedAccount?.id,
     notificationDrafts,
     handleError,
+    remindersEnabled,
   );
 
   if (isLoadingAuth || !user) {
@@ -641,7 +686,7 @@ export default function Home() {
           <DailyCompanion
             simulation={builderSimulation}
             recommendations={upgradeRecommendations}
-            enabled={profile?.dailySummaryEnabled ?? true}
+            enabled={dailySummaryEnabled}
             language={language}
           />
         </CollapsibleSection>
@@ -650,7 +695,7 @@ export default function Home() {
           <NotificationCenter
             notifications={plannerNotifications.notifications}
             isBusy={plannerNotifications.isBusy}
-            enabled={profile?.remindersEnabled ?? true}
+            enabled={remindersEnabled ?? false}
             language={language}
             onRefresh={plannerNotifications.refresh}
             onRead={plannerNotifications.markRead}
@@ -668,7 +713,7 @@ export default function Home() {
               recommendations: upgradeRecommendations,
               queue: queueItems,
               simulation: builderSimulation,
-              resources,
+              resources: effectivePlanningResources,
               inventory,
               events,
               profile,
@@ -709,12 +754,13 @@ export default function Home() {
             simulation={builderSimulation}
             strategy={planningStrategy}
             resources={resources}
+            resourceBonus={activeEffects.resourceBonus}
             storageCapacities={storageCapacities}
             horizonDays={horizonDays}
             goalPercent={goalPercent}
             dailyIncome={dailyIncome}
             strategyWeights={strategyWeights}
-            costDiscountPercent={activeDiscounts.costPercent}
+            costDiscountPercent={activeEffects.costPercent}
             onStrategyChange={setPlanningStrategy}
             onResourcesChange={setResources}
             onStorageCapacitiesChange={setStorageCapacities}
@@ -879,6 +925,7 @@ export default function Home() {
                 )
               }
               onAddToQueue={addRecommendationToQueue}
+              onOptimizeQueue={optimizeGoalQueue}
               isSaving={isSavingQueueItem}
               accountId={selectedAccount.id}
               builderCount={selectedAccount.builderCount}
