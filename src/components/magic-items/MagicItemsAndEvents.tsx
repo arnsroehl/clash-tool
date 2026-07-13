@@ -1,4 +1,323 @@
 "use client";
-import{type FormEvent}from"react";import{isPlanningEventActive}from"@/features/planning-events/planning-events";import type{MagicInventoryItem,PlanningEvent}from"@/types/magicItems";import type{UpgradeQueueItem}from"@/types/upgradeQueue";
-type Props={accountId:string;inventory:MagicInventoryItem[];events:PlanningEvent[];queue:UpgradeQueueItem[];onUpdateItem:(key:string,q:number,r:string|null)=>void;onAddEvent:(e:Omit<PlanningEvent,"id">)=>void;onDeleteEvent:(id:string)=>void};
-export function MagicItemsAndEvents(p:Props){const open=p.queue.filter(q=>q.status==="planned"||q.status==="active");const recommend=(item:MagicInventoryItem)=>open.filter(q=>item.appliesTo.includes(q.itemType)).sort((a,b)=>b.durationHours-a.durationHours)[0];const active=p.events.filter(e=>isPlanningEventActive(e));const costDiscount=Math.min(100,active.reduce((m,e)=>Math.max(m,e.costDiscountPercent),0));const timeDiscount=Math.min(100,active.reduce((m,e)=>Math.max(m,e.timeDiscountPercent),0));const submit=(ev:FormEvent<HTMLFormElement>)=>{ev.preventDefault();const f=new FormData(ev.currentTarget);p.onAddEvent({accountId:p.accountId,eventType:String(f.get("type")),name:String(f.get("name")),startsAt:String(f.get("start"))||null,endsAt:String(f.get("end"))||null,costDiscountPercent:Number(f.get("cost"))||0,timeDiscountPercent:Number(f.get("time"))||0,resourceGold:Number(f.get("gold"))||0,resourceElixir:Number(f.get("elixir"))||0,resourceDarkElixir:Number(f.get("darkElixir"))||0,rewardType:String(f.get("rewardType")) as PlanningEvent["rewardType"],rewardAmount:Number(f.get("rewardAmount"))||0,enabled:true});ev.currentTarget.reset();};return <section className="grid gap-6 lg:grid-cols-2"><div className="rounded-3xl border border-white/10 bg-white/5 p-6"><h2 className="text-xl font-bold">Magic Items</h2><div className="mt-4 flex max-h-[600px] flex-col gap-3 overflow-auto">{p.inventory.map(item=>{const best=recommend(item);return <div key={item.itemKey} className="rounded-xl bg-slate-900 p-4"><div className="flex items-center justify-between"><div><b>{item.name}</b><p className="text-xs text-slate-500">{item.category}</p></div><input aria-label={`Anzahl ${item.name}`} type="number" min="0" value={item.quantity} onChange={e=>p.onUpdateItem(item.itemKey,Math.max(0,Number(e.target.value)||0),item.reservedQueueItemId)} className="w-20 rounded-lg bg-slate-950 p-2"/></div>{item.quantity>0&&best?<><p className="mt-3 text-xs text-emerald-300">Bester Einsatz: {best.name} · bis zu {item.effectType==="finish_upgrade"?best.durationHours:item.effectType==="speed_boost"?Math.min(best.durationHours,item.effectValue-1):0} h Zeitgewinn</p><select value={item.reservedQueueItemId||""} onChange={e=>p.onUpdateItem(item.itemKey,item.quantity,e.target.value||null)} className="mt-2 w-full rounded-lg bg-slate-950 p-2 text-xs"><option value="">Nicht reserviert</option>{open.filter(q=>item.appliesTo.includes(q.itemType)).map(q=><option key={q.id} value={q.id}>{q.name} Level {q.toLevel}</option>)}</select></>:null}</div>})}</div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-6"><h2 className="text-xl font-bold">Saison & Events</h2><div className="mt-4 grid grid-cols-2 gap-3"><div className="rounded-xl bg-emerald-400/10 p-4"><p className="text-xs">Aktiver Kostenrabatt</p><b className="text-2xl">{costDiscount}%</b></div><div className="rounded-xl bg-sky-400/10 p-4"><p className="text-xs">Aktiver Zeitrabatt</p><b className="text-2xl">{timeDiscount}%</b></div></div><form onSubmit={submit} className="mt-5 grid gap-3"><input required name="name" placeholder="Eventname" className="rounded-xl bg-slate-900 p-3"/><select name="type" className="rounded-xl bg-slate-900 p-3"><option value="gold_pass">Gold Pass</option><option value="season_bank">Season Bank</option><option value="hammer_jam">Hammer Jam</option><option value="clan_games">Clan Games</option><option value="cwl">CWL</option><option value="event_discount">Event-Rabatt</option><option value="builder_boost">Builder Boost</option></select><div className="grid grid-cols-2 gap-3"><label className="text-xs">Von<input name="start" type="datetime-local" className="mt-1 w-full rounded-lg bg-slate-900 p-2"/></label><label className="text-xs">Bis<input name="end" type="datetime-local" className="mt-1 w-full rounded-lg bg-slate-900 p-2"/></label></div><div className="grid grid-cols-2 gap-3"><input name="cost" type="number" min="0" max="100" placeholder="Kostenrabatt %" className="rounded-xl bg-slate-900 p-3"/><input name="time" type="number" min="0" max="100" placeholder="Zeitrabatt %" className="rounded-xl bg-slate-900 p-3"/></div><div className="grid grid-cols-3 gap-2"><input name="gold" type="number" min="0" placeholder="Gold" className="rounded-xl bg-slate-900 p-3"/><input name="elixir" type="number" min="0" placeholder="Elixier" className="rounded-xl bg-slate-900 p-3"/><input name="darkElixir" type="number" min="0" placeholder="Dunkles Elixier" className="rounded-xl bg-slate-900 p-3"/></div><div className="grid grid-cols-2 gap-3"><select name="rewardType" className="rounded-xl bg-slate-900 p-3"><option value="none">Keine Sonderbelohnung</option><option value="cwl_medals">CWL-Medaillen</option><option value="clan_games_reward">Clan-Games-Belohnung</option><option value="season_bank">Season Bank</option></select><input name="rewardAmount" type="number" min="0" placeholder="Menge" className="rounded-xl bg-slate-900 p-3"/></div><button className="rounded-xl bg-amber-400 p-3 font-bold text-slate-950">Event einplanen</button></form><div className="mt-5 flex flex-col gap-2">{p.events.map(e=><div key={e.id} className="rounded-xl bg-slate-900 p-3 text-sm"><b>{e.name}</b><span className="ml-2 text-slate-400">Kosten −{e.costDiscountPercent}% · Zeit −{e.timeDiscountPercent}%{e.rewardAmount>0?` · ${e.rewardAmount} ${e.rewardType}`:""}</span><button onClick={()=>p.onDeleteEvent(e.id)} className="float-right text-red-300">Löschen</button></div>)}</div></div></section>}
+
+import { type FormEvent } from "react";
+import { isPlanningEventActive } from "@/features/planning-events/planning-events";
+import type { MagicInventoryItem, PlanningEvent } from "@/types/magicItems";
+import type { UpgradeQueueItem } from "@/types/upgradeQueue";
+
+type Props = {
+  accountId: string;
+  language?: "de" | "en";
+  inventory: MagicInventoryItem[];
+  events: PlanningEvent[];
+  queue: UpgradeQueueItem[];
+  onUpdateItem: (
+    key: string,
+    quantity: number,
+    reservedQueueItemId: string | null,
+  ) => void;
+  onAddEvent: (event: Omit<PlanningEvent, "id">) => void;
+  onDeleteEvent: (id: string) => void;
+};
+
+export function MagicItemsAndEvents({
+  accountId,
+  language = "de",
+  inventory,
+  events,
+  queue,
+  onUpdateItem,
+  onAddEvent,
+  onDeleteEvent,
+}: Props) {
+  const en = language === "en";
+  const openQueue = queue.filter(
+    (item) => item.status === "planned" || item.status === "active",
+  );
+  const activeEvents = events.filter((event) => isPlanningEventActive(event));
+  const costDiscount = Math.min(
+    100,
+    activeEvents.reduce(
+      (max, event) => Math.max(max, event.costDiscountPercent),
+      0,
+    ),
+  );
+  const timeDiscount = Math.min(
+    100,
+    activeEvents.reduce(
+      (max, event) => Math.max(max, event.timeDiscountPercent),
+      0,
+    ),
+  );
+
+  const recommendedUpgrade = (item: MagicInventoryItem) =>
+    openQueue
+      .filter((upgrade) => item.appliesTo.includes(upgrade.itemType))
+      .sort((a, b) => b.durationHours - a.durationHours)[0];
+
+  const submitEvent = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    onAddEvent({
+      accountId,
+      eventType: String(form.get("type")),
+      name: String(form.get("name")),
+      startsAt: String(form.get("start")) || null,
+      endsAt: String(form.get("end")) || null,
+      costDiscountPercent: Number(form.get("cost")) || 0,
+      timeDiscountPercent: Number(form.get("time")) || 0,
+      resourceGold: Number(form.get("gold")) || 0,
+      resourceElixir: Number(form.get("elixir")) || 0,
+      resourceDarkElixir: Number(form.get("darkElixir")) || 0,
+      rewardType: String(form.get("rewardType")) as PlanningEvent["rewardType"],
+      rewardAmount: Number(form.get("rewardAmount")) || 0,
+      enabled: true,
+    });
+    event.currentTarget.reset();
+  };
+
+  return (
+    <section className="grid gap-6 lg:grid-cols-2">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+        <h2 className="text-xl font-bold">
+          {en ? "Magic items" : "Magische Gegenstände"}
+        </h2>
+        <p className="mt-1 text-sm text-slate-400">
+          {en
+            ? "Track inventory and reserve each item for its best upgrade."
+            : "Verwalte den Bestand und reserviere Gegenstände für das beste Upgrade."}
+        </p>
+        <div className="mt-4 flex max-h-[600px] flex-col gap-3 overflow-auto">
+          {inventory.map((item) => {
+            const best = recommendedUpgrade(item);
+            const savedHours = best
+              ? item.effectType === "finish_upgrade"
+                ? best.durationHours
+                : item.effectType === "speed_boost"
+                  ? Math.min(
+                      best.durationHours,
+                      Math.max(0, item.effectValue - 1),
+                    )
+                  : 0
+              : 0;
+
+            return (
+              <div key={item.itemKey} className="rounded-xl bg-slate-900 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <b>{item.name}</b>
+                    <p className="text-xs text-slate-500">{item.category}</p>
+                  </div>
+                  <input
+                    aria-label={`${en ? "Quantity" : "Anzahl"} ${item.name}`}
+                    type="number"
+                    min="0"
+                    value={item.quantity}
+                    onChange={(event) =>
+                      onUpdateItem(
+                        item.itemKey,
+                        Math.max(0, Number(event.target.value) || 0),
+                        item.reservedQueueItemId,
+                      )
+                    }
+                    className="w-20 rounded-lg bg-slate-950 p-2"
+                  />
+                </div>
+                {item.quantity > 0 && best ? (
+                  <>
+                    <p className="mt-3 text-xs text-emerald-300">
+                      {en ? "Best use" : "Bester Einsatz"}: {best.name} ·{" "}
+                      {en ? "up to" : "bis zu"} {savedHours} h{" "}
+                      {en ? "saved" : "Zeitgewinn"}
+                    </p>
+                    <select
+                      aria-label={
+                        en ? `Reserve ${item.name}` : `${item.name} reservieren`
+                      }
+                      value={item.reservedQueueItemId || ""}
+                      onChange={(event) =>
+                        onUpdateItem(
+                          item.itemKey,
+                          item.quantity,
+                          event.target.value || null,
+                        )
+                      }
+                      className="mt-2 w-full rounded-lg bg-slate-950 p-2 text-xs"
+                    >
+                      <option value="">
+                        {en ? "Not reserved" : "Nicht reserviert"}
+                      </option>
+                      {openQueue
+                        .filter((upgrade) =>
+                          item.appliesTo.includes(upgrade.itemType),
+                        )
+                        .map((upgrade) => (
+                          <option key={upgrade.id} value={upgrade.id}>
+                            {upgrade.name} {en ? "level" : "Level"}{" "}
+                            {upgrade.toLevel}
+                          </option>
+                        ))}
+                    </select>
+                  </>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+        <h2 className="text-xl font-bold">
+          {en ? "Season & events" : "Saison & Events"}
+        </h2>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="rounded-xl bg-emerald-400/10 p-4">
+            <p className="text-xs">
+              {en ? "Active cost discount" : "Aktiver Kostenrabatt"}
+            </p>
+            <b className="text-2xl">{costDiscount}%</b>
+          </div>
+          <div className="rounded-xl bg-sky-400/10 p-4">
+            <p className="text-xs">
+              {en ? "Active time discount" : "Aktiver Zeitrabatt"}
+            </p>
+            <b className="text-2xl">{timeDiscount}%</b>
+          </div>
+        </div>
+
+        <form onSubmit={submitEvent} className="mt-5 grid gap-3">
+          <input
+            required
+            name="name"
+            placeholder={en ? "Event name" : "Eventname"}
+            className="rounded-xl bg-slate-900 p-3"
+          />
+          <select
+            name="type"
+            aria-label={en ? "Event type" : "Eventtyp"}
+            className="rounded-xl bg-slate-900 p-3"
+          >
+            <option value="gold_pass">Gold Pass</option>
+            <option value="season_bank">Season Bank</option>
+            <option value="hammer_jam">Hammer Jam</option>
+            <option value="clan_games">Clan Games</option>
+            <option value="cwl">CWL</option>
+            <option value="event_discount">
+              {en ? "Event discount" : "Event-Rabatt"}
+            </option>
+            <option value="builder_boost">Builder Boost</option>
+          </select>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-xs">
+              {en ? "From" : "Von"}
+              <input
+                name="start"
+                type="datetime-local"
+                className="mt-1 w-full rounded-lg bg-slate-900 p-2"
+              />
+            </label>
+            <label className="text-xs">
+              {en ? "Until" : "Bis"}
+              <input
+                name="end"
+                type="datetime-local"
+                className="mt-1 w-full rounded-lg bg-slate-900 p-2"
+              />
+            </label>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              name="cost"
+              type="number"
+              min="0"
+              max="100"
+              placeholder={en ? "Cost discount %" : "Kostenrabatt %"}
+              className="rounded-xl bg-slate-900 p-3"
+            />
+            <input
+              name="time"
+              type="number"
+              min="0"
+              max="100"
+              placeholder={en ? "Time discount %" : "Zeitrabatt %"}
+              className="rounded-xl bg-slate-900 p-3"
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <input
+              name="gold"
+              type="number"
+              min="0"
+              placeholder="Gold"
+              className="rounded-xl bg-slate-900 p-3"
+            />
+            <input
+              name="elixir"
+              type="number"
+              min="0"
+              placeholder={en ? "Elixir" : "Elixier"}
+              className="rounded-xl bg-slate-900 p-3"
+            />
+            <input
+              name="darkElixir"
+              type="number"
+              min="0"
+              placeholder={en ? "Dark elixir" : "Dunkles Elixier"}
+              className="rounded-xl bg-slate-900 p-3"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <select
+              name="rewardType"
+              aria-label={en ? "Special reward" : "Sonderbelohnung"}
+              className="rounded-xl bg-slate-900 p-3"
+            >
+              <option value="none">
+                {en ? "No special reward" : "Keine Sonderbelohnung"}
+              </option>
+              <option value="cwl_medals">
+                {en ? "CWL medals" : "CWL-Medaillen"}
+              </option>
+              <option value="clan_games_reward">
+                {en ? "Clan Games reward" : "Clan-Games-Belohnung"}
+              </option>
+              <option value="season_bank">Season Bank</option>
+            </select>
+            <input
+              name="rewardAmount"
+              type="number"
+              min="0"
+              placeholder={en ? "Amount" : "Menge"}
+              className="rounded-xl bg-slate-900 p-3"
+            />
+          </div>
+          <button className="rounded-xl bg-amber-400 p-3 font-bold text-slate-950">
+            {en ? "Schedule event" : "Event einplanen"}
+          </button>
+        </form>
+
+        <div className="mt-5 flex flex-col gap-2">
+          {events.map((event) => (
+            <div key={event.id} className="rounded-xl bg-slate-900 p-3 text-sm">
+              <b>{event.name}</b>
+              <span className="ml-2 text-slate-400">
+                {en ? "Cost" : "Kosten"} −{event.costDiscountPercent}% ·{" "}
+                {en ? "Time" : "Zeit"} −{event.timeDiscountPercent}%
+                {event.rewardAmount > 0
+                  ? ` · ${event.rewardAmount} ${event.rewardType}`
+                  : ""}
+              </span>
+              <button
+                type="button"
+                onClick={() => onDeleteEvent(event.id)}
+                className="float-right text-red-300"
+              >
+                {en ? "Delete" : "Löschen"}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

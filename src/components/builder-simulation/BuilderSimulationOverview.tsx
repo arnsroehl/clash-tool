@@ -3,15 +3,20 @@ import type { BuilderSimulationResult } from "@/features/builder-simulation/buil
 
 type BuilderSimulationOverviewProps = {
   simulation: BuilderSimulationResult;
+  language?: "de" | "en";
 };
 
-function formatNumber(value: number): string {
-  return new Intl.NumberFormat("de-DE").format(value);
+function formatNumber(value: number, language: "de" | "en"): string {
+  return new Intl.NumberFormat(language === "en" ? "en-US" : "de-DE").format(
+    value,
+  );
 }
 
 export function BuilderSimulationOverview({
   simulation,
+  language = "de",
 }: BuilderSimulationOverviewProps) {
+  const en = language === "en";
   const assignments = simulation.assignments;
 
   return (
@@ -20,23 +25,42 @@ export function BuilderSimulationOverview({
         <div>
           <h2 className="text-2xl font-bold">Builder Simulation</h2>
           <p className="mt-2 text-sm text-slate-400">
-            {simulation.builderCount} Builder · {formatNumber(simulation.totalDurationHours)} h ·{" "}
-            {formatNumber(simulation.totalDurationDays)} Tage
+            {simulation.builderCount} {en ? "builders" : "Builder"} ·{" "}
+            {formatNumber(simulation.totalDurationHours, language)} h ·{" "}
+            {formatNumber(simulation.totalDurationDays, language)}{" "}
+            {en ? "days" : "Tage"}
           </p>
         </div>
         <span className="rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-sm font-bold text-amber-300">
-          Leerlauf {formatNumber(simulation.idleTimeHours)} h
+          {en ? "Idle" : "Leerlauf"}{" "}
+          {formatNumber(simulation.idleTimeHours, language)} h
         </span>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl bg-white/5 p-4"><p className="text-xs text-slate-400">Bauarbeiter-Upgrades</p><p className="mt-1 text-2xl font-bold">{simulation.builderAssignmentCount}</p></div>
-        <div className="rounded-2xl bg-white/5 p-4"><p className="text-xs text-slate-400">Labor-Upgrades</p><p className="mt-1 text-2xl font-bold">{simulation.laboratoryAssignmentCount}</p></div>
+        <div className="rounded-2xl bg-white/5 p-4">
+          <p className="text-xs text-slate-400">
+            {en ? "Builder upgrades" : "Bauarbeiter-Upgrades"}
+          </p>
+          <p className="mt-1 text-2xl font-bold">
+            {simulation.builderAssignmentCount}
+          </p>
+        </div>
+        <div className="rounded-2xl bg-white/5 p-4">
+          <p className="text-xs text-slate-400">
+            {en ? "Laboratory upgrades" : "Labor-Upgrades"}
+          </p>
+          <p className="mt-1 text-2xl font-bold">
+            {simulation.laboratoryAssignmentCount}
+          </p>
+        </div>
       </div>
 
       {assignments.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
-          Keine Queue-Einträge für die Simulation vorhanden.
+          {en
+            ? "No queue entries available for the simulation."
+            : "Keine Queue-Einträge für die Simulation vorhanden."}
         </div>
       ) : (
         <div className="mt-5 flex flex-col gap-3">
@@ -44,6 +68,7 @@ export function BuilderSimulationOverview({
             <BuilderAssignmentCard
               key={`${assignment.queueItemId}-${assignment.builderIndex}-${assignment.startHour}`}
               assignment={assignment}
+              language={language}
             />
           ))}
         </div>

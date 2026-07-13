@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getPlannerNotifications, markPlannerNotificationRead, replacePlannerNotifications } from "@/services/notificationService";
+import { enableWebPush, sendTestPush } from "@/services/pushSubscriptionService";
 import type { PlannerNotification, PlannerNotificationDraft } from "@/types/notifications";
 
 export function usePlannerNotifications(accountId: string | undefined, drafts: PlannerNotificationDraft[], onError: (message: string) => void) {
@@ -11,12 +12,8 @@ export function usePlannerNotifications(accountId: string | undefined, drafts: P
   const refresh = async () => { if (!accountId) return; setIsBusy(true); try { setNotifications(await replacePlannerNotifications(accountId, drafts)); } catch (error) { onError(error instanceof Error ? error.message : "Erinnerungen konnten nicht aktualisiert werden."); } finally { setIsBusy(false); } };
   const markRead = async (id: string) => { try { await markPlannerNotificationRead(id); setNotifications((current) => current.map((item) => item.id === id ? { ...item, isRead: true } : item)); } catch (error) { onError(error instanceof Error ? error.message : "Erinnerung konnte nicht aktualisiert werden."); } };
   const enableBrowser = async () => {
-    if (!("Notification" in window)) throw new Error("Dieser Browser unterstützt keine Benachrichtigungen.");
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") throw new Error("Benachrichtigungen wurden nicht erlaubt.");
-    if ("serviceWorker" in navigator) await navigator.serviceWorker.register("/sw.js");
-    const registration = "serviceWorker" in navigator ? await navigator.serviceWorker.ready : null;
-    await registration?.showNotification("Clash Tool", { body: "Browser-Benachrichtigungen sind aktiviert.", icon: "/favicon.ico" });
+    await enableWebPush();
+    await sendTestPush();
   };
   return { notifications, isBusy, refresh, markRead, enableBrowser };
 }

@@ -1,5 +1,5 @@
 import { getSupabaseClient } from "@/lib/supabase";
-import type { Clan, ClanGoal, ClanMember, ClanRole, OfficialClan } from "@/types/clan";
+import type { Clan, ClanCollaborator, ClanGoal, ClanInvite, ClanMember, ClanRole, OfficialClan } from "@/types/clan";
 
 type ClanRow = {
   id: string; owner_user_id: string; clan_tag: string; name: string; clan_level: number;
@@ -23,12 +23,51 @@ export async function fetchOfficialClan(tag: string): Promise<OfficialClan> {
   return data as OfficialClan;
 }
 
-export async function getClans(userId: string): Promise<Clan[]> {
+export async function getClans(): Promise<Clan[]> {
   const { data, error } = await getSupabaseClient().from("clans")
     .select("id,owner_user_id,clan_tag,name,clan_level,description,member_count,war_league,last_synced_at")
-    .eq("owner_user_id", userId).order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data || []).map((row) => toClan(row as ClanRow));
+}
+
+export async function getClanCollaborators(clanId: string): Promise<ClanCollaborator[]> {
+  const { data, error } = await getSupabaseClient().from("clan_collaborators").select("clan_id,user_id,role,invited_by,created_at").eq("clan_id", clanId).order("created_at");
+  if (error) throw new Error(error.message);
+  return (data || []).map((row) => ({ clanId: row.clan_id, userId: row.user_id, role: row.role, invitedBy: row.invited_by, createdAt: row.created_at })) as ClanCollaborator[];
+}
+
+export async function getClanInvites(clanId: string): Promise<ClanInvite[]> {
+  const { data, error } = await getSupabaseClient().from("clan_invites").select("id,clan_id,invite_code,role,expires_at,redeemed_at").eq("clan_id", clanId).order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data || []).map((row) => ({ id: row.id, clanId: row.clan_id, inviteCode: row.invite_code, role: row.role, expiresAt: row.expires_at, redeemedAt: row.redeemed_at })) as ClanInvite[];
+}
+
+export async function createClanInvite(clanId: string, role: ClanInvite["role"], createdBy: string): Promise<ClanInvite> {
+  const { data, error } = await getSupabaseClient().from("clan_invites").insert({ clan_id: clanId, role, created_by: createdBy }).select("id,clan_id,invite_code,role,expires_at,redeemed_at").single();
+  if (error) throw new Error(error.message);
+  return { id: data.id, clanId: data.clan_id, inviteCode: data.invite_code, role: data.role, expiresAt: data.expires_at, redeemedAt: data.redeemed_at } as ClanInvite;
+}
+
+export async function deleteClanInvite(id: string): Promise<void> {
+  const { error } = await getSupabaseClient().from("clan_invites").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function joinClanWithInvite(inviteCode: string): Promise<string> {
+  const { data, error } = await getSupabaseClient().rpc("join_clan_with_invite", { code: inviteCode });
+  if (error) throw new Error(error.message);
+  return data as string;
+}
+
+export async function updateClanCollaboratorRole(clanId: string, collaboratorUserId: string, role: ClanCollaborator["role"]): Promise<void> {
+  const { error } = await getSupabaseClient().from("clan_collaborators").update({ role, updated_at: new Date().toISOString() }).eq("clan_id", clanId).eq("user_id", collaboratorUserId);
+  if (error) throw new Error(error.message);
+}
+
+export async function removeClanCollaborator(clanId: string, collaboratorUserId: string): Promise<void> {
+  const { error } = await getSupabaseClient().from("clan_collaborators").delete().eq("clan_id", clanId).eq("user_id", collaboratorUserId);
+  if (error) throw new Error(error.message);
 }
 
 export async function saveClan(userId: string, input: OfficialClan): Promise<Clan> {

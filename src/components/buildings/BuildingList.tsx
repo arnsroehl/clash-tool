@@ -4,6 +4,7 @@ import type { ClashAccount } from "@/types/account";
 import type { Building, BuildingInstanceLevelMap } from "@/types/building";
 
 type BuildingListProps = {
+  language?: "de" | "en";
   availableBuildings: Building[];
   buildingInstanceLevels: BuildingInstanceLevelMap;
   buildingsCount: number;
@@ -11,10 +12,15 @@ type BuildingListProps = {
   isSavingBuildingId: string | null;
   progress: number;
   selectedAccount: ClashAccount | null;
-  onUpdateBuildingLevel: (building: Building, instanceIndex: number, nextLevel: number) => void;
+  onUpdateBuildingLevel: (
+    building: Building,
+    instanceIndex: number,
+    nextLevel: number,
+  ) => void;
 };
 
 export function BuildingList({
+  language = "de",
   availableBuildings,
   buildingInstanceLevels,
   buildingsCount,
@@ -24,55 +30,74 @@ export function BuildingList({
   selectedAccount,
   onUpdateBuildingLevel,
 }: BuildingListProps) {
+  const en = language === "en";
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Gebäude-Erfassung</h2>
+          <h2 className="text-2xl font-bold">
+            {en ? "Building levels" : "Gebäude-Erfassung"}
+          </h2>
           <p className="mt-3 text-slate-300">
-            Wähle einen Account aus und trage die aktuellen Gebäudelevel ein.
-            Die Werte werden pro Account gespeichert.
+            {en
+              ? "Select an account and enter each current building level. Values are saved per account."
+              : "Wähle einen Account aus und trage die aktuellen Gebäudelevel ein. Die Werte werden pro Account gespeichert."}
           </p>
         </div>
-        <BuildingProgress progress={progress} />
+        <BuildingProgress progress={progress} language={language} />
       </div>
 
       {!selectedAccount ? (
         <div className="mt-8 rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
-          Bitte zuerst einen Account auswählen.
+          {en
+            ? "Please select an account first."
+            : "Bitte zuerst einen Account auswählen."}
         </div>
       ) : isLoadingBuildings ? (
-        <p className="mt-8 text-slate-300">Lade Gebäude...</p>
+        <p className="mt-8 text-slate-300">
+          {en ? "Loading buildings…" : "Lade Gebäude..."}
+        </p>
       ) : buildingsCount === 0 ? (
         <div className="mt-8 rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
-          Noch keine Gebäude in der Datenbank. Füge gleich ein paar
-          Start-Gebäude über den Supabase SQL Editor ein.
+          {en
+            ? "No buildings in the database yet. Import the game data first."
+            : "Noch keine Gebäude in der Datenbank. Importiere zuerst die Game-Daten."}
         </div>
       ) : availableBuildings.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
-          Für dieses Rathauslevel sind noch keine Gebäude hinterlegt.
+          {en
+            ? "No buildings are available for this Town Hall level."
+            : "Für dieses Rathauslevel sind noch keine Gebäude hinterlegt."}
         </div>
       ) : (
         <div className="mt-8 flex flex-col gap-4">
-          {Object.entries(Object.groupBy(availableBuildings, (building) => building.category)).map(([category, categoryBuildings]) => (
-            <details key={category} className="rounded-2xl border border-white/10 bg-white/5" open>
-              <summary className="cursor-pointer p-5 text-lg font-bold">{category} ({categoryBuildings?.length || 0})</summary>
+          {Object.entries(
+            Object.groupBy(availableBuildings, (building) => building.category),
+          ).map(([category, categoryBuildings]) => (
+            <details
+              key={category}
+              className="rounded-2xl border border-white/10 bg-white/5"
+              open
+            >
+              <summary className="cursor-pointer p-5 text-lg font-bold">
+                {category} ({categoryBuildings?.length || 0})
+              </summary>
               <div className="space-y-3 border-t border-white/10 p-4">
-              {(categoryBuildings || []).map((building) => (
-            <BuildingCard
-              key={building.id}
-              building={building}
-              instanceLevels={buildingInstanceLevels[building.id] || []}
-              isSaving={isSavingBuildingId === building.id}
-              onUpdateLevel={onUpdateBuildingLevel}
-            />
-              ))}
+                {(categoryBuildings || []).map((building) => (
+                  <BuildingCard
+                    key={building.id}
+                    building={building}
+                    instanceLevels={buildingInstanceLevels[building.id] || []}
+                    isSaving={isSavingBuildingId === building.id}
+                    onUpdateLevel={onUpdateBuildingLevel}
+                    language={language}
+                  />
+                ))}
               </div>
             </details>
           ))}
         </div>
       )}
-
     </section>
   );
 }

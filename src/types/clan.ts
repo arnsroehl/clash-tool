@@ -39,6 +39,23 @@ export type ClanGoal = {
   status: "active" | "completed" | "paused";
 };
 
+export type ClanCollaborator = {
+  clanId: string;
+  userId: string;
+  role: "leader" | "co_leader" | "member";
+  invitedBy: string | null;
+  createdAt: string;
+};
+
+export type ClanInvite = {
+  id: string;
+  clanId: string;
+  inviteCode: string;
+  role: "co_leader" | "member";
+  expiresAt: string;
+  redeemedAt: string | null;
+};
+
 export type OfficialClan = Omit<Clan, "id" | "ownerUserId" | "lastSyncedAt"> & {
   members: Omit<ClanMember, "clanId" | "accountId" | "activityScore" | "progressPercent" | "cwlReady" | "lastSyncedAt">[];
 };

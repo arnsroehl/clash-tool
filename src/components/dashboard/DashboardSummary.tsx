@@ -3,6 +3,7 @@ import type { ClashAccount } from "@/types/account";
 
 /** Displays the top-level planner snapshot for the currently selected account. */
 type DashboardSummaryProps = {
+  language?: "de" | "en";
   selectedAccount: ClashAccount | null;
   plannerResult: PlannerResult | null;
 };
@@ -12,24 +13,26 @@ function getProgressValue(plannerResult: PlannerResult | null): string {
 }
 
 export function DashboardSummary({
+  language = "de",
   selectedAccount,
   plannerResult,
 }: DashboardSummaryProps) {
+  const en = language === "en";
   const summaryCards = [
     {
-      label: "Aktiver Account",
-      value: selectedAccount?.name || "Noch keiner",
+      label: en ? "Active account" : "Aktiver Account",
+      value: selectedAccount?.name || (en ? "None yet" : "Noch keiner"),
     },
     {
-      label: "Rathauslevel",
+      label: en ? "Town Hall level" : "Rathauslevel",
       value: selectedAccount ? `TH ${selectedAccount.townHallLevel}` : "-",
     },
     {
-      label: "Gebäude-Fortschritt",
+      label: en ? "Overall progress" : "Gebäude-Fortschritt",
       value: getProgressValue(plannerResult),
     },
     {
-      label: "Mögliche Upgrades",
+      label: en ? "Available upgrades" : "Mögliche Upgrades",
       value: String(plannerResult?.summary.possibleUpgradeCount || 0),
     },
   ];

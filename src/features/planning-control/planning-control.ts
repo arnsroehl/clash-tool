@@ -23,25 +23,65 @@ export const strategyLabels: Record<PlanningStrategy, string> = {
   custom: "Eigene Strategie",
 };
 
-function strategyBonus(item: UpgradeRecommendation, strategy: PlanningStrategy, weights?: StrategyWeights): number {
+export const strategyLabelsEnglish: Record<PlanningStrategy, string> = {
+  balanced: "Balanced",
+  offense: "Offense first",
+  war: "Clan War / CWL",
+  farming: "Farming & resources",
+  fastest: "Max as fast as possible",
+  rush_recovery: "Recover rushed village",
+  town_hall_push: "Town Hall push",
+  custom: "Custom strategy",
+};
+
+function strategyBonus(
+  item: UpgradeRecommendation,
+  strategy: PlanningStrategy,
+  weights?: StrategyWeights,
+): number {
   const haystack = `${item.name} ${item.category}`.toLocaleLowerCase("de");
-  const includes = (...terms: string[]) => terms.some((term) => haystack.includes(term));
+  const includes = (...terms: string[]) =>
+    terms.some((term) => haystack.includes(term));
 
   switch (strategy) {
     case "custom":
       return weights?.[item.itemType] ?? 0;
     case "offense":
-      return item.itemType === "hero" || item.itemType === "troop" || item.itemType === "spell" || item.itemType === "siege_machine" ? 45 : includes("labor", "kaserne", "armeelager") ? 35 : 0;
+      return item.itemType === "hero" ||
+        item.itemType === "troop" ||
+        item.itemType === "spell" ||
+        item.itemType === "siege_machine"
+        ? 45
+        : includes("labor", "kaserne", "armeelager")
+          ? 35
+          : 0;
     case "war":
-      return item.itemType === "hero" ? 55 : item.itemType !== "building" ? 35 : includes("clanburg", "adler", "inferno", "monolith") ? 30 : 0;
+      return item.itemType === "hero"
+        ? 55
+        : item.itemType !== "building"
+          ? 35
+          : includes("clanburg", "adler", "inferno", "monolith")
+            ? 30
+            : 0;
     case "farming":
-      return includes("sammler", "mine", "bohrer", "lager") ? 55 : item.nextLevelCosts.darkElixir > 0 ? 10 : 0;
+      return includes("sammler", "mine", "bohrer", "lager")
+        ? 55
+        : item.nextLevelCosts.darkElixir > 0
+          ? 10
+          : 0;
     case "fastest":
       return Math.max(0, 40 - item.nextLevelTime.hours / 12);
     case "rush_recovery":
-      return item.missingLevels * 5 + (includes("labor", "lager", "clanburg") ? 25 : 0);
+      return (
+        item.missingLevels * 5 +
+        (includes("labor", "lager", "clanburg") ? 25 : 0)
+      );
     case "town_hall_push":
-      return includes("rathaus") ? 100 : includes("labor", "clanburg", "armeelager") ? 35 : 0;
+      return includes("rathaus")
+        ? 100
+        : includes("labor", "clanburg", "armeelager")
+          ? 35
+          : 0;
     default:
       return 0;
   }
@@ -54,7 +94,8 @@ export function rankRecommendations(
 ): UpgradeRecommendation[] {
   return [...recommendations].sort(
     (a, b) =>
-      b.priorityScore.value + strategyBonus(b, strategy, weights) -
+      b.priorityScore.value +
+      strategyBonus(b, strategy, weights) -
       (a.priorityScore.value + strategyBonus(a, strategy, weights)),
   );
 }
@@ -62,7 +103,14 @@ export function rankRecommendations(
 export function recommendationExplanation(
   recommendation: UpgradeRecommendation | undefined,
   strategy: PlanningStrategy,
+  language: "de" | "en" = "de",
 ): string {
-  if (!recommendation) return "Noch keine mögliche Empfehlung vorhanden.";
+  if (!recommendation)
+    return language === "en"
+      ? "No available recommendation yet."
+      : "Noch keine mögliche Empfehlung vorhanden.";
+  if (language === "en") {
+    return `${recommendation.name} currently fits the “${strategyLabelsEnglish[strategy]}” strategy best. Priority score: ${recommendation.priorityScore.value}.`;
+  }
   return `${recommendation.name} passt aktuell am besten zur Strategie „${strategyLabels[strategy]}“. ${recommendation.recommendationReason}`;
 }

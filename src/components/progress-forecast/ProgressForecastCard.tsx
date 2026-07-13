@@ -9,8 +9,7 @@ export function ProgressForecastCard({
   value,
   tone = "default",
 }: ProgressForecastCardProps) {
-  const valueClassName =
-    tone === "accent" ? "text-amber-300" : "text-white";
+  const valueClassName = tone === "accent" ? "text-amber-300" : "text-white";
 
   return (
     <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">

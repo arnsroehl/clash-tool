@@ -1,6 +1,7 @@
 import type { ClashAccount } from "@/types/account";
 
 type AccountListProps = {
+  language?: "de" | "en";
   accounts: ClashAccount[];
   isDeletingId: string | null;
   isLoading: boolean;
@@ -10,6 +11,7 @@ type AccountListProps = {
 };
 
 export function AccountList({
+  language = "de",
   accounts,
   isDeletingId,
   isLoading,
@@ -17,15 +19,20 @@ export function AccountList({
   onDelete,
   onSelect,
 }: AccountListProps) {
+  const en = language === "en";
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-      <h2 className="text-2xl font-bold">Gespeicherte Accounts</h2>
+      <h2 className="text-2xl font-bold">
+        {en ? "Saved accounts" : "Gespeicherte Accounts"}
+      </h2>
 
       {isLoading ? (
-        <p className="mt-5 text-slate-300">Lade Accounts...</p>
+        <p className="mt-5 text-slate-300">
+          {en ? "Loading accounts…" : "Lade Accounts..."}
+        </p>
       ) : accounts.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
-          Noch kein Account gespeichert.
+          {en ? "No account saved yet." : "Noch kein Account gespeichert."}
         </div>
       ) : (
         <div className="mt-5 flex flex-col gap-3">
@@ -44,8 +51,8 @@ export function AccountList({
               >
                 <p className="font-bold text-white">{account.name}</p>
                 <p className="mt-1 text-sm text-slate-400">
-                  Rathaus {account.townHallLevel} · {account.builderCount}{" "}
-                  Bauarbeiter
+                  {en ? "Town Hall" : "Rathaus"} {account.townHallLevel} ·{" "}
+                  {account.builderCount} {en ? "builders" : "Bauarbeiter"}
                 </p>
               </button>
 
@@ -54,14 +61,20 @@ export function AccountList({
                   onClick={() => onSelect(account)}
                   className="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-amber-400 hover:text-amber-300"
                 >
-                  Auswählen
+                  {en ? "Select" : "Auswählen"}
                 </button>
                 <button
                   onClick={() => onDelete(account.id)}
                   disabled={isDeletingId === account.id}
                   className="rounded-xl border border-red-400/30 px-4 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-400/10 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isDeletingId === account.id ? "Löscht..." : "Löschen"}
+                  {isDeletingId === account.id
+                    ? en
+                      ? "Deleting…"
+                      : "Löscht..."
+                    : en
+                      ? "Delete"
+                      : "Löschen"}
                 </button>
               </div>
             </div>

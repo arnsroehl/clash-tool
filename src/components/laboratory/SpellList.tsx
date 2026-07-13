@@ -3,6 +3,7 @@ import type { ClashAccount } from "@/types/account";
 import type { Spell, SpellLevelMap } from "@/types/laboratory";
 
 type SpellListProps = {
+  language?: "de" | "en";
   availableSpells: Spell[];
   spellLevels: SpellLevelMap;
   spellsCount: number;
@@ -13,6 +14,7 @@ type SpellListProps = {
 };
 
 export function SpellList({
+  language = "de",
   availableSpells,
   spellLevels,
   spellsCount,
@@ -21,22 +23,31 @@ export function SpellList({
   selectedAccount,
   onUpdateSpellLevel,
 }: SpellListProps) {
+  const en = language === "en";
   if (!selectedAccount) {
     return (
       <div className="rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
-        Bitte zuerst einen Account auswählen.
+        {en
+          ? "Please select an account first."
+          : "Bitte zuerst einen Account auswählen."}
       </div>
     );
   }
 
   if (isLoadingSpells) {
-    return <p className="text-slate-300">Lade Zauber...</p>;
+    return (
+      <p className="text-slate-300">
+        {en ? "Loading spells…" : "Lade Zauber..."}
+      </p>
+    );
   }
 
   if (spellsCount === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
-        Noch keine Zauber in der Datenbank.
+        {en
+          ? "No spells in the database yet."
+          : "Noch keine Zauber in der Datenbank."}
       </div>
     );
   }
@@ -44,7 +55,9 @@ export function SpellList({
   if (availableSpells.length === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-slate-900 p-5 text-slate-300">
-        Für dieses Rathauslevel sind noch keine Zauber verfügbar.
+        {en
+          ? "No spells are available for this Town Hall level."
+          : "Für dieses Rathauslevel sind noch keine Zauber verfügbar."}
       </div>
     );
   }
