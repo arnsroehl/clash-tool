@@ -24,9 +24,7 @@ function mapSiegeMachine(row: SiegeMachineRow): SiegeMachine {
   };
 }
 
-function mapSiegeMachineLevel(
-  row: SiegeMachineLevelRow,
-): SiegeMachineLevel {
+function mapSiegeMachineLevel(row: SiegeMachineLevelRow): SiegeMachineLevel {
   return {
     siegeMachineId: row.siege_machine_id,
     level: row.level,
@@ -79,13 +77,12 @@ export async function fetchAccountSiegeMachineLevels(
     throw new Error(error.message);
   }
 
-  return ((data || []) as AccountSiegeMachineRow[]).reduce<SiegeMachineLevelMap>(
-    (result, row) => {
-      result[row.siege_machine_id] = row.current_level;
-      return result;
-    },
-    {},
-  );
+  return (
+    (data || []) as AccountSiegeMachineRow[]
+  ).reduce<SiegeMachineLevelMap>((result, row) => {
+    result[row.siege_machine_id] = row.current_level;
+    return result;
+  }, {});
 }
 
 export async function upsertAccountSiegeMachineLevel(params: {

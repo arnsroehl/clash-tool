@@ -10,7 +10,9 @@ type Props = {
   onAddToQueue: (recommendation: UpgradeRecommendation) => void;
   isSaving: boolean;
   accountId: string;
+  builderCount: number;
   goals: PlanningGoal[];
+  currentLevels: Record<string, number>;
   onSaveGoal: (goal: Omit<PlanningGoal, "id" | "status">) => void;
   onDeleteGoal: (id: string) => void;
   language?: "de" | "en";
@@ -43,7 +45,9 @@ export function GoalPlanner({
   onAddToQueue,
   isSaving,
   accountId,
+  builderCount,
   goals,
+  currentLevels,
   onSaveGoal,
   onDeleteGoal,
   language = "de",
@@ -67,11 +71,16 @@ export function GoalPlanner({
   const levelsNeeded = selected
     ? Math.max(0, safeTarget - selected.currentLevel)
     : 0;
-  const averageHours =
-    selected && selected.missingLevels > 0
-      ? selected.remainingTime.hours / selected.missingLevels
-      : 0;
-  const estimatedHours = Math.ceil(averageHours * levelsNeeded);
+  const requiredUpgradePath = selected?.upgradePath?.filter(
+    (level) => level.level <= safeTarget,
+  );
+  const estimatedHours = Math.ceil(
+    requiredUpgradePath?.length
+      ? requiredUpgradePath.reduce((sum, level) => sum + level.time.hours, 0)
+      : selected && selected.missingLevels > 0
+        ? (selected.remainingTime.hours / selected.missingLevels) * levelsNeeded
+        : 0,
+  );
   const daysAvailable = Math.max(
     0,
     Math.floor(
@@ -105,12 +114,23 @@ export function GoalPlanner({
         filter: (item: UpgradeRecommendation) => item.itemType === "hero",
       },
       {
+        name: en
+          ? "Complete all walls at the next level"
+          : "Alle Mauern auf der nächsten Stufe abschließen",
+        description: en
+          ? "Every individual wall segment is included"
+          : "Jedes einzelne Mauersegment wird berücksichtigt",
+        filter: (item: UpgradeRecommendation) =>
+          item.itemType === "building" && /wall|mauer/i.test(item.name),
+      },
+      {
         name: en ? "Max defenses" : "Verteidigungen maxen",
         description: en
           ? "All remaining defensive building upgrades"
           : "Alle noch offenen Gebäude-Upgrades",
         filter: (item: UpgradeRecommendation) =>
           item.itemType === "building" &&
+          /defense|verteidigung/i.test(item.category) &&
           !/wall|mauer|town hall|rathaus/i.test(item.name),
       },
       {
@@ -125,14 +145,29 @@ export function GoalPlanner({
     ];
     return definitions.map((definition) => {
       const items = recommendations.filter(definition.filter);
-      const hours = Math.ceil(
-        items.reduce((sum, item) => sum + item.remainingTime.hours, 0),
+      const builderHours = items
+        .filter(
+          (item) => item.itemType === "building" || item.itemType === "hero",
+        )
+        .reduce((sum, item) => sum + item.remainingTime.hours, 0);
+      const laboratoryHours = items
+        .filter((item) =>
+          ["troop", "spell", "siege_machine"].includes(item.itemType),
+        )
+        .reduce((sum, item) => sum + item.remainingTime.hours, 0);
+      const elapsedHours = Math.ceil(
+        Math.max(builderHours / Math.max(1, builderCount), laboratoryHours),
       );
       const date = new Date();
-      date.setHours(date.getHours() + hours);
-      return { ...definition, items, hours, realisticDate: toDateInput(date) };
+      date.setHours(date.getHours() + elapsedHours);
+      return {
+        ...definition,
+        items,
+        elapsedHours,
+        realisticDate: toDateInput(date),
+      };
     });
-  }, [en, recommendations]);
+  }, [builderCount, en, recommendations]);
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
@@ -146,7 +181,7 @@ export function GoalPlanner({
             : "Definiere ein Ziellevel und einen Termin. Die Schätzung verwendet die echten verbleibenden Upgradezeiten."}
         </p>
       </div>
-      <div className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {milestonePrograms.map((program) => {
           const next = program.items.find(
             (item) =>
@@ -166,8 +201,8 @@ export function GoalPlanner({
               <p className="mt-3 text-sm">
                 <b>{program.items.length}</b>{" "}
                 {en
-                  ? `upgrade paths · ${Math.ceil(program.hours / 24)} days of pure time`
-                  : `Upgrade-Reihen · ${Math.ceil(program.hours / 24)} Tage reine Zeit`}
+                  ? `upgrade paths · about ${Math.ceil(program.elapsedHours / 24)} calendar days`
+                  : `Upgrade-Reihen · ca. ${Math.ceil(program.elapsedHours / 24)} Kalendertage`}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 {en
@@ -223,7 +258,8 @@ export function GoalPlanner({
                       key={`${item.itemType}:${item.itemId}`}
                       value={`${item.itemType}:${item.itemId}`}
                     >
-                      {item.name} (aktuell {item.currentLevel})
+                      {item.name} ({en ? "current" : "aktuell"}{" "}
+                      {item.currentLevel})
                     </option>
                   ))}
               </optgroup>
@@ -270,9 +306,12 @@ export function GoalPlanner({
                 : `ungefähr ${estimatedHours} Stunden bzw. ${estimatedDays} Tage reine Upgradezeit`}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {Array.from(
-                { length: levelsNeeded },
-                (_, index) => selected.currentLevel + index + 1,
+              {(
+                requiredUpgradePath?.map((step) => step.level) ||
+                Array.from(
+                  { length: levelsNeeded },
+                  (_, index) => selected.currentLevel + index + 1,
+                )
               ).map((level) => (
                 <span
                   key={level}
@@ -349,27 +388,57 @@ export function GoalPlanner({
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {goals.map((goal) => (
               <div key={goal.id} className="rounded-xl bg-slate-900 p-4">
-                <p className="font-bold">
-                  {goal.name} Level {goal.targetLevel}
-                </p>
-                <p className="mt-1 text-xs text-slate-400">
-                  {goal.targetDate
-                    ? `${en ? "by" : "bis"} ${new Intl.DateTimeFormat(en ? "en-US" : "de-DE").format(new Date(`${goal.targetDate}T00:00:00`))}`
-                    : en
-                      ? "without a date"
-                      : "ohne Termin"}{" "}
-                  ·{" "}
-                  {en
-                    ? `about ${Math.ceil(goal.estimatedHours / 24)} days`
-                    : `ca. ${Math.ceil(goal.estimatedHours / 24)} Tage`}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => onDeleteGoal(goal.id)}
-                  className="mt-3 text-xs font-bold text-red-300"
-                >
-                  {en ? "Delete goal" : "Ziel löschen"}
-                </button>
+                {(() => {
+                  const current =
+                    currentLevels[`${goal.itemType}:${goal.itemId}`] ??
+                    goal.currentLevel;
+                  const total = Math.max(
+                    1,
+                    goal.targetLevel - goal.currentLevel,
+                  );
+                  const progress = Math.min(
+                    100,
+                    Math.max(
+                      0,
+                      Math.round(((current - goal.currentLevel) / total) * 100),
+                    ),
+                  );
+                  return (
+                    <>
+                      <p className="font-bold">
+                        {goal.name} Level {goal.targetLevel}
+                      </p>
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-700">
+                        <div
+                          className="h-full bg-emerald-400"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <p className="mt-2 text-xs text-emerald-300">
+                        {current} / {goal.targetLevel} · {progress}%{" "}
+                        {en ? "complete" : "erreicht"}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        {goal.targetDate
+                          ? `${en ? "by" : "bis"} ${new Intl.DateTimeFormat(en ? "en-US" : "de-DE").format(new Date(`${goal.targetDate}T00:00:00`))}`
+                          : en
+                            ? "without a date"
+                            : "ohne Termin"}{" "}
+                        ·{" "}
+                        {en
+                          ? `about ${Math.ceil(goal.estimatedHours / 24)} days`
+                          : `ca. ${Math.ceil(goal.estimatedHours / 24)} Tage`}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => onDeleteGoal(goal.id)}
+                        className="mt-3 text-xs font-bold text-red-300"
+                      >
+                        {en ? "Delete goal" : "Ziel löschen"}
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
             ))}
           </div>

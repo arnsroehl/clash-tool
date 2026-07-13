@@ -116,8 +116,18 @@ describe("Builder Simulation", () => {
       builderCount: 1,
       queueItems: [
         createQueueItem({ id: "building", queueOrder: 1, durationHours: 10 }),
-        createQueueItem({ id: "troop", queueOrder: 2, durationHours: 8, itemType: "troop" }),
-        createQueueItem({ id: "spell", queueOrder: 3, durationHours: 4, itemType: "spell" }),
+        createQueueItem({
+          id: "troop",
+          queueOrder: 2,
+          durationHours: 8,
+          itemType: "troop",
+        }),
+        createQueueItem({
+          id: "spell",
+          queueOrder: 3,
+          durationHours: 4,
+          itemType: "spell",
+        }),
       ],
     });
     assert.equal(result.assignments[1].startHour, 0);
@@ -129,7 +139,9 @@ describe("Builder Simulation", () => {
     const result = simulateBuilderQueue({
       builderCount: 1,
       timeDiscountPercent: 20,
-      queueItems: [createQueueItem({ id: "discounted", queueOrder: 1, durationHours: 10 })],
+      queueItems: [
+        createQueueItem({ id: "discounted", queueOrder: 1, durationHours: 10 }),
+      ],
     });
     assert.equal(result.assignments[0].durationHours, 8);
     assert.equal(result.totalDurationHours, 8);

@@ -187,15 +187,26 @@ function validateLevel(value: unknown, buildingId: string): GameBuildingLevel {
     throw new Error(`Level in "${buildingId}" ist kein Objekt.`);
   }
 
-  const { level, townHall, upgradeTimeHours, goldCost, elixirCost, darkElixirCost, hitpoints } =
-    value;
+  const {
+    level,
+    townHall,
+    upgradeTimeHours,
+    goldCost,
+    elixirCost,
+    darkElixirCost,
+    hitpoints,
+  } = value;
 
   if (!isPositiveInteger(level)) {
-    throw new Error(`Level in "${buildingId}" braucht ein positives Feld "level".`);
+    throw new Error(
+      `Level in "${buildingId}" braucht ein positives Feld "level".`,
+    );
   }
 
   if (!isPositiveInteger(townHall)) {
-    throw new Error(`Level ${level} in "${buildingId}" braucht ein positives Feld "townHall".`);
+    throw new Error(
+      `Level ${level} in "${buildingId}" braucht ein positives Feld "townHall".`,
+    );
   }
 
   if (
@@ -226,16 +237,24 @@ function validateBuilding(value: unknown): GameBuilding {
     throw new Error("Ein Gebäude-Eintrag ist kein Objekt.");
   }
 
-  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels } = value;
+  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels } =
+    value;
 
-  if (!isUuid(id) || !isString(sourceId) || !isString(name) || !isString(category)) {
+  if (
+    !isUuid(id) ||
+    !isString(sourceId) ||
+    !isString(name) ||
+    !isString(category)
+  ) {
     throw new Error(
       "Gebäude brauchen gültige Felder id, sourceId, name und category. id muss eine UUID sein.",
     );
   }
 
   if (!isPositiveInteger(unlockTownHall) || !isPositiveInteger(sortOrder)) {
-    throw new Error(`"${id}" braucht positive Felder unlockTownHall und sortOrder.`);
+    throw new Error(
+      `"${id}" braucht positive Felder unlockTownHall und sortOrder.`,
+    );
   }
 
   if (!Array.isArray(levels) || levels.length === 0) {
@@ -288,16 +307,24 @@ function validateHero(value: unknown): GameHero {
     throw new Error("Ein Helden-Eintrag ist kein Objekt.");
   }
 
-  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels } = value;
+  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels } =
+    value;
 
-  if (!isUuid(id) || !isString(sourceId) || !isString(name) || !isString(category)) {
+  if (
+    !isUuid(id) ||
+    !isString(sourceId) ||
+    !isString(name) ||
+    !isString(category)
+  ) {
     throw new Error(
       "Game Items brauchen gültige Felder id, sourceId, name und category. id muss eine UUID sein.",
     );
   }
 
   if (!isPositiveInteger(unlockTownHall) || !isPositiveInteger(sortOrder)) {
-    throw new Error(`"${id}" braucht positive Felder unlockTownHall und sortOrder.`);
+    throw new Error(
+      `"${id}" braucht positive Felder unlockTownHall und sortOrder.`,
+    );
   }
 
   if (!Array.isArray(levels) || levels.length === 0) {
@@ -381,7 +408,9 @@ async function resolveBuildingIds(
     .select("id, name, source_id");
 
   if (error) {
-    throw new Error(`Bestehende Gebäude konnten nicht gelesen werden: ${error.message}`);
+    throw new Error(
+      `Bestehende Gebäude konnten nicht gelesen werden: ${error.message}`,
+    );
   }
 
   return ((data || []) as ExistingBuildingRow[]).reduce<Map<string, string>>(
@@ -396,7 +425,10 @@ async function resolveBuildingIds(
   );
 }
 
-function createScriptSupabaseClient(supabaseUrl: string, supabaseSecretKey: string) {
+function createScriptSupabaseClient(
+  supabaseUrl: string,
+  supabaseSecretKey: string,
+) {
   return createClient(supabaseUrl, supabaseSecretKey, {
     auth: {
       persistSession: false,
@@ -431,7 +463,9 @@ async function resolveHeroIds(
       return null;
     }
 
-    throw new Error(`Bestehende Helden konnten nicht gelesen werden: ${error.message}`);
+    throw new Error(
+      `Bestehende Helden konnten nicht gelesen werden: ${error.message}`,
+    );
   }
 
   return ((data || []) as ExistingHeroRow[]).reduce<Map<string, string>>(
@@ -602,7 +636,9 @@ async function importLaboratoryItems(params: {
   levelConflict: string;
   sqlFile: string;
 }): Promise<void> {
-  console.log(`Lese und validiere ${params.filePath.replace(process.cwd() + "/", "")}...`);
+  console.log(
+    `Lese und validiere ${params.filePath.replace(process.cwd() + "/", "")}...`,
+  );
   const items = await readGameItems(params.filePath);
   const totalLevelCount = items.reduce(
     (count, item) => count + item.levels.length,
@@ -644,7 +680,9 @@ async function importLaboratoryItems(params: {
       return;
     }
 
-    throw new Error(`${params.tableName} Import fehlgeschlagen: ${itemError.message}`);
+    throw new Error(
+      `${params.tableName} Import fehlgeschlagen: ${itemError.message}`,
+    );
   }
 
   console.log(`Upsert ${params.levelTableName}...`);
@@ -687,7 +725,9 @@ async function runImport() {
     0,
   );
 
-  console.log(`Validierung erfolgreich: ${buildings.length} Gebäude, ${totalLevelCount} Level.`);
+  console.log(
+    `Validierung erfolgreich: ${buildings.length} Gebäude, ${totalLevelCount} Level.`,
+  );
 
   const supabase = createScriptSupabaseClient(supabaseUrl, supabaseSecretKey);
 
@@ -711,7 +751,9 @@ async function runImport() {
     .upsert(buildingRows, { onConflict: "id" });
 
   if (buildingsError) {
-    throw new Error(`buildings Import fehlgeschlagen: ${buildingsError.message}`);
+    throw new Error(
+      `buildings Import fehlgeschlagen: ${buildingsError.message}`,
+    );
   }
 
   console.log("Upsert building_levels...");
@@ -741,44 +783,44 @@ async function runImport() {
   if (!existingHeroIds) {
     console.log("Hero-Import übersprungen.");
   } else {
-  const heroRows = toHeroRows(heroes, existingHeroIds);
-  const heroLevelRows = toHeroLevelRows(heroes, existingHeroIds);
+    const heroRows = toHeroRows(heroes, existingHeroIds);
+    const heroLevelRows = toHeroLevelRows(heroes, existingHeroIds);
 
-  console.log(
-    `${existingHeroIds.size} vorhandene Helden erkannt, ${heroRows.length - existingHeroIds.size} neue Helden vorbereitet.`,
-  );
+    console.log(
+      `${existingHeroIds.size} vorhandene Helden erkannt, ${heroRows.length - existingHeroIds.size} neue Helden vorbereitet.`,
+    );
 
-  console.log("Upsert heroes...");
-  const { error: heroesError } = await supabase
-    .from("heroes")
-    .upsert(heroRows, { onConflict: "id" });
+    console.log("Upsert heroes...");
+    const { error: heroesError } = await supabase
+      .from("heroes")
+      .upsert(heroRows, { onConflict: "id" });
 
-  if (heroesError) {
-    if (isMissingTableErrorMessage(heroesError.message)) {
-      console.log(
-        "Überspringe heroes: Tabelle fehlt. SQL-Datei: src/scripts/sql/heroes.sql",
-      );
-    } else {
-    throw new Error(`heroes Import fehlgeschlagen: ${heroesError.message}`);
-    }
-  } else {
-    console.log("Upsert hero_levels...");
-    const { error: heroLevelsError } = await supabase
-      .from("hero_levels")
-      .upsert(heroLevelRows, { onConflict: "hero_id,level" });
-
-    if (heroLevelsError) {
-      if (isMissingTableErrorMessage(heroLevelsError.message)) {
+    if (heroesError) {
+      if (isMissingTableErrorMessage(heroesError.message)) {
         console.log(
-          "Überspringe hero_levels: Tabelle fehlt. SQL-Datei: src/scripts/sql/heroes.sql",
+          "Überspringe heroes: Tabelle fehlt. SQL-Datei: src/scripts/sql/heroes.sql",
         );
       } else {
-        throw new Error(
-          `hero_levels Import fehlgeschlagen: ${heroLevelsError.message}`,
-        );
+        throw new Error(`heroes Import fehlgeschlagen: ${heroesError.message}`);
+      }
+    } else {
+      console.log("Upsert hero_levels...");
+      const { error: heroLevelsError } = await supabase
+        .from("hero_levels")
+        .upsert(heroLevelRows, { onConflict: "hero_id,level" });
+
+      if (heroLevelsError) {
+        if (isMissingTableErrorMessage(heroLevelsError.message)) {
+          console.log(
+            "Überspringe hero_levels: Tabelle fehlt. SQL-Datei: src/scripts/sql/heroes.sql",
+          );
+        } else {
+          throw new Error(
+            `hero_levels Import fehlgeschlagen: ${heroLevelsError.message}`,
+          );
+        }
       }
     }
-  }
   }
 
   await importLaboratoryItems({

@@ -13,13 +13,17 @@ export function sortQueueByOrder(
   });
 }
 
-export function createInitialBuilderAvailability(builderCount: number): number[] {
+export function createInitialBuilderAvailability(
+  builderCount: number,
+): number[] {
   const safeBuilderCount = Math.max(Math.floor(builderCount), 0);
 
   return Array.from({ length: safeBuilderCount }, () => 0);
 }
 
-export function findNextAvailableBuilder(builderAvailability: number[]): number {
+export function findNextAvailableBuilder(
+  builderAvailability: number[],
+): number {
   if (builderAvailability.length === 0) {
     return -1;
   }

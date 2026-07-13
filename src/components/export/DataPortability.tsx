@@ -97,8 +97,8 @@ export function DataPortability({
         <h3 className="font-bold">Discord Bot / Webhook</h3>
         <p className="mt-1 text-xs text-slate-400">
           {en
-            ? "The URL is used only for this delivery and is not stored."
-            : "Die URL wird nur für diesen Versand verwendet und nicht gespeichert."}
+            ? "Webhook URLs are used only for this delivery and are not stored. A signed slash-command endpoint is also available at /api/integrations/discord/interactions."
+            : "Webhook-URLs werden nur für diesen Versand verwendet und nicht gespeichert. Zusätzlich steht unter /api/integrations/discord/interactions ein signaturgeprüfter Slash-Command-Endpunkt bereit."}
         </p>
         <div className="mt-3 flex flex-col gap-2 md:flex-row">
           <input

@@ -32,7 +32,13 @@ function calculateProgress(
   instanceLevels: BuildingInstanceLevelMap,
 ): number {
   const completedBuildingLevels = availableBuildings.reduce((sum, building) => {
-    return sum + (instanceLevels[building.id] || []).reduce((levelSum, level) => levelSum + level, 0);
+    return (
+      sum +
+      (instanceLevels[building.id] || []).reduce(
+        (levelSum, level) => levelSum + level,
+        0,
+      )
+    );
   }, 0);
 
   const maxBuildingLevels = availableBuildings.reduce((sum, building) => {
@@ -75,8 +81,11 @@ export function useBuildings({
   const [buildingMaxLevels, setBuildingMaxLevels] = useState<BuildingLevel[]>(
     [],
   );
-  const [buildingInstanceLevels, setBuildingInstanceLevels] = useState<BuildingInstanceLevelMap>({});
-  const [buildingAvailability, setBuildingAvailability] = useState<BuildingTownHallAvailability[]>([]);
+  const [buildingInstanceLevels, setBuildingInstanceLevels] =
+    useState<BuildingInstanceLevelMap>({});
+  const [buildingAvailability, setBuildingAvailability] = useState<
+    BuildingTownHallAvailability[]
+  >([]);
   const [isLoadingBuildings, setIsLoadingBuildings] = useState(true);
   const [isSavingBuildingId, setIsSavingBuildingId] = useState<string | null>(
     null,
@@ -85,17 +94,22 @@ export function useBuildings({
   useEffect(() => {
     async function loadBuildings() {
       try {
-        const [loadedBuildings, loadedBuildingLevels, loadedAvailability] = await Promise.all([
-          fetchBuildings(),
-          fetchBuildingLevels(),
-          fetchBuildingAvailability(),
-        ]);
+        const [loadedBuildings, loadedBuildingLevels, loadedAvailability] =
+          await Promise.all([
+            fetchBuildings(),
+            fetchBuildingLevels(),
+            fetchBuildingAvailability(),
+          ]);
 
         setBuildings(loadedBuildings);
         setBuildingMaxLevels(loadedBuildingLevels);
         setBuildingAvailability(loadedAvailability);
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Gebäude konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Gebäude konnten nicht geladen werden.",
+        );
       } finally {
         setIsLoadingBuildings(false);
       }
@@ -112,10 +126,16 @@ export function useBuildings({
       }
 
       try {
-        const loadedLevels = await fetchAccountBuildingLevels(selectedAccount.id);
+        const loadedLevels = await fetchAccountBuildingLevels(
+          selectedAccount.id,
+        );
         setBuildingInstanceLevels(loadedLevels);
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Gebäudelevel konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Gebäudelevel konnten nicht geladen werden.",
+        );
       }
     }
 
@@ -142,8 +162,10 @@ export function useBuildings({
       })
       .map((building) => ({
         ...building,
-        buildingCount: availabilityByBuilding.get(building.id)?.buildingCount ?? 1,
-        countAfterMerges: availabilityByBuilding.get(building.id)?.countAfterMerges ?? 1,
+        buildingCount:
+          availabilityByBuilding.get(building.id)?.buildingCount ?? 1,
+        countAfterMerges:
+          availabilityByBuilding.get(building.id)?.countAfterMerges ?? 1,
         maxLevel: calculateAvailableMaxLevel(
           building,
           buildingMaxLevels,
@@ -163,19 +185,28 @@ export function useBuildings({
   }, [buildingInstanceLevels, buildings, selectedAccount]);
 
   const progress = useMemo(() => {
-    return calculateProgress(availableBuildings, effectiveBuildingInstanceLevels);
+    return calculateProgress(
+      availableBuildings,
+      effectiveBuildingInstanceLevels,
+    );
   }, [availableBuildings, effectiveBuildingInstanceLevels]);
 
   const buildingLevels = useMemo<BuildingLevelMap>(() => {
     return Object.fromEntries(
-      Object.entries(effectiveBuildingInstanceLevels).map(([buildingId, levels]) => [
-        buildingId,
-        levels.length > 0 ? Math.min(...levels) : 0,
-      ]),
+      Object.entries(effectiveBuildingInstanceLevels).map(
+        ([buildingId, levels]) => [
+          buildingId,
+          levels.length > 0 ? Math.min(...levels) : 0,
+        ],
+      ),
     );
   }, [effectiveBuildingInstanceLevels]);
 
-  async function updateBuildingLevel(building: Building, instanceIndex: number, nextLevel: number) {
+  async function updateBuildingLevel(
+    building: Building,
+    instanceIndex: number,
+    nextLevel: number,
+  ) {
     if (!selectedAccount) {
       return;
     }
@@ -198,7 +229,11 @@ export function useBuildings({
         currentLevel: safeLevel,
       });
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Gebäudelevel konnte nicht gespeichert werden.");
+      onError(
+        error instanceof Error
+          ? error.message
+          : "Gebäudelevel konnte nicht gespeichert werden.",
+      );
     } finally {
       setIsSavingBuildingId(null);
     }

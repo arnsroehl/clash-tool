@@ -68,7 +68,9 @@ export async function fetchBuildingLevels(): Promise<BuildingLevel[]> {
   return ((data || []) as BuildingLevelRow[]).map(mapBuildingLevel);
 }
 
-export async function fetchBuildingAvailability(): Promise<BuildingTownHallAvailability[]> {
+export async function fetchBuildingAvailability(): Promise<
+  BuildingTownHallAvailability[]
+> {
   const client = getSupabaseClient();
   const { data, error } = await client
     .from("building_town_hall_availability")
@@ -100,15 +102,14 @@ export async function fetchAccountBuildingLevels(
     throw new Error(error.message);
   }
 
-  return ((data || []) as AccountBuildingInstanceRow[]).reduce<BuildingInstanceLevelMap>(
-    (result, row) => {
-      const levels = result[row.building_id] || [];
-      levels[row.instance_index - 1] = row.current_level;
-      result[row.building_id] = levels;
-      return result;
-    },
-    {},
-  );
+  return (
+    (data || []) as AccountBuildingInstanceRow[]
+  ).reduce<BuildingInstanceLevelMap>((result, row) => {
+    const levels = result[row.building_id] || [];
+    levels[row.instance_index - 1] = row.current_level;
+    result[row.building_id] = levels;
+    return result;
+  }, {});
 }
 
 export async function upsertAccountBuildingLevel(params: {

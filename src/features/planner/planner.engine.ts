@@ -56,14 +56,13 @@ function getUpgradeQueue(input: PlannerInput): UpgradeQueue {
   return input.upgradeQueue || DEFAULT_UPGRADE_QUEUE;
 }
 
-function evaluateRules(
-  rules: PlannerRule[],
-  context: RuleContext,
-): string[] {
+function evaluateRules(rules: PlannerRule[], context: RuleContext): string[] {
   return rules
     .map((rule) => rule.evaluate(context))
     .filter((result) => !result.passed)
-    .map((result) => result.reason || `${result.ruleId} blockiert dieses Upgrade.`);
+    .map(
+      (result) => result.reason || `${result.ruleId} blockiert dieses Upgrade.`,
+    );
 }
 
 function getPlannerItems(input: PlannerInput): PlannerItem[] {
@@ -95,7 +94,7 @@ function createUpgradeCandidate(
     context.item.id,
     context.currentLevel,
     input.upgradeLevels || [],
-  );
+  ).filter((level) => level.level <= context.item.maxLevel);
   const missingLevels = calculateRemainingLevelsForBuilding(
     context.item,
     context.currentLevel,
@@ -117,6 +116,11 @@ function createUpgradeCandidate(
     remainingCosts: sumUpgradeCosts(remainingUpgradeLevels),
     nextLevelTime: nextUpgradeLevel?.time || { hours: NO_TIME_HOURS },
     remainingTime: sumUpgradeTime(remainingUpgradeLevels),
+    upgradePath: remainingUpgradeLevels.map((level) => ({
+      level: level.level,
+      costs: level.costs,
+      time: level.time,
+    })),
     priorityScore: calculatePriorityScore({
       itemType: context.item.type,
       name: context.item.name,
@@ -128,9 +132,7 @@ function createUpgradeCandidate(
   };
 }
 
-function toRecommendation(
-  candidate: UpgradeCandidate,
-): UpgradeRecommendation {
+function toRecommendation(candidate: UpgradeCandidate): UpgradeRecommendation {
   return {
     ...candidate,
     recommendationReason: "Upgrade ist nach den aktiven Regeln möglich.",
@@ -159,10 +161,7 @@ export function createPlannerResult(input: PlannerInput): PlannerResult {
   const blockedUpgrades: UpgradeCandidate[] = [];
 
   plannerItems.forEach((item) => {
-    const currentLevel = getCurrentBuildingLevel(
-      item.id,
-      plannerItemLevels,
-    );
+    const currentLevel = getCurrentBuildingLevel(item.id, plannerItemLevels);
 
     if (currentLevel >= item.maxLevel) {
       return;
@@ -191,10 +190,7 @@ export function createPlannerResult(input: PlannerInput): PlannerResult {
 
   const sortedPossibleUpgrades = possibleUpgrades.sort(sortByPlannerOrder);
   const sortedBlockedUpgrades = blockedUpgrades.sort(sortByPlannerOrder);
-  const buildingProgress = calculateProgress(
-    plannerItems,
-    plannerItemLevels,
-  );
+  const buildingProgress = calculateProgress(plannerItems, plannerItemLevels);
   const remainingTime = calculateRemainingTime(sortedPossibleUpgrades);
 
   return {

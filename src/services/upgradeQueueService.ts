@@ -150,8 +150,14 @@ export async function updateUpgradeQueueItemStatus(
   if (error) throw toUpgradeQueueError(error.message);
 }
 
-export async function updateUpgradeQueueItemLock(id: string, isLocked: boolean): Promise<void> {
+export async function updateUpgradeQueueItemLock(
+  id: string,
+  isLocked: boolean,
+): Promise<void> {
   const client = getSupabaseClient();
-  const { error } = await client.from("upgrade_queue_items").update({ is_locked: isLocked, updated_at: new Date().toISOString() }).eq("id", id);
+  const { error } = await client
+    .from("upgrade_queue_items")
+    .update({ is_locked: isLocked, updated_at: new Date().toISOString() })
+    .eq("id", id);
   if (error) throw toUpgradeQueueError(error.message);
 }

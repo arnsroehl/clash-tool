@@ -57,5 +57,13 @@ export type ClanInvite = {
 };
 
 export type OfficialClan = Omit<Clan, "id" | "ownerUserId" | "lastSyncedAt"> & {
-  members: Omit<ClanMember, "clanId" | "accountId" | "activityScore" | "progressPercent" | "cwlReady" | "lastSyncedAt">[];
+  members: Omit<
+    ClanMember,
+    | "clanId"
+    | "accountId"
+    | "activityScore"
+    | "progressPercent"
+    | "cwlReady"
+    | "lastSyncedAt"
+  >[];
 };

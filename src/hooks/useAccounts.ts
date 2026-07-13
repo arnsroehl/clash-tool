@@ -6,10 +6,7 @@ import {
   deleteAccount,
   fetchAccounts,
 } from "@/services/accountService";
-import type {
-  AccountFormValues,
-  ClashAccount,
-} from "@/types/account";
+import type { AccountFormValues, ClashAccount } from "@/types/account";
 
 type UseAccountsOptions = {
   onError: (message: string) => void;
@@ -31,7 +28,11 @@ function isValidAccountForm(values: AccountFormValues): boolean {
   return Boolean(values.name && values.townHallLevel && values.builderCount);
 }
 
-export function useAccounts({ onError, clearError, enabled = true }: UseAccountsOptions) {
+export function useAccounts({
+  onError,
+  clearError,
+  enabled = true,
+}: UseAccountsOptions) {
   const [accounts, setAccounts] = useState<ClashAccount[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<ClashAccount | null>(
     null,
@@ -54,7 +55,11 @@ export function useAccounts({ onError, clearError, enabled = true }: UseAccounts
         setAccounts(loadedAccounts);
         setSelectedAccount(loadedAccounts[0] || null);
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Accounts konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Accounts konnten nicht geladen werden.",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -83,7 +88,11 @@ export function useAccounts({ onError, clearError, enabled = true }: UseAccounts
       setSelectedAccount(newAccount);
       form.reset();
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Account konnte nicht gespeichert werden.");
+      onError(
+        error instanceof Error
+          ? error.message
+          : "Account konnte nicht gespeichert werden.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -108,7 +117,11 @@ export function useAccounts({ onError, clearError, enabled = true }: UseAccounts
         return remainingAccounts;
       });
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Account konnte nicht gelöscht werden.");
+      onError(
+        error instanceof Error
+          ? error.message
+          : "Account konnte nicht gelöscht werden.",
+      );
     } finally {
       setIsDeletingId(null);
     }

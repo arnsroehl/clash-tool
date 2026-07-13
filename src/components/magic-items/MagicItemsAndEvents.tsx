@@ -1,8 +1,14 @@
 "use client";
 
-import { type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 import { isPlanningEventActive } from "@/features/planning-events/planning-events";
-import type { MagicInventoryItem, PlanningEvent } from "@/types/magicItems";
+import { calculateMagicItemUses } from "@/features/magic-items/magic-item-advisor";
+import type { ResourceSnapshot } from "@/features/planner/planner.types";
+import type {
+  MagicInventoryItem,
+  PlanningEvent,
+  PlanningEventTemplate,
+} from "@/types/magicItems";
 import type { UpgradeQueueItem } from "@/types/upgradeQueue";
 
 type Props = {
@@ -10,7 +16,10 @@ type Props = {
   language?: "de" | "en";
   inventory: MagicInventoryItem[];
   events: PlanningEvent[];
+  eventTemplates: PlanningEventTemplate[];
   queue: UpgradeQueueItem[];
+  resources: ResourceSnapshot;
+  storageCapacities: ResourceSnapshot;
   onUpdateItem: (
     key: string,
     quantity: number,
@@ -25,12 +34,17 @@ export function MagicItemsAndEvents({
   language = "de",
   inventory,
   events,
+  eventTemplates,
   queue,
+  resources,
+  storageCapacities,
   onUpdateItem,
   onAddEvent,
   onDeleteEvent,
 }: Props) {
   const en = language === "en";
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<PlanningEventTemplate | null>(null);
   const openQueue = queue.filter(
     (item) => item.status === "planned" || item.status === "active",
   );
@@ -50,10 +64,8 @@ export function MagicItemsAndEvents({
     ),
   );
 
-  const recommendedUpgrade = (item: MagicInventoryItem) =>
-    openQueue
-      .filter((upgrade) => item.appliesTo.includes(upgrade.itemType))
-      .sort((a, b) => b.durationHours - a.durationHours)[0];
+  const formatNumber = (value: number) =>
+    new Intl.NumberFormat(en ? "en-US" : "de-DE").format(value);
 
   const submitEvent = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -74,6 +86,28 @@ export function MagicItemsAndEvents({
       enabled: true,
     });
     event.currentTarget.reset();
+    setSelectedTemplate(null);
+  };
+
+  const applyTemplate = (
+    template: PlanningEventTemplate,
+    form: HTMLFormElement,
+  ) => {
+    const setValue = (name: string, value: string | number) => {
+      const control = form.elements.namedItem(name) as
+        HTMLInputElement | HTMLSelectElement | null;
+      if (control) control.value = String(value);
+    };
+    setValue("type", template.eventType);
+    setValue("name", en ? template.nameEn : template.nameDe);
+    setValue("cost", template.costDiscountPercent);
+    setValue("time", template.timeDiscountPercent);
+    setValue("gold", template.resourceGold);
+    setValue("elixir", template.resourceElixir);
+    setValue("darkElixir", template.resourceDarkElixir);
+    setValue("rewardType", template.rewardType);
+    setValue("rewardAmount", template.rewardAmount);
+    setSelectedTemplate(template);
   };
 
   return (
@@ -89,17 +123,23 @@ export function MagicItemsAndEvents({
         </p>
         <div className="mt-4 flex max-h-[600px] flex-col gap-3 overflow-auto">
           {inventory.map((item) => {
-            const best = recommendedUpgrade(item);
-            const savedHours = best
-              ? item.effectType === "finish_upgrade"
-                ? best.durationHours
-                : item.effectType === "speed_boost"
-                  ? Math.min(
-                      best.durationHours,
-                      Math.max(0, item.effectValue - 1),
-                    )
-                  : 0
-              : 0;
+            const uses = calculateMagicItemUses(
+              item,
+              openQueue,
+              resources,
+              storageCapacities,
+            );
+            const best = uses[0];
+            const resourceName =
+              best?.name === "darkElixir"
+                ? en
+                  ? "Dark elixir"
+                  : "Dunkles Elixier"
+                : best?.name === "elixir"
+                  ? en
+                    ? "Elixir"
+                    : "Elixier"
+                  : best?.name;
 
             return (
               <div key={item.itemKey} className="rounded-xl bg-slate-900 p-4">
@@ -126,39 +166,75 @@ export function MagicItemsAndEvents({
                 {item.quantity > 0 && best ? (
                   <>
                     <p className="mt-3 text-xs text-emerald-300">
-                      {en ? "Best use" : "Bester Einsatz"}: {best.name} ·{" "}
-                      {en ? "up to" : "bis zu"} {savedHours} h{" "}
-                      {en ? "saved" : "Zeitgewinn"}
+                      {en ? "Best use" : "Bester Einsatz"}: {resourceName}
+                      {best.timeSavedHours > 0
+                        ? ` · ${en ? "up to" : "bis zu"} ${best.timeSavedHours} h ${en ? "saved" : "Zeitgewinn"}`
+                        : ""}
+                      {best.resourceSaved > 0
+                        ? ` · ${formatNumber(best.resourceSaved)} ${en ? "resources saved/gained" : "Ressourcen gespart/gewonnen"}`
+                        : ""}
                     </p>
-                    <select
-                      aria-label={
-                        en ? `Reserve ${item.name}` : `${item.name} reservieren`
-                      }
-                      value={item.reservedQueueItemId || ""}
-                      onChange={(event) =>
-                        onUpdateItem(
-                          item.itemKey,
-                          item.quantity,
-                          event.target.value || null,
-                        )
-                      }
-                      className="mt-2 w-full rounded-lg bg-slate-950 p-2 text-xs"
-                    >
-                      <option value="">
-                        {en ? "Not reserved" : "Nicht reserviert"}
-                      </option>
-                      {openQueue
-                        .filter((upgrade) =>
-                          item.appliesTo.includes(upgrade.itemType),
-                        )
-                        .map((upgrade) => (
-                          <option key={upgrade.id} value={upgrade.id}>
-                            {upgrade.name} {en ? "level" : "Level"}{" "}
-                            {upgrade.toLevel}
-                          </option>
+                    {uses.length > 1 ? (
+                      <div className="mt-2 rounded-lg bg-white/5 p-2 text-xs text-slate-400">
+                        <b>{en ? "Alternatives" : "Alternativen"}:</b>
+                        {uses.slice(1, 4).map((use) => (
+                          <span
+                            key={use.queueItemId || use.name}
+                            className="mt-1 block"
+                          >
+                            {use.name} ·{" "}
+                            {use.timeSavedHours > 0
+                              ? `${use.timeSavedHours} h`
+                              : formatNumber(use.resourceSaved)}
+                          </span>
                         ))}
-                    </select>
+                      </div>
+                    ) : null}
+                    {uses.some((use) => use.queueItemId) ? (
+                      <select
+                        aria-label={
+                          en
+                            ? `Reserve ${item.name}`
+                            : `${item.name} reservieren`
+                        }
+                        value={item.reservedQueueItemId || ""}
+                        onChange={(event) =>
+                          onUpdateItem(
+                            item.itemKey,
+                            item.quantity,
+                            event.target.value || null,
+                          )
+                        }
+                        className="mt-2 w-full rounded-lg bg-slate-950 p-2 text-xs"
+                      >
+                        <option value="">
+                          {en ? "Not reserved" : "Nicht reserviert"}
+                        </option>
+                        {uses
+                          .filter((use) => use.queueItemId)
+                          .map((use) => {
+                            const upgrade = openQueue.find(
+                              (entry) => entry.id === use.queueItemId,
+                            );
+                            return upgrade ? (
+                              <option key={upgrade.id} value={upgrade.id}>
+                                {upgrade.name} {en ? "level" : "Level"}{" "}
+                                {upgrade.toLevel} ·{" "}
+                                {use.timeSavedHours > 0
+                                  ? `${use.timeSavedHours} h`
+                                  : formatNumber(use.resourceSaved)}
+                              </option>
+                            ) : null;
+                          })}
+                      </select>
+                    ) : null}
                   </>
+                ) : item.quantity > 0 ? (
+                  <p className="mt-3 text-xs text-slate-500">
+                    {en
+                      ? "No suitable queued upgrade or missing storage capacity is available yet."
+                      : "Noch kein passendes Queue-Upgrade oder keine fehlende Lagerkapazität verfügbar."}
+                  </p>
                 ) : null}
               </div>
             );
@@ -186,6 +262,58 @@ export function MagicItemsAndEvents({
         </div>
 
         <form onSubmit={submitEvent} className="mt-5 grid gap-3">
+          <label className="text-xs text-slate-400">
+            {en ? "Maintained preset" : "Gepflegte Vorlage"}
+            <select
+              name="template"
+              defaultValue=""
+              onChange={(event) => {
+                const template = eventTemplates.find(
+                  (item) => item.eventType === event.target.value,
+                );
+                if (template && event.currentTarget.form) {
+                  applyTemplate(template, event.currentTarget.form);
+                } else {
+                  setSelectedTemplate(null);
+                }
+              }}
+              className="mt-1 w-full rounded-xl bg-slate-900 p-3 text-slate-100"
+            >
+              <option value="">
+                {en ? "Select a preset…" : "Vorlage auswählen…"}
+              </option>
+              {eventTemplates.map((template) => (
+                <option key={template.eventType} value={template.eventType}>
+                  {en ? template.nameEn : template.nameDe}
+                </option>
+              ))}
+            </select>
+          </label>
+          {selectedTemplate ? (
+            <div className="rounded-xl border border-sky-400/20 bg-sky-400/5 p-3 text-xs text-slate-300">
+              <p>{en ? selectedTemplate.notesEn : selectedTemplate.notesDe}</p>
+              <p className="mt-1 text-slate-500">
+                {en ? "Data version" : "Datenstand"}:{" "}
+                {selectedTemplate.dataVersion} ·{" "}
+                {new Date(selectedTemplate.updatedAt).toLocaleDateString(
+                  en ? "en-US" : "de-DE",
+                )}
+                {selectedTemplate.sourceUrl ? (
+                  <>
+                    {" · "}
+                    <a
+                      href={selectedTemplate.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sky-300 underline"
+                    >
+                      {en ? "Official source" : "Offizielle Quelle"}
+                    </a>
+                  </>
+                ) : null}
+              </p>
+            </div>
+          ) : null}
           <input
             required
             name="name"

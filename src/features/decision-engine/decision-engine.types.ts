@@ -5,20 +5,12 @@ import type {
   UpgradeRecommendation,
 } from "@/features/planner/planner.types";
 
-export type PlayerGoal =
-  | "MAX"
-  | "FARMING"
-  | "WAR"
-  | "LEGENDS"
-  | "SMART_RUSH";
+export type PlayerGoal = "MAX" | "FARMING" | "WAR" | "LEGENDS" | "SMART_RUSH";
 
 export type DecisionModuleStatus = "ready" | "placeholder";
 
 export type RecommendationSource =
-  | "planner"
-  | "recommendation-engine"
-  | "strategy-engine"
-  | "resource-engine";
+  "planner" | "recommendation-engine" | "strategy-engine" | "resource-engine";
 
 export type RecommendationReasonCode =
   | "LABOR_UNLOCKS_MORE_UPGRADES"

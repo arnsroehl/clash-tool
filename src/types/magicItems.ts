@@ -1,3 +1,47 @@
-export type MagicItem = { itemKey:string; name:string; category:string; appliesTo:string[]; effectType:string; effectValue:number; sortOrder:number };
-export type MagicInventoryItem = MagicItem & { quantity:number; reservedQueueItemId:string|null };
-export type PlanningEvent = { id:string; accountId:string; eventType:string; name:string; startsAt:string|null; endsAt:string|null; costDiscountPercent:number; timeDiscountPercent:number; resourceGold:number; resourceElixir:number; resourceDarkElixir:number; rewardType:"none"|"cwl_medals"|"clan_games_reward"|"season_bank"; rewardAmount:number; enabled:boolean };
+export type MagicItem = {
+  itemKey: string;
+  name: string;
+  category: string;
+  appliesTo: string[];
+  effectType: string;
+  effectValue: number;
+  sortOrder: number;
+};
+export type MagicInventoryItem = MagicItem & {
+  quantity: number;
+  reservedQueueItemId: string | null;
+};
+export type PlanningEvent = {
+  id: string;
+  accountId: string;
+  eventType: string;
+  name: string;
+  startsAt: string | null;
+  endsAt: string | null;
+  costDiscountPercent: number;
+  timeDiscountPercent: number;
+  resourceGold: number;
+  resourceElixir: number;
+  resourceDarkElixir: number;
+  rewardType: "none" | "cwl_medals" | "clan_games_reward" | "season_bank";
+  rewardAmount: number;
+  enabled: boolean;
+};
+
+export type PlanningEventTemplate = {
+  eventType: string;
+  nameDe: string;
+  nameEn: string;
+  costDiscountPercent: number;
+  timeDiscountPercent: number;
+  resourceGold: number;
+  resourceElixir: number;
+  resourceDarkElixir: number;
+  rewardType: PlanningEvent["rewardType"];
+  rewardAmount: number;
+  notesDe: string;
+  notesEn: string;
+  dataVersion: string;
+  sourceUrl: string | null;
+  updatedAt: string;
+};

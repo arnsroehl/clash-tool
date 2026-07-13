@@ -32,6 +32,10 @@ import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
 import {
+  buildingInstanceId,
+  createBuildingInstancePlannerData,
+} from "@/features/planner/building-instance-planner";
+import {
   rankRecommendations,
   type PlanningStrategy,
   type StrategyWeights,
@@ -43,6 +47,7 @@ import { useAccounts } from "@/hooks/useAccounts";
 import { useAuth } from "@/hooks/useAuth";
 import { usePlanningGoals } from "@/hooks/usePlanningGoals";
 import { usePlanningProfile } from "@/hooks/usePlanningProfile";
+import { usePlanningScenarios } from "@/hooks/usePlanningScenarios";
 import { usePlannerNotifications } from "@/hooks/usePlannerNotifications";
 import { useBuildings } from "@/hooks/useBuildings";
 import { useMagicItems } from "@/hooks/useMagicItems";
@@ -62,7 +67,7 @@ import type {
 } from "@/features/planner/planner.types";
 import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
-import type { Building, BuildingLevel } from "@/types/building";
+import type { PlanningScenario } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
   SiegeMachine,
@@ -122,6 +127,11 @@ export default function Home() {
     elixir: 0,
     darkElixir: 0,
   });
+  const [storageCapacities, setStorageCapacities] = useState<ResourceSnapshot>({
+    gold: 0,
+    elixir: 0,
+    darkElixir: 0,
+  });
   const [horizonDays, setHorizonDays] = useState(30);
   const [goalPercent, setGoalPercent] = useState(75);
   const [dailyIncome, setDailyIncome] = useState<ResourceSnapshot>({
@@ -168,12 +178,76 @@ export default function Home() {
     clearError,
     enabled: Boolean(user),
   });
+  const {
+    scenarios: planningScenarios,
+    isBusy: isScenarioBusy,
+    save: saveScenario,
+    activate: activateScenario,
+    remove: removeScenario,
+  } = usePlanningScenarios(selectedAccount?.id, handleError);
+  const applyPlanningScenario = useCallback((scenario: PlanningScenario) => {
+    setPlanningStrategy(scenario.strategy);
+    setResources(scenario.resources);
+    setStorageCapacities(scenario.storageCapacities);
+    setHorizonDays(scenario.horizonDays);
+    setGoalPercent(scenario.goalPercent);
+    setDailyIncome(scenario.dailyIncome);
+    setStrategyWeights(scenario.strategyWeights);
+  }, []);
+  const activeScenario = planningScenarios.find(
+    (scenario) => scenario.isActive,
+  );
+  useEffect(() => {
+    if (!activeScenario) return;
+    const timeout = window.setTimeout(
+      () => applyPlanningScenario(activeScenario),
+      0,
+    );
+    return () => window.clearTimeout(timeout);
+  }, [activeScenario, applyPlanningScenario]);
+  const loadPlanningScenario = useCallback(
+    (scenario: PlanningScenario) => {
+      applyPlanningScenario(scenario);
+      void activateScenario(scenario.id);
+    },
+    [activateScenario, applyPlanningScenario],
+  );
+  const saveCurrentScenario = useCallback(
+    (name: string, id?: string) => {
+      if (!selectedAccount) return;
+      void saveScenario(
+        {
+          accountId: selectedAccount.id,
+          name,
+          strategy: planningStrategy,
+          horizonDays,
+          goalPercent,
+          resources,
+          storageCapacities,
+          dailyIncome,
+          strategyWeights,
+          isActive: true,
+        },
+        id,
+      );
+    },
+    [
+      dailyIncome,
+      goalPercent,
+      horizonDays,
+      planningStrategy,
+      resources,
+      saveScenario,
+      selectedAccount,
+      storageCapacities,
+      strategyWeights,
+    ],
+  );
 
   const {
     buildings,
     availableBuildings,
     buildingMaxLevels,
-    buildingLevels,
     buildingInstanceLevels,
     progress,
     isLoadingBuildings,
@@ -300,28 +374,27 @@ export default function Home() {
       return null;
     }
 
+    const buildingPlanner = createBuildingInstancePlannerData(
+      availableBuildings,
+      buildingInstanceLevels,
+      buildingMaxLevels,
+    );
     const plannerItems = [
-      ...toPlannerItems<Building>(availableBuildings, "building"),
+      ...buildingPlanner.items,
       ...toPlannerItems<Hero>(availableHeroes, "hero"),
       ...toPlannerItems<Troop>(availableTroops, "troop"),
       ...toPlannerItems<Spell>(availableSpells, "spell"),
       ...toPlannerItems<SiegeMachine>(availableSiegeMachines, "siege_machine"),
     ];
     const plannerLevels = mergeLevelMaps(
-      buildingLevels,
+      buildingPlanner.itemLevels,
       heroLevels,
       troopLevels,
       spellLevels,
       siegeMachineLevels,
     );
     const plannerUpgradeLevels: PlannerUpgradeLevel[] = [
-      ...buildingMaxLevels.map((level: BuildingLevel) =>
-        toPlannerUpgradeLevel({
-          itemId: level.buildingId,
-          itemType: "building",
-          ...level,
-        }),
-      ),
+      ...buildingPlanner.upgradeLevels,
       ...heroMaxLevels.map((level: HeroLevel) =>
         toPlannerUpgradeLevel({
           itemId: level.heroId,
@@ -364,7 +437,7 @@ export default function Home() {
     availableSiegeMachines,
     availableSpells,
     availableTroops,
-    buildingLevels,
+    buildingInstanceLevels,
     buildingMaxLevels,
     heroLevels,
     heroMaxLevels,
@@ -384,9 +457,50 @@ export default function Home() {
       strategyWeights,
     );
   }, [plannerResult, planningStrategy, strategyWeights]);
+  const currentItemLevels = useMemo(
+    () =>
+      Object.fromEntries([
+        ...availableBuildings.flatMap((building) =>
+          Array.from(
+            { length: building.countAfterMerges || 1 },
+            (_, index) =>
+              [
+                `building:${buildingInstanceId(building.id, index + 1)}`,
+                buildingInstanceLevels[building.id]?.[index] || 0,
+              ] as const,
+          ),
+        ),
+        ...Object.entries(heroLevels).map(
+          ([id, level]) => [`hero:${id}`, level] as const,
+        ),
+        ...Object.entries(troopLevels).map(
+          ([id, level]) => [`troop:${id}`, level] as const,
+        ),
+        ...Object.entries(spellLevels).map(
+          ([id, level]) => [`spell:${id}`, level] as const,
+        ),
+        ...Object.entries(siegeMachineLevels).map(
+          ([id, level]) => [`siege_machine:${id}`, level] as const,
+        ),
+      ]),
+    [
+      availableBuildings,
+      buildingInstanceLevels,
+      heroLevels,
+      siegeMachineLevels,
+      spellLevels,
+      troopLevels,
+    ],
+  );
 
-  const { inventory, events, updateItem, addEvent, removeEvent } =
-    useMagicItems(selectedAccount?.id, handleError);
+  const {
+    inventory,
+    events,
+    eventTemplates,
+    updateItem,
+    addEvent,
+    removeEvent,
+  } = useMagicItems(selectedAccount?.id, handleError);
   const activeDiscounts = getActivePlanningDiscounts(events);
 
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
@@ -407,8 +521,15 @@ export default function Home() {
   const { goals, addGoal, removeGoal } = usePlanningGoals(
     selectedAccount?.id,
     handleError,
+    currentItemLevels,
   );
   const clanDashboard = useClanDashboard(user?.id, handleError);
+  const selectedClanForProgress = clanDashboard.selectedClan;
+  const syncOwnClanProgress = clanDashboard.syncOwnProgress;
+  useEffect(() => {
+    if (!selectedAccount?.playerTag || !selectedClanForProgress) return;
+    void syncOwnClanProgress(selectedAccount.id, progress);
+  }, [progress, selectedAccount, selectedClanForProgress, syncOwnClanProgress]);
   const notificationDrafts = useMemo(
     () =>
       selectedAccount
@@ -418,6 +539,10 @@ export default function Home() {
             recommendations: upgradeRecommendations,
             goals,
             events,
+            resources,
+            storageCapacities,
+            dailyIncome,
+            currentLevels: currentItemLevels,
             language: profile?.language || "de",
           })
         : [],
@@ -425,8 +550,12 @@ export default function Home() {
       builderSimulation,
       events,
       goals,
+      dailyIncome,
+      currentItemLevels,
       profile?.language,
+      resources,
       selectedAccount,
+      storageCapacities,
       upgradeRecommendations,
     ],
   );
@@ -555,6 +684,8 @@ export default function Home() {
         >
           <PlayerImportCenter
             account={selectedAccount}
+            buildings={availableBuildings}
+            buildingInstanceLevels={buildingInstanceLevels}
             heroes={availableHeroes}
             heroLevels={heroLevels}
             troops={availableTroops}
@@ -578,6 +709,7 @@ export default function Home() {
             simulation={builderSimulation}
             strategy={planningStrategy}
             resources={resources}
+            storageCapacities={storageCapacities}
             horizonDays={horizonDays}
             goalPercent={goalPercent}
             dailyIncome={dailyIncome}
@@ -585,10 +717,16 @@ export default function Home() {
             costDiscountPercent={activeDiscounts.costPercent}
             onStrategyChange={setPlanningStrategy}
             onResourcesChange={setResources}
+            onStorageCapacitiesChange={setStorageCapacities}
             onHorizonChange={setHorizonDays}
             onGoalPercentChange={setGoalPercent}
             onDailyIncomeChange={setDailyIncome}
             onStrategyWeightsChange={setStrategyWeights}
+            scenarios={planningScenarios}
+            isScenarioBusy={isScenarioBusy}
+            onLoadScenario={loadPlanningScenario}
+            onSaveScenario={saveCurrentScenario}
+            onDeleteScenario={removeScenario}
           />
         </CollapsibleSection>
 
@@ -689,7 +827,10 @@ export default function Home() {
               language={language}
               inventory={inventory}
               events={events}
+              eventTemplates={eventTemplates}
               queue={queueItems}
+              resources={resources}
+              storageCapacities={storageCapacities}
               onUpdateItem={updateItem}
               onAddEvent={addEvent}
               onDeleteEvent={removeEvent}
@@ -740,7 +881,9 @@ export default function Home() {
               onAddToQueue={addRecommendationToQueue}
               isSaving={isSavingQueueItem}
               accountId={selectedAccount.id}
+              builderCount={selectedAccount.builderCount}
               goals={goals}
+              currentLevels={currentItemLevels}
               onSaveGoal={addGoal}
               onDeleteGoal={removeGoal}
               language={language}
@@ -775,6 +918,7 @@ export default function Home() {
               events,
               magicItems: inventory,
               planningProfile: profile,
+              planningScenarios,
               clans: clanDashboard.clans,
               selectedClanMembers: clanDashboard.members,
               clanGoals: clanDashboard.goals,

@@ -56,7 +56,9 @@ const upgradeLevels: PlannerUpgradeLevel[] = [
   },
 ];
 
-function createContext(playerGoal: DecisionContext["playerGoal"]): DecisionContext {
+function createContext(
+  playerGoal: DecisionContext["playerGoal"],
+): DecisionContext {
   return {
     playerGoal,
     generatedAt: "2026-07-09T12:00:00.000Z",
@@ -101,7 +103,10 @@ describe("Decision Engine", () => {
     const maxResult = runDecisionEngine(createContext("MAX"));
     const warResult = runDecisionEngine(createContext("WAR"));
 
-    assert.notEqual(maxResult.strategy.strategyId, warResult.strategy.strategyId);
+    assert.notEqual(
+      maxResult.strategy.strategyId,
+      warResult.strategy.strategyId,
+    );
     assert.equal(warResult.strategy.goal, "WAR");
   });
 });

@@ -164,20 +164,40 @@ export function useUpgradeQueue({
   const moveQueueItem = useCallback(
     async (id: string, direction: "up" | "down") => {
       const currentIndex = queueItems.findIndex((item) => item.id === id);
-      const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
-      if (currentIndex < 0 || targetIndex < 0 || targetIndex >= queueItems.length) return;
+      const targetIndex =
+        direction === "up" ? currentIndex - 1 : currentIndex + 1;
+      if (
+        currentIndex < 0 ||
+        targetIndex < 0 ||
+        targetIndex >= queueItems.length
+      )
+        return;
 
       const reordered = [...queueItems];
-      [reordered[currentIndex], reordered[targetIndex]] = [reordered[targetIndex], reordered[currentIndex]];
-      const normalized = reordered.map((item, index) => ({ ...item, queueOrder: index + 1 }));
+      [reordered[currentIndex], reordered[targetIndex]] = [
+        reordered[targetIndex],
+        reordered[currentIndex],
+      ];
+      const normalized = reordered.map((item, index) => ({
+        ...item,
+        queueOrder: index + 1,
+      }));
       setQueueItems(normalized);
 
       try {
-        await updateUpgradeQueueItemOrder(normalized.map(({ id: itemId, queueOrder }) => ({ id: itemId, queueOrder })));
+        await updateUpgradeQueueItemOrder(
+          normalized.map(({ id: itemId, queueOrder }) => ({
+            id: itemId,
+            queueOrder,
+          })),
+        );
         setQueueErrorMessage(null);
       } catch (error) {
         setQueueItems(queueItems);
-        const message = error instanceof Error ? error.message : "Queue-Reihenfolge konnte nicht gespeichert werden.";
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Queue-Reihenfolge konnte nicht gespeichert werden.";
         setQueueErrorMessage(message);
         onError(message);
       }
@@ -185,57 +205,84 @@ export function useUpgradeQueue({
     [onError, queueItems],
   );
 
-  const reorderQueueItems = useCallback(async (draggedId: string, targetId: string) => {
-    if (draggedId === targetId) return;
-    const from = queueItems.findIndex((item) => item.id === draggedId);
-    const to = queueItems.findIndex((item) => item.id === targetId);
-    if (from < 0 || to < 0) return;
-    const reordered = [...queueItems];
-    const [dragged] = reordered.splice(from, 1);
-    reordered.splice(to, 0, dragged);
-    const normalized = reordered.map((item, index) => ({ ...item, queueOrder: index + 1 }));
-    setQueueItems(normalized);
-    try {
-      await updateUpgradeQueueItemOrder(normalized.map(({ id, queueOrder }) => ({ id, queueOrder })));
-      setQueueErrorMessage(null);
-    } catch (error) {
-      setQueueItems(queueItems);
-      const message = error instanceof Error ? error.message : "Queue-Reihenfolge konnte nicht gespeichert werden.";
-      setQueueErrorMessage(message);
-      onError(message);
-    }
-  }, [onError, queueItems]);
+  const reorderQueueItems = useCallback(
+    async (draggedId: string, targetId: string) => {
+      if (draggedId === targetId) return;
+      const from = queueItems.findIndex((item) => item.id === draggedId);
+      const to = queueItems.findIndex((item) => item.id === targetId);
+      if (from < 0 || to < 0) return;
+      const reordered = [...queueItems];
+      const [dragged] = reordered.splice(from, 1);
+      reordered.splice(to, 0, dragged);
+      const normalized = reordered.map((item, index) => ({
+        ...item,
+        queueOrder: index + 1,
+      }));
+      setQueueItems(normalized);
+      try {
+        await updateUpgradeQueueItemOrder(
+          normalized.map(({ id, queueOrder }) => ({ id, queueOrder })),
+        );
+        setQueueErrorMessage(null);
+      } catch (error) {
+        setQueueItems(queueItems);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Queue-Reihenfolge konnte nicht gespeichert werden.";
+        setQueueErrorMessage(message);
+        onError(message);
+      }
+    },
+    [onError, queueItems],
+  );
 
-  const changeQueueItemStatus = useCallback(async (id: string, status: UpgradeQueueItemStatus) => {
-    const previousItems = queueItems;
-    setQueueItems((items) => items.map((item) => item.id === id ? { ...item, status } : item));
-    try {
-      await updateUpgradeQueueItemStatus(id, status);
-      setQueueErrorMessage(null);
-    } catch (error) {
-      setQueueItems(previousItems);
-      const message = error instanceof Error ? error.message : "Upgrade-Status konnte nicht gespeichert werden.";
-      setQueueErrorMessage(message);
-      onError(message);
-    }
-  }, [onError, queueItems]);
+  const changeQueueItemStatus = useCallback(
+    async (id: string, status: UpgradeQueueItemStatus) => {
+      const previousItems = queueItems;
+      setQueueItems((items) =>
+        items.map((item) => (item.id === id ? { ...item, status } : item)),
+      );
+      try {
+        await updateUpgradeQueueItemStatus(id, status);
+        setQueueErrorMessage(null);
+      } catch (error) {
+        setQueueItems(previousItems);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Upgrade-Status konnte nicht gespeichert werden.";
+        setQueueErrorMessage(message);
+        onError(message);
+      }
+    },
+    [onError, queueItems],
+  );
 
-  const toggleQueueItemLock = useCallback(async (id: string) => {
-    const previousItems = queueItems;
-    const current = queueItems.find((item) => item.id === id);
-    if (!current) return;
-    const isLocked = !current.isLocked;
-    setQueueItems((items) => items.map((item) => item.id === id ? { ...item, isLocked } : item));
-    try {
-      await updateUpgradeQueueItemLock(id, isLocked);
-      setQueueErrorMessage(null);
-    } catch (error) {
-      setQueueItems(previousItems);
-      const message = error instanceof Error ? error.message : "Sperre konnte nicht gespeichert werden.";
-      setQueueErrorMessage(message);
-      onError(message);
-    }
-  }, [onError, queueItems]);
+  const toggleQueueItemLock = useCallback(
+    async (id: string) => {
+      const previousItems = queueItems;
+      const current = queueItems.find((item) => item.id === id);
+      if (!current) return;
+      const isLocked = !current.isLocked;
+      setQueueItems((items) =>
+        items.map((item) => (item.id === id ? { ...item, isLocked } : item)),
+      );
+      try {
+        await updateUpgradeQueueItemLock(id, isLocked);
+        setQueueErrorMessage(null);
+      } catch (error) {
+        setQueueItems(previousItems);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Sperre konnte nicht gespeichert werden.";
+        setQueueErrorMessage(message);
+        onError(message);
+      }
+    },
+    [onError, queueItems],
+  );
 
   return {
     queueItems,

@@ -21,7 +21,10 @@ function clampLevel(troop: Troop, nextLevel: number): number {
 }
 
 function calculateProgress(items: Troop[], levels: TroopLevelMap): number {
-  const completed = items.reduce((sum, item) => sum + (levels[item.id] || 0), 0);
+  const completed = items.reduce(
+    (sum, item) => sum + (levels[item.id] || 0),
+    0,
+  );
   const max = items.reduce((sum, item) => sum + item.maxLevel, 0);
   return max > 0 ? Math.round((completed / max) * 100) : 0;
 }
@@ -63,7 +66,11 @@ export function useTroops({
         setTroops(loadedTroops);
         setTroopMaxLevels(loadedLevels);
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Truppen konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Truppen konnten nicht geladen werden.",
+        );
       } finally {
         setIsLoadingTroops(false);
       }
@@ -82,7 +89,11 @@ export function useTroops({
       try {
         setTroopLevels(await fetchAccountTroopLevels(selectedAccount.id));
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Truppenlevel konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Truppenlevel konnten nicht geladen werden.",
+        );
       }
     }
 
@@ -95,7 +106,9 @@ export function useTroops({
     }
 
     return troops
-      .filter((troop) => troop.unlockTownHallLevel <= selectedAccount.townHallLevel)
+      .filter(
+        (troop) => troop.unlockTownHallLevel <= selectedAccount.townHallLevel,
+      )
       .map((troop) => ({
         ...troop,
         maxLevel: calculateAvailableMaxLevel(
@@ -131,7 +144,11 @@ export function useTroops({
         currentLevel: safeLevel,
       });
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Truppenlevel konnte nicht gespeichert werden.");
+      onError(
+        error instanceof Error
+          ? error.message
+          : "Truppenlevel konnte nicht gespeichert werden.",
+      );
     } finally {
       setIsSavingTroopId(null);
     }

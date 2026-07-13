@@ -110,7 +110,9 @@ export function createRecommendationReasons(
   }
 
   if (recommendation.priorityScore.value >= 80) {
-    reasons.push(createReason("HIGHEST_VALUE_UPGRADE", "Sehr hoher Upgrade-Wert"));
+    reasons.push(
+      createReason("HIGHEST_VALUE_UPGRADE", "Sehr hoher Upgrade-Wert"),
+    );
   }
 
   if (recommendation.nextLevelTime.hours <= 8) {

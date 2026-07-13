@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Clash Tool – Upgrade Planner",
-  description: "Plan accounts, upgrades, builders, goals, events and clans for Clash of Clans.",
+  description:
+    "Plan accounts, upgrades, builders, goals, events and clans for Clash of Clans.",
 };
 
 export default function RootLayout({

@@ -40,7 +40,10 @@ export async function createAccount(
   values: AccountFormValues,
 ): Promise<ClashAccount> {
   const client = getSupabaseClient();
-  const { data: { user }, error: userError } = await client.auth.getUser();
+  const {
+    data: { user },
+    error: userError,
+  } = await client.auth.getUser();
   if (userError || !user) throw new Error("Bitte melde dich an.");
 
   const { data, error } = await client
@@ -63,7 +66,10 @@ export async function createAccount(
 
 export async function claimLegacyAccounts(userId: string): Promise<void> {
   const client = getSupabaseClient();
-  const { error } = await client.from("accounts").update({ user_id: userId }).is("user_id", null);
+  const { error } = await client
+    .from("accounts")
+    .update({ user_id: userId })
+    .is("user_id", null);
   if (error) throw new Error(error.message);
 }
 

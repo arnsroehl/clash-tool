@@ -21,7 +21,10 @@ function clampLevel(spell: Spell, nextLevel: number): number {
 }
 
 function calculateProgress(items: Spell[], levels: SpellLevelMap): number {
-  const completed = items.reduce((sum, item) => sum + (levels[item.id] || 0), 0);
+  const completed = items.reduce(
+    (sum, item) => sum + (levels[item.id] || 0),
+    0,
+  );
   const max = items.reduce((sum, item) => sum + item.maxLevel, 0);
   return max > 0 ? Math.round((completed / max) * 100) : 0;
 }
@@ -63,7 +66,11 @@ export function useSpells({
         setSpells(loadedSpells);
         setSpellMaxLevels(loadedLevels);
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Zauber konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Zauber konnten nicht geladen werden.",
+        );
       } finally {
         setIsLoadingSpells(false);
       }
@@ -82,7 +89,11 @@ export function useSpells({
       try {
         setSpellLevels(await fetchAccountSpellLevels(selectedAccount.id));
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Zauberlevel konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Zauberlevel konnten nicht geladen werden.",
+        );
       }
     }
 
@@ -95,7 +106,9 @@ export function useSpells({
     }
 
     return spells
-      .filter((spell) => spell.unlockTownHallLevel <= selectedAccount.townHallLevel)
+      .filter(
+        (spell) => spell.unlockTownHallLevel <= selectedAccount.townHallLevel,
+      )
       .map((spell) => ({
         ...spell,
         maxLevel: calculateAvailableMaxLevel(
@@ -131,7 +144,11 @@ export function useSpells({
         currentLevel: safeLevel,
       });
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Zauberlevel konnte nicht gespeichert werden.");
+      onError(
+        error instanceof Error
+          ? error.message
+          : "Zauberlevel konnte nicht gespeichert werden.",
+      );
     } finally {
       setIsSavingSpellId(null);
     }

@@ -15,7 +15,9 @@ import type {
 export function simulateBuilderQueue(
   input: BuilderSimulationInput,
 ): BuilderSimulationResult {
-  const builderAvailability = createInitialBuilderAvailability(input.builderCount);
+  const builderAvailability = createInitialBuilderAvailability(
+    input.builderCount,
+  );
   const builderCount = builderAvailability.length;
   const laboratoryAvailability = [0];
 
@@ -37,13 +39,21 @@ export function simulateBuilderQueue(
   const assignments = sortQueueByOrder(schedulableItems).reduce<
     BuilderAssignment[]
   >((currentAssignments, queueItem) => {
-    const usesLaboratory = queueItem.itemType === "troop" || queueItem.itemType === "spell" || queueItem.itemType === "siege_machine";
-    const availability = usesLaboratory ? laboratoryAvailability : builderAvailability;
+    const usesLaboratory =
+      queueItem.itemType === "troop" ||
+      queueItem.itemType === "spell" ||
+      queueItem.itemType === "siege_machine";
+    const availability = usesLaboratory
+      ? laboratoryAvailability
+      : builderAvailability;
     const builderIndex = findNextAvailableBuilder(availability);
     if (builderIndex < 0) return currentAssignments;
     const startHour = availability[builderIndex] || 0;
     const discount = Math.min(100, Math.max(0, input.timeDiscountPercent || 0));
-    const durationHours = Math.max(Math.ceil(queueItem.durationHours * (1 - discount / 100)), 0);
+    const durationHours = Math.max(
+      Math.ceil(queueItem.durationHours * (1 - discount / 100)),
+      0,
+    );
     const endHour = startHour + durationHours;
 
     availability[builderIndex] = endHour;
@@ -66,8 +76,12 @@ export function simulateBuilderQueue(
     ];
   }, []);
   const totalDurationHours = calculateTotalDurationHours(assignments);
-  const builderAssignments = assignments.filter((assignment) => assignment.slotType === "builder");
-  const laboratoryAssignments = assignments.filter((assignment) => assignment.slotType === "laboratory");
+  const builderAssignments = assignments.filter(
+    (assignment) => assignment.slotType === "builder",
+  );
+  const laboratoryAssignments = assignments.filter(
+    (assignment) => assignment.slotType === "laboratory",
+  );
 
   return {
     assignments,

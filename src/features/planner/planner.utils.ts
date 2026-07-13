@@ -154,16 +154,15 @@ export function sumUpgradeTime(levels: PlannerUpgradeLevel[]): UpgradeTime {
 }
 
 /** Calculates remaining gold cost from generated upgrade candidates. */
-export function calculateRemainingGold(
-  upgrades: UpgradeCandidate[],
-): number {
-  return upgrades.reduce((sum, upgrade) => sum + upgrade.remainingCosts.gold, 0);
+export function calculateRemainingGold(upgrades: UpgradeCandidate[]): number {
+  return upgrades.reduce(
+    (sum, upgrade) => sum + upgrade.remainingCosts.gold,
+    0,
+  );
 }
 
 /** Calculates remaining elixir cost from generated upgrade candidates. */
-export function calculateRemainingElixir(
-  upgrades: UpgradeCandidate[],
-): number {
+export function calculateRemainingElixir(upgrades: UpgradeCandidate[]): number {
   return upgrades.reduce(
     (sum, upgrade) => sum + upgrade.remainingCosts.elixir,
     0,

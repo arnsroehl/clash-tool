@@ -28,7 +28,10 @@ function calculateProgress(
   items: SiegeMachine[],
   levels: SiegeMachineLevelMap,
 ): number {
-  const completed = items.reduce((sum, item) => sum + (levels[item.id] || 0), 0);
+  const completed = items.reduce(
+    (sum, item) => sum + (levels[item.id] || 0),
+    0,
+  );
   const max = items.reduce((sum, item) => sum + item.maxLevel, 0);
   return max > 0 ? Math.round((completed / max) * 100) : 0;
 }
@@ -78,7 +81,11 @@ export function useSiegeMachines({
         setSiegeMachines(loadedItems);
         setSiegeMachineMaxLevels(loadedLevels);
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Belagerungsmaschinen konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Belagerungsmaschinen konnten nicht geladen werden.",
+        );
       } finally {
         setIsLoadingSiegeMachines(false);
       }
@@ -99,7 +106,11 @@ export function useSiegeMachines({
           await fetchAccountSiegeMachineLevels(selectedAccount.id),
         );
       } catch (error) {
-        onError(error instanceof Error ? error.message : "Level der Belagerungsmaschinen konnten nicht geladen werden.");
+        onError(
+          error instanceof Error
+            ? error.message
+            : "Level der Belagerungsmaschinen konnten nicht geladen werden.",
+        );
       }
     }
 
@@ -112,7 +123,9 @@ export function useSiegeMachines({
     }
 
     return siegeMachines
-      .filter((item) => item.unlockTownHallLevel <= selectedAccount.townHallLevel)
+      .filter(
+        (item) => item.unlockTownHallLevel <= selectedAccount.townHallLevel,
+      )
       .map((item) => ({
         ...item,
         maxLevel: calculateAvailableMaxLevel(
@@ -151,7 +164,11 @@ export function useSiegeMachines({
         currentLevel: safeLevel,
       });
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Level der Belagerungsmaschine konnte nicht gespeichert werden.");
+      onError(
+        error instanceof Error
+          ? error.message
+          : "Level der Belagerungsmaschine konnte nicht gespeichert werden.",
+      );
     } finally {
       setIsSavingSiegeMachineId(null);
     }

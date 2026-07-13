@@ -1,7 +1,10 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { calculateClanDashboard } from "@/features/clan-dashboard/clan-dashboard";
+import {
+  calculateClanDashboard,
+  isLikelyRushed,
+} from "@/features/clan-dashboard/clan-dashboard";
 import type {
   Clan,
   ClanCollaborator,
@@ -199,13 +202,17 @@ export function ClanDashboard({
         </p>
       ) : (
         <>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
             {[
               [en ? "Members" : "Mitglieder", metrics.memberCount],
               [en ? "Ø Town Hall" : "Ø Rathaus", metrics.averageTownHall],
               [en ? "Donations" : "Spenden", metrics.totalDonations],
               [en ? "CWL ready*" : "CWL-bereit*", metrics.cwlReadyCount],
               [en ? "Low activity*" : "Wenig aktiv*", metrics.inactiveCount],
+              [
+                en ? "Likely rushed*" : "Vermutlich gerusht*",
+                metrics.rushedCount,
+              ],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl bg-slate-900 p-4">
                 <p className="text-xs uppercase tracking-wide text-slate-500">
@@ -221,7 +228,7 @@ export function ClanDashboard({
               : "* Heuristik aus Rathaus, Trophäen und Spenden; keine offizielle CWL- oder Online-Status-Angabe."}
           </p>
           <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10">
-            <table className="w-full min-w-[760px] text-left text-sm">
+            <table className="w-full min-w-[980px] text-left text-sm">
               <thead className="bg-slate-900 text-slate-400">
                 <tr>
                   <th className="p-3">{en ? "Member" : "Mitglied"}</th>
@@ -230,7 +237,9 @@ export function ClanDashboard({
                   <th>{en ? "Trophies" : "Trophäen"}</th>
                   <th>{en ? "Donations" : "Spenden"}</th>
                   <th>{en ? "Activity*" : "Aktivität*"}</th>
+                  <th>{en ? "Progress" : "Fortschritt"}</th>
                   <th>CWL*</th>
+                  <th>{en ? "Notices*" : "Hinweise*"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -251,6 +260,11 @@ export function ClanDashboard({
                     <td>{member.donations}</td>
                     <td>{member.activityScore}%</td>
                     <td>
+                      {member.progressPercent === null
+                        ? "—"
+                        : `${member.progressPercent}%`}
+                    </td>
+                    <td>
                       {member.cwlReady
                         ? en
                           ? "Ready"
@@ -258,6 +272,21 @@ export function ClanDashboard({
                         : en
                           ? "Building"
                           : "Aufbau"}
+                    </td>
+                    <td className="pr-3 text-xs">
+                      {isLikelyRushed(member) ? (
+                        <span className="rounded bg-red-400/10 px-2 py-1 text-red-200">
+                          {en ? "Likely rushed" : "Vermutlich gerusht"}
+                        </span>
+                      ) : member.activityScore < 25 ? (
+                        <span className="rounded bg-amber-400/10 px-2 py-1 text-amber-200">
+                          {en ? "Low activity" : "Wenig aktiv"}
+                        </span>
+                      ) : (
+                        <span className="text-emerald-300">
+                          {en ? "On track" : "Im Plan"}
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

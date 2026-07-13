@@ -122,7 +122,9 @@ export function useHeroes({
     }
 
     return heroes
-      .filter((hero) => hero.unlockTownHallLevel <= selectedAccount.townHallLevel)
+      .filter(
+        (hero) => hero.unlockTownHallLevel <= selectedAccount.townHallLevel,
+      )
       .map((hero) => ({
         ...hero,
         maxLevel: calculateAvailableMaxLevel(

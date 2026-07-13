@@ -20,11 +20,14 @@ import {
 } from "@/services/playerImportService";
 import { recognizeScreenshot } from "@/services/screenshotRecognitionService";
 import type { ClashAccount } from "@/types/account";
+import type { Building, BuildingInstanceLevelMap } from "@/types/building";
 import type { Hero } from "@/types/hero";
 import type { SiegeMachine, Spell, Troop } from "@/types/laboratory";
 
 type Props = {
   account: ClashAccount | null;
+  buildings: Building[];
+  buildingInstanceLevels: BuildingInstanceLevelMap;
   heroes: Hero[];
   heroLevels: Record<string, number>;
   troops: Troop[];
@@ -53,6 +56,14 @@ export function PlayerImportCenter(props: Props) {
   const autoCheckedAccount = useRef<string | null>(null);
   const entities = useMemo<ScreenshotEntity[]>(
     () => [
+      ...props.buildings.flatMap((item) =>
+        Array.from({ length: item.countAfterMerges || 1 }, (_, index) => ({
+          id: `${item.id}:${index + 1}`,
+          name: `${item.name} ${index + 1}`,
+          type: "building" as const,
+          currentLevel: props.buildingInstanceLevels[item.id]?.[index] || 0,
+        })),
+      ),
       ...props.heroes.map((item) => ({
         id: item.id,
         name: item.name,
@@ -79,6 +90,8 @@ export function PlayerImportCenter(props: Props) {
       })),
     ],
     [
+      props.buildingInstanceLevels,
+      props.buildings,
       props.heroes,
       props.heroLevels,
       props.siegeLevels,
@@ -319,8 +332,8 @@ export function PlayerImportCenter(props: Props) {
             </h3>
             <p className="mt-1 text-xs text-slate-400">
               {en
-                ? "One line per level, e.g. Barbarian King = 80"
-                : "Eine Zeile pro Level, z. B. Barbarian King = 80"}
+                ? "One line per level, e.g. Cannon 2 = 20 or Barbarian King = 80"
+                : "Eine Zeile pro Level, z. B. Kanone 2 = 20 oder Barbarenkönig = 80"}
             </p>
             <textarea
               value={manual}

@@ -12,11 +12,7 @@ export type PlannerBuilding = Building;
 export type PlannerBuildingLevels = BuildingLevelMap;
 
 export type PlannerItemType =
-  | "building"
-  | "hero"
-  | "troop"
-  | "spell"
-  | "siege_machine";
+  "building" | "hero" | "troop" | "spell" | "siege_machine";
 
 export type PlannerItem = {
   id: string;
@@ -143,6 +139,11 @@ export type UpgradeCandidate = {
   remainingCosts: UpgradeCosts;
   nextLevelTime: UpgradeTime;
   remainingTime: UpgradeTime;
+  upgradePath?: Array<{
+    level: number;
+    costs: UpgradeCosts;
+    time: UpgradeTime;
+  }>;
   priorityScore: PriorityScore;
   blockingReasons: string[];
 };

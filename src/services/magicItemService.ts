@@ -1,8 +1,168 @@
 import { getSupabaseClient } from "@/lib/supabase";
-import type { MagicInventoryItem, PlanningEvent } from "@/types/magicItems";
+import type {
+  MagicInventoryItem,
+  PlanningEvent,
+  PlanningEventTemplate,
+} from "@/types/magicItems";
 
-export async function getMagicInventory(accountId:string):Promise<MagicInventoryItem[]>{const c=getSupabaseClient();const [{data:catalog,error:ce},{data:inventory,error:ie}]=await Promise.all([c.from("magic_item_catalog").select("item_key,name,category,applies_to,effect_type,effect_value,sort_order").order("sort_order"),c.from("account_magic_items").select("item_key,quantity,reserved_queue_item_id").eq("account_id",accountId)]);if(ce)throw new Error(ce.message);if(ie)throw new Error(ie.message);const owned=new Map((inventory||[]).map((row)=>[row.item_key,row]));return (catalog||[]).map((row)=>{const item=owned.get(row.item_key);return{itemKey:row.item_key,name:row.name,category:row.category,appliesTo:row.applies_to,effectType:row.effect_type,effectValue:Number(row.effect_value),sortOrder:row.sort_order,quantity:item?.quantity||0,reservedQueueItemId:item?.reserved_queue_item_id||null};}) as MagicInventoryItem[];}
-export async function saveMagicInventory(accountId:string,itemKey:string,quantity:number,reservedQueueItemId:string|null):Promise<void>{const{error}=await getSupabaseClient().from("account_magic_items").upsert({account_id:accountId,item_key:itemKey,quantity,reserved_queue_item_id:reservedQueueItemId,updated_at:new Date().toISOString()},{onConflict:"account_id,item_key"});if(error)throw new Error(error.message);}
-export async function getPlanningEvents(accountId:string):Promise<PlanningEvent[]>{const{data,error}=await getSupabaseClient().from("account_planning_events").select("id,account_id,event_type,name,starts_at,ends_at,cost_discount_percent,time_discount_percent,resource_gold,resource_elixir,resource_dark_elixir,reward_type,reward_amount,enabled").eq("account_id",accountId).order("created_at",{ascending:false});if(error)throw new Error(error.message);return(data||[]).map((r)=>({id:r.id,accountId:r.account_id,eventType:r.event_type,name:r.name,startsAt:r.starts_at,endsAt:r.ends_at,costDiscountPercent:Number(r.cost_discount_percent),timeDiscountPercent:Number(r.time_discount_percent),resourceGold:r.resource_gold,resourceElixir:r.resource_elixir,resourceDarkElixir:r.resource_dark_elixir,rewardType:r.reward_type,rewardAmount:r.reward_amount,enabled:r.enabled})) as PlanningEvent[];}
-export async function addPlanningEvent(input:Omit<PlanningEvent,"id">):Promise<PlanningEvent>{const{data,error}=await getSupabaseClient().from("account_planning_events").insert({account_id:input.accountId,event_type:input.eventType,name:input.name,starts_at:input.startsAt,ends_at:input.endsAt,cost_discount_percent:input.costDiscountPercent,time_discount_percent:input.timeDiscountPercent,resource_gold:input.resourceGold,resource_elixir:input.resourceElixir,resource_dark_elixir:input.resourceDarkElixir,reward_type:input.rewardType,reward_amount:input.rewardAmount,enabled:input.enabled}).select("id,account_id,event_type,name,starts_at,ends_at,cost_discount_percent,time_discount_percent,resource_gold,resource_elixir,resource_dark_elixir,reward_type,reward_amount,enabled").single();if(error)throw new Error(error.message);return{id:data.id,accountId:data.account_id,eventType:data.event_type,name:data.name,startsAt:data.starts_at,endsAt:data.ends_at,costDiscountPercent:Number(data.cost_discount_percent),timeDiscountPercent:Number(data.time_discount_percent),resourceGold:data.resource_gold,resourceElixir:data.resource_elixir,resourceDarkElixir:data.resource_dark_elixir,rewardType:data.reward_type,rewardAmount:data.reward_amount,enabled:data.enabled} as PlanningEvent;}
-export async function deletePlanningEvent(id:string){const{error}=await getSupabaseClient().from("account_planning_events").delete().eq("id",id);if(error)throw new Error(error.message);}
+export async function getPlanningEventTemplates(): Promise<
+  PlanningEventTemplate[]
+> {
+  const { data, error } = await getSupabaseClient()
+    .from("planning_event_templates")
+    .select(
+      "event_type,name_de,name_en,cost_discount_percent,time_discount_percent,resource_gold,resource_elixir,resource_dark_elixir,reward_type,reward_amount,notes_de,notes_en,data_version,source_url,updated_at",
+    )
+    .order("name_de");
+  if (error) throw new Error(error.message);
+  return (data || []).map((row) => ({
+    eventType: row.event_type,
+    nameDe: row.name_de,
+    nameEn: row.name_en,
+    costDiscountPercent: Number(row.cost_discount_percent),
+    timeDiscountPercent: Number(row.time_discount_percent),
+    resourceGold: Number(row.resource_gold),
+    resourceElixir: Number(row.resource_elixir),
+    resourceDarkElixir: Number(row.resource_dark_elixir),
+    rewardType: row.reward_type,
+    rewardAmount: Number(row.reward_amount),
+    notesDe: row.notes_de,
+    notesEn: row.notes_en,
+    dataVersion: row.data_version,
+    sourceUrl: row.source_url,
+    updatedAt: row.updated_at,
+  })) as PlanningEventTemplate[];
+}
+
+export async function getMagicInventory(
+  accountId: string,
+): Promise<MagicInventoryItem[]> {
+  const c = getSupabaseClient();
+  const [{ data: catalog, error: ce }, { data: inventory, error: ie }] =
+    await Promise.all([
+      c
+        .from("magic_item_catalog")
+        .select(
+          "item_key,name,category,applies_to,effect_type,effect_value,sort_order",
+        )
+        .order("sort_order"),
+      c
+        .from("account_magic_items")
+        .select("item_key,quantity,reserved_queue_item_id")
+        .eq("account_id", accountId),
+    ]);
+  if (ce) throw new Error(ce.message);
+  if (ie) throw new Error(ie.message);
+  const owned = new Map((inventory || []).map((row) => [row.item_key, row]));
+  return (catalog || []).map((row) => {
+    const item = owned.get(row.item_key);
+    return {
+      itemKey: row.item_key,
+      name: row.name,
+      category: row.category,
+      appliesTo: row.applies_to,
+      effectType: row.effect_type,
+      effectValue: Number(row.effect_value),
+      sortOrder: row.sort_order,
+      quantity: item?.quantity || 0,
+      reservedQueueItemId: item?.reserved_queue_item_id || null,
+    };
+  }) as MagicInventoryItem[];
+}
+export async function saveMagicInventory(
+  accountId: string,
+  itemKey: string,
+  quantity: number,
+  reservedQueueItemId: string | null,
+): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from("account_magic_items")
+    .upsert(
+      {
+        account_id: accountId,
+        item_key: itemKey,
+        quantity,
+        reserved_queue_item_id: reservedQueueItemId,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "account_id,item_key" },
+    );
+  if (error) throw new Error(error.message);
+}
+export async function getPlanningEvents(
+  accountId: string,
+): Promise<PlanningEvent[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("account_planning_events")
+    .select(
+      "id,account_id,event_type,name,starts_at,ends_at,cost_discount_percent,time_discount_percent,resource_gold,resource_elixir,resource_dark_elixir,reward_type,reward_amount,enabled",
+    )
+    .eq("account_id", accountId)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data || []).map((r) => ({
+    id: r.id,
+    accountId: r.account_id,
+    eventType: r.event_type,
+    name: r.name,
+    startsAt: r.starts_at,
+    endsAt: r.ends_at,
+    costDiscountPercent: Number(r.cost_discount_percent),
+    timeDiscountPercent: Number(r.time_discount_percent),
+    resourceGold: r.resource_gold,
+    resourceElixir: r.resource_elixir,
+    resourceDarkElixir: r.resource_dark_elixir,
+    rewardType: r.reward_type,
+    rewardAmount: r.reward_amount,
+    enabled: r.enabled,
+  })) as PlanningEvent[];
+}
+export async function addPlanningEvent(
+  input: Omit<PlanningEvent, "id">,
+): Promise<PlanningEvent> {
+  const { data, error } = await getSupabaseClient()
+    .from("account_planning_events")
+    .insert({
+      account_id: input.accountId,
+      event_type: input.eventType,
+      name: input.name,
+      starts_at: input.startsAt,
+      ends_at: input.endsAt,
+      cost_discount_percent: input.costDiscountPercent,
+      time_discount_percent: input.timeDiscountPercent,
+      resource_gold: input.resourceGold,
+      resource_elixir: input.resourceElixir,
+      resource_dark_elixir: input.resourceDarkElixir,
+      reward_type: input.rewardType,
+      reward_amount: input.rewardAmount,
+      enabled: input.enabled,
+    })
+    .select(
+      "id,account_id,event_type,name,starts_at,ends_at,cost_discount_percent,time_discount_percent,resource_gold,resource_elixir,resource_dark_elixir,reward_type,reward_amount,enabled",
+    )
+    .single();
+  if (error) throw new Error(error.message);
+  return {
+    id: data.id,
+    accountId: data.account_id,
+    eventType: data.event_type,
+    name: data.name,
+    startsAt: data.starts_at,
+    endsAt: data.ends_at,
+    costDiscountPercent: Number(data.cost_discount_percent),
+    timeDiscountPercent: Number(data.time_discount_percent),
+    resourceGold: data.resource_gold,
+    resourceElixir: data.resource_elixir,
+    resourceDarkElixir: data.resource_dark_elixir,
+    rewardType: data.reward_type,
+    rewardAmount: data.reward_amount,
+    enabled: data.enabled,
+  } as PlanningEvent;
+}
+export async function deletePlanningEvent(id: string) {
+  const { error } = await getSupabaseClient()
+    .from("account_planning_events")
+    .delete()
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+}

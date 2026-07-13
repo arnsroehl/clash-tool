@@ -231,7 +231,9 @@ describe("Planner Engine", () => {
 
     assert.ok(heroUpgrade);
     assert.ok(buildingUpgrade);
-    assert.ok(heroUpgrade.priorityScore.value > buildingUpgrade.priorityScore.value);
+    assert.ok(
+      heroUpgrade.priorityScore.value > buildingUpgrade.priorityScore.value,
+    );
   });
 
   it("summiert fehlende Kosten", () => {
@@ -249,6 +251,48 @@ describe("Planner Engine", () => {
     assert.equal(result.summary.remainingGoldCost, 100);
     assert.equal(result.summary.remainingElixirCost, 300);
     assert.equal(result.summary.remainingDarkElixirCost, 200);
+  });
+
+  it("begrenzt Upgradepfad und Restzeit auf das Rathaus-Maximum", () => {
+    const result = planUpgrades({
+      account,
+      items: [
+        {
+          id: "cannon:1",
+          type: "building",
+          name: "Kanone 1",
+          category: "Verteidigung",
+          unlockTownHallLevel: 1,
+          maxLevel: 2,
+          sortOrder: 1,
+        },
+      ],
+      itemLevels: { "cannon:1": 1 },
+      upgradeLevels: [
+        {
+          itemId: "cannon:1",
+          itemType: "building",
+          level: 2,
+          townHallLevel: 9,
+          costs: { gold: 100, elixir: 0, darkElixir: 0 },
+          time: { hours: 5 },
+        },
+        {
+          itemId: "cannon:1",
+          itemType: "building",
+          level: 3,
+          townHallLevel: 10,
+          costs: { gold: 200, elixir: 0, darkElixir: 0 },
+          time: { hours: 7 },
+        },
+      ],
+    });
+
+    assert.equal(result.possibleUpgrades[0].remainingTime.hours, 5);
+    assert.deepEqual(
+      result.possibleUpgrades[0].upgradePath?.map((step) => step.level),
+      [2],
+    );
   });
 
   it("berechnet Fortschritt über alle Gebäude", () => {

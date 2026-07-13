@@ -25,6 +25,9 @@ export function DailyCompanion({
   const nextFinishes = [...simulation.assignments]
     .sort((a, b) => a.endHour - b.endHour)
     .slice(0, 3);
+  const weeklyAssignments = [...simulation.assignments]
+    .filter((item) => item.endHour <= 7 * 24)
+    .sort((a, b) => a.endHour - b.endHour);
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
       <h2 className="text-xl font-bold">
@@ -67,6 +70,38 @@ export function DailyCompanion({
             : "Noch keine Upgrades eingeplant."}
         </p>
       )}
+      <div className="mt-6 rounded-2xl border border-white/10 bg-slate-900 p-4">
+        <h3 className="font-bold">
+          {en ? "Seven-day plan" : "Sieben-Tage-Plan"}
+        </h3>
+        <p className="mt-1 text-sm text-slate-400">
+          {weeklyAssignments.length
+            ? en
+              ? `${weeklyAssignments.length} queued upgrades should finish this week.`
+              : `${weeklyAssignments.length} Queue-Upgrades werden diese Woche voraussichtlich fertig.`
+            : en
+              ? "No queued upgrade currently finishes within seven days."
+              : "Aktuell wird kein Queue-Upgrade innerhalb von sieben Tagen fertig."}
+        </p>
+        {weeklyAssignments.length ? (
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            {weeklyAssignments.slice(0, 8).map((item) => (
+              <div
+                key={`${item.queueItemId}-${item.endHour}`}
+                className="rounded-xl bg-white/5 p-3 text-xs"
+              >
+                <b>
+                  {item.name} Level {item.toLevel}
+                </b>
+                <span className="mt-1 block text-slate-500">
+                  {en ? "Day" : "Tag"}{" "}
+                  {Math.max(1, Math.ceil(item.endHour / 24))} · {item.slotLabel}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }

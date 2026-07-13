@@ -1,15 +1,8 @@
 export type UpgradeQueueItemStatus =
-  | "planned"
-  | "active"
-  | "completed"
-  | "skipped";
+  "planned" | "active" | "completed" | "skipped";
 
 export type UpgradeItemType =
-  | "building"
-  | "hero"
-  | "troop"
-  | "spell"
-  | "siege_machine";
+  "building" | "hero" | "troop" | "spell" | "siege_machine";
 
 export type UpgradeQueueItemRow = {
   id: string;

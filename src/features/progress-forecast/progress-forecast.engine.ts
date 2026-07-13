@@ -30,7 +30,9 @@ export function createProgressForecast(
 ): ProgressForecastResult {
   const currentProgressPercent = resolveCurrentProgressPercent(input);
   const remainingLevelsBefore = resolveRemainingLevels(input);
-  const completedQueueLevels = countCompletedQueueLevels(input.queueItems || []);
+  const completedQueueLevels = countCompletedQueueLevels(
+    input.queueItems || [],
+  );
   const progressGainPercent = calculateProgressGain({
     currentProgressPercent,
     remainingLevelsBefore,
@@ -56,7 +58,8 @@ export function createProgressForecast(
     }),
     completedQueueLevels,
     estimatedCompletionHours,
-    estimatedCompletionDays:
-      calculateEstimatedCompletionDays(estimatedCompletionHours),
+    estimatedCompletionDays: calculateEstimatedCompletionDays(
+      estimatedCompletionHours,
+    ),
   };
 }
