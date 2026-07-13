@@ -2,12 +2,17 @@
 
 import { useMemo, useState } from "react";
 import type { UpgradeRecommendation } from "@/features/planner/planner.types";
+import type { PlanningGoal } from "@/types/planningProfile";
 
 type Props = {
   recommendations: UpgradeRecommendation[];
   queuedKeys: Set<string>;
   onAddToQueue: (recommendation: UpgradeRecommendation) => void;
   isSaving: boolean;
+  accountId: string;
+  goals: PlanningGoal[];
+  onSaveGoal: (goal: Omit<PlanningGoal, "id" | "status">) => void;
+  onDeleteGoal: (id: string) => void;
 };
 
 const typeLabels = { building: "Gebäude", hero: "Helden", troop: "Truppen", spell: "Zauber", siege_machine: "Belagerungsmaschinen" };
@@ -16,7 +21,7 @@ function toDateInput(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-export function GoalPlanner({ recommendations, queuedKeys, onAddToQueue, isSaving }: Props) {
+export function GoalPlanner({ recommendations, queuedKeys, onAddToQueue, isSaving, accountId, goals, onSaveGoal, onDeleteGoal }: Props) {
   const [itemKey, setItemKey] = useState("");
   const [targetLevel, setTargetLevel] = useState(1);
   const today = useMemo(() => toDateInput(new Date()), []);
@@ -81,9 +86,11 @@ export function GoalPlanner({ recommendations, queuedKeys, onAddToQueue, isSavin
             <button type="button" disabled={alreadyQueued || isSaving} onClick={() => onAddToQueue(selected)} className="mt-4 rounded-xl bg-amber-400 px-4 py-2 text-sm font-bold text-slate-950 disabled:opacity-40">
               {alreadyQueued ? "Nächstes Level bereits in Queue" : "Nächstes benötigtes Level einplanen"}
             </button>
+            <button type="button" onClick={() => onSaveGoal({ accountId, itemType: selected.itemType, itemId: selected.itemId, name: selected.name, currentLevel: selected.currentLevel, targetLevel: safeTarget, targetDate, estimatedHours })} className="ml-2 mt-4 rounded-xl border border-amber-400/40 px-4 py-2 text-sm font-bold text-amber-200">Ziel dauerhaft speichern</button>
           </div>
         </div>
       ) : <div className="mt-6 rounded-2xl bg-slate-900 p-5 text-slate-400">Wähle ein konkretes Ziel aus.</div>}
+      {goals.length ? <div className="mt-6 border-t border-white/10 pt-5"><h3 className="font-bold">Gespeicherte Ziele</h3><div className="mt-3 grid gap-3 md:grid-cols-2">{goals.map((goal) => <div key={goal.id} className="rounded-xl bg-slate-900 p-4"><p className="font-bold">{goal.name} Level {goal.targetLevel}</p><p className="mt-1 text-xs text-slate-400">{goal.targetDate ? `bis ${new Intl.DateTimeFormat("de-DE").format(new Date(`${goal.targetDate}T00:00:00`))}` : "ohne Termin"} · ca. {Math.ceil(goal.estimatedHours / 24)} Tage</p><button type="button" onClick={() => onDeleteGoal(goal.id)} className="mt-3 text-xs font-bold text-red-300">Ziel löschen</button></div>)}</div></div> : null}
     </section>
   );
 }

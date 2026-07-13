@@ -12,7 +12,10 @@ import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
 import { HeroList } from "@/components/heroes/HeroList";
+import { PlayerImportCenter } from "@/components/import/PlayerImportCenter";
 import { GoalPlanner } from "@/components/goals/GoalPlanner";
+import { DailyCompanion } from "@/components/notifications/DailyCompanion";
+import { PlanningProfileSettings } from "@/components/profile/PlanningProfileSettings";
 import { LaboratoryOverview } from "@/components/laboratory/LaboratoryOverview";
 import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
@@ -26,6 +29,8 @@ import { rankRecommendations, type PlanningStrategy, type StrategyWeights } from
 import { createProgressForecast } from "@/features/progress-forecast/progress-forecast.engine";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useAuth } from "@/hooks/useAuth";
+import { usePlanningGoals } from "@/hooks/usePlanningGoals";
+import { usePlanningProfile } from "@/hooks/usePlanningProfile";
 import { useBuildings } from "@/hooks/useBuildings";
 import { useHeroes } from "@/hooks/useHeroes";
 import { useSiegeMachines } from "@/hooks/useSiegeMachines";
@@ -107,6 +112,7 @@ export default function Home() {
     setErrorMessage(message);
   }, []);
   const { user, isLoadingAuth, authMessage, setAuthMessage, signIn, signUp, signOut } = useAuth();
+  const { profile, updateProfile } = usePlanningProfile(user?.id, handleError);
 
   const {
     accounts,
@@ -346,6 +352,7 @@ export default function Home() {
       builderSimulation,
     });
   }, [builderSimulation, plannerResult, queueItems]);
+  const { goals, addGoal, removeGoal } = usePlanningGoals(selectedAccount?.id, handleError);
 
   if (isLoadingAuth || !user) {
     return <AuthPanel isLoading={isLoadingAuth} message={authMessage} onSignIn={signIn} onSignUp={signUp} onMessage={setAuthMessage} />;
@@ -376,6 +383,16 @@ export default function Home() {
         </div>
 
         <CollapsibleSection title="Übersicht"><StatsCards stats={stats} /></CollapsibleSection>
+
+        {profile ? <CollapsibleSection title="Nutzerprofil"><PlanningProfileSettings profile={profile} onChange={updateProfile} /></CollapsibleSection> : null}
+
+        <CollapsibleSection title="Täglicher Begleiter">
+          <DailyCompanion simulation={builderSimulation} recommendations={upgradeRecommendations} enabled={profile?.dailySummaryEnabled ?? true} />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Import & Synchronisierung" defaultOpen={false}>
+          <PlayerImportCenter account={selectedAccount} heroes={availableHeroes} heroLevels={heroLevels} troops={availableTroops} troopLevels={troopLevels} spells={availableSpells} spellLevels={spellLevels} siegeMachines={availableSiegeMachines} siegeLevels={siegeMachineLevels} />
+        </CollapsibleSection>
 
         <CollapsibleSection title="Planungszentrale">
           <PlanningControlCenter
@@ -443,12 +460,16 @@ export default function Home() {
         </CollapsibleSection>
 
         <CollapsibleSection title="Ziele & Meilensteine">
-          <GoalPlanner
+          {selectedAccount ? <GoalPlanner
             recommendations={upgradeRecommendations}
             queuedKeys={new Set(queueItems.map((item) => `${item.itemType}:${item.itemId}:${item.toLevel}`))}
             onAddToQueue={addRecommendationToQueue}
             isSaving={isSavingQueueItem}
-          />
+            accountId={selectedAccount.id}
+            goals={goals}
+            onSaveGoal={addGoal}
+            onDeleteGoal={removeGoal}
+          /> : <p className="p-5 text-slate-400">Wähle zuerst einen Clash-Account aus.</p>}
         </CollapsibleSection>
 
         <CollapsibleSection title="Accounts & Gebäude">

@@ -6,7 +6,7 @@ import type {
 } from "@/types/account";
 
 const ACCOUNT_SELECT_FIELDS =
-  "id, name, town_hall_level, builder_count, created_at, user_id";
+  "id, name, town_hall_level, builder_count, created_at, user_id, player_tag, last_synced_at";
 
 function mapAccount(row: AccountRow): ClashAccount {
   return {
@@ -16,6 +16,8 @@ function mapAccount(row: AccountRow): ClashAccount {
     builderCount: row.builder_count,
     createdAt: row.created_at,
     userId: row.user_id,
+    playerTag: row.player_tag,
+    lastSyncedAt: row.last_synced_at,
   };
 }
 

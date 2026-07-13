@@ -5,6 +5,8 @@ export type ClashAccount = {
   builderCount: number;
   createdAt: string;
   userId: string;
+  playerTag: string | null;
+  lastSyncedAt: string | null;
 };
 
 export type AccountFormValues = {
@@ -20,4 +22,6 @@ export type AccountRow = {
   builder_count: number;
   created_at: string;
   user_id: string;
+  player_tag: string | null;
+  last_synced_at: string | null;
 };
