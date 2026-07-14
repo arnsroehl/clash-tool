@@ -539,6 +539,7 @@ export type ImageQualityResult = {
 
 export type ScreenshotContentQualityIssue =
   | "foreign_game"
+  | "replay_or_foreign_base"
   | "obstructing_overlay"
   | "expected_view_markers_missing"
   | "content_near_image_edge";
@@ -805,6 +806,17 @@ const OBSTRUCTING_OVERLAY_MARKERS = [
   "airdrop",
 ] as const;
 
+const REPLAY_OR_FOREIGN_BASE_MARKERS = [
+  "replay",
+  "wiederholung",
+  "spectate",
+  "zuschauen",
+  "return home",
+  "nach hause",
+  "visit village",
+  "dorf besuchen",
+] as const;
+
 const REQUIRED_VIEW_MARKERS: Partial<Record<Exclude<ScreenshotScreenType, "unknown">, string[]>> = {
   laboratory: ["labor", "laboratory", "forschung", "research", "gesamtdauer", "total time"],
   heroes: ["helden", "heroes", "barbarenkonig", "barbarian king", "archer queen"],
@@ -839,6 +851,13 @@ export function assessScreenshotContentQuality(params: {
     issues.push("obstructing_overlay");
     evidence.push(...overlayMarkers);
   }
+  if (["village", "buildings", "walls", "builders"].includes(params.screenType)) {
+    const replayMarkers = matchMarkers(REPLAY_OR_FOREIGN_BASE_MARKERS);
+    if (replayMarkers.length) {
+      issues.push("replay_or_foreign_base");
+      evidence.push(...replayMarkers);
+    }
+  }
   const requiredMarkers = params.screenType === "unknown"
     ? []
     : REQUIRED_VIEW_MARKERS[params.screenType] || [];
@@ -854,9 +873,12 @@ export function assessScreenshotContentQuality(params: {
     issues.push("content_near_image_edge");
     evidence.push(...clippedLines.slice(0, 3).map((line) => line.text.trim()));
   }
-  const blocking = issues.includes("foreign_game") || issues.includes("obstructing_overlay");
+  const blocking = issues.includes("foreign_game") ||
+    issues.includes("replay_or_foreign_base") ||
+    issues.includes("obstructing_overlay");
   const penalties: Record<ScreenshotContentQualityIssue, number> = {
     foreign_game: 0.8,
+    replay_or_foreign_base: 0.8,
     obstructing_overlay: 0.55,
     expected_view_markers_missing: 0.2,
     content_near_image_edge: 0.18,

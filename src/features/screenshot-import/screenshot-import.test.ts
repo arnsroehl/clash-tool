@@ -362,6 +362,29 @@ test("blocks screenshots from another game or with a system overlay", () => {
   assert.ok(overlay.issues.includes("obstructing_overlay"));
 });
 
+test("blocks replay and visited-base screenshots for account progress imports", () => {
+  const replay = assessScreenshotContentQuality({
+    text: "Wiederholung 1x Nach Hause",
+    screenType: "village",
+  });
+  assert.equal(replay.accepted, false);
+  assert.ok(replay.issues.includes("replay_or_foreign_base"));
+
+  const visitedBase = assessScreenshotContentQuality({
+    text: "Visit Village Return Home",
+    screenType: "buildings",
+  });
+  assert.equal(visitedBase.accepted, false);
+  assert.ok(visitedBase.evidence.includes("visit village"));
+
+  const profileText = assessScreenshotContentQuality({
+    text: "Player Profile Replay Master Clan",
+    screenType: "profile",
+  });
+  assert.equal(profileText.accepted, true);
+  assert.ok(!profileText.issues.includes("replay_or_foreign_base"));
+});
+
 test("warns about missing view markers and text clipped by the image edge", () => {
   const result = assessScreenshotContentQuality({
     text: "Level 12\nLevel 13",

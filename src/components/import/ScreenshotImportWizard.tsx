@@ -172,6 +172,7 @@ const qualityIssueText: Record<string, { de: string; en: string }> = {
   likely_rotated: { de: "Der Screenshot ist vermutlich gedreht", en: "The screenshot appears to be rotated" },
   unexpected_aspect_ratio: { de: "Das Seitenverhältnis wirkt stark zugeschnitten", en: "The aspect ratio appears heavily cropped" },
   foreign_game: { de: "Das Bild stammt vermutlich aus einem anderen Spiel", en: "The image appears to come from another game" },
+  replay_or_foreign_base: { de: "Das Bild stammt vermutlich aus einer Wiederholung, Zuschaueransicht oder fremden Basis und wird nicht übernommen", en: "The image appears to show a replay, spectator view or foreign base and will not be imported" },
   obstructing_overlay: { de: "Eine Benachrichtigung oder ein Systemfenster verdeckt die Spielansicht", en: "A notification or system overlay obstructs the game view" },
   expected_view_markers_missing: { de: "Die typischen Überschriften dieser Ansicht fehlen; prüfe, ob die Übersicht vollständig sichtbar ist", en: "Typical headings for this view are missing; check that the complete overview is visible" },
   content_near_image_edge: { de: "Mehrere Texte liegen direkt am Bildrand; die Ansicht könnte abgeschnitten sein", en: "Several labels touch the image edge; the view may be cropped" },
