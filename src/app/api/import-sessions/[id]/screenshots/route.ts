@@ -1,6 +1,12 @@
 import { createHash, randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedSupabase } from "@/lib/server-supabase";
+import {
+  isScreenshotImportTypeEnabled,
+  isSupportedGameUiVersion,
+  SCREENSHOT_IMPORT_CONFIG,
+} from "@/config/screenshotImport";
+import type { ScreenshotScreenType } from "@/features/screenshot-import/screenshot-import";
 
 type Context = { params: Promise<{ id: string }> };
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -31,11 +37,16 @@ export async function POST(request: NextRequest, context: Context) {
 
   const { data: session, error: sessionError } = await auth.client
     .from("screenshot_import_sessions")
-    .select("id")
+    .select("id, selected_import_type, game_version")
     .eq("id", id)
     .single();
   if (sessionError || !session)
     return NextResponse.json({ error: "Importsitzung nicht gefunden." }, { status: 404 });
+  const importType = session.selected_import_type as Exclude<ScreenshotScreenType, "unknown">;
+  if (!isScreenshotImportTypeEnabled(importType))
+    return NextResponse.json({ error: "Dieser Importbereich ist aktuell deaktiviert." }, { status: 503 });
+  if (!isSupportedGameUiVersion(session.game_version))
+    return NextResponse.json({ error: "Die Importsitzung verwendet eine nicht unterstützte Spieloberfläche." }, { status: 409 });
 
   const bytes = new Uint8Array(await file.arrayBuffer());
   const contentHash = createHash("sha256").update(bytes).digest("hex");
@@ -76,6 +87,8 @@ export async function POST(request: NextRequest, context: Context) {
       quality_score: qualityScore,
       quality_issues: qualityIssues,
       processing_status: "uploaded",
+      model_version: SCREENSHOT_IMPORT_CONFIG.modelVersion,
+      layout_version: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
     })
     .select("id, original_filename, width, height, processing_status, created_at")
     .single();

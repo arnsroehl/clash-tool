@@ -88,6 +88,26 @@ NEXT_PUBLIC_CLASH_API_ENABLED=true
 Leave the variable unset or set it to `false` to avoid automatic API requests
 and hide unavailable sync controls.
 
+## Screenshot import rollout
+
+Screenshot recognition stores its game-UI, model, and layout versions with each
+import. Public feature flags allow a changed Clash interface to be disabled on
+Vercel without a code rollback:
+
+```env
+NEXT_PUBLIC_SCREENSHOT_IMPORT_ENABLED=true
+NEXT_PUBLIC_LABORATORY_IMPORT_ENABLED=true
+NEXT_PUBLIC_VILLAGE_DETECTION_ENABLED=true
+NEXT_PUBLIC_SUPPORTED_GAME_UI_VERSION=coc-ui-2026-07
+NEXT_PUBLIC_SCREENSHOT_MODEL_VERSION=local-tesseract-v1
+NEXT_PUBLIC_SCREENSHOT_LAYOUT_VERSION=guided-layout-v1
+```
+
+These values are public compatibility metadata, not secrets. When a game update
+changes the interface, disable the affected importer until its layout is
+verified, then set a new UI/layout version and redeploy. Imports without the
+currently supported UI version are not automatically analyzed.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP

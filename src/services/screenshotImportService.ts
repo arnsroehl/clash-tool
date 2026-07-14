@@ -10,6 +10,11 @@ import type {
   WallLevelDistribution,
 } from "@/features/screenshot-import/screenshot-import";
 import type { NormalizedScreenshot } from "@/services/screenshotRecognitionService";
+import {
+  isScreenshotImportTypeEnabled,
+  isSupportedGameUiVersion,
+  SCREENSHOT_IMPORT_CONFIG,
+} from "@/config/screenshotImport";
 
 const BUCKET = "screenshot-imports";
 
@@ -29,6 +34,7 @@ export type ScreenshotImportSession = {
   selectedImportType: Exclude<ScreenshotScreenType, "unknown">;
   status: string;
   retainOriginals: boolean;
+  gameVersion: string | null;
 };
 
 export type ResumableScreenshotFile = {
@@ -54,6 +60,7 @@ export type ScreenshotImportHistoryEntry = {
   selectedImportType: Exclude<ScreenshotScreenType, "unknown">;
   createdAt: string;
   confirmedAt: string | null;
+  gameVersion: string | null;
   retainedOriginalCount: number;
 };
 
@@ -63,7 +70,7 @@ export async function fetchScreenshotImportHistory(
   const client = getSupabaseClient();
   const { data: sessions, error } = await client
     .from("screenshot_import_sessions")
-    .select("id, selected_import_type, created_at, confirmed_at")
+    .select("id, selected_import_type, created_at, confirmed_at, game_version")
     .eq("account_id", accountId)
     .eq("status", "confirmed")
     .order("created_at", { ascending: false })
@@ -88,6 +95,7 @@ export async function fetchScreenshotImportHistory(
       session.selected_import_type as ScreenshotImportHistoryEntry["selectedImportType"],
     createdAt: String(session.created_at),
     confirmedAt: session.confirmed_at ? String(session.confirmed_at) : null,
+    gameVersion: session.game_version ? String(session.game_version) : null,
     retainedOriginalCount: retainedCounts.get(String(session.id)) || 0,
   }));
 }
@@ -105,7 +113,7 @@ export async function fetchLatestOpenScreenshotImport(
   const client = getSupabaseClient();
   const { data: row, error } = await client
     .from("screenshot_import_sessions")
-    .select("id, account_id, selected_import_type, status, retain_originals")
+    .select("id, account_id, selected_import_type, status, retain_originals, game_version")
     .eq("account_id", accountId)
     .in("status", ["draft", "uploaded", "analyzing", "review_required", "ready", "failed"])
     .order("updated_at", { ascending: false })
@@ -182,6 +190,7 @@ export async function fetchLatestOpenScreenshotImport(
       selectedImportType: row.selected_import_type as ScreenshotImportSession["selectedImportType"],
       status: row.status as string,
       retainOriginals: row.retain_originals as boolean,
+      gameVersion: row.game_version ? String(row.game_version) : null,
     },
     changes,
     fileCount: fileRows?.length || 0,
@@ -221,6 +230,10 @@ export async function createScreenshotImportSession(params: {
   retainOriginals: boolean;
   gameVersion?: string;
 }): Promise<ScreenshotImportSession> {
+  if (!isScreenshotImportTypeEnabled(params.importType))
+    throw new Error("Dieser Screenshot-Importbereich ist aktuell deaktiviert.");
+  if (!isSupportedGameUiVersion(params.gameVersion))
+    throw new Error("Unbekannte oder nicht unterstützte Spieloberflächen-Version.");
   const client = getSupabaseClient();
   const {
     data: { user },
@@ -238,7 +251,7 @@ export async function createScreenshotImportSession(params: {
       retain_originals: params.retainOriginals,
       game_version: params.gameVersion,
     })
-    .select("id, account_id, selected_import_type, status, retain_originals")
+    .select("id, account_id, selected_import_type, status, retain_originals, game_version")
     .single();
   if (error) throw new Error(error.message);
   return {
@@ -247,6 +260,7 @@ export async function createScreenshotImportSession(params: {
     selectedImportType: data.selected_import_type as ScreenshotImportSession["selectedImportType"],
     status: data.status as string,
     retainOriginals: data.retain_originals as boolean,
+    gameVersion: data.game_version ? String(data.game_version) : null,
   };
 }
 
@@ -256,6 +270,10 @@ export async function uploadScreenshot(params: {
   screenType: ScreenshotScreenType;
   screenTypeConfidence: number;
 }): Promise<{ id: string; storagePath: string; duplicate: boolean }> {
+  if (!isScreenshotImportTypeEnabled(params.session.selectedImportType))
+    throw new Error("Dieser Screenshot-Importbereich ist aktuell deaktiviert.");
+  if (!isSupportedGameUiVersion(params.session.gameVersion))
+    throw new Error("Die Importsitzung verwendet eine nicht unterstützte Spieloberfläche.");
   const client = getSupabaseClient();
   const {
     data: { user },
@@ -300,6 +318,8 @@ export async function uploadScreenshot(params: {
     quality_score: params.screenshot.quality.score,
     quality_issues: params.screenshot.quality.issues,
     processing_status: "analyzing",
+    model_version: SCREENSHOT_IMPORT_CONFIG.modelVersion,
+    layout_version: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
   });
   if (rowError) {
     await client.storage.from(BUCKET).remove([storagePath]);
@@ -321,6 +341,8 @@ export async function updateScreenshotAnalysis(params: {
       screen_type: params.screenType,
       screen_type_confidence: params.screenTypeConfidence,
       processing_status: params.processingStatus || "analyzing",
+      model_version: SCREENSHOT_IMPORT_CONFIG.modelVersion,
+      layout_version: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
     })
     .eq("id", params.screenshotId);
   if (error) throw new Error(error.message);
@@ -586,6 +608,7 @@ export async function recordScreenshotFeedback(params: {
   correctedResult: Record<string, unknown>;
   improvementConsent: boolean;
   language: "de" | "en";
+  gameVersion?: string | null;
 }): Promise<void> {
   const client = getSupabaseClient();
   const {
@@ -598,7 +621,8 @@ export async function recordScreenshotFeedback(params: {
     previous_result: params.previousResult,
     corrected_result: params.correctedResult,
     improvement_consent: params.improvementConsent,
-    model_version: "local-tesseract-v1",
+    model_version: SCREENSHOT_IMPORT_CONFIG.modelVersion,
+    game_version: params.gameVersion || null,
     language: params.language,
   });
   if (error) throw new Error(error.message);

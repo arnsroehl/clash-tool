@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedSupabase } from "@/lib/server-supabase";
+import {
+  isScreenshotImportTypeEnabled,
+  isSupportedGameUiVersion,
+} from "@/config/screenshotImport";
+import type { ScreenshotScreenType } from "@/features/screenshot-import/screenshot-import";
 
 const IMPORT_TYPES = new Set([
   "laboratory", "heroes", "pets", "equipment", "builders",
@@ -11,7 +16,7 @@ export async function GET(request: NextRequest) {
   if (!auth) return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
   let query = auth.client
     .from("screenshot_import_sessions")
-    .select("id, account_id, selected_import_type, status, language, retain_originals, created_at, updated_at, completed_at, confirmed_at")
+    .select("id, account_id, selected_import_type, status, language, retain_originals, game_version, created_at, updated_at, completed_at, confirmed_at")
     .order("created_at", { ascending: false })
     .limit(50);
   const accountId = request.nextUrl.searchParams.get("accountId");
@@ -30,6 +35,12 @@ export async function POST(request: NextRequest) {
   const language = body?.language === "en" ? "en" : "de";
   if (!accountId || !IMPORT_TYPES.has(importType))
     return NextResponse.json({ error: "Account oder Importbereich ist ungültig." }, { status: 400 });
+  const typedImport = importType as Exclude<ScreenshotScreenType, "unknown">;
+  if (!isScreenshotImportTypeEnabled(typedImport))
+    return NextResponse.json({ error: "Dieser Importbereich ist aktuell deaktiviert." }, { status: 503 });
+  const gameVersion = typeof body?.gameVersion === "string" ? body.gameVersion : null;
+  if (!isSupportedGameUiVersion(gameVersion))
+    return NextResponse.json({ error: "Unbekannte oder nicht unterstützte Spieloberflächen-Version." }, { status: 409 });
   const { data, error } = await auth.client
     .from("screenshot_import_sessions")
     .insert({
@@ -39,9 +50,9 @@ export async function POST(request: NextRequest) {
       status: "draft",
       language,
       retain_originals: body?.retainOriginals === true,
-      game_version: typeof body?.gameVersion === "string" ? body.gameVersion : null,
+      game_version: gameVersion,
     })
-    .select("id, account_id, selected_import_type, status, language, retain_originals, created_at")
+    .select("id, account_id, selected_import_type, status, language, retain_originals, game_version, created_at")
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ session: data }, { status: 201 });

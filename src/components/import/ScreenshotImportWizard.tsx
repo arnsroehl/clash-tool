@@ -54,6 +54,11 @@ import {
 } from "@/services/screenshotRecognitionService";
 import { recognizeScreenshotObjects } from "@/services/screenshotObjectRecognitionService";
 import type { ImportChange } from "@/services/playerImportService";
+import {
+  isScreenshotImportTypeEnabled,
+  isSupportedGameUiVersion,
+  SCREENSHOT_IMPORT_CONFIG,
+} from "@/config/screenshotImport";
 
 type ImportType = Exclude<ScreenshotScreenType, "unknown">;
 
@@ -142,6 +147,7 @@ export function ScreenshotImportWizard({
   const [step, setStep] = useState<"select" | "upload" | "review" | "done">("select");
   const [importType, setImportType] = useState<ImportType>("laboratory");
   const [buildingSection, setBuildingSection] = useState<BuildingImportSection>("all");
+  const [gameUiVersionKnown, setGameUiVersionKnown] = useState(true);
   const [session, setSession] = useState<ScreenshotImportSession | null>(null);
   const [resumeCandidate, setResumeCandidate] = useState<ResumableScreenshotImport | null>(null);
   const [pendingResumeFiles, setPendingResumeFiles] = useState<ResumableScreenshotFile[]>([]);
@@ -256,8 +262,10 @@ export function ScreenshotImportWizard({
     };
   }, [buildingSection, detections, entities, importType]);
   const selectedType = IMPORT_TYPES.find((item) => item.id === importType) || IMPORT_TYPES[0];
+  const selectedTypeEnabled = isScreenshotImportTypeEnabled(importType);
 
   const startSession = async () => {
+    if (!selectedTypeEnabled || !gameUiVersionKnown) return;
     setBusy(true);
     setMessage(null);
     try {
@@ -266,6 +274,7 @@ export function ScreenshotImportWizard({
         importType,
         language,
         retainOriginals,
+        gameVersion: SCREENSHOT_IMPORT_CONFIG.supportedGameUiVersion,
       });
       setSession(created);
       if (importType === "walls" && existingWallLevels.length) {
@@ -297,6 +306,14 @@ export function ScreenshotImportWizard({
 
   const resumeImport = () => {
     if (!resumeCandidate) return;
+    if (!isScreenshotImportTypeEnabled(resumeCandidate.session.selectedImportType)) {
+      setMessage(
+        en
+          ? "This import area is currently disabled by a feature flag."
+          : "Dieser Importbereich ist aktuell über einen Feature-Flag deaktiviert.",
+      );
+      return;
+    }
     const namedChanges = resumeCandidate.changes.map((change) => ({
       ...change,
       name: entities.find((entity) => entity.id === change.entityId)?.name || change.name,
@@ -326,6 +343,22 @@ export function ScreenshotImportWizard({
     inputs: Array<{ file: File; existing?: ResumableScreenshotFile }>,
   ) => {
     if (!session || !inputs.length) return;
+    if (!isScreenshotImportTypeEnabled(session.selectedImportType)) {
+      setMessage(
+        en
+          ? "Automatic analysis for this area is currently disabled."
+          : "Die automatische Analyse dieses Bereichs ist aktuell deaktiviert.",
+      );
+      return;
+    }
+    if (!isSupportedGameUiVersion(session.gameVersion)) {
+      setMessage(
+        en
+          ? "Automatic analysis is blocked because this import has no supported game UI version. Start a new import after confirming the current interface."
+          : "Die automatische Analyse ist gesperrt, weil dieser Import keine unterstützte Spieloberflächen-Version besitzt. Starte nach Bestätigung der aktuellen Oberfläche einen neuen Import.",
+      );
+      return;
+    }
     setBusy(true);
     setMessage(null);
     const combinedDetections = [...detections];
@@ -386,7 +419,13 @@ export function ScreenshotImportWizard({
             screenshotId: uploaded.id,
             jobType: "recognize_text",
             status: "running",
-            payload: { language, filename: file.name },
+            payload: {
+              language,
+              filename: file.name,
+              gameVersion: session.gameVersion,
+              modelVersion: SCREENSHOT_IMPORT_CONFIG.modelVersion,
+              layoutVersion: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
+            },
           });
           const recognition = await recognizeScreenshotDetailed(
             normalized.file,
@@ -725,6 +764,7 @@ export function ScreenshotImportWizard({
           correctedResult: { level: correctedLevel },
           improvementConsent,
           language,
+          gameVersion: session.gameVersion,
         });
       }
       const hasDeferredChanges = Object.values(deferred).some(Boolean);
@@ -787,6 +827,7 @@ export function ScreenshotImportWizard({
     setResumeCandidate(null);
     setPendingResumeFiles([]);
     setSavedForLater(false);
+    setGameUiVersionKnown(true);
     setProgress(0);
     setMessage(null);
     setStep("select");
@@ -841,10 +882,22 @@ export function ScreenshotImportWizard({
                 <b>{en ? "Saved import found" : "Gespeicherten Import gefunden"}</b><br />
                 {resumeCandidate.fileCount} {en ? "screenshots" : "Screenshots"} · {resumeCandidate.changes.length} {en ? "changes" : "Änderungen"}
               </span>
-              <button type="button" onClick={resumeImport} className="rounded-lg bg-sky-300 px-3 py-2 font-bold text-slate-950">
+              <button
+                type="button"
+                onClick={resumeImport}
+                disabled={!isScreenshotImportTypeEnabled(resumeCandidate.session.selectedImportType)}
+                className="rounded-lg bg-sky-300 px-3 py-2 font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
+              >
                 {en ? "Continue" : "Fortsetzen"}
               </button>
             </div>
+          ) : null}
+          {!SCREENSHOT_IMPORT_CONFIG.enabled ? (
+            <p className="mb-4 rounded-xl border border-rose-400/30 bg-rose-400/10 p-4 text-sm text-rose-100">
+              {en
+                ? "Screenshot imports are temporarily disabled while recognition is being updated. Your private history remains available."
+                : "Screenshot-Importe sind während einer Erkennungsaktualisierung vorübergehend deaktiviert. Deine private Historie bleibt verfügbar."}
+            </p>
           ) : null}
           {history.length ? (
             <details className="mb-4 rounded-xl border border-white/10 bg-slate-950/70 p-4">
@@ -860,6 +913,7 @@ export function ScreenshotImportWizard({
                         <b className="block text-slate-200">{en ? type?.en : type?.de}</b>
                         <span className="text-slate-500">
                           {new Intl.DateTimeFormat(en ? "en" : "de-DE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(entry.confirmedAt || entry.createdAt))}
+                          {entry.gameVersion ? ` · ${entry.gameVersion}` : ""}
                           {` · ${entry.retainedOriginalCount} ${en ? "retained originals" : "aufbewahrte Originale"}`}
                         </span>
                       </span>
@@ -882,21 +936,30 @@ export function ScreenshotImportWizard({
             </details>
           ) : null}
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {IMPORT_TYPES.map((item) => (
-              <button
-                type="button"
-                key={item.id}
-                onClick={() => setImportType(item.id)}
-                className={`rounded-xl border p-3 text-left transition ${
-                  importType === item.id
-                    ? "border-amber-400 bg-amber-400/10"
-                    : "border-white/10 bg-slate-950 hover:border-white/20"
-                }`}
-              >
-                <b className="block">{en ? item.en : item.de}</b>
-                <span className="mt-1 block text-xs text-slate-400">{en ? item.hintEn : item.hintDe}</span>
-              </button>
-            ))}
+            {IMPORT_TYPES.map((item) => {
+              const enabled = isScreenshotImportTypeEnabled(item.id);
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  onClick={() => setImportType(item.id)}
+                  disabled={!enabled}
+                  className={`rounded-xl border p-3 text-left transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                    importType === item.id
+                      ? "border-amber-400 bg-amber-400/10"
+                      : "border-white/10 bg-slate-950 hover:border-white/20"
+                  }`}
+                >
+                  <b className="block">{en ? item.en : item.de}</b>
+                  <span className="mt-1 block text-xs text-slate-400">{en ? item.hintEn : item.hintDe}</span>
+                  {!enabled ? (
+                    <span className="mt-1 block text-xs font-bold text-rose-300">
+                      {en ? "Temporarily disabled" : "Vorübergehend deaktiviert"}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
           </div>
           {importType === "buildings" ? (
             <fieldset className="mt-4">
@@ -947,6 +1010,41 @@ export function ScreenshotImportWizard({
               </ol>
             </div>
           ) : null}
+          <fieldset className="mt-4 rounded-xl border border-white/10 bg-slate-950/70 p-4">
+            <legend className="px-1 text-sm font-bold text-slate-200">
+              {en ? "Game interface compatibility" : "Kompatibilität der Spieloberfläche"}
+            </legend>
+            <p className="text-xs text-slate-400">
+              {en
+                ? `Recognition is calibrated for ${SCREENSHOT_IMPORT_CONFIG.supportedGameUiVersion}.`
+                : `Die Erkennung ist auf ${SCREENSHOT_IMPORT_CONFIG.supportedGameUiVersion} kalibriert.`}
+            </p>
+            <label className="mt-3 flex items-start gap-2 text-xs text-slate-300">
+              <input
+                type="radio"
+                name="game-ui-version"
+                checked={gameUiVersionKnown}
+                onChange={() => setGameUiVersionKnown(true)}
+              />
+              {en ? "The interface matches the current supported layout." : "Die Oberfläche entspricht dem aktuell unterstützten Layout."}
+            </label>
+            <label className="mt-2 flex items-start gap-2 text-xs text-slate-300">
+              <input
+                type="radio"
+                name="game-ui-version"
+                checked={!gameUiVersionKnown}
+                onChange={() => setGameUiVersionKnown(false)}
+              />
+              {en ? "The interface looks new or changed after a game update." : "Die Oberfläche sieht nach einem Spielupdate neu oder verändert aus."}
+            </label>
+            {!gameUiVersionKnown ? (
+              <p className="mt-3 text-xs text-rose-200">
+                {en
+                  ? "Automatic mass import stays blocked until this layout version is supported."
+                  : "Der automatische Massenimport bleibt gesperrt, bis diese Layoutversion unterstützt wird."}
+              </p>
+            ) : null}
+          </fieldset>
           <label className="mt-4 flex items-start gap-3 text-sm text-slate-300">
             <input
               type="checkbox"
@@ -965,7 +1063,7 @@ export function ScreenshotImportWizard({
           </label>
           <button
             type="button"
-            disabled={busy}
+            disabled={busy || !selectedTypeEnabled || !gameUiVersionKnown}
             onClick={() => void startSession()}
             className="mt-5 rounded-xl bg-amber-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40"
           >

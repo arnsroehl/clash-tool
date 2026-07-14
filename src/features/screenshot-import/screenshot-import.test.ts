@@ -28,6 +28,11 @@ import {
   selectVillageObjectMatches,
 } from "@/services/screenshotObjectRecognitionService";
 import { createLaboratoryGridCells } from "@/services/screenshotRecognitionService";
+import {
+  isScreenshotImportTypeEnabled,
+  isSupportedGameUiVersion,
+  resolveScreenshotImportConfig,
+} from "@/config/screenshotImport";
 
 const entities: ScreenshotEntity[] = [
   {
@@ -711,4 +716,31 @@ test("stores correction feedback only with explicit improvement consent", () => 
   assert.equal(shouldStoreScreenshotFeedback(true, undefined, 11), false);
   assert.equal(shouldStoreScreenshotFeedback(true, 11, 11), false);
   assert.equal(shouldStoreScreenshotFeedback(true, 12, 11), true);
+});
+
+test("resolves screenshot rollout flags and rejects unknown UI versions", () => {
+  const config = resolveScreenshotImportConfig({
+    enabled: "true",
+    laboratoryEnabled: "off",
+    villageEnabled: "false",
+    supportedGameUiVersion: "coc-ui-test",
+    modelVersion: "ocr-test",
+    layoutVersion: "layout-test",
+  });
+  assert.equal(isScreenshotImportTypeEnabled("laboratory", config), false);
+  assert.equal(isScreenshotImportTypeEnabled("village", config), false);
+  assert.equal(isScreenshotImportTypeEnabled("heroes", config), true);
+  assert.equal(isSupportedGameUiVersion("coc-ui-test", config), true);
+  assert.equal(isSupportedGameUiVersion("coc-ui-new", config), false);
+  assert.equal(isSupportedGameUiVersion(null, config), false);
+});
+
+test("global screenshot flag overrides individual import flags", () => {
+  const config = resolveScreenshotImportConfig({
+    enabled: "0",
+    laboratoryEnabled: "true",
+    villageEnabled: "true",
+  });
+  assert.equal(isScreenshotImportTypeEnabled("laboratory", config), false);
+  assert.equal(isScreenshotImportTypeEnabled("buildings", config), false);
 });
