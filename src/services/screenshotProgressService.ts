@@ -8,7 +8,23 @@ import type {
   ScreenshotProgressLevelRow,
   ScreenshotUpgradeSlot,
   ScreenshotResourceSnapshot,
+  ScreenshotWallLevel,
 } from "@/types/screenshotProgress";
+
+export async function fetchAccountWallLevels(
+  accountId: string,
+): Promise<ScreenshotWallLevel[]> {
+  const { data, error } = await getSupabaseClient()
+    .from("account_wall_levels")
+    .select("wall_level, wall_count")
+    .eq("account_id", accountId)
+    .order("wall_level");
+  if (error) throw new Error(error.message);
+  return (data || []).map((row) => ({
+    level: Number(row.wall_level),
+    count: Number(row.wall_count),
+  }));
+}
 
 export async function fetchScreenshotProgressCatalog(): Promise<{
   entities: ScreenshotProgressEntity[];

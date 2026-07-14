@@ -134,6 +134,12 @@ export type WallLevelDistribution = {
   confidence: number;
   sourceText: string;
   reasons: string[];
+  previousCount?: number;
+};
+
+export type WallDistributionParseOptions = {
+  maxLevel?: number;
+  previous?: Array<{ level: number; count: number }>;
 };
 
 export type UpgradeSlotType =
@@ -844,20 +850,42 @@ export function parseScreenshotLevels(
     }));
 }
 
-export function parseWallDistributions(text: string): WallLevelDistribution[] {
+export function parseWallDistributions(
+  text: string,
+  options?: WallDistributionParseOptions,
+): WallLevelDistribution[] {
   const byLevel = new Map<number, WallLevelDistribution>();
+  const previous = new Map((options?.previous || []).map((item) => [item.level, item.count]));
+  const hasWallContext = /(?:mauer|mauern|wall|walls)/i.test(text);
   text
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean)
     .forEach((line) => {
       const hasWallWord = /(?:mauer|mauern|wall|walls)/i.test(line);
-      if (!hasWallWord) return;
+      const maxLevelLine = options?.maxLevel && /(?:max(?:imum)?(?:\s+level)?|maximal(?:es)?\s+level)/i.test(line);
       const levelMatch = line.match(/(?:level|lvl|stufe)\s*[:=]?\s*(\d{1,2})/i);
       const countAfter = line.match(/(\d{1,3})\s*(?:x\s*)?(?:mauer|mauern|wall|walls)/i);
       const countBefore = line.match(/(?:mauer|mauern|wall|walls)\s*(?:anzahl|count)?\s*[:=x]?\s*(\d{1,3})/i);
-      const level = levelMatch ? Number(levelMatch[1]) : null;
-      const count = countAfter ? Number(countAfter[1]) : countBefore ? Number(countBefore[1]) : null;
+      const countFollowingLevel = line.match(/(?:level|lvl|stufe)\s*[:=]?\s*\d{1,2}\s*[:=x\-–]?\s*(\d{1,3})(?:\s|$)/i);
+      const countLeadingLevel = line.match(/^(\d{1,3})\s*x?\s*(?:mauer|mauern|wall|walls)?\s*(?:auf|at)?\s*(?:level|lvl|stufe)/i);
+      const level = maxLevelLine ? options.maxLevel as number : levelMatch ? Number(levelMatch[1]) : null;
+      const count = maxLevelLine
+        ? countAfter
+          ? Number(countAfter[1])
+          : countBefore
+            ? Number(countBefore[1])
+            : null
+        : countFollowingLevel
+          ? Number(countFollowingLevel[1])
+          : countLeadingLevel
+          ? Number(countLeadingLevel[1])
+          : countAfter
+            ? Number(countAfter[1])
+            : countBefore
+              ? Number(countBefore[1])
+              : null;
+      if (!hasWallWord && !(hasWallContext && (levelMatch || maxLevelLine))) return;
       if (level === null || count === null || level < 1 || level > 30 || count < 0 || count > 500)
         return;
       const confidence = levelMatch && (countAfter || countBefore) ? 0.94 : 0.68;
@@ -876,7 +904,10 @@ export function parseWallDistributions(text: string): WallLevelDistribution[] {
         count,
         confidence,
         sourceText: line,
-        reasons: [],
+        reasons: previous.has(level) && previous.get(level) !== count
+          ? [`Gespeichert: ${previous.get(level)}, erkannt: ${count}.`]
+          : [],
+        previousCount: previous.get(level),
       });
     });
   return [...byLevel.values()].sort((left, right) => left.level - right.level);

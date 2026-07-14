@@ -78,3 +78,8 @@ export type ScreenshotResourceSnapshot = {
   starryOre: number | null;
   capturedAt: string;
 };
+
+export type ScreenshotWallLevel = {
+  level: number;
+  count: number;
+};

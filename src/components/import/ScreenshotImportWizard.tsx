@@ -62,6 +62,10 @@ type Props = {
   onResourcesConfirmed?: (resources: ScreenshotResourceDetection[]) => void;
   onProfileConfirmed?: (profile: ScreenshotProfileDetection) => Promise<void>;
   onUpgradeSlotsConfirmed?: () => Promise<void> | void;
+  existingWallLevels?: Array<{ level: number; count: number }>;
+  expectedWallCount?: number;
+  maxWallLevel?: number;
+  onWallLevelsConfirmed?: () => Promise<void> | void;
 };
 
 type ProcessedScreenshot = {
@@ -125,6 +129,10 @@ export function ScreenshotImportWizard({
   onResourcesConfirmed,
   onProfileConfirmed,
   onUpgradeSlotsConfirmed,
+  existingWallLevels = [],
+  expectedWallCount = 0,
+  maxWallLevel = 0,
+  onWallLevelsConfirmed,
 }: Props) {
   const en = language === "en";
   const [step, setStep] = useState<"select" | "upload" | "review" | "done">("select");
@@ -181,6 +189,16 @@ export function ScreenshotImportWizard({
     () => upgradeSlots.some((slot) => !slot.isAvailable && slot.remainingSeconds === null),
     [upgradeSlots],
   );
+  const wallTotal = useMemo(
+    () => wallDistributions.reduce((sum, wall) => sum + wall.count, 0),
+    [wallDistributions],
+  );
+  const hasInvalidWallDistribution = useMemo(() => {
+    const levels = wallDistributions.map((wall) => wall.level);
+    return wallDistributions.some((wall) => wall.level < 1 || wall.count < 0)
+      || new Set(levels).size !== levels.length
+      || (expectedWallCount > 0 && wallTotal !== expectedWallCount);
+  }, [expectedWallCount, wallDistributions, wallTotal]);
   const groupedChanges = useMemo(() => {
     const groups = new Map<string, ScreenshotProposedChange[]>();
     changes
@@ -234,6 +252,17 @@ export function ScreenshotImportWizard({
         retainOriginals,
       });
       setSession(created);
+      if (importType === "walls" && existingWallLevels.length) {
+        setWallDistributions(existingWallLevels.map((wall) => ({
+          id: `wall:${wall.level}`,
+          level: wall.level,
+          count: wall.count,
+          confidence: 1,
+          sourceText: en ? "Saved distribution" : "Gespeicherte Verteilung",
+          reasons: [],
+          previousCount: wall.count,
+        })));
+      }
       setResumeCandidate(null);
       setRestoredChanges([]);
       setStep("upload");
@@ -437,7 +466,12 @@ export function ScreenshotImportWizard({
             ocrLines: recognition.lines,
             objectMatches,
           });
-          const currentWalls = importType === "walls" ? parseWallDistributions(recognition.text) : [];
+          const currentWalls = importType === "walls"
+            ? parseWallDistributions(recognition.text, {
+                maxLevel: maxWallLevel || undefined,
+                previous: existingWallLevels,
+              })
+            : [];
           const fallbackSlotTypeByImport = {
             builders: "builder",
             heroes: "builder",
@@ -473,7 +507,16 @@ export function ScreenshotImportWizard({
           const currentProfile = importType === "profile" ? parseProfileScreenshot(recognition.text) : null;
           if (!mismatch) {
             combinedDetections.push(...currentDetections);
-            currentWalls.forEach((item) => combinedWalls.set(item.level, item));
+            currentWalls.forEach((item) => {
+              const existing = combinedWalls.get(item.level);
+              combinedWalls.set(item.level, existing && existing.count !== item.count
+                ? {
+                    ...item,
+                    confidence: 0.49,
+                    reasons: [`Mehrere Screenshots zeigen ${existing.count} und ${item.count} Mauern auf Level ${item.level}.`],
+                  }
+                : item);
+            });
             currentSlots.forEach((item) => combinedSlots.set(`${item.slotType}:${item.slotIndex}`, item));
             currentResources.forEach((item) => combinedResources.set(item.resourceType, item));
             if (currentProfile && currentProfile.confidence > 0) combinedProfile = currentProfile;
@@ -616,8 +659,14 @@ export function ScreenshotImportWizard({
         }];
       });
       if (importChanges.length) await onConfirm(importChanges);
-      if (wallDistributions.length)
-        await saveWallDistributions(accountId, wallDistributions);
+      if (wallDistributions.length) {
+        await saveWallDistributions(
+          accountId,
+          wallDistributions,
+          expectedWallCount > 0 && wallTotal === expectedWallCount,
+        );
+        await onWallLevelsConfirmed?.();
+      }
       if (upgradeSlots.length) {
         await saveUpgradeSlots({ accountId, sessionId: session.id, slots: upgradeSlots });
         await onUpgradeSlotsConfirmed?.();
@@ -843,7 +892,6 @@ export function ScreenshotImportWizard({
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              capture="environment"
               multiple
               disabled={busy}
               onChange={(event) => void handleFiles(event)}
@@ -983,22 +1031,73 @@ export function ScreenshotImportWizard({
           {wallDistributions.length ? (
             <div className="mt-5">
               <h4 className="font-bold">{en ? "Wall distribution" : "Mauerverteilung"}</h4>
+              <p className={`mt-2 rounded-lg p-2 text-sm ${hasInvalidWallDistribution ? "bg-amber-400/10 text-amber-100" : "bg-emerald-400/10 text-emerald-100"}`}>
+                {en ? "Total" : "Gesamt"}: <b>{wallTotal}</b>
+                {expectedWallCount > 0 ? ` / ${expectedWallCount}` : ""}
+                {hasInvalidWallDistribution
+                  ? en ? " · Complete or correct the distribution before confirming." : " · Vervollständige oder korrigiere die Verteilung vor dem Bestätigen."
+                  : en ? " · Distribution complete." : " · Verteilung vollständig."}
+              </p>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 {wallDistributions.map((wall) => (
-                  <label key={wall.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
-                    <span>{en ? "Level" : "Level"} {wall.level} · {Math.round(wall.confidence * 100)}%</span>
+                  <div key={wall.id} className="rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
+                    <div className="flex items-center gap-2">
+                    <input
+                      aria-label={en ? "Wall level" : "Mauerlevel"}
+                      type="number"
+                      min={1}
+                      max={maxWallLevel || 30}
+                      value={wall.level}
+                      onChange={(event) => setWallDistributions((current) => current.map((item) => item.id === wall.id ? { ...item, level: Number(event.target.value), confidence: 1, reasons: [] } : item))}
+                      className="w-20 rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-white"
+                    />
+                    <span>×</span>
                     <input
                       aria-label={`${en ? "Walls level" : "Mauern Level"} ${wall.level}`}
                       type="number"
                       min={0}
-                      max={500}
+                      max={expectedWallCount || 500}
                       value={wall.count}
                       onChange={(event) => setWallDistributions((current) => current.map((item) => item.id === wall.id ? { ...item, count: Number(event.target.value), confidence: 1, reasons: [] } : item))}
                       className="w-24 rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-white"
                     />
-                  </label>
+                    <button
+                      type="button"
+                      aria-label={en ? `Remove wall level ${wall.level}` : `Mauerlevel ${wall.level} entfernen`}
+                      onClick={() => setWallDistributions((current) => current.filter((item) => item.id !== wall.id))}
+                      className="ml-auto rounded-lg border border-rose-400/30 px-2 py-1 text-rose-200"
+                    >
+                      {en ? "Remove" : "Entfernen"}
+                    </button>
+                    </div>
+                    <p className="mt-2 text-xs text-slate-400">
+                      {Math.round(wall.confidence * 100)}%
+                      {wall.previousCount !== undefined ? ` · ${en ? "saved" : "gespeichert"}: ${wall.previousCount}` : ""}
+                      {wall.reasons.length ? ` · ${wall.reasons.join(" ")}` : ""}
+                    </p>
+                  </div>
                 ))}
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const used = new Set(wallDistributions.map((wall) => wall.level));
+                  const nextLevel = Array.from({ length: maxWallLevel || 30 }, (_, index) => index + 1).find((level) => !used.has(level));
+                  if (!nextLevel) return;
+                  setWallDistributions((current) => [...current, {
+                    id: `wall:manual:${crypto.randomUUID()}`,
+                    level: nextLevel,
+                    count: 0,
+                    confidence: 1,
+                    sourceText: "Manuelle Korrektur",
+                    reasons: [],
+                    previousCount: existingWallLevels.find((item) => item.level === nextLevel)?.count,
+                  }]);
+                }}
+                className="mt-3 rounded-lg border border-amber-400/30 px-3 py-2 text-xs font-bold text-amber-200"
+              >
+                {en ? "Add wall level" : "Mauerlevel hinzufügen"}
+              </button>
             </div>
           ) : null}
           {upgradeSlots.length ? (
@@ -1110,7 +1209,7 @@ export function ScreenshotImportWizard({
             </span>
           </label>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
+            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
               {en ? "Confirm selected changes" : "Ausgewählte Änderungen bestätigen"}
             </button>
             <button type="button" disabled={busy} onClick={() => void cancel()} className="rounded-xl border border-rose-400/30 px-5 py-3 font-bold text-rose-200 disabled:opacity-40">
