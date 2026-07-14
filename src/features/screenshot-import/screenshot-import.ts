@@ -228,6 +228,34 @@ export type UpgradeSlotDetection = {
   sourceText: string;
 };
 
+export type UpgradeSlotSnapshot = Omit<UpgradeSlotDetection, "id" | "confidence" | "sourceText">;
+
+export type UpgradeSlotChangeType =
+  | "new_slot"
+  | "unchanged"
+  | "upgrade_started"
+  | "upgrade_completed"
+  | "upgrade_changed"
+  | "remaining_time_changed";
+
+export function compareUpgradeSlotState(
+  detected: UpgradeSlotSnapshot,
+  previous?: UpgradeSlotSnapshot | null,
+): UpgradeSlotChangeType {
+  if (!previous) return "new_slot";
+  if (previous.isAvailable && !detected.isAvailable) return "upgrade_started";
+  if (!previous.isAvailable && detected.isAvailable) return "upgrade_completed";
+  if (previous.isAvailable && detected.isAvailable) return "unchanged";
+  const normalizeName = (value: string | null) => normalizeScreenshotText(value || "");
+  if (
+    normalizeName(previous.entityName) !== normalizeName(detected.entityName) ||
+    previous.targetLevel !== detected.targetLevel
+  ) return "upgrade_changed";
+  if (previous.remainingSeconds !== detected.remainingSeconds)
+    return "remaining_time_changed";
+  return "unchanged";
+}
+
 export type UpgradeSlotParseOptions = {
   fallbackSlotType?: UpgradeSlotType;
   entities?: Array<Pick<ScreenshotEntity, "name" | "aliases">>;

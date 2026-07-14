@@ -28,7 +28,7 @@ import type { ClashAccount } from "@/types/account";
 import type { Building, BuildingInstanceLevelMap } from "@/types/building";
 import type { Hero } from "@/types/hero";
 import type { SiegeMachine, Spell, Troop } from "@/types/laboratory";
-import type { ScreenshotWallLevel } from "@/types/screenshotProgress";
+import type { ScreenshotUpgradeSlot, ScreenshotWallLevel } from "@/types/screenshotProgress";
 import type { MagicInventoryItem } from "@/types/magicItems";
 
 type Props = {
@@ -51,6 +51,7 @@ type Props = {
   onMagicItemsImported?: (items: ScreenshotMagicItemDetection[]) => Promise<void>;
   onProfileImported?: (profile: ScreenshotProfileDetection) => Promise<void>;
   onUpgradeSlotsImported?: () => Promise<void> | void;
+  upgradeSlots?: ScreenshotUpgradeSlot[];
   onProgressImported?: () => Promise<void> | void;
   wallLevels?: ScreenshotWallLevel[];
   onWallLevelsImported?: () => Promise<void> | void;
@@ -393,6 +394,7 @@ export function PlayerImportCenter(props: Props) {
             onMagicItemsConfirmed={props.onMagicItemsImported}
             onProfileConfirmed={props.onProfileImported}
             onUpgradeSlotsConfirmed={props.onUpgradeSlotsImported}
+            existingUpgradeSlots={props.upgradeSlots}
             existingWallLevels={props.wallLevels || []}
             expectedWallCount={wallBuilding?.buildingCount || 0}
             maxWallLevel={wallBuilding?.maxLevel || 0}

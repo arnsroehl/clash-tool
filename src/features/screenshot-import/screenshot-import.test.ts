@@ -5,6 +5,7 @@ import {
   assessScreenshotContentQuality,
   detectScreenshotLanguage,
   classifyScreenshotText,
+  compareUpgradeSlotState,
   mergeScreenshotDetections,
   mergeProfileScreenshotDetections,
   mergeScreenshotMagicItemDetections,
@@ -692,6 +693,36 @@ test("parses a builder summary and creates exact occupied and available slots", 
   });
   assert.equal(compactSlot[0].targetLevel, 20);
   assert.equal(compactSlot[0].remainingSeconds, 374_400);
+});
+
+test("compares imported upgrade slots with the saved planning state", () => {
+  const available = {
+    slotType: "builder" as const,
+    slotIndex: 1,
+    isAvailable: true,
+    entityName: null,
+    targetLevel: null,
+    remainingSeconds: null,
+  };
+  const occupied = {
+    ...available,
+    isAvailable: false,
+    entityName: "Kanone",
+    targetLevel: 20,
+    remainingSeconds: 86_400,
+  };
+  assert.equal(compareUpgradeSlotState(occupied, available), "upgrade_started");
+  assert.equal(compareUpgradeSlotState(available, occupied), "upgrade_completed");
+  assert.equal(
+    compareUpgradeSlotState({ ...occupied, remainingSeconds: 43_200 }, occupied),
+    "remaining_time_changed",
+  );
+  assert.equal(
+    compareUpgradeSlotState({ ...occupied, entityName: "Magierturm" }, occupied),
+    "upgrade_changed",
+  );
+  assert.equal(compareUpgradeSlotState(available, available), "unchanged");
+  assert.equal(compareUpgradeSlotState(occupied), "new_slot");
 });
 
 test("recognizes multi-line hero and pet upgrades from their selected views", () => {

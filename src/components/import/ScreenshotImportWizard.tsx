@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   classifyScreenshotText,
+  compareUpgradeSlotState,
   assessScreenshotContentQuality,
   detectScreenshotLanguage,
   filterBuildingImportEntities,
@@ -35,6 +36,7 @@ import {
   type ScreenshotImportType,
   type ScreenshotProfileDetection,
   type UpgradeSlotDetection,
+  type UpgradeSlotChangeType,
   type WallLevelDistribution,
 } from "@/features/screenshot-import/screenshot-import";
 import {
@@ -69,6 +71,7 @@ import {
 } from "@/services/screenshotRecognitionService";
 import { recognizeScreenshotObjects } from "@/services/screenshotObjectRecognitionService";
 import type { ImportChange } from "@/services/playerImportService";
+import type { ScreenshotUpgradeSlot } from "@/types/screenshotProgress";
 import {
   isScreenshotImportTypeEnabled,
   isSupportedGameUiVersion,
@@ -91,6 +94,7 @@ type Props = {
   onMagicItemsConfirmed?: (items: ScreenshotMagicItemDetection[]) => Promise<void>;
   onProfileConfirmed?: (profile: ScreenshotProfileDetection) => Promise<void>;
   onUpgradeSlotsConfirmed?: () => Promise<void> | void;
+  existingUpgradeSlots?: ScreenshotUpgradeSlot[];
   existingWallLevels?: Array<{ level: number; count: number }>;
   expectedWallCount?: number;
   maxWallLevel?: number;
@@ -178,6 +182,28 @@ const qualityIssueText: Record<string, { de: string; en: string }> = {
   content_near_image_edge: { de: "Mehrere Texte liegen direkt am Bildrand; die Ansicht könnte abgeschnitten sein", en: "Several labels touch the image edge; the view may be cropped" },
 };
 
+const upgradeSlotChangeText: Record<UpgradeSlotChangeType, { de: string; en: string }> = {
+  new_slot: { de: "Neuer Slotzustand", en: "New slot state" },
+  unchanged: { de: "Unverändert", en: "Unchanged" },
+  upgrade_started: { de: "Upgrade gestartet", en: "Upgrade started" },
+  upgrade_completed: { de: "Upgrade abgeschlossen", en: "Upgrade completed" },
+  upgrade_changed: { de: "Anderes laufendes Upgrade", en: "Different running upgrade" },
+  remaining_time_changed: { de: "Restzeit aktualisiert", en: "Remaining time updated" },
+};
+
+function formatSlotState(
+  slot: Pick<ScreenshotUpgradeSlot, "isAvailable" | "entityName" | "targetLevel" | "remainingSeconds">,
+  language: "de" | "en",
+): string {
+  if (slot.isAvailable) return language === "en" ? "available" : "frei";
+  const parts = [language === "en" ? "occupied" : "belegt"];
+  if (slot.entityName) parts.push(slot.entityName);
+  if (slot.targetLevel) parts.push(`${language === "en" ? "target" : "Ziel"} ${slot.targetLevel}`);
+  if (slot.remainingSeconds !== null)
+    parts.push(`${Math.round(slot.remainingSeconds / 360) / 10} h`);
+  return parts.join(" · ");
+}
+
 function formatScreenshotBytes(bytes: number, language: "de" | "en"): string {
   return new Intl.NumberFormat(language === "en" ? "en-US" : "de-DE", {
     maximumFractionDigits: bytes >= 1024 * 1024 ? 1 : 0,
@@ -197,6 +223,7 @@ export function ScreenshotImportWizard({
   onMagicItemsConfirmed,
   onProfileConfirmed,
   onUpgradeSlotsConfirmed,
+  existingUpgradeSlots = [],
   existingWallLevels = [],
   expectedWallCount = 0,
   maxWallLevel = 0,
@@ -227,6 +254,19 @@ export function ScreenshotImportWizard({
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
+  const reviewedUpgradeSlots = useMemo(
+    () => upgradeSlots.map((slot) => {
+      const previous = existingUpgradeSlots.find(
+        (item) => item.slotType === slot.slotType && item.slotIndex === slot.slotIndex,
+      );
+      return {
+        slot,
+        previous,
+        changeType: compareUpgradeSlotState(slot, previous),
+      };
+    }),
+    [existingUpgradeSlots, upgradeSlots],
+  );
   const [completionState, setCompletionState] = useState<CompletionState>("confirmed");
   const [reviewFilter, setReviewFilter] = useState<ScreenshotReviewFilter>("changes");
   const [history, setHistory] = useState<ScreenshotImportHistoryEntry[]>([]);
@@ -1849,8 +1889,18 @@ export function ScreenshotImportWizard({
             <div className="mt-5">
               <h4 className="font-bold">{en ? "Upgrade slots" : "Upgrade-Slots"}</h4>
               <div className="mt-2 space-y-2">
-                {upgradeSlots.map((slot) => (
+                {reviewedUpgradeSlots.map(({ slot, previous, changeType }) => (
                   <article key={slot.id} className="rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
+                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <span className={changeType === "unchanged" ? "text-slate-400" : "font-bold text-sky-200"}>
+                        {upgradeSlotChangeText[changeType][language]}
+                      </span>
+                      <span className="text-slate-500">
+                        {en ? "Saved" : "Gespeichert"}: {previous
+                          ? formatSlotState(previous, language)
+                          : en ? "not recorded" : "nicht erfasst"}
+                      </span>
+                    </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <b>{slot.slotType.replace("_", " ")} {slot.slotIndex}</b>
                       <select

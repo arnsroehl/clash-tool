@@ -859,6 +859,7 @@ export default function Home() {
               )
             }
             onUpgradeSlotsImported={refreshScreenshotProgress}
+            upgradeSlots={screenshotUpgradeSlots}
             onProgressImported={refreshAccountBuildings}
             wallLevels={screenshotWallLevels}
             onWallLevelsImported={refreshScreenshotProgress}
