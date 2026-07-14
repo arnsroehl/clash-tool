@@ -20,6 +20,8 @@ export type ImportChange = {
 export type PlayerImportPreview = {
   playerName: string;
   playerTag?: string;
+  experienceLevel?: number;
+  clanName?: string | null;
   townHallFrom: number;
   townHallTo: number;
   changes: ImportChange[];
@@ -48,10 +50,10 @@ export async function fetchOfficialPlayer(tag: string) {
   };
 }
 
-export async function applyPlayerImport(
+export function buildAccountProfileUpdate(
   account: ClashAccount,
   preview: PlayerImportPreview,
-): Promise<void> {
+): Record<string, unknown> {
   const expectedPlayerTag = normalizePlayerTag(account.playerTag);
   const importedPlayerTag = normalizePlayerTag(preview.playerTag);
   if (preview.playerTag && !importedPlayerTag)
@@ -64,24 +66,42 @@ export async function applyPlayerImport(
     throw new Error(
       `Ein veralteter Import darf das Rathaus nicht von ${account.townHallLevel} auf ${preview.townHallTo} zurückstufen.`,
     );
+  const playerName = preview.playerName.trim();
+  if (!playerName || playerName.length > 80)
+    throw new Error("Der importierte Spielername ist ungültig.");
+  if (
+    preview.experienceLevel !== undefined &&
+    (!Number.isInteger(preview.experienceLevel) || preview.experienceLevel < 1 || preview.experienceLevel > 999)
+  ) throw new Error("Das importierte Erfahrungslevel ist ungültig.");
+  const clanName = preview.clanName === null ? null : preview.clanName?.trim();
+  if (clanName !== undefined && clanName !== null && (!clanName || clanName.length > 80))
+    throw new Error("Der importierte Clanname ist ungültig.");
+  const accountUpdate: Record<string, unknown> = {};
+  if (playerName !== account.name) accountUpdate.name = playerName;
+  if (preview.townHallTo !== preview.townHallFrom)
+    accountUpdate.town_hall_level = preview.townHallTo;
+  if (importedPlayerTag && importedPlayerTag !== account.playerTag)
+    accountUpdate.player_tag = importedPlayerTag;
+  if (preview.experienceLevel !== undefined && preview.experienceLevel !== account.experienceLevel)
+    accountUpdate.experience_level = preview.experienceLevel;
+  if (preview.clanName !== undefined) {
+    accountUpdate.clan_name = clanName;
+    accountUpdate.clan_status = clanName === null ? "none" : "member";
+  }
+  return accountUpdate;
+}
+
+export async function applyPlayerImport(
+  account: ClashAccount,
+  preview: PlayerImportPreview,
+): Promise<void> {
   const client = getSupabaseClient();
-  if (preview.townHallTo !== preview.townHallFrom) {
+  const accountUpdate = buildAccountProfileUpdate(account, preview);
+  if (Object.keys(accountUpdate).length) {
+    accountUpdate.last_synced_at = new Date().toISOString();
     const { error } = await client
       .from("accounts")
-      .update({
-        town_hall_level: preview.townHallTo,
-        player_tag: importedPlayerTag || account.playerTag,
-        last_synced_at: new Date().toISOString(),
-      })
-      .eq("id", account.id);
-    if (error) throw new Error(error.message);
-  } else if (importedPlayerTag) {
-    const { error } = await client
-      .from("accounts")
-      .update({
-        player_tag: importedPlayerTag,
-        last_synced_at: new Date().toISOString(),
-      })
+      .update(accountUpdate)
       .eq("id", account.id);
     if (error) throw new Error(error.message);
   }

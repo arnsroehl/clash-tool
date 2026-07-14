@@ -48,6 +48,7 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/screenshot-progress-catalog.sql` | Screenshot catalog, account progress, wall distributions, upgrade slots, resource snapshots and analysis jobs |
 | `src/scripts/sql/screenshot-resource-capacities.sql` | Adds separately persisted resource storage capacities to existing screenshot snapshots |
 | `src/scripts/sql/screenshot-full-account-import.sql` | Allows one guided screenshot session to combine all supported account areas |
+| `src/scripts/sql/screenshot-profile-details.sql` | Adds confirmed experience-level and clan-name fields to accounts |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 
@@ -79,6 +80,8 @@ Account services read and write:
 - account name
 - town hall level
 - builder count
+- optional screenshot-confirmed experience level
+- clan status (`unknown`, `none`, or `member`) and optional clan name
 - created timestamp
 
 Progress tables store `current_level` per `account_id` and game-data id.

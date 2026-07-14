@@ -376,6 +376,11 @@ export function mergeScreenshotResourceDetections(
 export type ScreenshotProfileDetection = {
   playerTag: string | null;
   alternativePlayerTags?: string[];
+  playerName?: string | null;
+  alternativePlayerNames?: string[];
+  clanName?: string | null;
+  alternativeClanNames?: Array<string | null>;
+  clanDetected?: boolean;
   townHallLevel: number | null;
   experienceLevel: number | null;
   confidence: number;
@@ -421,12 +426,34 @@ export function mergeProfileScreenshotDetections(
   )];
   const townHallLevel = ranked.find((detection) => detection.townHallLevel !== null)?.townHallLevel ?? null;
   const experienceLevel = ranked.find((detection) => detection.experienceLevel !== null)?.experienceLevel ?? null;
+  const playerNames = [...new Set(
+    ranked.flatMap((detection) => [
+      detection.playerName,
+      ...(detection.alternativePlayerNames || []),
+    ]).filter((name): name is string => Boolean(name)),
+  )];
+  const clanMap = new Map<string, string | null>();
+  ranked.forEach((detection) => {
+    if (!detection.clanDetected) return;
+    const clan = detection.clanName ?? null;
+    clanMap.set(clan === null ? "none" : `name:${clan}`, clan);
+  });
+  const clans = [...clanMap.values()];
+  const clanConflict = clans.length > 1;
+  const playerNameConflict = playerNames.length > 1;
   return {
     playerTag: tags[0] || null,
     alternativePlayerTags: tags.slice(1),
+    playerName: playerNames[0] || null,
+    alternativePlayerNames: playerNames.slice(1),
+    clanName: clans[0] ?? null,
+    alternativeClanNames: clans.slice(1),
+    clanDetected: clans.length > 0,
     townHallLevel,
     experienceLevel,
-    confidence: tags.length > 1 ? Math.min(0.49, ranked[0].confidence) : ranked[0].confidence,
+    confidence: tags.length > 1 || playerNameConflict || clanConflict
+      ? Math.min(0.49, ranked[0].confidence)
+      : ranked[0].confidence,
   };
 }
 
@@ -446,6 +473,12 @@ export function validateProfileScreenshot(params: {
   if (observedTags.length > 1) {
     status = "mismatch";
     reasons.push(`Mehrere Screenshots zeigen unterschiedliche Spieler-Tags (${observedTags.join(", ")}).`);
+  } else if ((params.detection.alternativePlayerNames || []).length) {
+    status = "mismatch";
+    reasons.push("Mehrere Screenshots zeigen unterschiedliche Spielernamen.");
+  } else if ((params.detection.alternativeClanNames || []).length) {
+    status = "mismatch";
+    reasons.push("Mehrere Screenshots zeigen unterschiedliche Clanzugehörigkeiten.");
   } else if (!detectedPlayerTag) {
     status = "unverified";
     reasons.push("Der Spieler-Tag konnte nicht sicher erkannt werden.");
@@ -1530,16 +1563,51 @@ export function parseScreenshotMagicItems(
 }
 
 export function parseProfileScreenshot(text: string): ScreenshotProfileDetection {
+  const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const tagMatch = text.toUpperCase().match(/#[A-Z0-9]{3,15}/);
   const playerTag = normalizePlayerTag(tagMatch?.[0]);
   const townHallMatch = text.match(/(?:rathaus|town\s*hall|th)\s*(?:level|lvl|stufe)?\s*[:=]?\s*(\d{1,2})/i);
   const experienceMatch = text.match(/(?:erfahrungslevel|experience\s*level|xp\s*level)\s*[:=]?\s*(\d{1,3})/i);
-  const found = [playerTag, townHallMatch, experienceMatch].filter(Boolean).length;
+  const cleanValue = (value: string | undefined): string | null => {
+    const cleaned = value?.replace(/^[\s:;=–—-]+/, "").replace(/[\s|]+$/, "").trim() || "";
+    if (!cleaned || cleaned.length > 80 || /^#|^\d+$/.test(cleaned)) return null;
+    return cleaned;
+  };
+  const isProfileMetadata = (value: string): boolean =>
+    /^(?:spielerprofil|player\s*profile|profil|profile|spieler-?tag|player\s*tag|rathaus|town\s*hall|th\b|erfahrungslevel|experience\s*level|xp\s*level|clan(?:name)?\b|clan\s*name|name\b)/i.test(value);
+  const explicitPlayerName = lines
+    .map((line) => line.match(/^(?:spielername|player\s*name|name)\s*[:=–—-]\s*(.+)$/i)?.[1])
+    .map(cleanValue)
+    .find((value): value is string => Boolean(value)) || null;
+  const tagLineIndex = lines.findIndex((line) => /#[A-Z0-9]{3,15}/i.test(line));
+  const anchoredPlayerName = tagLineIndex > 0
+    ? [...lines.slice(Math.max(0, tagLineIndex - 2), tagLineIndex)].reverse()
+        .map(cleanValue)
+        .find((value) => value !== null && !isProfileMetadata(value)) || null
+    : null;
+  const playerName = explicitPlayerName || anchoredPlayerName;
+  const noClanPattern = /(?:kein(?:em|en)?\s+clan|ohne\s+clan|not\s+in\s+(?:a\s+)?clan|no\s+clan)/i;
+  const explicitClan = lines
+    .map((line) => line.match(/^(?:clan(?:name)?|clan\s*name)\s*[:=–—-]\s*(.+)$/i)?.[1])
+    .map(cleanValue)
+    .find((value): value is string => Boolean(value)) || null;
+  const clanLabelIndex = lines.findIndex((line) => /^(?:clan|clanname|clan\s*name)$/i.test(line));
+  const clanCandidate = clanLabelIndex >= 0 ? cleanValue(lines[clanLabelIndex + 1]) : null;
+  const anchoredClan = clanCandidate && !isProfileMetadata(clanCandidate) ? clanCandidate : null;
+  const clanNoneDetected = lines.some((line) => noClanPattern.test(line));
+  const clanName = clanNoneDetected ? null : explicitClan || anchoredClan;
+  const clanDetected = clanNoneDetected || clanName !== null;
+  const found = [playerTag, playerName, townHallMatch, experienceMatch, clanDetected].filter(Boolean).length;
   return {
     playerTag,
     alternativePlayerTags: [],
+    playerName,
+    alternativePlayerNames: [],
+    clanName,
+    alternativeClanNames: [],
+    clanDetected,
     townHallLevel: townHallMatch ? Number(townHallMatch[1]) : null,
     experienceLevel: experienceMatch ? Number(experienceMatch[1]) : null,
-    confidence: found >= 2 ? 0.95 : found === 1 ? 0.72 : 0,
+    confidence: found >= 3 ? 0.95 : found === 2 ? 0.88 : found === 1 ? 0.72 : 0,
   };
 }

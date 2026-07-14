@@ -1868,7 +1868,21 @@ export function ScreenshotImportWizard({
           {profileDetection ? (
             <div className={`mt-5 rounded-xl border p-4 text-sm ${profileValidation?.canApply ? "border-emerald-400/30 bg-emerald-400/5" : "border-rose-400/30 bg-rose-400/5"}`}>
               <h4 className="font-bold">{en ? "Profile data" : "Profildaten"}</h4>
-              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <label className="text-xs text-slate-400">
+                  {en ? "Player name" : "Spielername"}
+                  <input
+                    value={profileDetection.playerName || ""}
+                    maxLength={80}
+                    onChange={(event) => setProfileDetection((current) => current ? {
+                      ...current,
+                      playerName: event.target.value || null,
+                      alternativePlayerNames: [],
+                      confidence: 1,
+                    } : current)}
+                    className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"
+                  />
+                </label>
                 <label className="text-xs text-slate-400">
                   {en ? "Player tag" : "Spieler-Tag"}
                   <input
@@ -1878,6 +1892,21 @@ export function ScreenshotImportWizard({
                       ...current,
                       playerTag: event.target.value.toUpperCase(),
                       alternativePlayerTags: [],
+                      confidence: 1,
+                    } : current)}
+                    className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"
+                  />
+                </label>
+                <label className="text-xs text-slate-400">
+                  {en ? "Clan (empty = no clan)" : "Clan (leer = kein Clan)"}
+                  <input
+                    value={profileDetection.clanName || ""}
+                    maxLength={80}
+                    onChange={(event) => setProfileDetection((current) => current ? {
+                      ...current,
+                      clanName: event.target.value || null,
+                      clanDetected: true,
+                      alternativeClanNames: [],
                       confidence: 1,
                     } : current)}
                     className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"

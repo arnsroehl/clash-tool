@@ -127,6 +127,13 @@ while the whole session can be saved and resumed later. Existing databases can
 enable this session type with
 `src/scripts/sql/screenshot-full-account-import.sql`.
 
+Profile screenshots recognize the player tag, player name, Town Hall,
+experience level and clan in German and English. Conflicting names, tags or
+clans block confirmation until corrected. Confirmed experience and clan values
+are stored on the linked account using
+`src/scripts/sql/screenshot-profile-details.sql` when the optional official API
+is disabled.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP

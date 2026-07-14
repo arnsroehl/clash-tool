@@ -742,14 +742,36 @@ test("requires a manual magic-item quantity and exposes screenshot conflicts", (
   assert.match(conflict.reasons[0], /unterschiedliche Mengen/);
 });
 
-test("parses stable profile identifiers without guessing a player name", () => {
+test("parses stable profile identifiers without guessing a profile heading as the player name", () => {
   assert.deepEqual(parseProfileScreenshot("Player Profile\nPlayer Tag #2P0Y8LQ\nTown Hall 17\nExperience Level 241"), {
     playerTag: "#2P0Y8LQ",
     alternativePlayerTags: [],
+    playerName: null,
+    alternativePlayerNames: [],
+    clanName: null,
+    alternativeClanNames: [],
+    clanDetected: false,
     townHallLevel: 17,
     experienceLevel: 241,
     confidence: 0.95,
   });
+});
+
+test("parses German and English player names and clans from profile screenshots", () => {
+  const german = parseProfileScreenshot(
+    "Spielerprofil\nNik der Große\n#2P0Y8LQ\nClan: Codex Krieger\nRathaus 17\nErfahrungslevel 241",
+  );
+  assert.equal(german.playerName, "Nik der Große");
+  assert.equal(german.clanName, "Codex Krieger");
+  assert.equal(german.clanDetected, true);
+  assert.equal(german.confidence, 0.95);
+
+  const english = parseProfileScreenshot(
+    "Player Profile\nPlayer Name: Archer One\nPlayer Tag #9G8J2\nNot in a Clan\nTown Hall 16\nExperience Level 220",
+  );
+  assert.equal(english.playerName, "Archer One");
+  assert.equal(english.clanName, null);
+  assert.equal(english.clanDetected, true);
 });
 
 test("normalizes OCR player tags and blocks foreign or stale profiles", () => {
@@ -785,6 +807,11 @@ test("merges profile screenshots and exposes conflicting account identities", ()
   assert.deepEqual(merged, {
     playerTag: "#2P0Y8LQ",
     alternativePlayerTags: ["#9G8J2"],
+    playerName: null,
+    alternativePlayerNames: [],
+    clanName: null,
+    alternativeClanNames: [],
+    clanDetected: false,
     townHallLevel: 17,
     experienceLevel: 241,
     confidence: 0.49,
@@ -794,6 +821,37 @@ test("merges profile screenshots and exposes conflicting account identities", ()
     expectedPlayerTag: "#2P0Y8LQ",
     currentTownHallLevel: 17,
   }).status, "mismatch");
+});
+
+test("requires correction when profile screenshots disagree on name or clan", () => {
+  const merged = mergeProfileScreenshotDetections([
+    {
+      playerTag: "#2P0Y8LQ",
+      playerName: "Main One",
+      clanName: "Codex",
+      clanDetected: true,
+      townHallLevel: 17,
+      experienceLevel: 240,
+      confidence: 0.95,
+    },
+    {
+      playerTag: "#2P0Y8LQ",
+      playerName: "Main Two",
+      clanName: null,
+      clanDetected: true,
+      townHallLevel: 17,
+      experienceLevel: 241,
+      confidence: 0.94,
+    },
+  ]);
+  assert.deepEqual(merged?.alternativePlayerNames, ["Main Two"]);
+  assert.deepEqual(merged?.alternativeClanNames, [null]);
+  assert.equal(merged?.confidence, 0.49);
+  assert.equal(validateProfileScreenshot({
+    detection: merged!,
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  }).canApply, false);
 });
 
 test("computes and compares deterministic visual fingerprints", () => {

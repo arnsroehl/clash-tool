@@ -182,6 +182,7 @@ export default function Home() {
     createAccount,
     deleteAccount,
     selectAccount,
+    refreshAccounts,
   } = useAccounts({
     onError: handleError,
     clearError,
@@ -864,12 +865,15 @@ export default function Home() {
             onProfileImported={async (detected) => {
               if (!selectedAccount) return;
               await applyPlayerImport(selectedAccount, {
-                playerName: selectedAccount.name,
+                playerName: detected.playerName?.trim() || selectedAccount.name,
                 playerTag: detected.playerTag || undefined,
+                experienceLevel: detected.experienceLevel || undefined,
+                clanName: detected.clanDetected ? detected.clanName?.trim() || null : undefined,
                 townHallFrom: selectedAccount.townHallLevel,
                 townHallTo: detected.townHallLevel || selectedAccount.townHallLevel,
                 changes: [],
               });
+              await refreshAccounts();
             }}
           />
         </CollapsibleSection>

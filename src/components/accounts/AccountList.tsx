@@ -54,6 +54,19 @@ export function AccountList({
                   {en ? "Town Hall" : "Rathaus"} {account.townHallLevel} ·{" "}
                   {account.builderCount} {en ? "builders" : "Bauarbeiter"}
                 </p>
+                {account.experienceLevel || account.clanStatus !== "unknown" ? (
+                  <p className="mt-1 text-xs text-slate-500">
+                    {account.experienceLevel
+                      ? `${en ? "Experience" : "Erfahrung"} ${account.experienceLevel}`
+                      : null}
+                    {account.experienceLevel && account.clanStatus !== "unknown" ? " · " : null}
+                    {account.clanStatus === "member"
+                      ? `Clan: ${account.clanName}`
+                      : account.clanStatus === "none"
+                        ? (en ? "No clan" : "Kein Clan")
+                        : null}
+                  </p>
+                ) : null}
               </button>
 
               <div className="mt-4 flex gap-3">
