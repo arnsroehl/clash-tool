@@ -58,6 +58,7 @@ type Props = {
   onConfirm: (changes: ImportChange[]) => Promise<void>;
   onResourcesConfirmed?: (resources: ScreenshotResourceDetection[]) => void;
   onProfileConfirmed?: (profile: ScreenshotProfileDetection) => Promise<void>;
+  onUpgradeSlotsConfirmed?: () => Promise<void> | void;
 };
 
 type ProcessedScreenshot = {
@@ -107,6 +108,7 @@ export function ScreenshotImportWizard({
   onConfirm,
   onResourcesConfirmed,
   onProfileConfirmed,
+  onUpgradeSlotsConfirmed,
 }: Props) {
   const en = language === "en";
   const [step, setStep] = useState<"select" | "upload" | "review" | "done">("select");
@@ -158,6 +160,10 @@ export function ScreenshotImportWizard({
     return [...combined.values()];
   }, [detections, restoredChanges]);
   const summary = useMemo(() => summarizeScreenshotReview(changes), [changes]);
+  const hasIncompleteUpgradeSlots = useMemo(
+    () => upgradeSlots.some((slot) => !slot.isAvailable && slot.remainingSeconds === null),
+    [upgradeSlots],
+  );
   const groupedChanges = useMemo(() => {
     const groups = new Map<string, ScreenshotProposedChange[]>();
     changes
@@ -396,20 +402,24 @@ export function ScreenshotImportWizard({
             objectMatches,
           });
           const currentWalls = importType === "walls" ? parseWallDistributions(recognition.text) : [];
-          const phaseTwoSlotType = {
+          const fallbackSlotTypeByImport = {
+            builders: "builder",
             heroes: "builder",
             pets: "pet_house",
             equipment: "blacksmith",
           } as const;
           const fallbackSlotType =
-            phaseTwoSlotType[importType as keyof typeof phaseTwoSlotType];
+            fallbackSlotTypeByImport[importType as keyof typeof fallbackSlotTypeByImport];
           const currentSlots =
             importType === "builders" || fallbackSlotType
               ? parseUpgradeSlots(recognition.text, {
                   fallbackSlotType,
+                  inferBuilderSummary: importType === "builders",
                   entities: entities
                     .filter((entity) =>
-                      importType === "heroes"
+                      importType === "builders"
+                        ? entity.type === "building" || entity.type === "hero"
+                        : importType === "heroes"
                         ? entity.type === "hero"
                         : importType === "pets"
                           ? entity.type === "pet"
@@ -572,8 +582,10 @@ export function ScreenshotImportWizard({
       if (importChanges.length) await onConfirm(importChanges);
       if (wallDistributions.length)
         await saveWallDistributions(accountId, wallDistributions);
-      if (upgradeSlots.length)
+      if (upgradeSlots.length) {
         await saveUpgradeSlots({ accountId, sessionId: session.id, slots: upgradeSlots });
+        await onUpgradeSlotsConfirmed?.();
+      }
       if (resourceDetections.length) {
         await saveResourceSnapshot({ accountId, sessionId: session.id, resources: resourceDetections });
         onResourcesConfirmed?.(resourceDetections);
@@ -927,12 +939,57 @@ export function ScreenshotImportWizard({
               <div className="mt-2 space-y-2">
                 {upgradeSlots.map((slot) => (
                   <article key={slot.id} className="rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
-                    <b>{slot.slotType.replace("_", " ")} {slot.slotIndex}</b>
-                    <span className="ml-2 text-slate-400">
-                      {slot.isAvailable ? (en ? "available" : "frei") : slot.entityName || (en ? "occupied" : "belegt")}
-                      {slot.targetLevel ? ` → ${slot.targetLevel}` : ""}
-                      {slot.remainingSeconds !== null ? ` · ${Math.round(slot.remainingSeconds / 3600)} h` : ""}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <b>{slot.slotType.replace("_", " ")} {slot.slotIndex}</b>
+                      <select
+                        aria-label={`${slot.slotType} ${slot.slotIndex} ${en ? "status" : "Status"}`}
+                        value={slot.isAvailable ? "available" : "occupied"}
+                        onChange={(event) => setUpgradeSlots((current) => current.map((item) => item.id === slot.id
+                          ? event.target.value === "available"
+                            ? { ...item, isAvailable: true, entityName: null, targetLevel: null, remainingSeconds: null, confidence: 1 }
+                            : { ...item, isAvailable: false, confidence: 1 }
+                          : item))}
+                        className="rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                      >
+                        <option value="available">{en ? "available" : "frei"}</option>
+                        <option value="occupied">{en ? "occupied" : "belegt"}</option>
+                      </select>
+                      {!slot.isAvailable ? (
+                        <>
+                          <input
+                            aria-label={`${slot.slotType} ${slot.slotIndex} ${en ? "upgrade" : "Upgrade"}`}
+                            value={slot.entityName || ""}
+                            placeholder={en ? "Upgrade" : "Upgrade"}
+                            onChange={(event) => setUpgradeSlots((current) => current.map((item) => item.id === slot.id ? { ...item, entityName: event.target.value || null, confidence: 1 } : item))}
+                            className="min-w-40 flex-1 rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                          />
+                          <input
+                            aria-label={`${slot.slotType} ${slot.slotIndex} ${en ? "target level" : "Ziellevel"}`}
+                            type="number"
+                            min={1}
+                            value={slot.targetLevel ?? ""}
+                            placeholder={en ? "Target" : "Ziellevel"}
+                            onChange={(event) => setUpgradeSlots((current) => current.map((item) => item.id === slot.id ? { ...item, targetLevel: event.target.value ? Number(event.target.value) : null, confidence: 1 } : item))}
+                            className="w-24 rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                          />
+                          <input
+                            aria-label={`${slot.slotType} ${slot.slotIndex} ${en ? "remaining hours" : "Reststunden"}`}
+                            type="number"
+                            min={0}
+                            step="0.5"
+                            value={slot.remainingSeconds === null ? "" : slot.remainingSeconds / 3600}
+                            placeholder={en ? "Hours left" : "Reststunden"}
+                            onChange={(event) => setUpgradeSlots((current) => current.map((item) => item.id === slot.id ? { ...item, remainingSeconds: event.target.value ? Math.round(Number(event.target.value) * 3600) : null, confidence: 1 } : item))}
+                            className="w-28 rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                          />
+                        </>
+                      ) : null}
+                    </div>
+                    {!slot.isAvailable && slot.remainingSeconds === null ? (
+                      <p className="mt-2 text-xs text-amber-200">
+                        {en ? "Remaining time was not recognized. Enter it before confirming for an exact simulation." : "Restzeit wurde nicht erkannt. Für eine genaue Simulation bitte vor dem Bestätigen eintragen."}
+                      </p>
+                    ) : null}
                   </article>
                 ))}
               </div>
@@ -985,7 +1042,7 @@ export function ScreenshotImportWizard({
             </span>
           </label>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" disabled={busy || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
+            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
               {en ? "Confirm selected changes" : "Ausgewählte Änderungen bestätigen"}
             </button>
             <button type="button" disabled={busy} onClick={() => void cancel()} className="rounded-xl border border-rose-400/30 px-5 py-3 font-bold text-rose-200 disabled:opacity-40">

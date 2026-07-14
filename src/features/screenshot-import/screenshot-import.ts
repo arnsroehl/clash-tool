@@ -129,6 +129,13 @@ export type UpgradeSlotDetection = {
 export type UpgradeSlotParseOptions = {
   fallbackSlotType?: UpgradeSlotType;
   entities?: Array<Pick<ScreenshotEntity, "name" | "aliases">>;
+  inferBuilderSummary?: boolean;
+};
+
+export type BuilderAvailabilitySummary = {
+  available: number;
+  total: number;
+  sourceText: string;
 };
 
 export type ScreenshotResourceType =
@@ -848,14 +855,47 @@ export function parseDurationSeconds(value: string): number | null {
   return matched ? total : null;
 }
 
+export function parseBuilderAvailability(
+  text: string,
+  allowBareRatio = false,
+): BuilderAvailabilitySummary | null {
+  const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  for (const line of lines) {
+    const normalized = normalizeScreenshotText(line);
+    const ratioAfterLabel = normalized.match(
+      /(?:bauarbeit(?:er|ern)|builders?)(?:verfugbar|available|frei|free)?(\d{1,2})\/(\d{1,2})/,
+    );
+    const ratioBeforeLabel = normalized.match(
+      /(\d{1,2})\/(\d{1,2})(?:bauarbeit(?:er|ern)|builders?)(?:verfugbar|available|frei|free)?/,
+    );
+    const worded = normalized.match(
+      /(\d{1,2})(?:von|of)(\d{1,2})(?:bauarbeit(?:er|ern)|builders?)(?:verfugbar|available|frei|free)/,
+    );
+    const bare = allowBareRatio ? line.match(/^\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*$/) : null;
+    const match = ratioAfterLabel || ratioBeforeLabel || worded || bare;
+    if (!match) continue;
+    const available = Number(match[1]);
+    const total = Number(match[2]);
+    if (total < 1 || total > 10 || available < 0 || available > total) continue;
+    return { available, total, sourceText: line };
+  }
+  return null;
+}
+
 export function parseUpgradeSlots(
   text: string,
   options?: UpgradeSlotParseOptions,
 ): UpgradeSlotDetection[] {
-  const lines = text
+  const allLines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
+  const builderSummary = options?.inferBuilderSummary
+    ? parseBuilderAvailability(text, true)
+    : null;
+  const lines = builderSummary
+    ? allLines.filter((line) => line !== builderSummary.sourceText)
+    : allLines;
   const candidates = [
     ...lines,
     ...(options?.fallbackSlotType
@@ -878,6 +918,15 @@ export function parseUpgradeSlots(
 
   candidates.forEach((line) => {
     const normalized = normalizeScreenshotText(line);
+    const matchedEntity = options?.entities
+      ?.flatMap((entity) =>
+        [entity.name, ...(entity.aliases || [])].map((name) => ({
+          entityName: entity.name,
+          match: normalizeScreenshotText(name),
+        })),
+      )
+      .filter((candidate) => candidate.match && normalized.includes(candidate.match))
+      .sort((left, right) => right.match.length - left.match.length)[0];
     let slotType: UpgradeSlotType | null = null;
     let usedFallbackSlotType = false;
     if (/(?:bauarbeiter|builder)/i.test(line)) slotType = "builder";
@@ -889,7 +938,12 @@ export function parseUpgradeSlots(
     const hasRunningSignal = /(?:verbesserunglauft|wirdverbessert|upgradeinprogress|upgrading|remaining|noch\d)/.test(
       normalized,
     );
-    if (!slotType && options?.fallbackSlotType && hasRunningSignal && duration !== null) {
+    if (
+      !slotType &&
+      options?.fallbackSlotType &&
+      duration !== null &&
+      (hasRunningSignal || Boolean(matchedEntity))
+    ) {
       slotType = options.fallbackSlotType;
       usedFallbackSlotType = true;
     }
@@ -897,17 +951,9 @@ export function parseUpgradeSlots(
 
     const available = /(?:verfugbar|frei|available|idle|free)/.test(normalized);
     const occupied = /(?:belegt|beschaftigt|upgrading|upgrade|researching|busy)/.test(normalized);
-    const targetMatch = line.match(/(?:→|->|auf|to|ziel(?:level)?|target)\s*(?:level|lvl|stufe)?\s*(\d{1,3})/i);
+    const targetMatch = line.match(/(?:→|->|auf|to|ziel(?:level)?|target)\s*(?:level|lvl|stufe)?\s*(\d{1,3})/i)
+      || (usedFallbackSlotType ? line.match(/(?:level|lvl|stufe)\s*(\d{1,3})/i) : null);
     const separator = line.match(/[:\-]\s*([^,;|]+?)(?=\s+(?:→|->|auf\s|to\s|noch\s|remaining\s|\d+\s*(?:d|h|std|tag|day))|$)/i);
-    const matchedEntity = options?.entities
-      ?.flatMap((entity) =>
-        [entity.name, ...(entity.aliases || [])].map((name) => ({
-          entityName: entity.name,
-          match: normalizeScreenshotText(name),
-        })),
-      )
-      .filter((candidate) => candidate.match && normalized.includes(candidate.match))
-      .sort((left, right) => right.match.length - left.match.length)[0];
     if (usedFallbackSlotType && options?.entities?.length && !matchedEntity) return;
     const parsedEntityName = matchedEntity?.entityName || separator?.[1]?.trim() || null;
     const isAvailable = available && !occupied && duration === null;
@@ -928,7 +974,38 @@ export function parseUpgradeSlots(
       sourceText: line,
     });
   });
-  return [...parsed.values()].map((slot) => ({
+  let parsedSlots = [...parsed.values()];
+  if (builderSummary) {
+    const otherSlots = parsedSlots.filter((slot) => slot.slotType !== "builder");
+    const occupiedCount = builderSummary.total - builderSummary.available;
+    const detectedOccupied = parsedSlots
+      .filter((slot) => slot.slotType === "builder" && !slot.isAvailable)
+      .sort((left, right) => right.confidence - left.confidence)
+      .slice(0, occupiedCount);
+    const missingOccupied = Array.from(
+      { length: Math.max(0, occupiedCount - detectedOccupied.length) },
+      () => ({
+        slotType: "builder" as const,
+        isAvailable: false,
+        entityName: null,
+        targetLevel: null,
+        remainingSeconds: null,
+        confidence: 0.7,
+        sourceText: builderSummary.sourceText,
+      }),
+    );
+    const availableSlots = Array.from({ length: builderSummary.available }, () => ({
+      slotType: "builder" as const,
+      isAvailable: true,
+      entityName: null,
+      targetLevel: null,
+      remainingSeconds: null,
+      confidence: 0.96,
+      sourceText: builderSummary.sourceText,
+    }));
+    parsedSlots = [...detectedOccupied, ...missingOccupied, ...availableSlots, ...otherSlots];
+  }
+  return parsedSlots.map((slot) => ({
     ...slot,
     id: `slot:${slot.slotType}:${nextIndex(slot.slotType)}`,
     slotIndex: slotCounts.get(slot.slotType) as number,

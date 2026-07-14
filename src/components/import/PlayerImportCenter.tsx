@@ -44,6 +44,7 @@ type Props = {
   language?: "de" | "en";
   onResourcesImported?: (resources: ScreenshotResourceDetection[]) => void;
   onProfileImported?: (profile: ScreenshotProfileDetection) => Promise<void>;
+  onUpgradeSlotsImported?: () => Promise<void> | void;
 };
 const normalize = (name: string) =>
   name
@@ -371,6 +372,7 @@ export function PlayerImportCenter(props: Props) {
             onConfirm={applyScreenshotChanges}
             onResourcesConfirmed={props.onResourcesImported}
             onProfileConfirmed={props.onProfileImported}
+            onUpgradeSlotsConfirmed={props.onUpgradeSlotsImported}
           />
         </div>
       ) : null}
