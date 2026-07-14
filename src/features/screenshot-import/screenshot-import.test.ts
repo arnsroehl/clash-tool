@@ -4,6 +4,8 @@ import {
   assessImageQuality,
   classifyScreenshotText,
   mergeScreenshotDetections,
+  mergeProfileScreenshotDetections,
+  normalizePlayerTag,
   parseScreenshotDetections,
   parseScreenshotLevels,
   parseScreenshotResources,
@@ -17,6 +19,7 @@ import {
   parseWallDistributions,
   summarizeScreenshotReview,
   shouldStoreScreenshotFeedback,
+  validateProfileScreenshot,
   type ScreenshotEntity,
   type ScreenshotProposedChange,
 } from "./screenshot-import";
@@ -595,10 +598,55 @@ test("parses only explicitly labelled resource values and compact numbers", () =
 test("parses stable profile identifiers without guessing a player name", () => {
   assert.deepEqual(parseProfileScreenshot("Player Profile\nPlayer Tag #2P0Y8LQ\nTown Hall 17\nExperience Level 241"), {
     playerTag: "#2P0Y8LQ",
+    alternativePlayerTags: [],
     townHallLevel: 17,
     experienceLevel: 241,
     confidence: 0.95,
   });
+});
+
+test("normalizes OCR player tags and blocks foreign or stale profiles", () => {
+  assert.equal(normalizePlayerTag(" 2pOy8lq "), "#2P0Y8LQ");
+  const matching = validateProfileScreenshot({
+    detection: { playerTag: "#2P0Y8LQ", townHallLevel: 17, experienceLevel: 241, confidence: 0.95 },
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  });
+  assert.equal(matching.status, "match");
+  assert.equal(matching.canApply, true);
+  const foreign = validateProfileScreenshot({
+    detection: { playerTag: "#9G8J2", townHallLevel: 17, experienceLevel: 200, confidence: 0.95 },
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  });
+  assert.equal(foreign.status, "mismatch");
+  assert.equal(foreign.canApply, false);
+  const stale = validateProfileScreenshot({
+    detection: { playerTag: "#2P0Y8LQ", townHallLevel: 16, experienceLevel: 230, confidence: 0.95 },
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  });
+  assert.equal(stale.status, "stale");
+  assert.equal(stale.canApply, false);
+});
+
+test("merges profile screenshots and exposes conflicting account identities", () => {
+  const merged = mergeProfileScreenshotDetections([
+    { playerTag: "#2P0Y8LQ", townHallLevel: 17, experienceLevel: null, confidence: 0.94 },
+    { playerTag: "#9G8J2", townHallLevel: null, experienceLevel: 241, confidence: 0.92 },
+  ]);
+  assert.deepEqual(merged, {
+    playerTag: "#2P0Y8LQ",
+    alternativePlayerTags: ["#9G8J2"],
+    townHallLevel: 17,
+    experienceLevel: 241,
+    confidence: 0.49,
+  });
+  assert.equal(validateProfileScreenshot({
+    detection: merged!,
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  }).status, "mismatch");
 });
 
 test("computes and compares deterministic visual fingerprints", () => {

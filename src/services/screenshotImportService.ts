@@ -1,13 +1,14 @@
 import { getSupabaseClient } from "@/lib/supabase";
-import type {
-  ConfidenceBand,
-  ScreenshotDetection,
-  ScreenshotProposedChange,
-  ScreenshotProfileDetection,
-  ScreenshotResourceDetection,
-  ScreenshotScreenType,
-  UpgradeSlotDetection,
-  WallLevelDistribution,
+import {
+  mergeProfileScreenshotDetections,
+  type ConfidenceBand,
+  type ScreenshotDetection,
+  type ScreenshotProposedChange,
+  type ScreenshotProfileDetection,
+  type ScreenshotResourceDetection,
+  type ScreenshotScreenType,
+  type UpgradeSlotDetection,
+  type WallLevelDistribution,
 } from "@/features/screenshot-import/screenshot-import";
 import type { NormalizedScreenshot } from "@/services/screenshotRecognitionService";
 import {
@@ -171,7 +172,7 @@ export async function fetchLatestOpenScreenshotImport(
   const wallMap = new Map<number, WallLevelDistribution>();
   const slotMap = new Map<string, UpgradeSlotDetection>();
   const resourceMap = new Map<string, ScreenshotResourceDetection>();
-  let profile: ScreenshotProfileDetection | null = null;
+  const profileDetections: ScreenshotProfileDetection[] = [];
   (jobRows || []).forEach((job) => {
     const result = (job.result || {}) as {
       wallDistributions?: WallLevelDistribution[];
@@ -186,8 +187,9 @@ export async function fetchLatestOpenScreenshotImport(
     (result.resourceDetections || []).forEach((item) =>
       resourceMap.set(item.resourceType, item),
     );
-    if (result.profileDetection) profile = result.profileDetection;
+    if (result.profileDetection) profileDetections.push(result.profileDetection);
   });
+  const profile = mergeProfileScreenshotDetections(profileDetections);
   return {
     session: {
       id: row.id as string,

@@ -7,6 +7,7 @@ import {
   filterBuildingImportEntities,
   filterScreenshotReviewChanges,
   getBuildingImportSection,
+  mergeProfileScreenshotDetections,
   mergeScreenshotDetections,
   parseUpgradeSlots,
   parseWallDistributions,
@@ -15,6 +16,7 @@ import {
   parseProfileScreenshot,
   summarizeScreenshotReview,
   shouldStoreScreenshotFeedback,
+  validateProfileScreenshot,
   type ScreenshotDetection,
   type BuildingImportSection,
   type ScreenshotEntity,
@@ -70,6 +72,7 @@ type Props = {
   accountId: string;
   entities: ScreenshotEntity[];
   townHallLevel: number;
+  expectedPlayerTag?: string | null;
   language: "de" | "en";
   onConfirm: (changes: ImportChange[]) => Promise<void>;
   onResourcesConfirmed?: (resources: ScreenshotResourceDetection[]) => void;
@@ -137,6 +140,7 @@ export function ScreenshotImportWizard({
   accountId,
   entities,
   townHallLevel,
+  expectedPlayerTag = null,
   language,
   onConfirm,
   onResourcesConfirmed,
@@ -218,6 +222,16 @@ export function ScreenshotImportWizard({
   const wallTotal = useMemo(
     () => wallDistributions.reduce((sum, wall) => sum + wall.count, 0),
     [wallDistributions],
+  );
+  const profileValidation = useMemo(
+    () => profileDetection
+      ? validateProfileScreenshot({
+          detection: profileDetection,
+          expectedPlayerTag,
+          currentTownHallLevel: townHallLevel,
+        })
+      : null,
+    [expectedPlayerTag, profileDetection, townHallLevel],
   );
   const hasInvalidWallDistribution = useMemo(() => {
     const levels = wallDistributions.map((wall) => wall.level);
@@ -577,7 +591,12 @@ export function ScreenshotImportWizard({
             });
             currentSlots.forEach((item) => combinedSlots.set(`${item.slotType}:${item.slotIndex}`, item));
             currentResources.forEach((item) => combinedResources.set(item.resourceType, item));
-            if (currentProfile && currentProfile.confidence > 0) combinedProfile = currentProfile;
+            if (currentProfile && currentProfile.confidence > 0)
+              combinedProfile = mergeProfileScreenshotDetections(
+                [combinedProfile, currentProfile].filter(
+                  (profile): profile is ScreenshotProfileDetection => Boolean(profile),
+                ),
+              );
           }
           const merged = mergeScreenshotDetections(combinedDetections);
           await persistScreenshotReview({
@@ -701,6 +720,14 @@ export function ScreenshotImportWizard({
 
   const confirm = async () => {
     if (!session) return;
+    if (profileValidation && !profileValidation.canApply) {
+      setMessage(
+        en
+          ? "The profile identity is not verified. Correct the player tag or select the matching account before confirming."
+          : "Die Profilidentität ist nicht bestätigt. Korrigiere den Spieler-Tag oder wähle vor der Bestätigung den passenden Account.",
+      );
+      return;
+    }
     setBusy(true);
     setMessage(null);
     try {
@@ -1479,14 +1506,69 @@ export function ScreenshotImportWizard({
             </div>
           ) : null}
           {profileDetection ? (
-            <div className="mt-5 rounded-xl border border-white/10 bg-slate-950 p-4 text-sm">
+            <div className={`mt-5 rounded-xl border p-4 text-sm ${profileValidation?.canApply ? "border-emerald-400/30 bg-emerald-400/5" : "border-rose-400/30 bg-rose-400/5"}`}>
               <h4 className="font-bold">{en ? "Profile data" : "Profildaten"}</h4>
-              <p className="mt-2 text-slate-300">
-                {en ? "Player tag" : "Spieler-Tag"}: <b>{profileDetection.playerTag || "–"}</b><br />
-                {en ? "Town Hall" : "Rathaus"}: <b>{profileDetection.townHallLevel ?? "–"}</b><br />
-                {en ? "Experience" : "Erfahrung"}: <b>{profileDetection.experienceLevel ?? "–"}</b><br />
-                Confidence: {Math.round(profileDetection.confidence * 100)}%
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                <label className="text-xs text-slate-400">
+                  {en ? "Player tag" : "Spieler-Tag"}
+                  <input
+                    value={profileDetection.playerTag || ""}
+                    placeholder="#PLAYERTAG"
+                    onChange={(event) => setProfileDetection((current) => current ? {
+                      ...current,
+                      playerTag: event.target.value.toUpperCase(),
+                      alternativePlayerTags: [],
+                      confidence: 1,
+                    } : current)}
+                    className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"
+                  />
+                </label>
+                <label className="text-xs text-slate-400">
+                  {en ? "Town Hall" : "Rathaus"}
+                  <input
+                    type="number"
+                    min={1}
+                    max={30}
+                    value={profileDetection.townHallLevel ?? ""}
+                    onChange={(event) => setProfileDetection((current) => current ? {
+                      ...current,
+                      townHallLevel: event.target.value ? Number(event.target.value) : null,
+                      confidence: 1,
+                    } : current)}
+                    className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"
+                  />
+                </label>
+                <label className="text-xs text-slate-400">
+                  {en ? "Experience" : "Erfahrung"}
+                  <input
+                    type="number"
+                    min={1}
+                    value={profileDetection.experienceLevel ?? ""}
+                    onChange={(event) => setProfileDetection((current) => current ? {
+                      ...current,
+                      experienceLevel: event.target.value ? Number(event.target.value) : null,
+                      confidence: 1,
+                    } : current)}
+                    className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"
+                  />
+                </label>
+              </div>
+              <p className="mt-3 text-xs text-slate-400">
+                {en ? "Opened account" : "Geöffneter Account"}: <b>{profileValidation?.expectedPlayerTag || (en ? "not linked" : "nicht verknüpft")}</b>
+                {` · Confidence ${Math.round(profileDetection.confidence * 100)}%`}
               </p>
+              {profileValidation?.reasons.length ? (
+                <ul className={`mt-2 list-disc space-y-1 pl-5 text-xs ${profileValidation.canApply ? "text-amber-100" : "text-rose-200"}`}>
+                  {profileValidation.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                </ul>
+              ) : null}
+              {!profileValidation?.canApply ? (
+                <p className="mt-3 text-xs font-bold text-rose-200">
+                  {en
+                    ? "Import stopped: choose the matching account or correct the recognized identity."
+                    : "Import gestoppt: Wähle den passenden Account oder korrigiere die erkannte Identität."}
+                </p>
+              ) : null}
             </div>
           ) : null}
           <label className="mt-5 flex items-start gap-3 text-xs text-slate-400">
@@ -1503,7 +1585,7 @@ export function ScreenshotImportWizard({
             </span>
           </label>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
+            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || (profileValidation !== null && !profileValidation.canApply) || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
               {en ? "Confirm selected changes" : "Ausgewählte Änderungen bestätigen"}
             </button>
             <button type="button" disabled={busy} onClick={() => void saveEntireImportForLater()} className="rounded-xl border border-sky-400/30 px-5 py-3 font-bold text-sky-200 disabled:opacity-40">

@@ -1,5 +1,6 @@
 import { getSupabaseClient } from "@/lib/supabase";
 import type { ClashAccount } from "@/types/account";
+import { normalizePlayerTag } from "@/features/screenshot-import/screenshot-import";
 
 export type ImportEntityType =
   | "building"
@@ -51,22 +52,34 @@ export async function applyPlayerImport(
   account: ClashAccount,
   preview: PlayerImportPreview,
 ): Promise<void> {
+  const expectedPlayerTag = normalizePlayerTag(account.playerTag);
+  const importedPlayerTag = normalizePlayerTag(preview.playerTag);
+  if (preview.playerTag && !importedPlayerTag)
+    throw new Error("Der importierte Spieler-Tag ist ungültig und wurde nicht gespeichert.");
+  if (expectedPlayerTag && importedPlayerTag && expectedPlayerTag !== importedPlayerTag)
+    throw new Error(
+      `Der Import gehört zu ${importedPlayerTag}, geöffnet ist aber ${expectedPlayerTag}. Wähle den passenden Account.`,
+    );
+  if (preview.townHallTo < account.townHallLevel)
+    throw new Error(
+      `Ein veralteter Import darf das Rathaus nicht von ${account.townHallLevel} auf ${preview.townHallTo} zurückstufen.`,
+    );
   const client = getSupabaseClient();
   if (preview.townHallTo !== preview.townHallFrom) {
     const { error } = await client
       .from("accounts")
       .update({
         town_hall_level: preview.townHallTo,
-        player_tag: preview.playerTag || account.playerTag,
+        player_tag: importedPlayerTag || account.playerTag,
         last_synced_at: new Date().toISOString(),
       })
       .eq("id", account.id);
     if (error) throw new Error(error.message);
-  } else if (preview.playerTag) {
+  } else if (importedPlayerTag) {
     const { error } = await client
       .from("accounts")
       .update({
-        player_tag: preview.playerTag,
+        player_tag: importedPlayerTag,
         last_synced_at: new Date().toISOString(),
       })
       .eq("id", account.id);

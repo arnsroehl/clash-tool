@@ -207,10 +207,104 @@ export type ScreenshotResourceDetection = {
 
 export type ScreenshotProfileDetection = {
   playerTag: string | null;
+  alternativePlayerTags?: string[];
   townHallLevel: number | null;
   experienceLevel: number | null;
   confidence: number;
 };
+
+export type ScreenshotProfileValidationStatus =
+  | "match"
+  | "new_identity"
+  | "unverified"
+  | "mismatch"
+  | "stale";
+
+export type ScreenshotProfileValidation = {
+  status: ScreenshotProfileValidationStatus;
+  canApply: boolean;
+  detectedPlayerTag: string | null;
+  expectedPlayerTag: string | null;
+  reasons: string[];
+};
+
+const PLAYER_TAG_PATTERN = /^#[0289PYLQGRJCUV]{3,15}$/;
+
+export function normalizePlayerTag(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const normalized = `#${value
+    .toUpperCase()
+    .replace(/^#/, "")
+    .replace(/O/g, "0")
+    .replace(/[^A-Z0-9]/g, "")}`;
+  return PLAYER_TAG_PATTERN.test(normalized) ? normalized : null;
+}
+
+export function mergeProfileScreenshotDetections(
+  detections: ScreenshotProfileDetection[],
+): ScreenshotProfileDetection | null {
+  if (!detections.length) return null;
+  const ranked = [...detections].sort((left, right) => right.confidence - left.confidence);
+  const tags = [...new Set(
+    ranked.flatMap((detection) => [
+      detection.playerTag,
+      ...(detection.alternativePlayerTags || []),
+    ]).map(normalizePlayerTag).filter((tag): tag is string => Boolean(tag)),
+  )];
+  const townHallLevel = ranked.find((detection) => detection.townHallLevel !== null)?.townHallLevel ?? null;
+  const experienceLevel = ranked.find((detection) => detection.experienceLevel !== null)?.experienceLevel ?? null;
+  return {
+    playerTag: tags[0] || null,
+    alternativePlayerTags: tags.slice(1),
+    townHallLevel,
+    experienceLevel,
+    confidence: tags.length > 1 ? Math.min(0.49, ranked[0].confidence) : ranked[0].confidence,
+  };
+}
+
+export function validateProfileScreenshot(params: {
+  detection: ScreenshotProfileDetection;
+  expectedPlayerTag?: string | null;
+  currentTownHallLevel: number;
+}): ScreenshotProfileValidation {
+  const expectedPlayerTag = normalizePlayerTag(params.expectedPlayerTag);
+  const observedTags = [...new Set([
+    params.detection.playerTag,
+    ...(params.detection.alternativePlayerTags || []),
+  ].map(normalizePlayerTag).filter((tag): tag is string => Boolean(tag)))];
+  const detectedPlayerTag = observedTags[0] || null;
+  const reasons: string[] = [];
+  let status: ScreenshotProfileValidationStatus;
+  if (observedTags.length > 1) {
+    status = "mismatch";
+    reasons.push(`Mehrere Screenshots zeigen unterschiedliche Spieler-Tags (${observedTags.join(", ")}).`);
+  } else if (!detectedPlayerTag) {
+    status = "unverified";
+    reasons.push("Der Spieler-Tag konnte nicht sicher erkannt werden.");
+  } else if (expectedPlayerTag && detectedPlayerTag !== expectedPlayerTag) {
+    status = "mismatch";
+    reasons.push(`Der Screenshot gehört zu ${detectedPlayerTag}, geöffnet ist aber ${expectedPlayerTag}.`);
+  } else if (
+    params.detection.townHallLevel !== null &&
+    params.detection.townHallLevel < params.currentTownHallLevel
+  ) {
+    status = "stale";
+    reasons.push(
+      `Das erkannte Rathaus ${params.detection.townHallLevel} ist niedriger als der gespeicherte Stand ${params.currentTownHallLevel}.`,
+    );
+  } else {
+    status = expectedPlayerTag ? "match" : "new_identity";
+    if (!expectedPlayerTag)
+      reasons.push("Dieser Spieler-Tag wird nach ausdrücklicher Bestätigung mit dem Account verknüpft.");
+  }
+  return {
+    status,
+    canApply: status === "match" || status === "new_identity",
+    detectedPlayerTag,
+    expectedPlayerTag,
+    reasons,
+  };
+}
 
 export type ScreenshotVisualObjectMatch = {
   sourceId: string;
@@ -1160,12 +1254,14 @@ export function parseScreenshotResources(text: string): ScreenshotResourceDetect
 }
 
 export function parseProfileScreenshot(text: string): ScreenshotProfileDetection {
-  const tagMatch = text.toUpperCase().match(/#[0289PYLQGRJCUV]{3,15}/);
+  const tagMatch = text.toUpperCase().match(/#[A-Z0-9]{3,15}/);
+  const playerTag = normalizePlayerTag(tagMatch?.[0]);
   const townHallMatch = text.match(/(?:rathaus|town\s*hall|th)\s*(?:level|lvl|stufe)?\s*[:=]?\s*(\d{1,2})/i);
   const experienceMatch = text.match(/(?:erfahrungslevel|experience\s*level|xp\s*level)\s*[:=]?\s*(\d{1,3})/i);
-  const found = [tagMatch, townHallMatch, experienceMatch].filter(Boolean).length;
+  const found = [playerTag, townHallMatch, experienceMatch].filter(Boolean).length;
   return {
-    playerTag: tagMatch?.[0] || null,
+    playerTag,
+    alternativePlayerTags: [],
     townHallLevel: townHallMatch ? Number(townHallMatch[1]) : null,
     experienceLevel: experienceMatch ? Number(experienceMatch[1]) : null,
     confidence: found >= 2 ? 0.95 : found === 1 ? 0.72 : 0,

@@ -373,6 +373,7 @@ export function PlayerImportCenter(props: Props) {
         <div className="mt-5">
           <ScreenshotImportWizard
             accountId={props.account.id}
+            expectedPlayerTag={props.account.playerTag}
             entities={entities}
             townHallLevel={props.account.townHallLevel}
             language={en ? "en" : "de"}
