@@ -419,6 +419,27 @@ export async function recognizeScreenshotDetailed(
         });
         onProgress(75 + Math.round(((cell.index + 1) / grid.length) * 25));
       }
+      const recognizedLevelCount = laboratoryGridCells.filter(
+        (cell) => cell.level !== null,
+      ).length;
+      const inferredMaxCandidates = laboratoryGridCells.filter(
+        (cell) =>
+          cell.level === null &&
+          !cell.isMaxLevel &&
+          grayscaleCells.has(cell.index),
+      );
+      if (
+        recognizedLevelCount >= 8 &&
+        !laboratoryGridCells.some((cell) => cell.isMaxLevel) &&
+        inferredMaxCandidates.length === 1
+      ) {
+        const maxCellIndex = inferredMaxCandidates[0].index;
+        laboratoryGridCells = laboratoryGridCells.map((cell) =>
+          cell.index === maxCellIndex
+            ? { ...cell, isMaxLevel: true, confidence: 0.84 }
+            : cell,
+        );
+      }
       bitmap.close();
     }
     const lineKeys = new Set<string>();
