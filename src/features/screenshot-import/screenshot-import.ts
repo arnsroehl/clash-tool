@@ -543,6 +543,14 @@ export function calculateDetectionConfidence(parts: {
   );
 }
 
+export function shouldStoreScreenshotFeedback(
+  improvementConsent: boolean,
+  correctedLevel: number | undefined,
+  proposedLevel: number | null,
+): boolean {
+  return improvementConsent && correctedLevel !== undefined && correctedLevel !== proposedLevel;
+}
+
 export function parseScreenshotDetections(params: {
   text: string;
   entities: ScreenshotEntity[];

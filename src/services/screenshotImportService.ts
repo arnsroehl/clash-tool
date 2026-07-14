@@ -49,6 +49,49 @@ export type ResumableScreenshotImport = {
   profile: ScreenshotProfileDetection | null;
 };
 
+export type ScreenshotImportHistoryEntry = {
+  id: string;
+  selectedImportType: Exclude<ScreenshotScreenType, "unknown">;
+  createdAt: string;
+  confirmedAt: string | null;
+  retainedOriginalCount: number;
+};
+
+export async function fetchScreenshotImportHistory(
+  accountId: string,
+): Promise<ScreenshotImportHistoryEntry[]> {
+  const client = getSupabaseClient();
+  const { data: sessions, error } = await client
+    .from("screenshot_import_sessions")
+    .select("id, selected_import_type, created_at, confirmed_at")
+    .eq("account_id", accountId)
+    .eq("status", "confirmed")
+    .order("created_at", { ascending: false })
+    .limit(10);
+  if (error) throw new Error(error.message);
+  if (!sessions?.length) return [];
+  const sessionIds = sessions.map((session) => String(session.id));
+  const { data: files, error: fileError } = await client
+    .from("screenshot_import_files")
+    .select("import_session_id")
+    .in("import_session_id", sessionIds)
+    .is("deleted_at", null);
+  if (fileError) throw new Error(fileError.message);
+  const retainedCounts = (files || []).reduce<Map<string, number>>((counts, file) => {
+    const id = String(file.import_session_id);
+    counts.set(id, (counts.get(id) || 0) + 1);
+    return counts;
+  }, new Map());
+  return sessions.map((session) => ({
+    id: String(session.id),
+    selectedImportType:
+      session.selected_import_type as ScreenshotImportHistoryEntry["selectedImportType"],
+    createdAt: String(session.created_at),
+    confirmedAt: session.confirmed_at ? String(session.confirmed_at) : null,
+    retainedOriginalCount: retainedCounts.get(String(session.id)) || 0,
+  }));
+}
+
 function confidenceBand(confidence: number): ConfidenceBand {
   if (confidence >= 0.95) return "very_high";
   if (confidence >= 0.8) return "high";
@@ -581,6 +624,10 @@ export async function confirmScreenshotImport(
         .update({ processing_status: "deleted", deleted_at: new Date().toISOString() })
         .eq("import_session_id", session.id);
       if (fileUpdateError) throw new Error(fileUpdateError.message);
+      await appendImportEvent(session.id, "original_screenshots_deleted", {
+        reason: "confirmation_retention_policy",
+        count: paths.length,
+      });
     }
   }
   const { error: sessionError } = await client
@@ -595,6 +642,31 @@ export async function confirmScreenshotImport(
   if (sessionError) throw new Error(sessionError.message);
   await appendImportEvent(session.id, "import_confirmed", {
     originals_retained: session.retainOriginals,
+  });
+}
+
+export async function deleteScreenshotOriginals(sessionId: string): Promise<void> {
+  const client = getSupabaseClient();
+  const { data: files, error } = await client
+    .from("screenshot_import_files")
+    .select("storage_path")
+    .eq("import_session_id", sessionId)
+    .is("deleted_at", null);
+  if (error) throw new Error(error.message);
+  const paths = (files || []).map((file) => String(file.storage_path));
+  if (!paths.length) return;
+  const { error: removeError } = await client.storage.from(BUCKET).remove(paths);
+  if (removeError) throw new Error(removeError.message);
+  const deletedAt = new Date().toISOString();
+  const { error: updateError } = await client
+    .from("screenshot_import_files")
+    .update({ processing_status: "deleted", deleted_at: deletedAt })
+    .eq("import_session_id", sessionId)
+    .is("deleted_at", null);
+  if (updateError) throw new Error(updateError.message);
+  await appendImportEvent(sessionId, "original_screenshots_deleted", {
+    reason: "user_requested",
+    count: paths.length,
   });
 }
 

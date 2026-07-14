@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   classifyScreenshotText,
   filterBuildingImportEntities,
@@ -13,6 +13,7 @@ import {
   parseScreenshotResources,
   parseProfileScreenshot,
   summarizeScreenshotReview,
+  shouldStoreScreenshotFeedback,
   type ScreenshotDetection,
   type BuildingImportSection,
   type ScreenshotEntity,
@@ -28,7 +29,9 @@ import {
   createAnalysisJob,
   createScreenshotImportSession,
   deleteScreenshotImportSession,
+  deleteScreenshotOriginals,
   downloadScreenshotFile,
+  fetchScreenshotImportHistory,
   fetchLatestOpenScreenshotImport,
   persistScreenshotReview,
   recordChangeDecisions,
@@ -41,6 +44,7 @@ import {
   updateScreenshotAnalysis,
   uploadScreenshot,
   type ScreenshotImportSession,
+  type ScreenshotImportHistoryEntry,
   type ResumableScreenshotImport,
   type ResumableScreenshotFile,
 } from "@/services/screenshotImportService";
@@ -157,6 +161,8 @@ export function ScreenshotImportWizard({
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const [savedForLater, setSavedForLater] = useState(false);
+  const [history, setHistory] = useState<ScreenshotImportHistoryEntry[]>([]);
+  const [deletingOriginalsFor, setDeletingOriginalsFor] = useState<string | null>(null);
   const previewUrls = useRef(new Set<string>());
 
   useEffect(
@@ -167,11 +173,20 @@ export function ScreenshotImportWizard({
     [],
   );
 
+  const refreshHistory = useCallback(async () => {
+    setHistory(await fetchScreenshotImportHistory(accountId));
+  }, [accountId]);
+
   useEffect(() => {
     let cancelled = false;
     void fetchLatestOpenScreenshotImport(accountId)
       .then((candidate) => {
         if (!cancelled) setResumeCandidate(candidate);
+      })
+      .catch(() => undefined);
+    void fetchScreenshotImportHistory(accountId)
+      .then((entries) => {
+        if (!cancelled) setHistory(entries);
       })
       .catch(() => undefined);
     return () => {
@@ -694,7 +709,11 @@ export function ScreenshotImportWizard({
       );
       for (const change of changes) {
         const correctedLevel = correctedLevels[change.id];
-        if (correctedLevel === undefined || correctedLevel === change.proposedLevel) continue;
+        if (!shouldStoreScreenshotFeedback(
+          improvementConsent,
+          correctedLevel,
+          change.proposedLevel,
+        )) continue;
         await recordScreenshotFeedback({
           sessionId: session.id,
           previousResult: {
@@ -711,6 +730,7 @@ export function ScreenshotImportWizard({
       const hasDeferredChanges = Object.values(deferred).some(Boolean);
       if (hasDeferredChanges) await saveScreenshotImportForLater(session.id);
       else await confirmScreenshotImport(session);
+      if (!hasDeferredChanges) await refreshHistory().catch(() => undefined);
       setSavedForLater(hasDeferredChanges);
       setStep("done");
     } catch (error) {
@@ -723,6 +743,28 @@ export function ScreenshotImportWizard({
   const cancel = async () => {
     if (session) await deleteScreenshotImportSession(session.id);
     resetWizard();
+  };
+
+  const removeRetainedOriginals = async (entry: ScreenshotImportHistoryEntry) => {
+    const approved = window.confirm(
+      en
+        ? `Permanently delete ${entry.retainedOriginalCount} retained original screenshot(s)? The confirmed account data remains saved.`
+        : `${entry.retainedOriginalCount} aufbewahrte Original-Screenshot(s) dauerhaft löschen? Die bestätigten Accountdaten bleiben gespeichert.`,
+    );
+    if (!approved) return;
+    setDeletingOriginalsFor(entry.id);
+    setMessage(null);
+    try {
+      await deleteScreenshotOriginals(entry.id);
+      setHistory((current) => current.map((item) =>
+        item.id === entry.id ? { ...item, retainedOriginalCount: 0 } : item,
+      ));
+      await refreshHistory().catch(() => undefined);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Originalbilder konnten nicht gelöscht werden.");
+    } finally {
+      setDeletingOriginalsFor(null);
+    }
   };
 
   const resetWizard = () => {
@@ -803,6 +845,41 @@ export function ScreenshotImportWizard({
                 {en ? "Continue" : "Fortsetzen"}
               </button>
             </div>
+          ) : null}
+          {history.length ? (
+            <details className="mb-4 rounded-xl border border-white/10 bg-slate-950/70 p-4">
+              <summary className="cursor-pointer text-sm font-bold text-slate-200">
+                {en ? "Private import history" : "Private Importhistorie"} ({history.length})
+              </summary>
+              <div className="mt-3 space-y-2">
+                {history.map((entry) => {
+                  const type = IMPORT_TYPES.find((item) => item.id === entry.selectedImportType);
+                  return (
+                    <div key={entry.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 p-3 text-xs">
+                      <span>
+                        <b className="block text-slate-200">{en ? type?.en : type?.de}</b>
+                        <span className="text-slate-500">
+                          {new Intl.DateTimeFormat(en ? "en" : "de-DE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(entry.confirmedAt || entry.createdAt))}
+                          {` · ${entry.retainedOriginalCount} ${en ? "retained originals" : "aufbewahrte Originale"}`}
+                        </span>
+                      </span>
+                      {entry.retainedOriginalCount > 0 ? (
+                        <button
+                          type="button"
+                          disabled={deletingOriginalsFor === entry.id}
+                          onClick={() => void removeRetainedOriginals(entry)}
+                          className="rounded-lg border border-rose-400/30 px-3 py-2 font-bold text-rose-200 disabled:opacity-40"
+                        >
+                          {deletingOriginalsFor === entry.id
+                            ? (en ? "Deleting…" : "Wird gelöscht…")
+                            : (en ? "Delete originals now" : "Originale jetzt löschen")}
+                        </button>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </details>
           ) : null}
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {IMPORT_TYPES.map((item) => (

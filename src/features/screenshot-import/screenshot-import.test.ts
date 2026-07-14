@@ -15,6 +15,7 @@ import {
   parseUpgradeSlots,
   parseWallDistributions,
   summarizeScreenshotReview,
+  shouldStoreScreenshotFeedback,
   type ScreenshotEntity,
 } from "./screenshot-import";
 import {
@@ -703,4 +704,11 @@ test("keeps supported village proposals and suppresses overlapping detections", 
   assert.equal(matches.length, 1);
   assert.equal(matches[0].sourceId, "cannon");
   assert.equal(matches[0].confidence, 0.95);
+});
+
+test("stores correction feedback only with explicit improvement consent", () => {
+  assert.equal(shouldStoreScreenshotFeedback(false, 12, 11), false);
+  assert.equal(shouldStoreScreenshotFeedback(true, undefined, 11), false);
+  assert.equal(shouldStoreScreenshotFeedback(true, 11, 11), false);
+  assert.equal(shouldStoreScreenshotFeedback(true, 12, 11), true);
 });
