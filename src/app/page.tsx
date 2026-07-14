@@ -82,6 +82,9 @@ import type {
   TroopLevel,
 } from "@/types/laboratory";
 
+const officialClashApiEnabled =
+  process.env.NEXT_PUBLIC_CLASH_API_ENABLED === "true";
+
 function toPlannerItems<
   TItem extends { id: string } & Omit<PlannerItem, "type">,
 >(items: TItem[], type: PlannerItem["type"]): PlannerItem[] {
@@ -753,6 +756,7 @@ export default function Home() {
           defaultOpen={isHardcoreProfile}
         >
           <PlayerImportCenter
+            officialApiEnabled={officialClashApiEnabled}
             account={selectedAccount}
             buildings={availableBuildings}
             buildingInstanceLevels={buildingInstanceLevels}
@@ -915,6 +919,7 @@ export default function Home() {
           defaultOpen={isHardcoreProfile}
         >
           <ClanDashboard
+            officialApiEnabled={officialClashApiEnabled}
             currentUserId={user.id}
             language={language}
             clans={clanDashboard.clans}

@@ -25,6 +25,7 @@ import type { Hero } from "@/types/hero";
 import type { SiegeMachine, Spell, Troop } from "@/types/laboratory";
 
 type Props = {
+  officialApiEnabled?: boolean;
   account: ClashAccount | null;
   buildings: Building[];
   buildingInstanceLevels: BuildingInstanceLevelMap;
@@ -47,6 +48,7 @@ const normalize = (name: string) =>
 
 export function PlayerImportCenter(props: Props) {
   const en = props.language === "en";
+  const officialApiEnabled = props.officialApiEnabled === true;
   const [tag, setTag] = useState(props.account?.playerTag || "");
   const [manual, setManual] = useState("");
   const [preview, setPreview] = useState<PlayerImportPreview | null>(null);
@@ -154,6 +156,7 @@ export function PlayerImportCenter(props: Props) {
   );
 
   useEffect(() => {
+    if (!officialApiEnabled) return;
     const account = props.account;
     if (
       !account?.playerTag ||
@@ -182,7 +185,13 @@ export function PlayerImportCenter(props: Props) {
         ),
       )
       .finally(() => setBusy(false));
-  }, [en, entities.length, previewOfficial, props.account]);
+  }, [
+    en,
+    entities.length,
+    officialApiEnabled,
+    previewOfficial,
+    props.account,
+  ]);
 
   const loadOfficial = async () => {
     if (!props.account) return;
@@ -273,47 +282,57 @@ export function PlayerImportCenter(props: Props) {
         {en ? "Import & Updates" : "Import & Aktualisierung"}
       </h2>
       <p className="mt-2 text-sm text-slate-400">
-        {en
-          ? "API sync is prepared after 24 hours. Screenshots are read locally and saved only after confirmation."
-          : "API-Abgleiche werden nach 24 Stunden beim Öffnen vorbereitet. Screenshots werden lokal per OCR gelesen; gespeichert wird immer erst nach deiner Bestätigung."}
+        {officialApiEnabled
+          ? en
+            ? "API sync is prepared after 24 hours. Screenshots are read locally and saved only after confirmation."
+            : "API-Abgleiche werden nach 24 Stunden beim Öffnen vorbereitet. Screenshots werden lokal per OCR gelesen; gespeichert wird immer erst nach deiner Bestätigung."
+          : en
+            ? "Manual mode is active. Enter levels as text or use local screenshot recognition; changes are saved only after confirmation."
+            : "Der manuelle Modus ist aktiv. Trage Level als Text ein oder nutze die lokale Screenshot-Erkennung; gespeichert wird erst nach deiner Bestätigung."}
       </p>
       {!props.account ? (
         <p className="mt-5 rounded-xl bg-slate-900 p-4 text-slate-400">
           {en ? "Select an account first." : "Wähle zuerst einen Account."}
         </p>
       ) : (
-        <div className="mt-5 grid gap-5 lg:grid-cols-3">
-          <div className="rounded-2xl bg-slate-900 p-5">
-            <h3 className="font-bold">
-              {en ? "Player tag & API" : "Spieler-Tag & API"}
-            </h3>
-            <div className="mt-3 flex gap-2">
-              <input
-                value={tag}
-                onChange={(e) => setTag(e.target.value)}
-                placeholder="#PLAYERTAG"
-                className="min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-950 p-3"
-              />
-              <button
-                type="button"
-                disabled={busy || !tag}
-                onClick={() => void loadOfficial()}
-                className="rounded-xl bg-amber-400 px-4 font-bold text-slate-950 disabled:opacity-40"
-              >
-                {en ? "Fetch" : "Abrufen"}
-              </button>
+        <div
+          className={`mt-5 grid gap-5 ${
+            officialApiEnabled ? "lg:grid-cols-3" : "lg:grid-cols-2"
+          }`}
+        >
+          {officialApiEnabled ? (
+            <div className="rounded-2xl bg-slate-900 p-5">
+              <h3 className="font-bold">
+                {en ? "Player tag & API" : "Spieler-Tag & API"}
+              </h3>
+              <div className="mt-3 flex gap-2">
+                <input
+                  value={tag}
+                  onChange={(e) => setTag(e.target.value)}
+                  placeholder="#PLAYERTAG"
+                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-950 p-3"
+                />
+                <button
+                  type="button"
+                  disabled={busy || !tag}
+                  onClick={() => void loadOfficial()}
+                  className="rounded-xl bg-amber-400 px-4 font-bold text-slate-950 disabled:opacity-40"
+                >
+                  {en ? "Fetch" : "Abrufen"}
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                {en ? "Last sync" : "Letzter Abgleich"}:{" "}
+                {props.account.lastSyncedAt
+                  ? new Date(props.account.lastSyncedAt).toLocaleString(
+                      en ? "en-US" : "de-DE",
+                    )
+                  : en
+                    ? "never"
+                    : "noch nie"}
+              </p>
             </div>
-            <p className="mt-2 text-xs text-slate-500">
-              {en ? "Last sync" : "Letzter Abgleich"}:{" "}
-              {props.account.lastSyncedAt
-                ? new Date(props.account.lastSyncedAt).toLocaleString(
-                    en ? "en-US" : "de-DE",
-                  )
-                : en
-                  ? "never"
-                  : "noch nie"}
-            </p>
-          </div>
+          ) : null}
           <div className="rounded-2xl bg-slate-900 p-5">
             <h3 className="font-bold">
               {en ? "Screenshot recognition" : "Screenshot-Erkennung"}

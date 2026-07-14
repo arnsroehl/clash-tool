@@ -14,6 +14,7 @@ import type {
 } from "@/types/clan";
 
 type Props = {
+  officialApiEnabled?: boolean;
   currentUserId: string;
   language?: "de" | "en";
   clans: Clan[];
@@ -54,6 +55,7 @@ const roleNames: Record<"de" | "en", Record<ClanMember["role"], string>> = {
 };
 
 export function ClanDashboard({
+  officialApiEnabled = false,
   currentUserId,
   language = "de",
   clans,
@@ -138,7 +140,13 @@ export function ClanDashboard({
           </label>
         ) : null}
       </div>
-      <div className="mt-5 grid gap-3 md:grid-cols-[1fr_1fr_auto_auto]">
+      <div
+        className={`mt-5 grid gap-3 ${
+          officialApiEnabled
+            ? "md:grid-cols-[1fr_1fr_auto_auto]"
+            : "md:grid-cols-[1fr_1fr_auto]"
+        }`}
+      >
         <input
           aria-label={en ? "Clan tag" : "Clan-Tag"}
           value={tag}
@@ -159,14 +167,16 @@ export function ClanDashboard({
           }
           className="rounded-xl border border-white/10 bg-slate-950 p-3"
         />
-        <button
-          type="button"
-          disabled={isBusy || !tag}
-          onClick={() => void onSync(tag)}
-          className="rounded-xl bg-amber-400 px-4 py-3 font-bold text-slate-950 disabled:opacity-40"
-        >
-          {en ? "Sync API" : "API synchronisieren"}
-        </button>
+        {officialApiEnabled ? (
+          <button
+            type="button"
+            disabled={isBusy || !tag}
+            onClick={() => void onSync(tag)}
+            className="rounded-xl bg-amber-400 px-4 py-3 font-bold text-slate-950 disabled:opacity-40"
+          >
+            {en ? "Sync API" : "API synchronisieren"}
+          </button>
+        ) : null}
         <button
           type="button"
           disabled={isBusy || !tag || !name}
@@ -197,8 +207,12 @@ export function ClanDashboard({
       {!selectedClan ? (
         <p className="mt-5 rounded-xl bg-slate-900 p-4 text-slate-400">
           {en
-            ? "Create a clan or sync it using the clan tag."
-            : "Lege einen Clan an oder synchronisiere ihn über den Clan-Tag."}
+            ? officialApiEnabled
+              ? "Create a clan or sync it using the clan tag."
+              : "Create a clan manually using its tag and name."
+            : officialApiEnabled
+              ? "Lege einen Clan an oder synchronisiere ihn über den Clan-Tag."
+              : "Lege einen Clan mit Tag und Name manuell an."}
         </p>
       ) : (
         <>

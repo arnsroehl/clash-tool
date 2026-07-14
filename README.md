@@ -74,7 +74,21 @@ src/scripts/sql/
 
 These SQL files are setup helpers and are not executed automatically by the app.
 
-## Clash API Proxy
+## Optional Clash API integration
+
+The app runs in manual mode by default. Level entry, screenshot recognition,
+planning, queues, simulations, and manual clan creation work without the
+official Clash API. To expose automatic player and clan sync after configuring
+a fixed-IP API connection, set:
+
+```env
+NEXT_PUBLIC_CLASH_API_ENABLED=true
+```
+
+Leave the variable unset or set it to `false` to avoid automatic API requests
+and hide unavailable sync controls.
+
+### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP
 addresses. Vercel Hobby uses changing outbound IPs, so production imports should
@@ -94,10 +108,10 @@ Setup order:
    openssl rand -hex 32
    ```
 
-4. After the Render service exists, open **Connect → Outbound** and copy every
-   outbound CIDR range for its region.
+4. Provide the proxy with individual, fixed outbound IPv4 addresses. Shared
+   Render CIDR ranges cannot be entered in the Clash Developer Portal.
 5. In the Clash of Clans Developer Portal, create a key for this proxy and add
-   every Render outbound range under **Allowed IP Addresses**.
+   every individual fixed IPv4 address under **Allowed IP Addresses**.
 6. Replace the temporary Render token with the generated official API token and
    redeploy the proxy. `/health` must return `{ "status": "ok" }`.
 7. Add the following sensitive values to Vercel Preview and Production:
