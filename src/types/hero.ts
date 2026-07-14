@@ -1,5 +1,6 @@
 export type Hero = {
   id: string;
+  sourceId?: string;
   name: string;
   apiName: string;
   category: string;
@@ -10,6 +11,7 @@ export type Hero = {
 
 export type HeroRow = {
   id: string;
+  source_id?: string;
   name: string;
   api_name: string;
   category: string;

@@ -9,13 +9,14 @@ import type {
 } from "@/types/laboratory";
 
 const TROOP_SELECT_FIELDS =
-  "id, name, api_name, category, unlock_town_hall_level, max_level, sort_order";
+  "id, source_id, name, api_name, category, unlock_town_hall_level, max_level, sort_order";
 const TROOP_LEVEL_SELECT_FIELDS =
   "troop_id, level, town_hall_level, upgrade_time_hours, gold_cost, elixir_cost, dark_elixir_cost, hitpoints";
 
 function mapTroop(row: TroopRow): Troop {
   return {
     id: row.id,
+    sourceId: row.source_id,
     name: row.name,
     apiName: row.api_name,
     category: row.category,

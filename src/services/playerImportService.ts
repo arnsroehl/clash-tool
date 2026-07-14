@@ -2,7 +2,13 @@ import { getSupabaseClient } from "@/lib/supabase";
 import type { ClashAccount } from "@/types/account";
 
 export type ImportEntityType =
-  "building" | "hero" | "troop" | "spell" | "siege_machine";
+  | "building"
+  | "hero"
+  | "troop"
+  | "spell"
+  | "siege_machine"
+  | "pet"
+  | "equipment";
 export type ImportChange = {
   type: ImportEntityType;
   itemId: string;
@@ -93,7 +99,7 @@ export async function applyPlayerImport(
   } as const;
   for (const type of Object.keys(tableFor) as Exclude<
     ImportEntityType,
-    "building"
+    "building" | "pet" | "equipment"
   >[]) {
     const changes = preview.changes.filter((change) => change.type === type);
     if (!changes.length) continue;
@@ -107,6 +113,22 @@ export async function applyPlayerImport(
     const { error } = await client
       .from(table)
       .upsert(rows, { onConflict: `account_id,${idColumn}` });
+    if (error) throw new Error(error.message);
+  }
+  const screenshotEntityChanges = preview.changes.filter(
+    (change) => change.type === "pet" || change.type === "equipment",
+  );
+  if (screenshotEntityChanges.length) {
+    const { error } = await client.from("account_screenshot_entities").upsert(
+      screenshotEntityChanges.map((change) => ({
+        account_id: account.id,
+        entity_id: change.itemId,
+        current_level: change.toLevel,
+        is_unlocked: change.toLevel > 0,
+        updated_at: new Date().toISOString(),
+      })),
+      { onConflict: "account_id,entity_id" },
+    );
     if (error) throw new Error(error.message);
   }
 }

@@ -136,6 +136,18 @@ describe("Builder Simulation", () => {
     assert.equal(result.laboratoryAssignmentCount, 2);
   });
 
+  it("berücksichtigt per Screenshot erkannte belegte Slots", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 2,
+      queueItems: [createQueueItem({ id: "next", queueOrder: 1, durationHours: 10 })],
+      initialBuilderAvailabilityHours: [24, 5],
+      initialLaboratoryAvailabilityHours: 12,
+    });
+    assert.equal(result.assignments[0].builderIndex, 1);
+    assert.equal(result.assignments[0].startHour, 5);
+    assert.equal(result.assignments[0].endHour, 15);
+  });
+
   it("Event-Zeitbonus verkürzt geplante Upgrades", () => {
     const result = simulateBuilderQueue({
       builderCount: 1,

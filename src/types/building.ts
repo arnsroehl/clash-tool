@@ -1,5 +1,6 @@
 export type Building = {
   id: string;
+  sourceId?: string;
   name: string;
   category: string;
   unlockTownHallLevel: number;
@@ -25,6 +26,7 @@ export type BuildingTownHallAvailabilityRow = {
 
 export type BuildingRow = {
   id: string;
+  source_id?: string;
   name: string;
   category: string;
   unlock_town_hall_level: number;

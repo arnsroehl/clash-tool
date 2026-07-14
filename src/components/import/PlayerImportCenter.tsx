@@ -1,16 +1,18 @@
 "use client";
 
 import {
-  ChangeEvent,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { ScreenshotImportWizard } from "@/components/import/ScreenshotImportWizard";
 import {
   parseScreenshotLevels,
   type ScreenshotEntity,
+  type ScreenshotResourceDetection,
+  type ScreenshotProfileDetection,
 } from "@/features/screenshot-import/screenshot-import";
 import {
   applyPlayerImport,
@@ -18,7 +20,6 @@ import {
   type ImportChange,
   type PlayerImportPreview,
 } from "@/services/playerImportService";
-import { recognizeScreenshot } from "@/services/screenshotRecognitionService";
 import type { ClashAccount } from "@/types/account";
 import type { Building, BuildingInstanceLevelMap } from "@/types/building";
 import type { Hero } from "@/types/hero";
@@ -37,7 +38,10 @@ type Props = {
   spellLevels: Record<string, number>;
   siegeMachines: SiegeMachine[];
   siegeLevels: Record<string, number>;
+  extraScreenshotEntities?: ScreenshotEntity[];
   language?: "de" | "en";
+  onResourcesImported?: (resources: ScreenshotResourceDetection[]) => void;
+  onProfileImported?: (profile: ScreenshotProfileDetection) => Promise<void>;
 };
 const normalize = (name: string) =>
   name
@@ -54,7 +58,6 @@ export function PlayerImportCenter(props: Props) {
   const [preview, setPreview] = useState<PlayerImportPreview | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [ocrProgress, setOcrProgress] = useState<number | null>(null);
   const autoCheckedAccount = useRef<string | null>(null);
   const entities = useMemo<ScreenshotEntity[]>(
     () => [
@@ -62,42 +65,55 @@ export function PlayerImportCenter(props: Props) {
         Array.from({ length: item.countAfterMerges || 1 }, (_, index) => ({
           id: `${item.id}:${index + 1}`,
           name: `${item.name} ${index + 1}`,
+          aliases: item.sourceId ? [item.sourceId, `${item.sourceId}-${index + 1}`] : [],
           type: "building" as const,
           currentLevel: props.buildingInstanceLevels[item.id]?.[index] || 0,
+          maxLevel: item.maxLevel,
+          unlockTownHallLevel: item.unlockTownHallLevel,
         })),
       ),
       ...props.heroes.map((item) => ({
         id: item.id,
         name: item.name,
-        aliases: [item.apiName],
+        aliases: [item.apiName, item.sourceId].filter((value): value is string => Boolean(value)),
         type: "hero" as const,
         currentLevel: props.heroLevels[item.id] || 0,
+        maxLevel: item.maxLevel,
+        unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...props.troops.map((item) => ({
         id: item.id,
         name: item.name,
-        aliases: [item.apiName],
+        aliases: [item.apiName, item.sourceId].filter((value): value is string => Boolean(value)),
         type: "troop" as const,
         currentLevel: props.troopLevels[item.id] || 0,
+        maxLevel: item.maxLevel,
+        unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...props.spells.map((item) => ({
         id: item.id,
         name: item.name,
-        aliases: [item.apiName],
+        aliases: [item.apiName, item.sourceId].filter((value): value is string => Boolean(value)),
         type: "spell" as const,
         currentLevel: props.spellLevels[item.id] || 0,
+        maxLevel: item.maxLevel,
+        unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...props.siegeMachines.map((item) => ({
         id: item.id,
         name: item.name,
-        aliases: [item.apiName],
+        aliases: [item.apiName, item.sourceId].filter((value): value is string => Boolean(value)),
         type: "siege_machine" as const,
         currentLevel: props.siegeLevels[item.id] || 0,
+        maxLevel: item.maxLevel,
+        unlockTownHallLevel: item.unlockTownHallLevel,
       })),
+      ...(props.extraScreenshotEntities || []),
     ],
     [
       props.buildingInstanceLevels,
       props.buildings,
+      props.extraScreenshotEntities,
       props.heroes,
       props.heroLevels,
       props.siegeLevels,
@@ -127,7 +143,7 @@ export function PlayerImportCenter(props: Props) {
         return match && match.currentLevel !== item.level
           ? [
               {
-                type: match.type,
+                type: match.type as ImportChange["type"],
                 itemId: match.id,
                 name: match.name,
                 fromLevel: match.currentLevel,
@@ -216,7 +232,7 @@ export function PlayerImportCenter(props: Props) {
     const changes = parseScreenshotLevels(text, entities)
       .filter((match) => match.detectedLevel !== match.currentLevel)
       .map((match) => ({
-        type: match.type,
+        type: match.type as ImportChange["type"],
         itemId: match.id,
         name: match.name,
         fromLevel: match.currentLevel,
@@ -229,34 +245,14 @@ export function PlayerImportCenter(props: Props) {
       changes,
     });
   };
-  const handleScreenshot = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setBusy(true);
-    setMessage(null);
-    setOcrProgress(0);
-    try {
-      const text = await recognizeScreenshot(file, setOcrProgress);
-      setManual(text);
-      parseText(text);
-      setMessage(
-        en
-          ? "Screenshot recognized locally. Review the changes before saving."
-          : "Screenshot lokal erkannt. Bitte prüfe die Änderungsvorschau vor dem Speichern.",
-      );
-    } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : en
-            ? "Screenshot could not be read."
-            : "Screenshot konnte nicht gelesen werden.",
-      );
-    } finally {
-      setBusy(false);
-      setOcrProgress(null);
-      event.target.value = "";
-    }
+  const applyScreenshotChanges = async (changes: ImportChange[]) => {
+    if (!props.account) return;
+    await applyPlayerImport(props.account, {
+      playerName: props.account.name,
+      townHallFrom: props.account.townHallLevel,
+      townHallTo: props.account.townHallLevel,
+      changes,
+    });
   };
   const apply = async () => {
     if (!props.account || !preview) return;
@@ -284,11 +280,11 @@ export function PlayerImportCenter(props: Props) {
       <p className="mt-2 text-sm text-slate-400">
         {officialApiEnabled
           ? en
-            ? "API sync is prepared after 24 hours. Screenshots are read locally and saved only after confirmation."
-            : "API-Abgleiche werden nach 24 Stunden beim Öffnen vorbereitet. Screenshots werden lokal per OCR gelesen; gespeichert wird immer erst nach deiner Bestätigung."
+            ? "API sync is prepared after 24 hours. The guided screenshot import validates every detected change before confirmation."
+            : "API-Abgleiche werden nach 24 Stunden beim Öffnen vorbereitet. Der geführte Screenshot-Import prüft jede erkannte Änderung vor der Bestätigung."
           : en
-            ? "Manual mode is active. Enter levels as text or use local screenshot recognition; changes are saved only after confirmation."
-            : "Der manuelle Modus ist aktiv. Trage Level als Text ein oder nutze die lokale Screenshot-Erkennung; gespeichert wird erst nach deiner Bestätigung."}
+            ? "Manual API mode is active. Screenshot imports work independently and save only confirmed changes."
+            : "Der manuelle API-Modus ist aktiv. Screenshot-Importe funktionieren unabhängig und speichern nur bestätigte Änderungen."}
       </p>
       {!props.account ? (
         <p className="mt-5 rounded-xl bg-slate-900 p-4 text-slate-400">
@@ -335,30 +331,6 @@ export function PlayerImportCenter(props: Props) {
           ) : null}
           <div className="rounded-2xl bg-slate-900 p-5">
             <h3 className="font-bold">
-              {en ? "Screenshot recognition" : "Screenshot-Erkennung"}
-            </h3>
-            <p className="mt-1 text-xs text-slate-400">
-              {en
-                ? "Use a clearly readable level overview. The first run downloads OCR language data."
-                : "Nutze gut lesbare Level-Übersichten. Der erste OCR-Lauf lädt Sprachdaten."}
-            </p>
-            <label className="mt-3 block cursor-pointer rounded-xl border border-amber-400/30 p-3 text-center text-sm font-bold text-amber-200">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(event) => void handleScreenshot(event)}
-                className="sr-only"
-              />
-              {en ? "Choose screenshot" : "Screenshot auswählen"}
-            </label>
-            {ocrProgress !== null ? (
-              <p className="mt-2 text-xs text-slate-400">
-                {en ? "Recognition" : "Erkennung"}: {ocrProgress}%
-              </p>
-            ) : null}
-          </div>
-          <div className="rounded-2xl bg-slate-900 p-5">
-            <h3 className="font-bold">
               {en ? "Level list / OCR text" : "Level-Liste / OCR-Text"}
             </h3>
             <p className="mt-1 text-xs text-slate-400">
@@ -382,6 +354,19 @@ export function PlayerImportCenter(props: Props) {
           </div>
         </div>
       )}
+      {props.account ? (
+        <div className="mt-5">
+          <ScreenshotImportWizard
+            accountId={props.account.id}
+            entities={entities}
+            townHallLevel={props.account.townHallLevel}
+            language={en ? "en" : "de"}
+            onConfirm={applyScreenshotChanges}
+            onResourcesConfirmed={props.onResourcesImported}
+            onProfileConfirmed={props.onProfileImported}
+          />
+        </div>
+      ) : null}
       {message ? (
         <p
           aria-live="polite"
