@@ -548,6 +548,7 @@ export default function Home() {
     events,
     eventTemplates,
     updateItem,
+    importQuantities,
     addEvent,
     removeEvent,
   } = useMagicItems(selectedAccount?.id, handleError);
@@ -823,6 +824,7 @@ export default function Home() {
             siegeMachines={availableSiegeMachines}
             siegeLevels={siegeMachineLevels}
             extraScreenshotEntities={screenshotProgressEntities}
+            magicItems={inventory}
             language={language}
             onResourcesImported={(detected) => {
               const values = Object.fromEntries(
@@ -846,6 +848,15 @@ export default function Home() {
                 darkElixir: capacities.dark_elixir ?? current.darkElixir,
               }));
             }}
+            onMagicItemsImported={(detected) =>
+              importQuantities(
+                detected.flatMap((item) =>
+                  item.quantity === null
+                    ? []
+                    : [{ itemKey: item.itemKey, quantity: item.quantity }],
+                ),
+              )
+            }
             onUpgradeSlotsImported={refreshScreenshotProgress}
             onProgressImported={refreshAccountBuildings}
             wallLevels={screenshotWallLevels}

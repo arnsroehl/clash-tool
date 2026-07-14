@@ -8,11 +8,13 @@ import {
   filterScreenshotReviewChanges,
   getBuildingImportSection,
   mergeProfileScreenshotDetections,
+  mergeScreenshotMagicItemDetections,
   mergeScreenshotResourceDetections,
   mergeScreenshotDetections,
   parseUpgradeSlots,
   parseWallDistributions,
   parseScreenshotDetections,
+  parseScreenshotMagicItems,
   parseScreenshotResources,
   parseProfileScreenshot,
   summarizeScreenshotReview,
@@ -25,6 +27,8 @@ import {
   type ScreenshotScreenType,
   type ScreenshotReviewFilter,
   type ScreenshotResourceDetection,
+  type ScreenshotMagicItemDefinition,
+  type ScreenshotMagicItemDetection,
   type ScreenshotProfileDetection,
   type UpgradeSlotDetection,
   type WallLevelDistribution,
@@ -77,6 +81,8 @@ type Props = {
   language: "de" | "en";
   onConfirm: (changes: ImportChange[]) => Promise<void>;
   onResourcesConfirmed?: (resources: ScreenshotResourceDetection[]) => void;
+  magicItems?: ScreenshotMagicItemDefinition[];
+  onMagicItemsConfirmed?: (items: ScreenshotMagicItemDetection[]) => Promise<void>;
   onProfileConfirmed?: (profile: ScreenshotProfileDetection) => Promise<void>;
   onUpgradeSlotsConfirmed?: () => Promise<void> | void;
   existingWallLevels?: Array<{ level: number; count: number }>;
@@ -111,7 +117,7 @@ const IMPORT_TYPES: Array<{
   { id: "buildings", de: "Gebäude", en: "Buildings", hintDe: "Strukturierte Gebäudeübersichten", hintEn: "Structured building overviews" },
   { id: "walls", de: "Mauern", en: "Walls", hintDe: "Verteilung der Mauerlevel", hintEn: "Wall level distribution" },
   { id: "village", de: "Dorfansicht", en: "Village", hintDe: "Experimentelle freie Dorfansicht", hintEn: "Experimental free village view" },
-  { id: "resources", de: "Ressourcen", en: "Resources", hintDe: "Ressourcen und Lagerstände", hintEn: "Resources and storage levels" },
+  { id: "resources", de: "Ressourcen", en: "Resources", hintDe: "Ressourcen, Lagerstände und magische Gegenstände", hintEn: "Resources, storage levels and Magic Items" },
   { id: "profile", de: "Profil", en: "Profile", hintDe: "Spieler-Tag, Rathaus und Erfahrungslevel", hintEn: "Player tag, Town Hall and experience level" },
 ];
 
@@ -145,6 +151,8 @@ export function ScreenshotImportWizard({
   language,
   onConfirm,
   onResourcesConfirmed,
+  magicItems = [],
+  onMagicItemsConfirmed,
   onProfileConfirmed,
   onUpgradeSlotsConfirmed,
   existingWallLevels = [],
@@ -166,6 +174,7 @@ export function ScreenshotImportWizard({
   const [wallDistributions, setWallDistributions] = useState<WallLevelDistribution[]>([]);
   const [upgradeSlots, setUpgradeSlots] = useState<UpgradeSlotDetection[]>([]);
   const [resourceDetections, setResourceDetections] = useState<ScreenshotResourceDetection[]>([]);
+  const [magicItemDetections, setMagicItemDetections] = useState<ScreenshotMagicItemDetection[]>([]);
   const [profileDetection, setProfileDetection] = useState<ScreenshotProfileDetection | null>(null);
   const [accepted, setAccepted] = useState<Record<string, boolean>>({});
   const [deferred, setDeferred] = useState<Record<string, boolean>>({});
@@ -230,6 +239,17 @@ export function ScreenshotImportWizard({
           resource.amount > resource.capacity),
     ),
     [resourceDetections],
+  );
+  const hasInvalidMagicItemDetection = useMemo(
+    () => magicItemDetections.some(
+      (item) =>
+        item.quantity === null ||
+        !Number.isInteger(item.quantity) ||
+        item.quantity < 0 ||
+        item.quantity > 999 ||
+        item.confidence < 0.5,
+    ),
+    [magicItemDetections],
   );
   const wallTotal = useMemo(
     () => wallDistributions.reduce((sum, wall) => sum + wall.count, 0),
@@ -354,6 +374,7 @@ export function ScreenshotImportWizard({
     setWallDistributions(resumeCandidate.wallDistributions);
     setUpgradeSlots(resumeCandidate.upgradeSlots);
     setResourceDetections(resumeCandidate.resources);
+    setMagicItemDetections(resumeCandidate.magicItems);
     setProfileDetection(resumeCandidate.profile);
     setPendingResumeFiles(resumeCandidate.pendingFiles);
     setAccepted(Object.fromEntries(namedChanges.map((change) => [change.id, change.status === "preselected"])));
@@ -362,6 +383,7 @@ export function ScreenshotImportWizard({
         resumeCandidate.wallDistributions.length ||
         resumeCandidate.upgradeSlots.length ||
         resumeCandidate.resources.length ||
+        resumeCandidate.magicItems.length ||
         resumeCandidate.profile
         ? "review"
         : "upload",
@@ -394,6 +416,7 @@ export function ScreenshotImportWizard({
     const combinedWalls = new Map(wallDistributions.map((item) => [item.level, item]));
     const combinedSlots = new Map(upgradeSlots.map((item) => [`${item.slotType}:${item.slotIndex}`, item]));
     const combinedResources = new Map(resourceDetections.map((item) => [item.resourceType, item]));
+    const combinedMagicItems = new Map(magicItemDetections.map((item) => [item.itemKey, item]));
     let combinedProfile = profileDetection;
     const nextScreenshots: ProcessedScreenshot[] = [];
     try {
@@ -588,6 +611,9 @@ export function ScreenshotImportWizard({
             importType === "resources" || importType === "equipment"
               ? parseScreenshotResources(recognition.text)
               : [];
+          const currentMagicItems = importType === "resources"
+            ? parseScreenshotMagicItems(recognition.text, magicItems)
+            : [];
           const currentProfile = importType === "profile" ? parseProfileScreenshot(recognition.text) : null;
           if (!mismatch) {
             combinedDetections.push(...currentDetections);
@@ -607,6 +633,15 @@ export function ScreenshotImportWizard({
                 item.resourceType,
                 mergeScreenshotResourceDetections(
                   combinedResources.get(item.resourceType),
+                  item,
+                ),
+              ),
+            );
+            currentMagicItems.forEach((item) =>
+              combinedMagicItems.set(
+                item.itemKey,
+                mergeScreenshotMagicItemDetections(
+                  combinedMagicItems.get(item.itemKey),
                   item,
                 ),
               ),
@@ -634,6 +669,7 @@ export function ScreenshotImportWizard({
               wallDistributions: currentWalls,
               upgradeSlotDetections: currentSlots,
               resourceDetections: currentResources,
+              magicItemDetections: mismatch ? [] : currentMagicItems,
               profileDetection: currentProfile,
               mismatch,
             },
@@ -678,6 +714,7 @@ export function ScreenshotImportWizard({
       setWallDistributions([...combinedWalls.values()].sort((a, b) => a.level - b.level));
       setUpgradeSlots([...combinedSlots.values()]);
       setResourceDetections([...combinedResources.values()]);
+      setMagicItemDetections([...combinedMagicItems.values()]);
       setProfileDetection(combinedProfile);
       setScreenshots((current) => [...current, ...nextScreenshots]);
       setPendingResumeFiles((current) =>
@@ -690,7 +727,7 @@ export function ScreenshotImportWizard({
         ),
         ...current,
       }));
-      if (merged.length || combinedWalls.size || combinedSlots.size || combinedResources.size || combinedProfile) setStep("review");
+      if (merged.length || combinedWalls.size || combinedSlots.size || combinedResources.size || combinedMagicItems.size || combinedProfile) setStep("review");
       setProgress(100);
     } finally {
       setBusy(false);
@@ -780,6 +817,7 @@ export function ScreenshotImportWizard({
         await saveResourceSnapshot({ accountId, sessionId: session.id, resources: resourceDetections });
         onResourcesConfirmed?.(resourceDetections);
       }
+      if (magicItemDetections.length) await onMagicItemsConfirmed?.(magicItemDetections);
       if (profileDetection) await onProfileConfirmed?.(profileDetection);
       await recordChangeDecisions(
         session.id,
@@ -921,6 +959,7 @@ export function ScreenshotImportWizard({
     setWallDistributions([]);
     setUpgradeSlots([]);
     setResourceDetections([]);
+    setMagicItemDetections([]);
     setProfileDetection(null);
     setAccepted({});
     setDeferred({});
@@ -1557,6 +1596,64 @@ export function ScreenshotImportWizard({
               </div>
             </div>
           ) : null}
+          {magicItemDetections.length ? (
+            <div className="mt-5">
+              <h4 className="font-bold">{en ? "Magic Items" : "Magische Gegenstände"}</h4>
+              <p className="mt-1 text-xs text-slate-400">
+                {en
+                  ? "Only recognized catalog items are shown. Every quantity is compared with the saved inventory."
+                  : "Es werden nur erkannte Kataloggegenstände angezeigt. Jede Menge wird mit dem gespeicherten Inventar verglichen."}
+              </p>
+              {hasInvalidMagicItemDetection ? (
+                <p className="mt-2 rounded-lg bg-amber-400/10 p-2 text-xs text-amber-200">
+                  {en
+                    ? "Correct missing, contradictory or implausible quantities before confirming."
+                    : "Korrigiere fehlende, widersprüchliche oder unplausible Mengen, bevor du bestätigst."}
+                </p>
+              ) : null}
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {magicItemDetections.map((item) => {
+                  const definition = magicItems.find((candidate) => candidate.itemKey === item.itemKey);
+                  const displayName = en ? item.name : definition?.aliases?.[0] || item.name;
+                  return (
+                    <div key={item.itemKey} className="rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <b>{displayName}</b>
+                          <p className="text-xs text-slate-500">
+                            {en ? "Saved" : "Gespeichert"}: {item.previousQuantity}
+                          </p>
+                        </div>
+                        <span className={item.confidence < 0.5 ? "text-amber-200" : "text-slate-400"}>
+                          {Math.round(item.confidence * 100)}%
+                        </span>
+                      </div>
+                      <label className="mt-2 block text-xs text-slate-400">
+                        {en ? "Recognized quantity" : "Erkannte Menge"}
+                        <input
+                          aria-label={`${displayName} ${en ? "quantity" : "Menge"}`}
+                          type="number"
+                          min={0}
+                          max={999}
+                          value={item.quantity ?? ""}
+                          onChange={(event) => setMagicItemDetections((current) => current.map((candidate) => candidate.itemKey === item.itemKey ? {
+                            ...candidate,
+                            quantity: event.target.value === "" ? null : Number(event.target.value),
+                            confidence: 1,
+                            reasons: [],
+                          } : candidate))}
+                          className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-white"
+                        />
+                      </label>
+                      {item.reasons.length ? (
+                        <p className="mt-2 text-xs text-amber-200">{item.reasons.join(" ")}</p>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
           {profileDetection ? (
             <div className={`mt-5 rounded-xl border p-4 text-sm ${profileValidation?.canApply ? "border-emerald-400/30 bg-emerald-400/5" : "border-rose-400/30 bg-rose-400/5"}`}>
               <h4 className="font-bold">{en ? "Profile data" : "Profildaten"}</h4>
@@ -1637,7 +1734,7 @@ export function ScreenshotImportWizard({
             </span>
           </label>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || hasInvalidResourceDetection || (profileValidation !== null && !profileValidation.canApply) || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
+            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || hasInvalidResourceDetection || hasInvalidMagicItemDetection || (profileValidation !== null && !profileValidation.canApply) || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !magicItemDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
               {en ? "Confirm selected changes" : "Ausgewählte Änderungen bestätigen"}
             </button>
             <button type="button" disabled={busy} onClick={() => void saveEntireImportForLater()} className="rounded-xl border border-sky-400/30 px-5 py-3 font-bold text-sky-200 disabled:opacity-40">

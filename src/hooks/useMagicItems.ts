@@ -8,6 +8,7 @@ import {
   getPlanningEventTemplates,
   getPlanningEvents,
   saveMagicInventory,
+  saveMagicInventoryQuantities,
 } from "@/services/magicItemService";
 import type {
   MagicInventoryItem,
@@ -82,6 +83,32 @@ export function useMagicItems(
     [onError],
   );
 
+  const importQuantities = useCallback(
+    async (quantities: Array<{ itemKey: string; quantity: number }>) => {
+      if (!accountId || !quantities.length) return;
+      const previous = inventory;
+      const imported = new Map(quantities.map((item) => [item.itemKey, item.quantity]));
+      setInventory((items) =>
+        items.map((item) =>
+          imported.has(item.itemKey)
+            ? { ...item, quantity: imported.get(item.itemKey) as number }
+            : item,
+        ),
+      );
+      try {
+        await saveMagicInventoryQuantities(accountId, quantities);
+      } catch (error) {
+        setInventory(previous);
+        const message = error instanceof Error
+          ? error.message
+          : "Magic-Item-Bestände konnten nicht gespeichert werden.";
+        onError(message);
+        throw error;
+      }
+    },
+    [accountId, inventory, onError],
+  );
+
   const removeEvent = useCallback(
     async (id: string) => {
       try {
@@ -103,6 +130,7 @@ export function useMagicItems(
     events,
     eventTemplates,
     updateItem,
+    importQuantities,
     addEvent,
     removeEvent,
   };

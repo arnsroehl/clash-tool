@@ -5,10 +5,12 @@ import {
   classifyScreenshotText,
   mergeScreenshotDetections,
   mergeProfileScreenshotDetections,
+  mergeScreenshotMagicItemDetections,
   mergeScreenshotResourceDetections,
   normalizePlayerTag,
   parseScreenshotDetections,
   parseScreenshotLevels,
+  parseScreenshotMagicItems,
   parseScreenshotResources,
   parseProfileScreenshot,
   parseDurationSeconds,
@@ -16,6 +18,7 @@ import {
   filterBuildingImportEntities,
   filterScreenshotReviewChanges,
   getBuildingImportSection,
+  getMagicItemScreenshotAliases,
   parseUpgradeSlots,
   parseWallDistributions,
   summarizeScreenshotReview,
@@ -634,6 +637,15 @@ test("parses only explicitly labelled resource values and compact numbers", () =
   );
 });
 
+test("does not mistake Magic Item names for resource balances", () => {
+  assert.deepEqual(
+    parseScreenshotResources("Rune of Gold 1/1\nGold 12.500.000").map(
+      ({ resourceType, amount }) => [resourceType, amount],
+    ),
+    [["gold", 12_500_000]],
+  );
+});
+
 test("parses resource amounts and storage capacities from combined or separate lines", () => {
   const resources = parseScreenshotResources(
     "Gold 12.500.000 / 22.000.000\nElixier 9,5 Mio von 22 Mio\nDunkles Elixier 245000\nDunkles Elixier Lagerkapazität 360000\nShiny Ore capacity 50K",
@@ -669,6 +681,64 @@ test("merges complementary resource screenshots and exposes contradictions", () 
   assert.equal(conflict.confidence, 0.49);
   assert.ok(conflict.reasons.some((reason) => /unterschiedliche Bestände/.test(reason)));
   assert.ok(conflict.reasons.some((reason) => /unterschiedliche Lagerkapazitäten/.test(reason)));
+});
+
+test("parses German and English magic-item quantities from the database catalog", () => {
+  const definitions = [
+    { itemKey: "book_building", name: "Book of Building", currentQuantity: 0 },
+    { itemKey: "builder_potion", name: "Builder Potion", currentQuantity: 2 },
+    { itemKey: "wall_rings", name: "Wall Rings", currentQuantity: 4 },
+    { itemKey: "rune_dark_elixir", name: "Rune of Dark Elixir", currentQuantity: 0 },
+  ];
+  const detections = parseScreenshotMagicItems(
+    "Buch der Gebäude 1/1\nBuilder Potion x3\n5× Mauerringe\nDunkle-Elixier-Rune: 1",
+    definitions,
+  );
+  assert.deepEqual(
+    detections.map(({ itemKey, quantity, previousQuantity }) => [itemKey, quantity, previousQuantity]),
+    [
+      ["book_building", 1, 0],
+      ["builder_potion", 3, 2],
+      ["wall_rings", 5, 4],
+      ["rune_dark_elixir", 1, 0],
+    ],
+  );
+});
+
+test("ships German screenshot aliases for every supported magic-item catalog key", () => {
+  const itemKeys = [
+    "book_building",
+    "book_heroes",
+    "book_fighting",
+    "book_spells",
+    "hammer_building",
+    "hammer_heroes",
+    "hammer_fighting",
+    "hammer_spells",
+    "builder_potion",
+    "research_potion",
+    "wall_rings",
+    "rune_gold",
+    "rune_elixir",
+    "rune_dark_elixir",
+  ];
+  assert.ok(itemKeys.every((itemKey) => getMagicItemScreenshotAliases(itemKey).length > 0));
+});
+
+test("requires a manual magic-item quantity and exposes screenshot conflicts", () => {
+  const definitions = [
+    { itemKey: "book_heroes", name: "Book of Heroes", currentQuantity: 1 },
+  ];
+  const missing = parseScreenshotMagicItems("Buch der Helden", definitions)[0];
+  assert.equal(missing.quantity, null);
+  assert.equal(missing.confidence, 0.35);
+
+  const conflict = mergeScreenshotMagicItemDetections(
+    parseScreenshotMagicItems("Book of Heroes x1", definitions)[0],
+    parseScreenshotMagicItems("Book of Heroes x2", definitions)[0],
+  );
+  assert.equal(conflict.confidence, 0.49);
+  assert.match(conflict.reasons[0], /unterschiedliche Mengen/);
 });
 
 test("parses stable profile identifiers without guessing a player name", () => {

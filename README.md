@@ -111,8 +111,11 @@ currently supported UI version are not automatically analyzed.
 The guided resource view recognizes current Gold, Elixir, Dark Elixir and ore
 balances. Lines such as `Gold 12.5M / 22M` additionally populate the storage
 capacity. Amounts and capacities remain separately editable in the review and
-are only persisted after confirmation. Existing databases can add the capacity
-columns with `src/scripts/sql/screenshot-resource-capacities.sql`.
+are only persisted after confirmation. The same guided area recognizes the 14
+Magic Items from the live Supabase catalog in German and English, compares each
+quantity with the saved inventory and blocks conflicting screenshots until the
+user corrects them. Existing databases can add the capacity columns with
+`src/scripts/sql/screenshot-resource-capacities.sql`.
 
 ### Clash API Proxy
 

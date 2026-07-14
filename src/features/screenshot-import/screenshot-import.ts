@@ -207,6 +207,80 @@ export type ScreenshotResourceDetection = {
   reasons: string[];
 };
 
+export type ScreenshotMagicItemDefinition = {
+  itemKey: string;
+  name: string;
+  aliases?: string[];
+  currentQuantity: number;
+};
+
+export type ScreenshotMagicItemDetection = {
+  itemKey: string;
+  name: string;
+  quantity: number | null;
+  previousQuantity: number;
+  confidence: number;
+  sourceText: string;
+  reasons: string[];
+};
+
+const MAGIC_ITEM_SCREENSHOT_ALIASES: Record<string, string[]> = {
+  book_building: ["Buch der Gebäude", "Gebäudebuch"],
+  book_heroes: ["Buch der Helden", "Heldenbuch"],
+  book_fighting: ["Buch des Kampfes", "Kampfbuch"],
+  book_spells: ["Buch der Zauber", "Zauberbuch"],
+  hammer_building: ["Hammer der Gebäude", "Gebäudehammer"],
+  hammer_heroes: ["Hammer der Helden", "Heldenhammer"],
+  hammer_fighting: ["Hammer des Kampfes", "Kampfhammer"],
+  hammer_spells: ["Hammer der Zauber", "Zauberhammer"],
+  builder_potion: ["Bauarbeitertrank", "Bauarbeiter-Trank"],
+  research_potion: ["Forschungstrank", "Forschungs-Trank"],
+  wall_rings: ["Mauerringe", "Mauer-Ringe", "Wall Ring"],
+  rune_gold: ["Goldrune", "Rune des Goldes", "Gold-Rune"],
+  rune_elixir: ["Elixierrune", "Rune des Elixiers", "Elixier-Rune"],
+  rune_dark_elixir: [
+    "Dunkle-Elixier-Rune",
+    "Rune des Dunklen Elixiers",
+    "Dunkles Elixier Rune",
+  ],
+};
+
+export function getMagicItemScreenshotAliases(itemKey: string): string[] {
+  return MAGIC_ITEM_SCREENSHOT_ALIASES[itemKey] || [];
+}
+
+export function mergeScreenshotMagicItemDetections(
+  existing: ScreenshotMagicItemDetection | undefined,
+  next: ScreenshotMagicItemDetection,
+): ScreenshotMagicItemDetection {
+  if (!existing) return next;
+  if (existing.itemKey !== next.itemKey)
+    throw new Error("Nur derselbe magische Gegenstand kann zusammengeführt werden.");
+  const conflict =
+    existing.quantity !== null &&
+    next.quantity !== null &&
+    existing.quantity !== next.quantity;
+  const preferNext = next.confidence > existing.confidence;
+  const reasons = [...(existing.reasons || []), ...(next.reasons || [])];
+  if (conflict)
+    reasons.push(
+      `Mehrere Screenshots zeigen unterschiedliche Mengen (${existing.quantity} und ${next.quantity}).`,
+    );
+  return {
+    itemKey: existing.itemKey,
+    name: existing.name,
+    quantity: conflict
+      ? preferNext ? next.quantity : existing.quantity
+      : next.quantity ?? existing.quantity,
+    previousQuantity: existing.previousQuantity,
+    confidence: conflict
+      ? Math.min(existing.confidence, next.confidence, 0.49)
+      : Math.max(existing.confidence, next.confidence),
+    sourceText: `${existing.sourceText} · ${next.sourceText}`,
+    reasons: [...new Set(reasons)],
+  };
+}
+
 export function mergeScreenshotResourceDetections(
   existing: ScreenshotResourceDetection | undefined,
   next: ScreenshotResourceDetection,
@@ -531,7 +605,18 @@ const SCREEN_HINTS: Record<Exclude<ScreenshotScreenType, "unknown">, string[]> =
   buildings: ["gebaude", "buildings", "verteidigung", "defense", "fallen", "traps"],
   walls: ["mauern", "walls", "mauerlevel", "wall level"],
   village: ["heimatdorf", "home village", "angreifen", "attack", "shop"],
-  resources: ["ressourcen", "resources", "gold", "elixier", "elixir", "dunkles elixier"],
+  resources: [
+    "ressourcen",
+    "resources",
+    "gold",
+    "elixier",
+    "elixir",
+    "dunkles elixier",
+    "magische gegenstande",
+    "magic items",
+    "mauerringe",
+    "wall rings",
+  ],
   profile: ["spielerprofil", "player profile", "spielertag", "player tag", "erfahrungslevel", "experience level"],
 };
 
@@ -1283,6 +1368,8 @@ export function parseScreenshotResources(text: string): ScreenshotResourceDetect
   ];
   const result = new Map<ScreenshotResourceType, ScreenshotResourceDetection>();
   text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).forEach((line) => {
+    if (/(?:\bbook\b|\bbuch\b|hammer|potion|trank|rune|rings?|mauerringe?|magic\s+items?|magische\s+gegenst[aä]nde)/i.test(line))
+      return;
     const definition = definitions.find(({ pattern }) => pattern.test(line));
     if (!definition) return;
     const withoutName = line.replace(definition.pattern, " ");
@@ -1329,6 +1416,67 @@ export function parseScreenshotResources(text: string): ScreenshotResourceDetect
     });
   });
   return [...result.values()];
+}
+
+export function parseScreenshotMagicItems(
+  text: string,
+  definitions: ScreenshotMagicItemDefinition[],
+): ScreenshotMagicItemDetection[] {
+  const detections = new Map<string, ScreenshotMagicItemDetection>();
+  const searchable = definitions.flatMap((definition) =>
+    [definition.name, ...(definition.aliases || []), ...getMagicItemScreenshotAliases(definition.itemKey)]
+      .map((alias) => ({
+        definition,
+        alias,
+        normalized: normalizeScreenshotText(alias),
+      }))
+      .filter((candidate) => candidate.normalized.length >= 4),
+  );
+  text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .forEach((line) => {
+      const normalizedLine = normalizeScreenshotText(line);
+      const match = searchable
+        .filter((candidate) => normalizedLine.includes(candidate.normalized))
+        .sort((left, right) => right.normalized.length - left.normalized.length)[0];
+      if (!match) return;
+      const explicitMultiplier = line.match(/(?:[x×]\s*(\d{1,3})|(\d{1,3})\s*[x×])\b/i);
+      const fraction = line.match(/\b(\d{1,3})\s*\/\s*\d{1,3}\b/);
+      const plainNumbers = [...line.matchAll(/\b\d{1,3}\b/g)];
+      const quantityRaw = explicitMultiplier?.[1]
+        || explicitMultiplier?.[2]
+        || fraction?.[1]
+        || plainNumbers.at(-1)?.[0]
+        || null;
+      const quantity = quantityRaw === null ? null : Number(quantityRaw);
+      const validQuantity =
+        quantity !== null && Number.isInteger(quantity) && quantity >= 0 && quantity <= 999
+          ? quantity
+          : null;
+      const reasons = validQuantity === null
+        ? ["Die Menge des erkannten magischen Gegenstands fehlt oder ist unplausibel."]
+        : [];
+      const current: ScreenshotMagicItemDetection = {
+        itemKey: match.definition.itemKey,
+        name: match.definition.name,
+        quantity: validQuantity,
+        previousQuantity: match.definition.currentQuantity,
+        confidence: validQuantity === null
+          ? 0.35
+          : explicitMultiplier || fraction
+            ? 0.96
+            : 0.86,
+        sourceText: line,
+        reasons,
+      };
+      detections.set(
+        current.itemKey,
+        mergeScreenshotMagicItemDetections(detections.get(current.itemKey), current),
+      );
+    });
+  return [...detections.values()];
 }
 
 export function parseProfileScreenshot(text: string): ScreenshotProfileDetection {

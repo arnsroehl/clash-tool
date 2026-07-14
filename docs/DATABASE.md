@@ -33,6 +33,8 @@ This document describes database tables referenced by the current code and SQL h
 | `siege_machines` | Siege machine game data | `siegeMachineService`, importer |
 | `siege_machine_levels` | Siege machine level game data | `siegeMachineService`, importer |
 | `account_siege_machines` | Per-account siege machine levels | `siegeMachineService` |
+| `magic_item_catalog` | Stable Magic-Item IDs and planner effects | `magicItemService`, screenshot import |
+| `account_magic_items` | Per-account quantities and queue reservations | `magicItemService`, screenshot import |
 
 ## SQL Files Present in Repository
 

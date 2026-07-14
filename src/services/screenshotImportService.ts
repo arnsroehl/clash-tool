@@ -1,11 +1,13 @@
 import { getSupabaseClient } from "@/lib/supabase";
 import {
+  mergeScreenshotMagicItemDetections,
   mergeProfileScreenshotDetections,
   type ConfidenceBand,
   type ScreenshotDetection,
   type ScreenshotProposedChange,
   type ScreenshotProfileDetection,
   type ScreenshotResourceDetection,
+  type ScreenshotMagicItemDetection,
   type ScreenshotScreenType,
   type UpgradeSlotDetection,
   type WallLevelDistribution,
@@ -53,6 +55,7 @@ export type ResumableScreenshotImport = {
   wallDistributions: WallLevelDistribution[];
   upgradeSlots: UpgradeSlotDetection[];
   resources: ScreenshotResourceDetection[];
+  magicItems: ScreenshotMagicItemDetection[];
   profile: ScreenshotProfileDetection | null;
 };
 
@@ -172,12 +175,14 @@ export async function fetchLatestOpenScreenshotImport(
   const wallMap = new Map<number, WallLevelDistribution>();
   const slotMap = new Map<string, UpgradeSlotDetection>();
   const resourceMap = new Map<string, ScreenshotResourceDetection>();
+  const magicItemMap = new Map<string, ScreenshotMagicItemDetection>();
   const profileDetections: ScreenshotProfileDetection[] = [];
   (jobRows || []).forEach((job) => {
     const result = (job.result || {}) as {
       wallDistributions?: WallLevelDistribution[];
       upgradeSlotDetections?: UpgradeSlotDetection[];
       resourceDetections?: ScreenshotResourceDetection[];
+      magicItemDetections?: ScreenshotMagicItemDetection[];
       profileDetection?: ScreenshotProfileDetection | null;
     };
     (result.wallDistributions || []).forEach((item) => wallMap.set(item.level, item));
@@ -193,6 +198,16 @@ export async function fetchLatestOpenScreenshotImport(
       }),
     );
     if (result.profileDetection) profileDetections.push(result.profileDetection);
+    (result.magicItemDetections || []).forEach((item) =>
+      magicItemMap.set(
+        item.itemKey,
+        mergeScreenshotMagicItemDetections(magicItemMap.get(item.itemKey), {
+          ...item,
+          quantity: item.quantity ?? null,
+          reasons: item.reasons || [],
+        }),
+      ),
+    );
   });
   const profile = mergeProfileScreenshotDetections(profileDetections);
   return {
@@ -217,6 +232,7 @@ export async function fetchLatestOpenScreenshotImport(
     wallDistributions: [...wallMap.values()],
     upgradeSlots: [...slotMap.values()],
     resources: [...resourceMap.values()],
+    magicItems: [...magicItemMap.values()],
     profile,
   };
 }
