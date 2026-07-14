@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   assessImageQuality,
+  assessScreenshotContentQuality,
   classifyScreenshotText,
   mergeScreenshotDetections,
   mergeProfileScreenshotDetections,
@@ -322,6 +323,48 @@ test("creates a contrast-normalized grayscale OCR variant without changing the s
   assert.ok(enhanced[4] < enhanced[8]);
   assert.ok(enhanced[0] < 20);
   assert.ok(enhanced[8] > 230);
+});
+
+test("blocks screenshots from another game or with a system overlay", () => {
+  const foreignGame = assessScreenshotContentQuality({
+    text: "Brawl Stars Trophy Road",
+    screenType: "unknown",
+  });
+  assert.equal(foreignGame.accepted, false);
+  assert.deepEqual(foreignGame.issues, ["foreign_game"]);
+
+  const overlay = assessScreenshotContentQuality({
+    text: "Labor Forschung\nWhatsApp\nNeue Nachricht",
+    screenType: "laboratory",
+  });
+  assert.equal(overlay.accepted, false);
+  assert.ok(overlay.issues.includes("obstructing_overlay"));
+});
+
+test("warns about missing view markers and text clipped by the image edge", () => {
+  const result = assessScreenshotContentQuality({
+    text: "Level 12\nLevel 13",
+    screenType: "laboratory",
+    lines: [
+      { text: "Level 12", boundingBox: { x: 0, y: 0.2, width: 0.2, height: 0.05 } },
+      { text: "Level 13", boundingBox: { x: 0.8, y: 0.96, width: 0.2, height: 0.04 } },
+    ],
+  });
+  assert.equal(result.accepted, true);
+  assert.ok(result.issues.includes("expected_view_markers_missing"));
+  assert.ok(result.issues.includes("content_near_image_edge"));
+  assert.ok(result.score < 1);
+});
+
+test("accepts a complete unobstructed Clash laboratory view", () => {
+  const result = assessScreenshotContentQuality({
+    text: "Labor Forschung Truppen Zauber Gesamtdauer",
+    screenType: "laboratory",
+    lines: [
+      { text: "Labor", boundingBox: { x: 0.4, y: 0.08, width: 0.2, height: 0.06 } },
+    ],
+  });
+  assert.deepEqual(result, { score: 1, accepted: true, issues: [], evidence: [] });
 });
 
 test("extracts supported entity levels and English aliases", () => {

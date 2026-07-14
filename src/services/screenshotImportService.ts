@@ -384,7 +384,12 @@ export async function updateScreenshotAnalysis(params: {
   screenType: ScreenshotScreenType;
   screenTypeConfidence: number;
   processingStatus?: string;
+  qualityScore?: number;
+  qualityIssues?: string[];
 }): Promise<void> {
+  const quality = params.qualityScore === undefined
+    ? {}
+    : { quality_score: params.qualityScore, quality_issues: params.qualityIssues || [] };
   const { error } = await getSupabaseClient()
     .from("screenshot_import_files")
     .update({
@@ -393,6 +398,7 @@ export async function updateScreenshotAnalysis(params: {
       processing_status: params.processingStatus || "analyzing",
       model_version: SCREENSHOT_IMPORT_CONFIG.modelVersion,
       layout_version: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
+      ...quality,
     })
     .eq("id", params.screenshotId);
   if (error) throw new Error(error.message);

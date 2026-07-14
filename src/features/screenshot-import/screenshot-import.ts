@@ -537,6 +537,19 @@ export type ImageQualityResult = {
   >;
 };
 
+export type ScreenshotContentQualityIssue =
+  | "foreign_game"
+  | "obstructing_overlay"
+  | "expected_view_markers_missing"
+  | "content_near_image_edge";
+
+export type ScreenshotContentQualityResult = {
+  score: number;
+  accepted: boolean;
+  issues: ScreenshotContentQualityIssue[];
+  evidence: string[];
+};
+
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 
 export const normalizeScreenshotText = (value: string) =>
@@ -726,6 +739,93 @@ export function classifyScreenshotText(text: string): {
   const runnerUp = scores[1]?.score || 0;
   const confidence = clamp(0.55 + best.score * 0.12 + (best.score - runnerUp) * 0.08);
   return { screenType: best.screenType, confidence, matchedHints: best.matchedHints };
+}
+
+const FOREIGN_GAME_MARKERS = [
+  "brawl stars",
+  "clash royale",
+  "hay day",
+  "boom beach",
+  "squad busters",
+] as const;
+
+const OBSTRUCTING_OVERLAY_MARKERS = [
+  "whatsapp",
+  "imessage",
+  "facetime",
+  "notification center",
+  "mitteilungszentrale",
+  "incoming call",
+  "eingehender anruf",
+  "low battery",
+  "batteriestand niedrig",
+  "save to photos",
+  "in fotos sichern",
+  "airdrop",
+] as const;
+
+const REQUIRED_VIEW_MARKERS: Partial<Record<Exclude<ScreenshotScreenType, "unknown">, string[]>> = {
+  laboratory: ["labor", "laboratory", "forschung", "research", "gesamtdauer", "total time"],
+  heroes: ["helden", "heroes", "barbarenkonig", "barbarian king", "archer queen"],
+  pets: ["haustiere", "pets", "pet house", "tierhaus"],
+  equipment: ["ausrustung", "equipment", "schmied", "blacksmith", "erze", "ore"],
+  builders: ["bauarbeiter", "builders", "verfugbar", "available", "upgrade in progress"],
+  buildings: ["gebaude", "buildings", "verteidigung", "defense", "rathaus", "town hall"],
+  walls: ["mauern", "walls", "mauerlevel", "wall level"],
+  village: ["heimatdorf", "home village", "angreifen", "attack", "shop"],
+  resources: ["ressourcen", "resources", "gold", "elixier", "elixir", "erze", "ore"],
+  profile: ["spielerprofil", "player profile", "spielertag", "player tag", "clan"],
+};
+
+export function assessScreenshotContentQuality(params: {
+  text: string;
+  screenType: ScreenshotScreenType;
+  lines?: Array<{ text: string; boundingBox: BoundingBox }>;
+}): ScreenshotContentQualityResult {
+  const normalized = normalizeScreenshotText(params.text);
+  const evidence: string[] = [];
+  const issues: ScreenshotContentQualityIssue[] = [];
+  const matchMarkers = (markers: readonly string[]) => markers.filter((marker) =>
+    normalized.includes(normalizeScreenshotText(marker)),
+  );
+  const foreignMarkers = matchMarkers(FOREIGN_GAME_MARKERS);
+  if (foreignMarkers.length) {
+    issues.push("foreign_game");
+    evidence.push(...foreignMarkers);
+  }
+  const overlayMarkers = matchMarkers(OBSTRUCTING_OVERLAY_MARKERS);
+  if (overlayMarkers.length) {
+    issues.push("obstructing_overlay");
+    evidence.push(...overlayMarkers);
+  }
+  const requiredMarkers = params.screenType === "unknown"
+    ? []
+    : REQUIRED_VIEW_MARKERS[params.screenType] || [];
+  if (requiredMarkers.length && matchMarkers(requiredMarkers).length === 0)
+    issues.push("expected_view_markers_missing");
+  const clippedLines = (params.lines || []).filter((line) => {
+    if (line.text.trim().length < 3) return false;
+    const box = line.boundingBox;
+    return box.x <= 0.003 || box.y <= 0.003 ||
+      box.x + box.width >= 0.997 || box.y + box.height >= 0.997;
+  });
+  if (clippedLines.length >= 2) {
+    issues.push("content_near_image_edge");
+    evidence.push(...clippedLines.slice(0, 3).map((line) => line.text.trim()));
+  }
+  const blocking = issues.includes("foreign_game") || issues.includes("obstructing_overlay");
+  const penalties: Record<ScreenshotContentQualityIssue, number> = {
+    foreign_game: 0.8,
+    obstructing_overlay: 0.55,
+    expected_view_markers_missing: 0.2,
+    content_near_image_edge: 0.18,
+  };
+  return {
+    score: Math.round(clamp(1 - issues.reduce((sum, issue) => sum + penalties[issue], 0)) * 100) / 100,
+    accepted: !blocking,
+    issues,
+    evidence: [...new Set(evidence)],
+  };
 }
 
 function bestEntityForLine(line: string, entities: ScreenshotEntity[]) {

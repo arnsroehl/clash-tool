@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   classifyScreenshotText,
+  assessScreenshotContentQuality,
   filterBuildingImportEntities,
   filterScreenshotReviewChanges,
   getBuildingImportSection,
@@ -104,6 +105,7 @@ type ProcessedScreenshot = {
   screenTypeConfidence: number;
   duplicate: boolean;
   error?: string;
+  warnings?: string[];
   sourceMetadata?: ScreenshotSourceMetadata & {
     normalizedSizeBytes: number;
   };
@@ -166,6 +168,10 @@ const qualityIssueText: Record<string, { de: string; en: string }> = {
   too_bright: { de: "Bild ist überbelichtet", en: "Image is overexposed" },
   likely_rotated: { de: "Der Screenshot ist vermutlich gedreht", en: "The screenshot appears to be rotated" },
   unexpected_aspect_ratio: { de: "Das Seitenverhältnis wirkt stark zugeschnitten", en: "The aspect ratio appears heavily cropped" },
+  foreign_game: { de: "Das Bild stammt vermutlich aus einem anderen Spiel", en: "The image appears to come from another game" },
+  obstructing_overlay: { de: "Eine Benachrichtigung oder ein Systemfenster verdeckt die Spielansicht", en: "A notification or system overlay obstructs the game view" },
+  expected_view_markers_missing: { de: "Die typischen Überschriften dieser Ansicht fehlen; prüfe, ob die Übersicht vollständig sichtbar ist", en: "Typical headings for this view are missing; check that the complete overview is visible" },
+  content_near_image_edge: { de: "Mehrere Texte liegen direkt am Bildrand; die Ansicht könnte abgeschnitten sein", en: "Several labels touch the image edge; the view may be cropped" },
 };
 
 function formatScreenshotBytes(bytes: number, language: "de" | "en"): string {
@@ -643,17 +649,68 @@ export function ScreenshotImportWizard({
             compatibleClassification: compatibleBuildingClassification,
           });
           const effectiveScreenType = typeResolution.screenType;
+          const contentQuality = assessScreenshotContentQuality({
+            text: recognition.text,
+            screenType: effectiveScreenType,
+            lines: recognition.lines,
+          });
+          const combinedQualityScore = Math.min(
+            normalized.quality.score,
+            contentQuality.score,
+          );
+          const combinedQualityIssues = [
+            ...normalized.quality.issues,
+            ...contentQuality.issues,
+          ];
+          const contentIssueMessages = contentQuality.issues.map(
+            (issue) => qualityIssueText[issue]?.[language] || issue,
+          );
           await updateAnalysisJob({
             jobId: activeJobId,
             status: "completed",
             progress: 100,
-            result: { ...classification, manuallySelectedType: forcedType || null },
+            result: {
+              ...classification,
+              manuallySelectedType: forcedType || null,
+              contentQuality,
+            },
           });
           await updateScreenshotAnalysis({
             screenshotId: uploaded.id,
             screenType: effectiveScreenType,
             screenTypeConfidence: forcedType ? 1 : classification.confidence,
+            qualityScore: combinedQualityScore,
+            qualityIssues: combinedQualityIssues,
           });
+          if (!contentQuality.accepted) {
+            await updateScreenshotAnalysis({
+              screenshotId: uploaded.id,
+              screenType: effectiveScreenType,
+              screenTypeConfidence: forcedType ? 1 : classification.confidence,
+              processingStatus: "review_required",
+              qualityScore: combinedQualityScore,
+              qualityIssues: combinedQualityIssues,
+            });
+            activeJobId = null;
+            nextScreenshots.push({
+              id: uploaded.id,
+              name: normalized.originalFilename,
+              previewUrl,
+              qualityScore: combinedQualityScore,
+              screenType: effectiveScreenType,
+              screenTypeConfidence: forcedType ? 1 : classification.confidence,
+              duplicate: uploaded.duplicate,
+              sourceMetadata: {
+                originalFilename: normalized.originalFilename,
+                originalMimeType: normalized.originalMimeType,
+                originalSizeBytes: normalized.originalSizeBytes,
+                devicePlatform: normalized.devicePlatform,
+                normalizedSizeBytes: normalized.normalizedSizeBytes,
+              },
+              error: contentIssueMessages.join(". "),
+            });
+            continue;
+          }
           if (typeResolution.requiresManualSelection) {
             await updateScreenshotAnalysis({
               screenshotId: uploaded.id,
@@ -666,7 +723,7 @@ export function ScreenshotImportWizard({
               id: uploaded.id,
               name: normalized.originalFilename,
               previewUrl,
-              qualityScore: normalized.quality.score,
+              qualityScore: combinedQualityScore,
               screenType: "unknown",
               screenTypeConfidence: classification.confidence,
               duplicate: uploaded.duplicate,
@@ -680,6 +737,7 @@ export function ScreenshotImportWizard({
               error: en
                 ? "The view could not be classified safely. Select the matching area."
                 : "Die Ansicht konnte nicht sicher klassifiziert werden. Wähle den passenden Bereich.",
+              warnings: contentIssueMessages,
               manualSelection: {
                 file: normalized.file,
                 storagePath: uploaded.storagePath,
@@ -840,7 +898,7 @@ export function ScreenshotImportWizard({
             id: uploaded.id,
             name: normalized.originalFilename,
             previewUrl,
-            qualityScore: normalized.quality.score,
+            qualityScore: combinedQualityScore,
             screenType: effectiveScreenType,
             screenTypeConfidence: forcedType ? 1 : classification.confidence,
             duplicate: uploaded.duplicate,
@@ -856,6 +914,7 @@ export function ScreenshotImportWizard({
                 ? `This appears to be a ${classification.screenType} screenshot, not ${importType}.`
                 : `Das scheint eine ${classification.screenType}-Ansicht statt ${importType} zu sein.`
               : undefined,
+            warnings: contentIssueMessages,
           });
         } catch (error) {
           if (activeJobId) {
@@ -1541,6 +1600,9 @@ export function ScreenshotImportWizard({
                     ) : null}
                     {screenshot.duplicate ? <p className="mt-1 text-sky-300">{en ? "Duplicate ignored" : "Dublette ignoriert"}</p> : null}
                     {screenshot.error ? <p className="mt-1 text-rose-300">{screenshot.error}</p> : null}
+                    {screenshot.warnings?.map((warning) => (
+                      <p key={warning} className="mt-1 text-amber-200">{warning}</p>
+                    ))}
                     {screenshot.manualSelection ? (
                       <label className="mt-2 block text-slate-300">
                         {en ? "Select view" : "Ansicht auswählen"}
