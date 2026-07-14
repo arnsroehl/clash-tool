@@ -1,0 +1,4220 @@
+{
+  "dataVersion": "clash-of-clans-data@0.16.0",
+  "skipped": [
+    "crafted-defenses/light-beam/normal/level-3.png"
+  ],
+  "signatures": [
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 1,
+      "hash": "23193b368d2907c6"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 2,
+      "hash": "23193b368d2907c6"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 3,
+      "hash": "33193b1e1c4d47a4"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 4,
+      "hash": "33193b1e1c4d47a4"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 5,
+      "hash": "33193b1e1c4d47a4"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 6,
+      "hash": "33193b1e1c4d47a4"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 7,
+      "hash": "23193b1e1c4d47a4"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 8,
+      "hash": "23193b1e1c4d47a4"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 9,
+      "hash": "23383c1b5c4d0786"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 10,
+      "hash": "23383c1b5c4d0786"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 11,
+      "hash": "23383c1b1e6d0f8e"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 12,
+      "hash": "23383c1b1e6d0f8e"
+    },
+    {
+      "sourceId": "air-bomb",
+      "entityType": "building",
+      "level": 13,
+      "hash": "23383d1b3e7d07e6"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 1,
+      "hash": "9696cc0f636117cc"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 2,
+      "hash": "96968c0f672517ce"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 3,
+      "hash": "96968c0f6365078e"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 4,
+      "hash": "96968c0f637517ce"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 5,
+      "hash": "96968c0f676517ce"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 6,
+      "hash": "96968c0f616507ce"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 7,
+      "hash": "96968c0f616107ce"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 8,
+      "hash": "96968c0f616107ce"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 9,
+      "hash": "96968c0f612107cc"
+    },
+    {
+      "sourceId": "air-bombs",
+      "entityType": "building",
+      "level": 10,
+      "hash": "96968e0775130f8e"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4a4a0c0603611e8d"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 2,
+      "hash": "2431131b13600e8d"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 3,
+      "hash": "29311b1b23614e8d"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 4,
+      "hash": "9a961e2653430f8c"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 5,
+      "hash": "72333307c3d10fcc"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 6,
+      "hash": "525b090d5bc1074e"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 7,
+      "hash": "2d2e1e1641604f9c"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 8,
+      "hash": "24252d3a03634c9d"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 9,
+      "hash": "4c6f690f23630f1e"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 10,
+      "hash": "ce6d690f03631e9d"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 11,
+      "hash": "4665690f13534c0d"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 12,
+      "hash": "44272137032304cc"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 13,
+      "hash": "44252b27032734ce"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 14,
+      "hash": "4c6f690f23e3648d"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 15,
+      "hash": "4e6d790d73c3ab0e"
+    },
+    {
+      "sourceId": "air-defense",
+      "entityType": "building",
+      "level": 16,
+      "hash": "c627330f0be1c406"
+    },
+    {
+      "sourceId": "air-sweeper",
+      "entityType": "building",
+      "level": 1,
+      "hash": "8e161b0f07960f6c"
+    },
+    {
+      "sourceId": "air-sweeper",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8c971b1717968e69"
+    },
+    {
+      "sourceId": "air-sweeper",
+      "entityType": "building",
+      "level": 3,
+      "hash": "cc171b1707968e6d"
+    },
+    {
+      "sourceId": "air-sweeper",
+      "entityType": "building",
+      "level": 4,
+      "hash": "cc17331747960f4c"
+    },
+    {
+      "sourceId": "air-sweeper",
+      "entityType": "building",
+      "level": 5,
+      "hash": "4c97330745544d4d"
+    },
+    {
+      "sourceId": "air-sweeper",
+      "entityType": "building",
+      "level": 6,
+      "hash": "4c97331745540d4d"
+    },
+    {
+      "sourceId": "air-sweeper",
+      "entityType": "building",
+      "level": 7,
+      "hash": "4c97331f55454dcd"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "8f171b0f4d4d2c2a"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "ce0f1b1765656c6d"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 3,
+      "hash": "8e0f0f076d4d6d0c"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 4,
+      "hash": "8e0f0f036d4d0d0e"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 5,
+      "hash": "8e0f0f034943070c"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 6,
+      "hash": "8e3b7907454507cc"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 7,
+      "hash": "8e3b790d454507cc"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 8,
+      "hash": "8e3b390d450707cc"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 9,
+      "hash": "8e33330f6907064c"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 10,
+      "hash": "8e13330f6507064c"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 11,
+      "hash": "cc0f330e4f0706cc"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 12,
+      "hash": "cc17338e4d45064c"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 13,
+      "hash": "cc1531064d2317d6"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 14,
+      "hash": "4d5d71064da717d6"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 15,
+      "hash": "4ddd7106cd17178e"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 16,
+      "hash": "8e55710f4945078e"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 17,
+      "hash": "8e17710f4d650786"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 18,
+      "hash": "cc1f31070f861746"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 19,
+      "hash": "8e17710f0db61646"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 20,
+      "hash": "8e4d4d0d21a7074c"
+    },
+    {
+      "sourceId": "archer-tower",
+      "entityType": "building",
+      "level": 21,
+      "hash": "8e172d232b55238e"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 1,
+      "hash": "9c0f2b69254f0e8c"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 2,
+      "hash": "21599d3369070e8e"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9d498d0765391f8e"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 4,
+      "hash": "25498d3579391e8e"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 5,
+      "hash": "21459f2175190e8e"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 6,
+      "hash": "25859d6969391b8e"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 7,
+      "hash": "1b496507370d0e96"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 8,
+      "hash": "25270d0f170f0b97"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 9,
+      "hash": "4c8e0f373f0f0bcc"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 10,
+      "hash": "8c972b4d6d2b174d"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 11,
+      "hash": "8e1623456d23174d"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 12,
+      "hash": "8e172b4d4d33174d"
+    },
+    {
+      "sourceId": "army-camp",
+      "entityType": "building",
+      "level": 13,
+      "hash": "8e1f33694d3b174d"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 1,
+      "hash": "8d0e2f0f0b0d06ce"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 2,
+      "hash": "890e0f0f0f0d959e"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 3,
+      "hash": "8c0e0f0f4f291d9e"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 4,
+      "hash": "8d0e0f074f2909ce"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 5,
+      "hash": "8c0e070f496d0b9b"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 6,
+      "hash": "8c0f270f2d2db91b"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 7,
+      "hash": "8607270725349e99"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 8,
+      "hash": "8c0f67072d252e39"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 9,
+      "hash": "067f6d2b2d252e39"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 10,
+      "hash": "963773570f292d36"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 11,
+      "hash": "c61b150b2765272e"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 12,
+      "hash": "860f13134d6d6569"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 13,
+      "hash": "ce0f27272525674c"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 14,
+      "hash": "ce07472335347129"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 15,
+      "hash": "33cb07736735130f"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 16,
+      "hash": "4cce276737150b5c"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 17,
+      "hash": "8e023133256f6f5c"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 18,
+      "hash": "c60f342755c54e4d"
+    },
+    {
+      "sourceId": "barracks",
+      "entityType": "building",
+      "level": 19,
+      "hash": "c60719736766575e"
+    },
+    {
+      "sourceId": "blacksmith",
+      "entityType": "building",
+      "level": 1,
+      "hash": "8f134d3527038461"
+    },
+    {
+      "sourceId": "blacksmith",
+      "entityType": "building",
+      "level": 3,
+      "hash": "0e034f3527038461"
+    },
+    {
+      "sourceId": "blacksmith",
+      "entityType": "building",
+      "level": 5,
+      "hash": "9e134f3527038461"
+    },
+    {
+      "sourceId": "blacksmith",
+      "entityType": "building",
+      "level": 7,
+      "hash": "9e134f3527078947"
+    },
+    {
+      "sourceId": "blacksmith",
+      "entityType": "building",
+      "level": 9,
+      "hash": "9e034f3527078947"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 1,
+      "hash": "095383371f070f06"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 2,
+      "hash": "095383371f070f06"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 3,
+      "hash": "29c3635527337180"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 4,
+      "hash": "29c3635527337180"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 5,
+      "hash": "29db731d0f33718c"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 6,
+      "hash": "29db731d0f33718c"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 7,
+      "hash": "29c3731d0d33718c"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 8,
+      "hash": "29c3731d0d33718c"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 9,
+      "hash": "c3262d0e1bc31959"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 10,
+      "hash": "c3262d0e1bc31959"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 11,
+      "hash": "bb13159d79194332"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 12,
+      "hash": "bb13159d79194332"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 13,
+      "hash": "910b4f9725464951"
+    },
+    {
+      "sourceId": "bomb",
+      "entityType": "building",
+      "level": 14,
+      "hash": "910b4f9725464951"
+    },
+    {
+      "sourceId": "bomb-hive",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4c8e335149238e4d"
+    },
+    {
+      "sourceId": "bomb-hive",
+      "entityType": "building",
+      "level": 2,
+      "hash": "0e8f2745692b8e4d"
+    },
+    {
+      "sourceId": "bomb-hive",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4c8e2b654d238e4d"
+    },
+    {
+      "sourceId": "bomb-hive",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4c8e2b6569338e4d"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "932b0b3333333333"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "1b2b0f3333313333"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 3,
+      "hash": "931bbb3333702b0f"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 4,
+      "hash": "332b0b692333090f"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 5,
+      "hash": "33331b1169313313"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 6,
+      "hash": "332b330f61713313"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 7,
+      "hash": "332b1b0b61330b17"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 8,
+      "hash": "333b330b23330b3b"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 9,
+      "hash": "330b330909110d0b"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 10,
+      "hash": "33371f098d510d0b"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 11,
+      "hash": "33392b3349693333"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 12,
+      "hash": "334d290d8a7971b3"
+    },
+    {
+      "sourceId": "bomb-tower",
+      "entityType": "building",
+      "level": 13,
+      "hash": "33696d31b3b37133"
+    },
+    {
+      "sourceId": "builders-hut",
+      "entityType": "building",
+      "level": 1,
+      "hash": "8c0f37254d2d8346"
+    },
+    {
+      "sourceId": "builders-hut",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8c0f3705452d078c"
+    },
+    {
+      "sourceId": "builders-hut",
+      "entityType": "building",
+      "level": 3,
+      "hash": "cd0e17074d6905ce"
+    },
+    {
+      "sourceId": "builders-hut",
+      "entityType": "building",
+      "level": 4,
+      "hash": "cd4f35054d6d078e"
+    },
+    {
+      "sourceId": "builders-hut",
+      "entityType": "building",
+      "level": 5,
+      "hash": "cd4e35094d2d078e"
+    },
+    {
+      "sourceId": "builders-hut",
+      "entityType": "building",
+      "level": 6,
+      "hash": "cd0f311d4d6d078e"
+    },
+    {
+      "sourceId": "builders-hut",
+      "entityType": "building",
+      "level": 7,
+      "hash": "cc0d2f0f4d0d064e"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 1,
+      "hash": "1d0e07233b2b7169"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 2,
+      "hash": "998e0763711fce4d"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 3,
+      "hash": "190e0763331fce4c"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 4,
+      "hash": "990c0763550b8f4c"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 5,
+      "hash": "1a0c0f23710b8f4c"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 6,
+      "hash": "9d8e27633b8e4c08"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 7,
+      "hash": "9d8e0b633b8f4c48"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 8,
+      "hash": "9d8e0b633b8f4c48"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 9,
+      "hash": "9d8e23359e8e6d0c"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 10,
+      "hash": "9d9e0723138f4c0e"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 11,
+      "hash": "9d9c07279ecc4d48"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 12,
+      "hash": "999c07271d4f4c48"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 13,
+      "hash": "0d9c07235d4dcc4d"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 14,
+      "hash": "0c0c0f65f02b864d"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 15,
+      "hash": "0d0e076d392b0f4c"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 16,
+      "hash": "9d8e076f293386cc"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 17,
+      "hash": "9d86076d293b86cc"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 18,
+      "hash": "9d3c236763338e4d"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 19,
+      "hash": "9d1c336763338e4c"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 20,
+      "hash": "0d8c0f7373338e4c"
+    },
+    {
+      "sourceId": "cannon",
+      "entityType": "building",
+      "level": 21,
+      "hash": "9d9e376571130c68"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 1,
+      "hash": "cc173b0f6b070f8e"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8e1769330f47070e"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4c9e31330f0307cc"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4d9e33330745078e"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 5,
+      "hash": "4c9771731313478e"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 6,
+      "hash": "8e1369330f0b078e"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 7,
+      "hash": "cc3b7d332929078e"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 8,
+      "hash": "cc1f39174c070fcc"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 9,
+      "hash": "cc0f790f0fb20744"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 10,
+      "hash": "8e1f4d0f0f233386"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 11,
+      "hash": "ce0f1f0f0f2337cc"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 12,
+      "hash": "4d8e5d550f65278c"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 13,
+      "hash": "4d8e154d0f9223ce"
+    },
+    {
+      "sourceId": "clan-castle",
+      "entityType": "building",
+      "level": 14,
+      "hash": "ce173917070f078c"
+    },
+    {
+      "sourceId": "crafting-station",
+      "entityType": "building",
+      "level": 1,
+      "hash": "ce17338fc46307cc"
+    },
+    {
+      "sourceId": "crusher-mortar",
+      "entityType": "building",
+      "level": 1,
+      "hash": "468f2f53c343064c"
+    },
+    {
+      "sourceId": "crusher-mortar",
+      "entityType": "building",
+      "level": 2,
+      "hash": "468f0f13c143064c"
+    },
+    {
+      "sourceId": "crusher-mortar",
+      "entityType": "building",
+      "level": 3,
+      "hash": "ce0f3711c183c64c"
+    },
+    {
+      "sourceId": "crusher-mortar",
+      "entityType": "building",
+      "level": 4,
+      "hash": "46832f11d183874c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 1,
+      "hash": "992e362b19454786"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8d36330b4923874c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9936360b6127060d"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 4,
+      "hash": "9c36374d6363279c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 5,
+      "hash": "cd13178d8933074c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 6,
+      "hash": "8c37371d31e7068e"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 7,
+      "hash": "cc0f038d31331f9c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 8,
+      "hash": "8c33330d7565c70c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 9,
+      "hash": "4c138b4d61631f9c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 10,
+      "hash": "8c0f6b8d69673f3c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 11,
+      "hash": "8e4b4b4d61273f9c"
+    },
+    {
+      "sourceId": "dark-barracks",
+      "entityType": "building",
+      "level": 12,
+      "hash": "8e0f618f2d36364e"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 1,
+      "hash": "9b0b8f3131533d33"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 2,
+      "hash": "9b0b0f3331333d33"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9b0b0f3331333db3"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 4,
+      "hash": "9b0b0f3333332da3"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 5,
+      "hash": "24161e26223329c7"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 6,
+      "hash": "36161e2732636907"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 7,
+      "hash": "36161f2732636903"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 8,
+      "hash": "36161f2733736d67"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 9,
+      "hash": "36160f2333736d67"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 10,
+      "hash": "26123e23abf36963"
+    },
+    {
+      "sourceId": "dark-elixir-drill",
+      "entityType": "building",
+      "level": 11,
+      "hash": "27133633abb32963"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 1,
+      "hash": "172b0745c9f11ecd"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 2,
+      "hash": "1633074dd0f1034c"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 3,
+      "hash": "1633074df0f1034c"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 4,
+      "hash": "9633074de0f1094d"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 5,
+      "hash": "96330fcdf0f10d4d"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 6,
+      "hash": "8e33074dd0f1870f"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 7,
+      "hash": "8e33074d70218f4d"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 8,
+      "hash": "8e13074d71098f74"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 9,
+      "hash": "8e330f4d71098f4d"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 10,
+      "hash": "8e13074d71134f0c"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 11,
+      "hash": "8e96874d71510f4c"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 12,
+      "hash": "8e960f69711b8d4e"
+    },
+    {
+      "sourceId": "dark-elixir-storage",
+      "entityType": "building",
+      "level": 13,
+      "hash": "8e33234dc9e90f8e"
+    },
+    {
+      "sourceId": "dark-spell-factory",
+      "entityType": "building",
+      "level": 1,
+      "hash": "8e33391f8e2b4b4c"
+    },
+    {
+      "sourceId": "dark-spell-factory",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8e33391b862b4b4c"
+    },
+    {
+      "sourceId": "dark-spell-factory",
+      "entityType": "building",
+      "level": 3,
+      "hash": "8e333b96464b4f2c"
+    },
+    {
+      "sourceId": "dark-spell-factory",
+      "entityType": "building",
+      "level": 4,
+      "hash": "cc9633964d43cf4c"
+    },
+    {
+      "sourceId": "dark-spell-factory",
+      "entityType": "building",
+      "level": 5,
+      "hash": "cc963b160603430c"
+    },
+    {
+      "sourceId": "dark-spell-factory",
+      "entityType": "building",
+      "level": 6,
+      "hash": "ccb62b96c643878c"
+    },
+    {
+      "sourceId": "dark-spell-factory",
+      "entityType": "building",
+      "level": 7,
+      "hash": "cc173347b26b0b4c"
+    },
+    {
+      "sourceId": "eagle-artillery",
+      "entityType": "building",
+      "level": 1,
+      "hash": "468e976333860e4c"
+    },
+    {
+      "sourceId": "eagle-artillery",
+      "entityType": "building",
+      "level": 2,
+      "hash": "468e974b03872e4c"
+    },
+    {
+      "sourceId": "eagle-artillery",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4a8b975b25178f4c"
+    },
+    {
+      "sourceId": "eagle-artillery",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4a8b975b014d8e16"
+    },
+    {
+      "sourceId": "eagle-artillery",
+      "entityType": "building",
+      "level": 5,
+      "hash": "4e8b974b2307074c"
+    },
+    {
+      "sourceId": "eagle-artillery",
+      "entityType": "building",
+      "level": 6,
+      "hash": "5a0b97532905074c"
+    },
+    {
+      "sourceId": "eagle-artillery",
+      "entityType": "building",
+      "level": 7,
+      "hash": "920b17136105078e"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 1,
+      "hash": "96b3274749616346"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 2,
+      "hash": "86b7232723656367"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 3,
+      "hash": "8627271763656363"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 4,
+      "hash": "0637271363656363"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 5,
+      "hash": "4e13890d77493d1f"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 6,
+      "hash": "0c130b4b57493d1d"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 7,
+      "hash": "0d2e134b4559391d"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 8,
+      "hash": "0c331b5dd1483c1d"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 9,
+      "hash": "950e33199d490c0d"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 10,
+      "hash": "861707078d49150f"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 11,
+      "hash": "8607030f154d158f"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 12,
+      "hash": "c6071343554d159f"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 13,
+      "hash": "c60f0b0365454e07"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 14,
+      "hash": "e60e3657494d0d8f"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 15,
+      "hash": "4f4b2b1749491597"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 16,
+      "hash": "4f4f2b17454c1797"
+    },
+    {
+      "sourceId": "elixir-collector",
+      "entityType": "building",
+      "level": 17,
+      "hash": "46cf2b374d491797"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4f17270715040c8c"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 2,
+      "hash": "3333333333b2b2a2"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 3,
+      "hash": "47833313313131d1"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 4,
+      "hash": "8e073b3127068e4b"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 5,
+      "hash": "0f07270715050d9d"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 6,
+      "hash": "0f17270715058c51"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 7,
+      "hash": "0f6707171d0509c9"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 8,
+      "hash": "2f0707171d0509c9"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 9,
+      "hash": "0f0707170f55094d"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 10,
+      "hash": "0f07071f44494f8c"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 11,
+      "hash": "0f07075d41494f8c"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 12,
+      "hash": "8e07074d694d864c"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 13,
+      "hash": "8e07074d254d4d0e"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 14,
+      "hash": "8e07074d250d4716"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 15,
+      "hash": "8e07071d454dcd4c"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 16,
+      "hash": "8e07075d450d4d26"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 17,
+      "hash": "8e07071749498f0c"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 18,
+      "hash": "8e0707170f4b8f0c"
+    },
+    {
+      "sourceId": "elixir-storage",
+      "entityType": "building",
+      "level": 19,
+      "hash": "8e07070fcdab87cc"
+    },
+    {
+      "sourceId": "firespitter",
+      "entityType": "building",
+      "level": 1,
+      "hash": "2c0f0745d97c038f"
+    },
+    {
+      "sourceId": "firespitter",
+      "entityType": "building",
+      "level": 2,
+      "hash": "2c0f0745d13c038f"
+    },
+    {
+      "sourceId": "firespitter",
+      "entityType": "building",
+      "level": 3,
+      "hash": "2c070743596507ce"
+    },
+    {
+      "sourceId": "flame-spinner",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4d861345211b0e4c"
+    },
+    {
+      "sourceId": "flame-spinner",
+      "entityType": "building",
+      "level": 2,
+      "hash": "4d0f3365690d0e4c"
+    },
+    {
+      "sourceId": "flame-spinner",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4c0d071125150fcc"
+    },
+    {
+      "sourceId": "flame-spinner",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4ecc072765050fcc"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 1,
+      "hash": "2c8f33735527169c"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 2,
+      "hash": "2c8f33735527169c"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 3,
+      "hash": "8e236b614b17169d"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 4,
+      "hash": "8e236b614b17169d"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 5,
+      "hash": "26134b614b17069d"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 6,
+      "hash": "26134b614b17069d"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 7,
+      "hash": "26134b6151330e8d"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 8,
+      "hash": "26134b6151330e8d"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 9,
+      "hash": "0d337349298f86b2"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 10,
+      "hash": "0d337349298f86b2"
+    },
+    {
+      "sourceId": "giant-bomb",
+      "entityType": "building",
+      "level": 11,
+      "hash": "c30b2f6d3b332e0c"
+    },
+    {
+      "sourceId": "giga-bomb",
+      "entityType": "building",
+      "level": 1,
+      "hash": "8e96074d4d07cc4d"
+    },
+    {
+      "sourceId": "giga-bomb",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8e139f074d238e4d"
+    },
+    {
+      "sourceId": "giga-bomb",
+      "entityType": "building",
+      "level": 3,
+      "hash": "8e139f074d23864d"
+    },
+    {
+      "sourceId": "giga-bomb",
+      "entityType": "building",
+      "level": 4,
+      "hash": "8e9f9f474d478e4d"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 1,
+      "hash": "9d3636b331131b1e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 2,
+      "hash": "9d1e36b311531b1e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9d1e36b3d1533b9e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 4,
+      "hash": "8d1616b3d1733b1e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 5,
+      "hash": "9d3636b351339a5e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 6,
+      "hash": "9d1636b351339ade"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 7,
+      "hash": "8d1636b351339bde"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 8,
+      "hash": "882d16b651311b1e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 9,
+      "hash": "9a0d16b69151131e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 10,
+      "hash": "1a3d169319119b9e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 11,
+      "hash": "3a1d169219111b9e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 12,
+      "hash": "3a3c1d1e59091b8e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 13,
+      "hash": "1a3d1e1b19098b8f"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 14,
+      "hash": "9a0d0e1b19098b4b"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 15,
+      "hash": "9a2d0e1b49090f4c"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 16,
+      "hash": "88064eab99490b8e"
+    },
+    {
+      "sourceId": "gold-mine",
+      "entityType": "building",
+      "level": 17,
+      "hash": "8a2e2e8bc9490f8c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 1,
+      "hash": "ce072727130b864d"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 2,
+      "hash": "ce0727270b2b678c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 3,
+      "hash": "ce072737494307cc"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 4,
+      "hash": "ce072723494306cc"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 5,
+      "hash": "ce0727134927874c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 6,
+      "hash": "ce0727036927074c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 7,
+      "hash": "ce07170361078f4c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 8,
+      "hash": "4e07170361078f4c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 9,
+      "hash": "ce07170341078f4c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 10,
+      "hash": "8e07274f4d078f4c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 11,
+      "hash": "4c0f07074d4307ce"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 12,
+      "hash": "cc4f07074d61078e"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 13,
+      "hash": "ce07270f6d232f8e"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 14,
+      "hash": "cc07270f21233796"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 15,
+      "hash": "cc07250f2933238c"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 16,
+      "hash": "cc4f07172b3303cc"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 17,
+      "hash": "cc4745178a63238e"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 18,
+      "hash": "8c4717178f29338e"
+    },
+    {
+      "sourceId": "gold-storage",
+      "entityType": "building",
+      "level": 19,
+      "hash": "8e07250f49cc0686"
+    },
+    {
+      "sourceId": "hero-bell",
+      "entityType": "building",
+      "level": 1,
+      "hash": "460d8e23496907cc"
+    },
+    {
+      "sourceId": "hero-bell",
+      "entityType": "building",
+      "level": 2,
+      "hash": "264d862349290fcc"
+    },
+    {
+      "sourceId": "hero-bell",
+      "entityType": "building",
+      "level": 3,
+      "hash": "264d8e2b492b0fcc"
+    },
+    {
+      "sourceId": "hero-bell",
+      "entityType": "building",
+      "level": 4,
+      "hash": "464e9e234b6307cc"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 1,
+      "hash": "393e175b9b63068c"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 2,
+      "hash": "393c171b9b63068c"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9a3c171b5b23060c"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 4,
+      "hash": "7a3c171b5b63070c"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 5,
+      "hash": "7a3c171b5363070c"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 6,
+      "hash": "7a3c171b5363070e"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 7,
+      "hash": "7a3c171b5363070e"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 8,
+      "hash": "322d36175b63070e"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 9,
+      "hash": "3a2c37174b43070e"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 10,
+      "hash": "3a2c361f4b43070e"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 11,
+      "hash": "303c27174b43070e"
+    },
+    {
+      "sourceId": "hero-hall",
+      "entityType": "building",
+      "level": 12,
+      "hash": "325c27174b03078e"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4d8e0e86276e61a7"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 2,
+      "hash": "0d0e0683276e69a7"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 3,
+      "hash": "0e07072b2f6e6987"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 4,
+      "hash": "8e17372b2f6e6987"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 5,
+      "hash": "8e07332b2f6e6987"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 6,
+      "hash": "8e07372b2f6e6987"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 7,
+      "hash": "9e06266b264a4b87"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 8,
+      "hash": "0f03970b264a4987"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 9,
+      "hash": "0e4b436b0e4e4b03"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 10,
+      "hash": "8d8c060e666b0bcf"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 11,
+      "hash": "0e8e860f2a6b0fc6"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 12,
+      "hash": "4e4e868f6a2929c7"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 13,
+      "hash": "0e86868f071313c7"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 14,
+      "hash": "8e86870603131347"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 15,
+      "hash": "2d0f86232f0b05a7"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 16,
+      "hash": "8e86079616570f86"
+    },
+    {
+      "sourceId": "hidden-tesla",
+      "entityType": "building",
+      "level": 17,
+      "hash": "8e8e0f23060f0dc7"
+    },
+    {
+      "sourceId": "hook-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "1f0f8f3745690fcc"
+    },
+    {
+      "sourceId": "hook-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "1e0f8f33456107cc"
+    },
+    {
+      "sourceId": "hook-tower",
+      "entityType": "building",
+      "level": 3,
+      "hash": "1e4f8f23612107cc"
+    },
+    {
+      "sourceId": "hook-tower",
+      "entityType": "building",
+      "level": 4,
+      "hash": "16078f23616107cc"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "cc0e1b861343693d"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "4d0e0e8e174b190f"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 3,
+      "hash": "ce0f0bcd0b4b0d1d"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 4,
+      "hash": "ce0f0b4b23491d0d"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 5,
+      "hash": "ce2e37070349190f"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 6,
+      "hash": "ce3b334b7369190f"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 7,
+      "hash": "ce0b1b4b4b691b0f"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 8,
+      "hash": "cf1b0b2b2369098f"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 9,
+      "hash": "ce1f136b23211b8f"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 10,
+      "hash": "ce0b3b0b336b490d"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 11,
+      "hash": "960f1b17232b4903"
+    },
+    {
+      "sourceId": "inferno-tower",
+      "entityType": "building",
+      "level": 12,
+      "hash": "cf233b233b330b0f"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 1,
+      "hash": "172b3315038e8686"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 2,
+      "hash": "95376336178d8f0e"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 3,
+      "hash": "852b6332178d8f0e"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 4,
+      "hash": "952b6332170d8f0e"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 5,
+      "hash": "552f6b32174d0f8e"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 6,
+      "hash": "cc4d272b32170d8e"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 7,
+      "hash": "4d5707b29311038b"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 8,
+      "hash": "6d511172460d2bab"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 9,
+      "hash": "4d57245253051393"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 10,
+      "hash": "4e465751552d0787"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 11,
+      "hash": "4d4d4f4d4d311393"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 12,
+      "hash": "4f5729110d070b8f"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 13,
+      "hash": "04474533170f0793"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 14,
+      "hash": "0e476575934e2b2b"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 15,
+      "hash": "2646474d51120d2b"
+    },
+    {
+      "sourceId": "laboratory",
+      "entityType": "building",
+      "level": 16,
+      "hash": "4c4f4dc18703178e"
+    },
+    {
+      "sourceId": "lava-launcher",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4d863351c1038e4d"
+    },
+    {
+      "sourceId": "lava-launcher",
+      "entityType": "building",
+      "level": 2,
+      "hash": "4d863351c1278e4d"
+    },
+    {
+      "sourceId": "lava-launcher",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4d863351c1078e4d"
+    },
+    {
+      "sourceId": "lava-launcher",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4e863379c1278e4d"
+    },
+    {
+      "sourceId": "lava-launcher",
+      "entityType": "building",
+      "level": 5,
+      "hash": "4e863379c5078e4d"
+    },
+    {
+      "sourceId": "lava-launcher",
+      "entityType": "building",
+      "level": 6,
+      "hash": "4e862371c5038e4d"
+    },
+    {
+      "sourceId": "lava-launcher",
+      "entityType": "building",
+      "level": 7,
+      "hash": "264d8e33510b07cc"
+    },
+    {
+      "sourceId": "light-beam",
+      "entityType": "building",
+      "level": 1,
+      "hash": "0e868633616107cc"
+    },
+    {
+      "sourceId": "light-beam",
+      "entityType": "building",
+      "level": 2,
+      "hash": "0e068633696307cc"
+    },
+    {
+      "sourceId": "light-beam",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4e068633696307cc"
+    },
+    {
+      "sourceId": "longshot",
+      "entityType": "building",
+      "level": 1,
+      "hash": "1d461f77461e7862"
+    },
+    {
+      "sourceId": "monolith",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4e8e969b3771030e"
+    },
+    {
+      "sourceId": "monolith",
+      "entityType": "building",
+      "level": 2,
+      "hash": "4c0c969b17710f4e"
+    },
+    {
+      "sourceId": "monolith",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4e8e96863761078e"
+    },
+    {
+      "sourceId": "monolith",
+      "entityType": "building",
+      "level": 4,
+      "hash": "469e960f2b69178e"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 1,
+      "hash": "96337343f3278f4e"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 2,
+      "hash": "9e3b5bc1f3a7074e"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9eb27641b3a74f4c"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 4,
+      "hash": "96b33343f3a74f4c"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 5,
+      "hash": "1eb33b43b3a74f4c"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 6,
+      "hash": "96b33b43a3a74f4c"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 7,
+      "hash": "4e9b0b433361692e"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 8,
+      "hash": "ce9b0741f3672f0c"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 9,
+      "hash": "8e9207438367271e"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 10,
+      "hash": "870f2f654167159a"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 11,
+      "hash": "8e0f47436327139a"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 12,
+      "hash": "8e0f4743733513cb"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 13,
+      "hash": "ce262647633113e6"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 14,
+      "hash": "ce062653672917e7"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 15,
+      "hash": "8e2f479353653183"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 16,
+      "hash": "8e2f2f437321098f"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 17,
+      "hash": "9e0e2f3157331ba4"
+    },
+    {
+      "sourceId": "mortar",
+      "entityType": "building",
+      "level": 18,
+      "hash": "1e3a6773573d0da6"
+    },
+    {
+      "sourceId": "multi-archer-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "ce4d0d8e694d074c"
+    },
+    {
+      "sourceId": "multi-archer-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8e4d4d8e23cc864d"
+    },
+    {
+      "sourceId": "multi-archer-tower",
+      "entityType": "building",
+      "level": 3,
+      "hash": "cc0f1f0f0763864c"
+    },
+    {
+      "sourceId": "multi-archer-tower",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4d16ba172f45ce4e"
+    },
+    {
+      "sourceId": "multi-gear-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "490c33712b07232b"
+    },
+    {
+      "sourceId": "multi-gear-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "4d0c33592b07232b"
+    },
+    {
+      "sourceId": "multi-gear-tower",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4d8f33592b230f0f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 1,
+      "hash": "0c376b370f0d034f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 2,
+      "hash": "1c374b170f4d038f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9c370f65170d078f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 4,
+      "hash": "1e1b0f61170d078f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 5,
+      "hash": "1e1b0f61170d078b"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 6,
+      "hash": "1e1b0f61034d270f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 7,
+      "hash": "1e2f07450345270f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 8,
+      "hash": "8e132749230f070b"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 9,
+      "hash": "0e13730383673999"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 10,
+      "hash": "8e0f0f437355198f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 11,
+      "hash": "cd0d1d170d71130b"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 12,
+      "hash": "4d8e170b4d63238c"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 13,
+      "hash": "cc0f2b0f4d652386"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 14,
+      "hash": "cc0d694d8d23238e"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 15,
+      "hash": "ce0d250f49691d9f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 16,
+      "hash": "4c8f45454bc34b0f"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 17,
+      "hash": "4c8e4d690b6133ce"
+    },
+    {
+      "sourceId": "normal",
+      "entityType": "building",
+      "level": 18,
+      "hash": "8d1d4d0d452527cf"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 1,
+      "hash": "cc06460b41210786"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 2,
+      "hash": "cc06660b41410786"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 3,
+      "hash": "cc06660b41450786"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 4,
+      "hash": "cc066e0b41410786"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 5,
+      "hash": "cc066e0b41450786"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 6,
+      "hash": "cc066e0b0141038e"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 7,
+      "hash": "cc066e0b01450786"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 8,
+      "hash": "cc066e0b03410786"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 9,
+      "hash": "cc066f0b0341078e"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 10,
+      "hash": "2c37170b03070786"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 11,
+      "hash": "0c27272fa9810706"
+    },
+    {
+      "sourceId": "pet-house",
+      "entityType": "building",
+      "level": 12,
+      "hash": "cc072f0b29410786"
+    },
+    {
+      "sourceId": "revenge-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "8e074751410e510f"
+    },
+    {
+      "sourceId": "revenge-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8e0747412112510f"
+    },
+    {
+      "sourceId": "ricochet-cannon",
+      "entityType": "building",
+      "level": 1,
+      "hash": "1e0e0f73de8c0b8e"
+    },
+    {
+      "sourceId": "ricochet-cannon",
+      "entityType": "building",
+      "level": 2,
+      "hash": "1e260f53d6cc0b8e"
+    },
+    {
+      "sourceId": "ricochet-cannon",
+      "entityType": "building",
+      "level": 3,
+      "hash": "871b2711dbca07ce"
+    },
+    {
+      "sourceId": "ricochet-cannon",
+      "entityType": "building",
+      "level": 4,
+      "hash": "8e932f1b78550fcc"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 1,
+      "hash": "0d8e236961238e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8d86236961238e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 3,
+      "hash": "8d86434169338e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 4,
+      "hash": "1d86034141338e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 5,
+      "hash": "0d86236161238e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 6,
+      "hash": "0d86236161238e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 7,
+      "hash": "0d86237341238e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 8,
+      "hash": "0d862361492b8e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 9,
+      "hash": "0d86237145238e4d"
+    },
+    {
+      "sourceId": "roaster",
+      "entityType": "building",
+      "level": 10,
+      "hash": "4d8e277105278e4d"
+    },
+    {
+      "sourceId": "scattershot",
+      "entityType": "building",
+      "level": 1,
+      "hash": "6e5b4b69134fac2d"
+    },
+    {
+      "sourceId": "scattershot",
+      "entityType": "building",
+      "level": 2,
+      "hash": "6e4b4b69134f8d4d"
+    },
+    {
+      "sourceId": "scattershot",
+      "entityType": "building",
+      "level": 3,
+      "hash": "7e13cf294d0fcc2c"
+    },
+    {
+      "sourceId": "scattershot",
+      "entityType": "building",
+      "level": 4,
+      "hash": "6e238f6d6c4fcc4d"
+    },
+    {
+      "sourceId": "scattershot",
+      "entityType": "building",
+      "level": 5,
+      "hash": "2e1b0b6d7007ce05"
+    },
+    {
+      "sourceId": "scattershot",
+      "entityType": "building",
+      "level": 6,
+      "hash": "7f9f4f6b33074c4c"
+    },
+    {
+      "sourceId": "seeking-air-mine",
+      "entityType": "building",
+      "level": 1,
+      "hash": "21848706cc3b47cc"
+    },
+    {
+      "sourceId": "seeking-air-mine",
+      "entityType": "building",
+      "level": 2,
+      "hash": "21848706cc3b47cc"
+    },
+    {
+      "sourceId": "seeking-air-mine",
+      "entityType": "building",
+      "level": 3,
+      "hash": "314547841a2f23c6"
+    },
+    {
+      "sourceId": "seeking-air-mine",
+      "entityType": "building",
+      "level": 4,
+      "hash": "314547841a2f23c6"
+    },
+    {
+      "sourceId": "seeking-air-mine",
+      "entityType": "building",
+      "level": 5,
+      "hash": "31464786196b4587"
+    },
+    {
+      "sourceId": "seeking-air-mine",
+      "entityType": "building",
+      "level": 6,
+      "hash": "31464786196b4587"
+    },
+    {
+      "sourceId": "seeking-air-mine",
+      "entityType": "building",
+      "level": 7,
+      "hash": "332e87060d6d0903"
+    },
+    {
+      "sourceId": "seeking-air-mine",
+      "entityType": "building",
+      "level": 8,
+      "hash": "332e87060d6d0903"
+    },
+    {
+      "sourceId": "skeleton-trap",
+      "entityType": "building",
+      "level": 1,
+      "hash": "1e2f474f1b613396"
+    },
+    {
+      "sourceId": "skeleton-trap",
+      "entityType": "building",
+      "level": 2,
+      "hash": "1e2f474f1b613396"
+    },
+    {
+      "sourceId": "skeleton-trap",
+      "entityType": "building",
+      "level": 3,
+      "hash": "1c2607458b613396"
+    },
+    {
+      "sourceId": "skeleton-trap",
+      "entityType": "building",
+      "level": 4,
+      "hash": "1c2607458b613396"
+    },
+    {
+      "sourceId": "skeleton-trap",
+      "entityType": "building",
+      "level": 5,
+      "hash": "1c4c0f071f178fc6"
+    },
+    {
+      "sourceId": "smasher",
+      "entityType": "building",
+      "level": 1,
+      "hash": "0f0f1c1933073cb3"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 1,
+      "hash": "207e3b1d31239193"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 2,
+      "hash": "28563b1d35099196"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 3,
+      "hash": "284e1b1d2d0d0996"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 4,
+      "hash": "2d0c1f1f164b0fcc"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 5,
+      "hash": "2d0e1f1d0f0b0f8c"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 6,
+      "hash": "2d0e1f1d0f0f864c"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 7,
+      "hash": "2d0e1f1d070f4d44"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 8,
+      "hash": "2d0e1f1d078a0756"
+    },
+    {
+      "sourceId": "spell-factory",
+      "entityType": "building",
+      "level": 9,
+      "hash": "35161b1b1f0b078e"
+    },
+    {
+      "sourceId": "spell-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4c0707072523070c"
+    },
+    {
+      "sourceId": "spell-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "4c070707ac230f8c"
+    },
+    {
+      "sourceId": "spell-tower",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4c07070786270d8c"
+    },
+    {
+      "sourceId": "spell-tower",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4d8c27278e41074c"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 1,
+      "hash": "cf073b170f03874e"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 2,
+      "hash": "cf073b170f03874e"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 3,
+      "hash": "cf172b170b03874e"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 4,
+      "hash": "cf172b170b03874e"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 5,
+      "hash": "cf1f3f1f0b03074c"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 6,
+      "hash": "cf1f3f1f0b03074c"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 7,
+      "hash": "4f97270f8283074c"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 8,
+      "hash": "4f97270f8283074c"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 9,
+      "hash": "4f87050f8e83074e"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 10,
+      "hash": "4f87050f8e83074e"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 11,
+      "hash": "4f9721178683070e"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 12,
+      "hash": "4f9721178683070e"
+    },
+    {
+      "sourceId": "spring-trap",
+      "entityType": "building",
+      "level": 13,
+      "hash": "4f9723178683074e"
+    },
+    {
+      "sourceId": "super-wizard-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "0e1f97862769178e"
+    },
+    {
+      "sourceId": "super-wizard-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "8e39138627613796"
+    },
+    {
+      "sourceId": "tornado-trap",
+      "entityType": "building",
+      "level": 1,
+      "hash": "9b1b133316890326"
+    },
+    {
+      "sourceId": "tornado-trap",
+      "entityType": "building",
+      "level": 2,
+      "hash": "9b1b133316890326"
+    },
+    {
+      "sourceId": "tornado-trap",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9b1b133316890326"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 1,
+      "hash": "4d8d960753711b13"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 2,
+      "hash": "4d8d160311311b17"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 3,
+      "hash": "4d8d160311331b17"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 4,
+      "hash": "4d8d160747451307"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 5,
+      "hash": "4d8d160715131b17"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 6,
+      "hash": "4c8d062705570b03"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 7,
+      "hash": "4c8d124319311b17"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 8,
+      "hash": "36960e2333b15107"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 9,
+      "hash": "220f330f37b15107"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 10,
+      "hash": "2e1f0f0f278d5107"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 11,
+      "hash": "3e0b0f0f23490107"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 12,
+      "hash": "0e0e0f4b098d0507"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 13,
+      "hash": "0e0e0f0b0b2b1507"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 14,
+      "hash": "36160e0b0b0b0b06"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 15,
+      "hash": "0e160f0b0b8d2507"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 16,
+      "hash": "2b0f0b0bc1456123"
+    },
+    {
+      "sourceId": "wizard-tower",
+      "entityType": "building",
+      "level": 17,
+      "hash": "6b0f0f0f6bcccd0f"
+    },
+    {
+      "sourceId": "workshop",
+      "entityType": "building",
+      "level": 1,
+      "hash": "e4ba2c6d721c35b3"
+    },
+    {
+      "sourceId": "workshop",
+      "entityType": "building",
+      "level": 2,
+      "hash": "9adadc3c79723533"
+    },
+    {
+      "sourceId": "workshop",
+      "entityType": "building",
+      "level": 3,
+      "hash": "988ccdae6b723433"
+    },
+    {
+      "sourceId": "workshop",
+      "entityType": "building",
+      "level": 4,
+      "hash": "988ccd262f723433"
+    },
+    {
+      "sourceId": "workshop",
+      "entityType": "building",
+      "level": 5,
+      "hash": "9898cda63b723433"
+    },
+    {
+      "sourceId": "workshop",
+      "entityType": "building",
+      "level": 6,
+      "hash": "9898cda62f7a3433"
+    },
+    {
+      "sourceId": "workshop",
+      "entityType": "building",
+      "level": 7,
+      "hash": "9c98ccac2f7a3433"
+    },
+    {
+      "sourceId": "workshop",
+      "entityType": "building",
+      "level": 8,
+      "hash": "989dc5342d3b1533"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 1,
+      "hash": "9b9b8f2e1919864d"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 2,
+      "hash": "9b9b8f0e3b1f8e4d"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 3,
+      "hash": "9a9a8e0e1b0fcc28"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 4,
+      "hash": "9e9a8e161b8fcc28"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 5,
+      "hash": "9a0a96333b0f8e4d"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 6,
+      "hash": "9b8b82373b1b0f4c"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 7,
+      "hash": "9b8b9237791b0f4c"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 8,
+      "hash": "9b0b9237390b0fcc"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 9,
+      "hash": "9b8b823b3b0b0f4c"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 10,
+      "hash": "9b8b93373b1b2fcc"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 11,
+      "hash": "999b83271bd8178e"
+    },
+    {
+      "sourceId": "x-bow",
+      "entityType": "building",
+      "level": 12,
+      "hash": "9b8b2387131b0fe8"
+    },
+    {
+      "sourceId": "action-figure",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "8e031b0f09992f2c"
+    },
+    {
+      "sourceId": "archer-puppet",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "8e0701434f49814d"
+    },
+    {
+      "sourceId": "barbarian-puppet",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "0e07010707899101"
+    },
+    {
+      "sourceId": "dark-crown",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "ce5a5677716424ad"
+    },
+    {
+      "sourceId": "dark-orb",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "274b989a9c79330f"
+    },
+    {
+      "sourceId": "earthquake-boots",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "0c5d191b2707178b"
+    },
+    {
+      "sourceId": "electro-boots",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "8c2f8d6163399b87"
+    },
+    {
+      "sourceId": "eternal-tome",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "8d4e5fcd4d0d9d9e"
+    },
+    {
+      "sourceId": "fire-heart",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "982561a553333dc3"
+    },
+    {
+      "sourceId": "fireball",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "598e1f79411d3b07"
+    },
+    {
+      "sourceId": "flame-blower",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "6154593131994923"
+    },
+    {
+      "sourceId": "frost-flake",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "9b132b69593f2626"
+    },
+    {
+      "sourceId": "frozen-arrow",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "3143472747963668"
+    },
+    {
+      "sourceId": "giant-arrow",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "182101254e916068"
+    },
+    {
+      "sourceId": "giant-gauntlet",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "383c6f2d71118b66"
+    },
+    {
+      "sourceId": "haste-vial",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "9c3d361f0d999141"
+    },
+    {
+      "sourceId": "healer-puppet",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "1929654d0f179b9b"
+    },
+    {
+      "sourceId": "healing-tome",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "8d1e3b390b27878c"
+    },
+    {
+      "sourceId": "henchmen-puppet",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "184d4c4383914121"
+    },
+    {
+      "sourceId": "heroic-torch",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "623d6c0d26275129"
+    },
+    {
+      "sourceId": "hog-rider-puppet",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "8c872563079f5945"
+    },
+    {
+      "sourceId": "invisibility-vial",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "5d54d6cf43019949"
+    },
+    {
+      "sourceId": "lavaloon-puppet",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "932f219d456c8343"
+    },
+    {
+      "sourceId": "life-gem",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "e4521d1e07854424"
+    },
+    {
+      "sourceId": "magic-mirror",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "13870f1707071e1c"
+    },
+    {
+      "sourceId": "metal-pants",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "bf0f276363238365"
+    },
+    {
+      "sourceId": "meteor-staff",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "2e667f3353078979"
+    },
+    {
+      "sourceId": "noble-iron",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "3c7bd345652d8927"
+    },
+    {
+      "sourceId": "rage-gem",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "60691c0683412713"
+    },
+    {
+      "sourceId": "rage-vial",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "5d8dce4b01496131"
+    },
+    {
+      "sourceId": "rocket-backpack",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "3a33673737776f4e"
+    },
+    {
+      "sourceId": "rocket-spear",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "102123830c3b7448"
+    },
+    {
+      "sourceId": "royal-gem",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "3a3d661303034721"
+    },
+    {
+      "sourceId": "seeking-shield",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "1e1f6d6c394911cf"
+    },
+    {
+      "sourceId": "snake-bracelet",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "0e33b17119990787"
+    },
+    {
+      "sourceId": "spiky-ball",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "0727010383472797"
+    },
+    {
+      "sourceId": "stick-horse",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "0f331547633703b1"
+    },
+    {
+      "sourceId": "stun-blaster",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "5adb9c9449cd2703"
+    },
+    {
+      "sourceId": "vampstache",
+      "entityType": "equipment",
+      "level": null,
+      "hash": "8c07636928d21309"
+    },
+    {
+      "sourceId": "archer-queen",
+      "entityType": "hero",
+      "level": null,
+      "hash": "37674b0d0dce1d35"
+    },
+    {
+      "sourceId": "barbarian-king",
+      "entityType": "hero",
+      "level": null,
+      "hash": "a7939313b3c38630"
+    },
+    {
+      "sourceId": "dragon-duke",
+      "entityType": "hero",
+      "level": null,
+      "hash": "9d818125958bc64f"
+    },
+    {
+      "sourceId": "grand-warden",
+      "entityType": "hero",
+      "level": null,
+      "hash": "0607130782d1e94b"
+    },
+    {
+      "sourceId": "minion-prince",
+      "entityType": "hero",
+      "level": null,
+      "hash": "48068f0b21395158"
+    },
+    {
+      "sourceId": "royal-champion",
+      "entityType": "hero",
+      "level": null,
+      "hash": "0f29291b273d7973"
+    },
+    {
+      "sourceId": "angry-jelly",
+      "entityType": "pet",
+      "level": null,
+      "hash": "0e0f0f371f722689"
+    },
+    {
+      "sourceId": "diggy",
+      "entityType": "pet",
+      "level": null,
+      "hash": "5f7b27e7a35ffe2e"
+    },
+    {
+      "sourceId": "electro-owl",
+      "entityType": "pet",
+      "level": null,
+      "hash": "9e8c0d0b0f76ce7d"
+    },
+    {
+      "sourceId": "frosty",
+      "entityType": "pet",
+      "level": null,
+      "hash": "39093b19491593d1"
+    },
+    {
+      "sourceId": "greedy-raven",
+      "entityType": "pet",
+      "level": null,
+      "hash": "7c0f4ddcee3b1c01"
+    },
+    {
+      "sourceId": "lassi",
+      "entityType": "pet",
+      "level": null,
+      "hash": "569733723091c3ab"
+    },
+    {
+      "sourceId": "mighty-yak",
+      "entityType": "pet",
+      "level": null,
+      "hash": "03d0c2c2c2a22425"
+    },
+    {
+      "sourceId": "phoenix",
+      "entityType": "pet",
+      "level": null,
+      "hash": "73d7077d9d9fdcfd"
+    },
+    {
+      "sourceId": "poison-lizard",
+      "entityType": "pet",
+      "level": null,
+      "hash": "6e357b3f139b8e3d"
+    },
+    {
+      "sourceId": "sneezy",
+      "entityType": "pet",
+      "level": null,
+      "hash": "c9fb7327670d0eec"
+    },
+    {
+      "sourceId": "spirit-fox",
+      "entityType": "pet",
+      "level": null,
+      "hash": "1d4de6d1d3e6c646"
+    },
+    {
+      "sourceId": "unicorn",
+      "entityType": "pet",
+      "level": null,
+      "hash": "87878d8483070643"
+    },
+    {
+      "sourceId": "battle-blimp",
+      "entityType": "siege_machine",
+      "level": null,
+      "hash": "021f3b6323230796"
+    },
+    {
+      "sourceId": "battle-drill",
+      "entityType": "siege_machine",
+      "level": null,
+      "hash": "862351c222251f86"
+    },
+    {
+      "sourceId": "flame-flinger",
+      "entityType": "siege_machine",
+      "level": null,
+      "hash": "96962f2d0d13d044"
+    },
+    {
+      "sourceId": "log-launcher",
+      "entityType": "siege_machine",
+      "level": null,
+      "hash": "3303652d6d23692b"
+    },
+    {
+      "sourceId": "siege-barracks",
+      "entityType": "siege_machine",
+      "level": null,
+      "hash": "0d0d454523a2074c"
+    },
+    {
+      "sourceId": "stone-slammer",
+      "entityType": "siege_machine",
+      "level": null,
+      "hash": "070140444523078e"
+    },
+    {
+      "sourceId": "troop-launcher",
+      "entityType": "siege_machine",
+      "level": null,
+      "hash": "c607454d43610983"
+    },
+    {
+      "sourceId": "wall-wrecker",
+      "entityType": "siege_machine",
+      "level": null,
+      "hash": "2b6d2f252d4c450f"
+    },
+    {
+      "sourceId": "bat-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "0f1717933333130d"
+    },
+    {
+      "sourceId": "clone-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "2b3171616161a347"
+    },
+    {
+      "sourceId": "earthquake-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "0d06068eccdddc4d"
+    },
+    {
+      "sourceId": "freeze-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "0f73333333333235"
+    },
+    {
+      "sourceId": "haste-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "8d16371717161b1b"
+    },
+    {
+      "sourceId": "healing-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "4d1333616143e571"
+    },
+    {
+      "sourceId": "ice-block-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "4d0f94d4d1f6dc6d"
+    },
+    {
+      "sourceId": "invisibility-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "0e079737160fb27d"
+    },
+    {
+      "sourceId": "jump-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "4e9733606061e071"
+    },
+    {
+      "sourceId": "lightning-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "8932b3333633774d"
+    },
+    {
+      "sourceId": "overgrowth-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "0f37d5868e6d6c4d"
+    },
+    {
+      "sourceId": "poison-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "2d2e17131b1b1b0f"
+    },
+    {
+      "sourceId": "rage-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "4c57317161616367"
+    },
+    {
+      "sourceId": "recall-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "8f96b36161612307"
+    },
+    {
+      "sourceId": "revive-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "8e33f1cdce646471"
+    },
+    {
+      "sourceId": "skeleton-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "4e45656f2f0f131e"
+    },
+    {
+      "sourceId": "totem-spell",
+      "entityType": "spell",
+      "level": null,
+      "hash": "0f96170f97175259"
+    },
+    {
+      "sourceId": "apprentice-warden",
+      "entityType": "troop",
+      "level": null,
+      "hash": "2667437fe207174f"
+    },
+    {
+      "sourceId": "archer",
+      "entityType": "troop",
+      "level": null,
+      "hash": "0f3d2c2949633b4d"
+    },
+    {
+      "sourceId": "archer",
+      "entityType": "troop",
+      "level": null,
+      "hash": "8f0325250e5c3c1e"
+    },
+    {
+      "sourceId": "baby-dragon",
+      "entityType": "troop",
+      "level": null,
+      "hash": "3c3d3fb8465070e6"
+    },
+    {
+      "sourceId": "balloon",
+      "entityType": "troop",
+      "level": null,
+      "hash": "e4cc4c0d298b9549"
+    },
+    {
+      "sourceId": "barbarian",
+      "entityType": "troop",
+      "level": null,
+      "hash": "03230d2132282041"
+    },
+    {
+      "sourceId": "barbarian",
+      "entityType": "troop",
+      "level": null,
+      "hash": "c3196bcbdbc6e7e1"
+    },
+    {
+      "sourceId": "bowler",
+      "entityType": "troop",
+      "level": null,
+      "hash": "4f053d8f83cfe77f"
+    },
+    {
+      "sourceId": "dragon",
+      "entityType": "troop",
+      "level": null,
+      "hash": "7623130eae4be7e7"
+    },
+    {
+      "sourceId": "dragon-rider",
+      "entityType": "troop",
+      "level": null,
+      "hash": "36160e1c8c023230"
+    },
+    {
+      "sourceId": "druid",
+      "entityType": "troop",
+      "level": null,
+      "hash": "0f434f396107272c"
+    },
+    {
+      "sourceId": "electro-dragon",
+      "entityType": "troop",
+      "level": null,
+      "hash": "1b3c366369a37333"
+    },
+    {
+      "sourceId": "electro-titan",
+      "entityType": "troop",
+      "level": null,
+      "hash": "1d575637d9d9f3a4"
+    },
+    {
+      "sourceId": "furnace",
+      "entityType": "troop",
+      "level": null,
+      "hash": "4387131d9e86276e"
+    },
+    {
+      "sourceId": "giant",
+      "entityType": "troop",
+      "level": null,
+      "hash": "4b5dcd6565470783"
+    },
+    {
+      "sourceId": "giant",
+      "entityType": "troop",
+      "level": null,
+      "hash": "134783af83d3c674"
+    },
+    {
+      "sourceId": "goblin",
+      "entityType": "troop",
+      "level": null,
+      "hash": "67098943eb37b5a4"
+    },
+    {
+      "sourceId": "goblin",
+      "entityType": "troop",
+      "level": null,
+      "hash": "c60e1dd9848ec626"
+    },
+    {
+      "sourceId": "golem",
+      "entityType": "troop",
+      "level": null,
+      "hash": "860303112249c1e0"
+    },
+    {
+      "sourceId": "headhunter",
+      "entityType": "troop",
+      "level": null,
+      "hash": "27616153f9c96215"
+    },
+    {
+      "sourceId": "healer",
+      "entityType": "troop",
+      "level": null,
+      "hash": "cbd96ce865633232"
+    },
+    {
+      "sourceId": "hog-rider",
+      "entityType": "troop",
+      "level": null,
+      "hash": "4eb7333367ce8dc1"
+    },
+    {
+      "sourceId": "ice-golem",
+      "entityType": "troop",
+      "level": null,
+      "hash": "968f3b4f753d1f43"
+    },
+    {
+      "sourceId": "lava-hound",
+      "entityType": "troop",
+      "level": null,
+      "hash": "0f36373371706c74"
+    },
+    {
+      "sourceId": "meteor-golem",
+      "entityType": "troop",
+      "level": null,
+      "hash": "249a9aefe815151f"
+    },
+    {
+      "sourceId": "miner",
+      "entityType": "troop",
+      "level": null,
+      "hash": "1c0607260764a48c"
+    },
+    {
+      "sourceId": "minion",
+      "entityType": "troop",
+      "level": null,
+      "hash": "d9870387870444a0"
+    },
+    {
+      "sourceId": "pekka",
+      "entityType": "troop",
+      "level": null,
+      "hash": "6e4696b7f1ba9066"
+    },
+    {
+      "sourceId": "root-rider",
+      "entityType": "troop",
+      "level": null,
+      "hash": "3060c3c513a3b697"
+    },
+    {
+      "sourceId": "thrower",
+      "entityType": "troop",
+      "level": null,
+      "hash": "07866343cb0d370b"
+    },
+    {
+      "sourceId": "valkyrie",
+      "entityType": "troop",
+      "level": null,
+      "hash": "5b4d4dc5d3d6c4cf"
+    },
+    {
+      "sourceId": "wall-breaker",
+      "entityType": "troop",
+      "level": null,
+      "hash": "63b1999991c35d8d"
+    },
+    {
+      "sourceId": "wall-breaker",
+      "entityType": "troop",
+      "level": null,
+      "hash": "87231313db8ececf"
+    },
+    {
+      "sourceId": "witch",
+      "entityType": "troop",
+      "level": null,
+      "hash": "6663635257454d73"
+    },
+    {
+      "sourceId": "wizard",
+      "entityType": "troop",
+      "level": null,
+      "hash": "8f0b0b930d554469"
+    },
+    {
+      "sourceId": "yeti",
+      "entityType": "troop",
+      "level": null,
+      "hash": "e9611755131a2e09"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 1,
+      "hash": "660387a191c3c6f0"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 2,
+      "hash": "4e8707038387c6e1"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 3,
+      "hash": "ce1f0f27230786e4"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 4,
+      "hash": "8e07430f61178ee9"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 5,
+      "hash": "cc170f2b21292f2d"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 6,
+      "hash": "4687834143cfe4f1"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 7,
+      "hash": "26079303238bc4f1"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 8,
+      "hash": "4e8f030d999990e0"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 9,
+      "hash": "8e0f2913273386e4"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 10,
+      "hash": "8e8707b331713186"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 11,
+      "hash": "8c0f0f23330f07cc"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 12,
+      "hash": "8e8e8e2361238e4d"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 13,
+      "hash": "8e8e8e0723138e4d"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 14,
+      "hash": "8e1f0f0f6969294d"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 15,
+      "hash": "ce1707c545451786"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 16,
+      "hash": "8e230f610769078e"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 17,
+      "hash": "0f2707073103130f"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 18,
+      "hash": "2b0f0f4d61333333"
+    },
+    {
+      "sourceId": "wall",
+      "entityType": "wall",
+      "level": 19,
+      "hash": "0e67436123860386"
+    }
+  ]
+}

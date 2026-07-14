@@ -9,13 +9,14 @@ import type {
 } from "@/types/laboratory";
 
 const SPELL_SELECT_FIELDS =
-  "id, name, api_name, category, unlock_town_hall_level, max_level, sort_order";
+  "id, source_id, name, api_name, category, unlock_town_hall_level, max_level, sort_order";
 const SPELL_LEVEL_SELECT_FIELDS =
   "spell_id, level, town_hall_level, upgrade_time_hours, gold_cost, elixir_cost, dark_elixir_cost, hitpoints";
 
 function mapSpell(row: SpellRow): Spell {
   return {
     id: row.id,
+    sourceId: row.source_id,
     name: row.name,
     apiName: row.api_name,
     category: row.category,

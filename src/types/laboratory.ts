@@ -1,5 +1,6 @@
 type LaboratoryEntity = {
   id: string;
+  sourceId?: string;
   name: string;
   apiName: string;
   category: string;
@@ -10,6 +11,7 @@ type LaboratoryEntity = {
 
 type LaboratoryEntityRow = {
   id: string;
+  source_id?: string;
   name: string;
   api_name: string;
   category: string;

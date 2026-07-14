@@ -44,11 +44,11 @@ function getDiscountPercent(
 export function simulateBuilderQueue(
   input: BuilderSimulationInput,
 ): BuilderSimulationResult {
-  const builderAvailability = createInitialBuilderAvailability(
-    input.builderCount,
+  const builderAvailability = createInitialBuilderAvailability(input.builderCount).map(
+    (_, index) => Math.max(0, input.initialBuilderAvailabilityHours?.[index] || 0),
   );
   const builderCount = builderAvailability.length;
-  const laboratoryAvailability = [0];
+  const laboratoryAvailability = [Math.max(0, input.initialLaboratoryAvailabilityHours || 0)];
 
   if (input.queueItems.length === 0) {
     return {

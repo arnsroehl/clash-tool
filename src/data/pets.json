@@ -1,0 +1,1346 @@
+[
+  {
+    "id": "4224723d-6163-4661-84d6-093637c25f02",
+    "sourceId": "angry-jelly",
+    "name": "Angry Jelly",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 16,
+    "petHouseLevelRequired": 10,
+    "sortOrder": 10,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1450
+      },
+      {
+        "level": 2,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 150000,
+        "hitpoints": 1525
+      },
+      {
+        "level": 3,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 160000,
+        "hitpoints": 1600
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 170000,
+        "hitpoints": 1675
+      },
+      {
+        "level": 5,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 180000,
+        "hitpoints": 1750
+      },
+      {
+        "level": 6,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 168,
+        "darkElixirCost": 190000,
+        "hitpoints": 1825
+      },
+      {
+        "level": 7,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 200000,
+        "hitpoints": 1900
+      },
+      {
+        "level": 8,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 210000,
+        "hitpoints": 1975
+      },
+      {
+        "level": 9,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 220000,
+        "hitpoints": 2050
+      },
+      {
+        "level": 10,
+        "townHall": 16,
+        "requiredFacilityLevel": 10,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 230000,
+        "hitpoints": 2125
+      }
+    ]
+  },
+  {
+    "id": "26efa7a2-525a-45ce-8a92-95e06de549ff",
+    "sourceId": "diggy",
+    "name": "Diggy",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 15,
+    "petHouseLevelRequired": 6,
+    "sortOrder": 20,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 3650
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 36,
+        "darkElixirCost": 90000,
+        "hitpoints": 3800
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 48,
+        "darkElixirCost": 105000,
+        "hitpoints": 3950
+      },
+      {
+        "level": 4,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 120000,
+        "hitpoints": 4100
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 130000,
+        "hitpoints": 4250
+      },
+      {
+        "level": 6,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 108,
+        "darkElixirCost": 140000,
+        "hitpoints": 4400
+      },
+      {
+        "level": 7,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 150000,
+        "hitpoints": 4550
+      },
+      {
+        "level": 8,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 132,
+        "darkElixirCost": 160000,
+        "hitpoints": 4700
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 170000,
+        "hitpoints": 4850
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "requiredFacilityLevel": 6,
+        "upgradeTimeHours": 156,
+        "darkElixirCost": 180000,
+        "hitpoints": 5000
+      }
+    ]
+  },
+  {
+    "id": "5b6d5d9f-1c1e-4864-8944-67522eddd332",
+    "sourceId": "electro-owl",
+    "name": "Electro Owl",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 14,
+    "petHouseLevelRequired": 2,
+    "sortOrder": 30,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1600
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 36,
+        "darkElixirCost": 30000,
+        "hitpoints": 1700
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 48,
+        "darkElixirCost": 45000,
+        "hitpoints": 1800
+      },
+      {
+        "level": 4,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 60000,
+        "hitpoints": 1900
+      },
+      {
+        "level": 5,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 75000,
+        "hitpoints": 2000
+      },
+      {
+        "level": 6,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 108,
+        "darkElixirCost": 90000,
+        "hitpoints": 2100
+      },
+      {
+        "level": 7,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 105000,
+        "hitpoints": 2200
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 132,
+        "darkElixirCost": 120000,
+        "hitpoints": 2300
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 135000,
+        "hitpoints": 2400
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "requiredFacilityLevel": 2,
+        "upgradeTimeHours": 156,
+        "darkElixirCost": 150000,
+        "hitpoints": 2500
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 168,
+        "darkElixirCost": 165000,
+        "hitpoints": 2600
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 180000,
+        "hitpoints": 2700
+      },
+      {
+        "level": 13,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 195000,
+        "hitpoints": 2800
+      },
+      {
+        "level": 14,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 210000,
+        "hitpoints": 2900
+      },
+      {
+        "level": 15,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 225000,
+        "hitpoints": 3000
+      }
+    ]
+  },
+  {
+    "id": "3944b306-7030-4d7c-89b3-0d24db5279c5",
+    "sourceId": "frosty",
+    "name": "Frosty",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 15,
+    "petHouseLevelRequired": 5,
+    "sortOrder": 40,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 2350
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 36,
+        "darkElixirCost": 70000,
+        "hitpoints": 2450
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 48,
+        "darkElixirCost": 85000,
+        "hitpoints": 2550
+      },
+      {
+        "level": 4,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 100000,
+        "hitpoints": 2650
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 115000,
+        "hitpoints": 2800
+      },
+      {
+        "level": 6,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 108,
+        "darkElixirCost": 130000,
+        "hitpoints": 2900
+      },
+      {
+        "level": 7,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 145000,
+        "hitpoints": 3000
+      },
+      {
+        "level": 8,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 132,
+        "darkElixirCost": 160000,
+        "hitpoints": 3100
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 170000,
+        "hitpoints": 3200
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 156,
+        "darkElixirCost": 180000,
+        "hitpoints": 3300
+      },
+      {
+        "level": 11,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 168,
+        "darkElixirCost": 200000,
+        "hitpoints": 3400
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 230000,
+        "hitpoints": 3500
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 260000,
+        "hitpoints": 3600
+      },
+      {
+        "level": 14,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 290000,
+        "hitpoints": 3700
+      },
+      {
+        "level": 15,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 320000,
+        "hitpoints": 3800
+      }
+    ]
+  },
+  {
+    "id": "c5e4cd17-2b44-4360-8c10-5110d8c4ae0d",
+    "sourceId": "greedy-raven",
+    "name": "Greedy Raven",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 18,
+    "petHouseLevelRequired": 12,
+    "sortOrder": 50,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 2150
+      },
+      {
+        "level": 2,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 260000,
+        "hitpoints": 2300
+      },
+      {
+        "level": 3,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 280000,
+        "hitpoints": 2450
+      },
+      {
+        "level": 4,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 300000,
+        "hitpoints": 2600
+      },
+      {
+        "level": 5,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 320000,
+        "hitpoints": 2750
+      },
+      {
+        "level": 6,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 340000,
+        "hitpoints": 2900
+      },
+      {
+        "level": 7,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 360000,
+        "hitpoints": 3050
+      },
+      {
+        "level": 8,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 380000,
+        "hitpoints": 3200
+      },
+      {
+        "level": 9,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 400000,
+        "hitpoints": 3350
+      },
+      {
+        "level": 10,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 420000,
+        "hitpoints": 3500
+      }
+    ]
+  },
+  {
+    "id": "17b99e5f-78ba-4b1c-820b-cdecc872780a",
+    "sourceId": "lassi",
+    "name": "L.A.S.S.I",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 14,
+    "petHouseLevelRequired": 1,
+    "sortOrder": 60,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 2800
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 24,
+        "darkElixirCost": 20000,
+        "hitpoints": 2900
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 36,
+        "darkElixirCost": 30000,
+        "hitpoints": 3000
+      },
+      {
+        "level": 4,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 48,
+        "darkElixirCost": 40000,
+        "hitpoints": 3100
+      },
+      {
+        "level": 5,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 60,
+        "darkElixirCost": 50000,
+        "hitpoints": 3200
+      },
+      {
+        "level": 6,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 60000,
+        "hitpoints": 3300
+      },
+      {
+        "level": 7,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 84,
+        "darkElixirCost": 70000,
+        "hitpoints": 3400
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 80000,
+        "hitpoints": 3500
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 108,
+        "darkElixirCost": 90000,
+        "hitpoints": 3600
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "requiredFacilityLevel": 1,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 100000,
+        "hitpoints": 3700
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 132,
+        "darkElixirCost": 110000,
+        "hitpoints": 3850
+      },
+      {
+        "level": 12,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 120000,
+        "hitpoints": 3950
+      },
+      {
+        "level": 13,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 156,
+        "darkElixirCost": 130000,
+        "hitpoints": 4100
+      },
+      {
+        "level": 14,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 168,
+        "darkElixirCost": 140000,
+        "hitpoints": 4300
+      },
+      {
+        "level": 15,
+        "townHall": 15,
+        "requiredFacilityLevel": 5,
+        "upgradeTimeHours": 180,
+        "darkElixirCost": 150000,
+        "hitpoints": 4500
+      }
+    ]
+  },
+  {
+    "id": "8a760332-bdb0-4dec-83bb-ea9230ae2d35",
+    "sourceId": "mighty-yak",
+    "name": "Mighty Yak",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 14,
+    "petHouseLevelRequired": 3,
+    "sortOrder": 70,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 3750
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 24,
+        "darkElixirCost": 40000,
+        "hitpoints": 4000
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 36,
+        "darkElixirCost": 50000,
+        "hitpoints": 4250
+      },
+      {
+        "level": 4,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 48,
+        "darkElixirCost": 60000,
+        "hitpoints": 4500
+      },
+      {
+        "level": 5,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 60,
+        "darkElixirCost": 70000,
+        "hitpoints": 4750
+      },
+      {
+        "level": 6,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 80000,
+        "hitpoints": 4950
+      },
+      {
+        "level": 7,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 84,
+        "darkElixirCost": 90000,
+        "hitpoints": 5100
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 100000,
+        "hitpoints": 5250
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 108,
+        "darkElixirCost": 110000,
+        "hitpoints": 5400
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "requiredFacilityLevel": 3,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 120000,
+        "hitpoints": 5550
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 132,
+        "darkElixirCost": 130000,
+        "hitpoints": 5700
+      },
+      {
+        "level": 12,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 140000,
+        "hitpoints": 5850
+      },
+      {
+        "level": 13,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 156,
+        "darkElixirCost": 150000,
+        "hitpoints": 6000
+      },
+      {
+        "level": 14,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 168,
+        "darkElixirCost": 160000,
+        "hitpoints": 6150
+      },
+      {
+        "level": 15,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 180,
+        "darkElixirCost": 170000,
+        "hitpoints": 6300
+      }
+    ]
+  },
+  {
+    "id": "add922f8-01fe-4735-860e-6f219c6e4f05",
+    "sourceId": "phoenix",
+    "name": "Phoenix",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 15,
+    "petHouseLevelRequired": 8,
+    "sortOrder": 80,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 3120
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 36,
+        "darkElixirCost": 80000,
+        "hitpoints": 3240
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 48,
+        "darkElixirCost": 95000,
+        "hitpoints": 3360
+      },
+      {
+        "level": 4,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 110000,
+        "hitpoints": 3480
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 125000,
+        "hitpoints": 3600
+      },
+      {
+        "level": 6,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 108,
+        "darkElixirCost": 140000,
+        "hitpoints": 3720
+      },
+      {
+        "level": 7,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 155000,
+        "hitpoints": 3840
+      },
+      {
+        "level": 8,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 132,
+        "darkElixirCost": 170000,
+        "hitpoints": 3960
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 180000,
+        "hitpoints": 4080
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "upgradeTimeHours": 156,
+        "darkElixirCost": 190000,
+        "hitpoints": 4200
+      }
+    ]
+  },
+  {
+    "id": "8f3f100c-8e19-4e3e-8c6c-b4c4ff077821",
+    "sourceId": "poison-lizard",
+    "name": "Poison Lizard",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 15,
+    "petHouseLevelRequired": 7,
+    "sortOrder": 90,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1400
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 24,
+        "darkElixirCost": 60000,
+        "hitpoints": 1450
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 36,
+        "darkElixirCost": 75000,
+        "hitpoints": 1500
+      },
+      {
+        "level": 4,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 48,
+        "darkElixirCost": 90000,
+        "hitpoints": 1550
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 60,
+        "darkElixirCost": 100000,
+        "hitpoints": 1600
+      },
+      {
+        "level": 6,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 110000,
+        "hitpoints": 1650
+      },
+      {
+        "level": 7,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 84,
+        "darkElixirCost": 120000,
+        "hitpoints": 1700
+      },
+      {
+        "level": 8,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 130000,
+        "hitpoints": 1800
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 108,
+        "darkElixirCost": 140000,
+        "hitpoints": 1900
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "requiredFacilityLevel": 7,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 150000,
+        "hitpoints": 2050
+      },
+      {
+        "level": 11,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 180000,
+        "hitpoints": 2100
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 168,
+        "darkElixirCost": 200000,
+        "hitpoints": 2150
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 220000,
+        "hitpoints": 2200
+      },
+      {
+        "level": 14,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 240000,
+        "hitpoints": 2250
+      },
+      {
+        "level": 15,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 260000,
+        "hitpoints": 2300
+      }
+    ]
+  },
+  {
+    "id": "ea4a4009-4686-4805-8652-90837ec66daf",
+    "sourceId": "sneezy",
+    "name": "Sneezy",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 17,
+    "petHouseLevelRequired": 11,
+    "sortOrder": 100,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 3300
+      },
+      {
+        "level": 2,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 200000,
+        "hitpoints": 3450
+      },
+      {
+        "level": 3,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 220000,
+        "hitpoints": 3600
+      },
+      {
+        "level": 4,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 240000,
+        "hitpoints": 3750
+      },
+      {
+        "level": 5,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 260000,
+        "hitpoints": 3900
+      },
+      {
+        "level": 6,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 280000,
+        "hitpoints": 4050
+      },
+      {
+        "level": 7,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 300000,
+        "hitpoints": 4200
+      },
+      {
+        "level": 8,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 320000,
+        "hitpoints": 4350
+      },
+      {
+        "level": 9,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 340000,
+        "hitpoints": 4500
+      },
+      {
+        "level": 10,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 360000,
+        "hitpoints": 4650
+      }
+    ]
+  },
+  {
+    "id": "4f20cb14-e074-425c-892f-053c647bed82",
+    "sourceId": "spirit-fox",
+    "name": "Spirit Fox",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 16,
+    "petHouseLevelRequired": 9,
+    "sortOrder": 110,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1900
+      },
+      {
+        "level": 2,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 150000,
+        "hitpoints": 2000
+      },
+      {
+        "level": 3,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 160000,
+        "hitpoints": 2100
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 170000,
+        "hitpoints": 2200
+      },
+      {
+        "level": 5,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 132,
+        "darkElixirCost": 180000,
+        "hitpoints": 2300
+      },
+      {
+        "level": 6,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 190000,
+        "hitpoints": 2400
+      },
+      {
+        "level": 7,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 156,
+        "darkElixirCost": 200000,
+        "hitpoints": 2500
+      },
+      {
+        "level": 8,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 168,
+        "darkElixirCost": 210000,
+        "hitpoints": 2600
+      },
+      {
+        "level": 9,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 180,
+        "darkElixirCost": 220000,
+        "hitpoints": 2700
+      },
+      {
+        "level": 10,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 230000,
+        "hitpoints": 2800
+      }
+    ]
+  },
+  {
+    "id": "9f7ed06b-7e06-4362-8d50-b1d7a968dc09",
+    "sourceId": "unicorn",
+    "name": "Unicorn",
+    "aliases": [],
+    "category": "Pet",
+    "unlockTownHall": 14,
+    "petHouseLevelRequired": 4,
+    "sortOrder": 120,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 1400
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 36,
+        "darkElixirCost": 50000,
+        "hitpoints": 1450
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 48,
+        "darkElixirCost": 65000,
+        "hitpoints": 1500
+      },
+      {
+        "level": 4,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 72,
+        "darkElixirCost": 80000,
+        "hitpoints": 1550
+      },
+      {
+        "level": 5,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 96,
+        "darkElixirCost": 95000,
+        "hitpoints": 1600
+      },
+      {
+        "level": 6,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 108,
+        "darkElixirCost": 110000,
+        "hitpoints": 1675
+      },
+      {
+        "level": 7,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 120,
+        "darkElixirCost": 125000,
+        "hitpoints": 1725
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 132,
+        "darkElixirCost": 140000,
+        "hitpoints": 1800
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 144,
+        "darkElixirCost": 155000,
+        "hitpoints": 1875
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "requiredFacilityLevel": 4,
+        "upgradeTimeHours": 156,
+        "darkElixirCost": 170000,
+        "hitpoints": 1950
+      },
+      {
+        "level": 11,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 168,
+        "darkElixirCost": 200000,
+        "hitpoints": 2025
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 230000,
+        "hitpoints": 2100
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 260000,
+        "hitpoints": 2175
+      },
+      {
+        "level": 14,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 290000,
+        "hitpoints": 2250
+      },
+      {
+        "level": 15,
+        "townHall": 17,
+        "requiredFacilityLevel": 11,
+        "upgradeTimeHours": 192,
+        "darkElixirCost": 320000,
+        "hitpoints": 2325
+      }
+    ]
+  }
+]

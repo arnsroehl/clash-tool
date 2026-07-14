@@ -57,9 +57,11 @@ import { useMagicItems } from "@/hooks/useMagicItems";
 import { useClanDashboard } from "@/hooks/useClanDashboard";
 import { useHeroes } from "@/hooks/useHeroes";
 import { useSiegeMachines } from "@/hooks/useSiegeMachines";
+import { applyPlayerImport } from "@/services/playerImportService";
 import { useSpells } from "@/hooks/useSpells";
 import { useTroops } from "@/hooks/useTroops";
 import { useUpgradeQueue } from "@/hooks/useUpgradeQueue";
+import { useScreenshotProgress } from "@/hooks/useScreenshotProgress";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type {
   PlannerItem,
@@ -186,6 +188,27 @@ export default function Home() {
     enabled: Boolean(user),
   });
   const {
+    availableEntities: availableScreenshotEntities,
+    accountLevels: screenshotEntityLevels,
+    upgradeSlots: screenshotUpgradeSlots,
+    resourceSnapshot: screenshotResourceSnapshot,
+  } =
+    useScreenshotProgress(selectedAccount, handleError, Boolean(user));
+  const screenshotProgressEntities = useMemo(
+    () =>
+      availableScreenshotEntities.map((entity) => ({
+        id: entity.id,
+        name: entity.name,
+        aliases: [...entity.aliases, entity.sourceId],
+        currentLevel: screenshotEntityLevels[entity.id] || 0,
+        maxLevel: entity.maxLevel,
+        maxLevelForTownHall: entity.maxLevel,
+        unlockTownHallLevel: entity.unlockTownHallLevel,
+        type: entity.type,
+      })),
+    [availableScreenshotEntities, screenshotEntityLevels],
+  );
+  const {
     scenarios: planningScenarios,
     isBusy: isScenarioBusy,
     save: saveScenario,
@@ -204,6 +227,17 @@ export default function Home() {
   const activeScenario = planningScenarios.find(
     (scenario) => scenario.isActive,
   );
+  useEffect(() => {
+    if (!screenshotResourceSnapshot || activeScenario) return;
+    const timeout = window.setTimeout(() => {
+      setResources((current) => ({
+        gold: screenshotResourceSnapshot.gold ?? current.gold,
+        elixir: screenshotResourceSnapshot.elixir ?? current.elixir,
+        darkElixir: screenshotResourceSnapshot.darkElixir ?? current.darkElixir,
+      }));
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [activeScenario, screenshotResourceSnapshot]);
   useEffect(() => {
     if (!activeScenario) return;
     const timeout = window.setTimeout(
@@ -554,10 +588,22 @@ export default function Home() {
     [addRawGoalRecommendationsToQueue],
   );
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
+    const builderSlots = screenshotUpgradeSlots.filter((slot) => slot.slotType === "builder");
+    const laboratorySlot = screenshotUpgradeSlots.find((slot) => slot.slotType === "laboratory");
     return simulateBuilderQueue({
       builderCount: selectedAccount?.builderCount || 0,
       queueItems,
       simulationStartsAt,
+      initialBuilderAvailabilityHours: Array.from(
+        { length: selectedAccount?.builderCount || 0 },
+        (_, index) => {
+          const slot = builderSlots.find((item) => item.slotIndex === index + 1);
+          return slot?.isAvailable ? 0 : (slot?.remainingSeconds || 0) / 3_600;
+        },
+      ),
+      initialLaboratoryAvailabilityHours: laboratorySlot?.isAvailable
+        ? 0
+        : (laboratorySlot?.remainingSeconds || 0) / 3_600,
       timeDiscountWindows: events
         .filter((event) => event.enabled && event.timeDiscountPercent > 0)
         .map((event) => ({
@@ -573,7 +619,7 @@ export default function Home() {
           percent: event.costDiscountPercent,
         })),
     });
-  }, [events, queueItems, selectedAccount, simulationStartsAt]);
+  }, [events, queueItems, screenshotUpgradeSlots, selectedAccount, simulationStartsAt]);
 
   const progressForecast = useMemo<ProgressForecastResult>(() => {
     return createProgressForecast({
@@ -768,7 +814,26 @@ export default function Home() {
             spellLevels={spellLevels}
             siegeMachines={availableSiegeMachines}
             siegeLevels={siegeMachineLevels}
+            extraScreenshotEntities={screenshotProgressEntities}
             language={language}
+            onResourcesImported={(detected) => {
+              const values = Object.fromEntries(detected.map((item) => [item.resourceType, item.amount]));
+              setResources((current) => ({
+                gold: values.gold ?? current.gold,
+                elixir: values.elixir ?? current.elixir,
+                darkElixir: values.dark_elixir ?? current.darkElixir,
+              }));
+            }}
+            onProfileImported={async (detected) => {
+              if (!selectedAccount) return;
+              await applyPlayerImport(selectedAccount, {
+                playerName: selectedAccount.name,
+                playerTag: detected.playerTag || undefined,
+                townHallFrom: selectedAccount.townHallLevel,
+                townHallTo: detected.townHallLevel || selectedAccount.townHallLevel,
+                changes: [],
+              });
+            }}
           />
         </CollapsibleSection>
 

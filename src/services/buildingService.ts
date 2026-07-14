@@ -11,13 +11,14 @@ import type {
 } from "@/types/building";
 
 const BUILDING_SELECT_FIELDS =
-  "id, name, category, unlock_town_hall_level, max_level, sort_order";
+  "id, source_id, name, category, unlock_town_hall_level, max_level, sort_order";
 const BUILDING_LEVEL_SELECT_FIELDS =
   "building_id, level, town_hall_level, upgrade_time_hours, gold_cost, elixir_cost, dark_elixir_cost, hitpoints";
 
 function mapBuilding(row: BuildingRow): Building {
   return {
     id: row.id,
+    sourceId: row.source_id,
     name: row.name,
     category: row.category,
     unlockTownHallLevel: row.unlock_town_hall_level,

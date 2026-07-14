@@ -14,6 +14,8 @@ export type BuilderSimulationInput = {
   simulationStartsAt?: string;
   timeDiscountWindows?: SimulationDiscountWindow[];
   costDiscountWindows?: SimulationDiscountWindow[];
+  initialBuilderAvailabilityHours?: number[];
+  initialLaboratoryAvailabilityHours?: number;
 };
 
 export type UpgradeSlotType = "builder" | "laboratory";

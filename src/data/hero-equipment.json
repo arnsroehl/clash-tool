@@ -1,0 +1,7277 @@
+[
+  {
+    "id": "57523455-c60e-4cd9-811c-d64906f265c3",
+    "sourceId": "action-figure",
+    "name": "Action Figure",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "archer-queen",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 10,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "f0bbe57c-0e5c-4cbd-8ec8-0606437ffc24",
+    "sourceId": "archer-puppet",
+    "name": "Archer Puppet",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "archer-queen",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 20,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "76560e06-2b52-4319-89a9-8c2b03f67393",
+    "sourceId": "barbarian-puppet",
+    "name": "Barbarian Puppet",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "barbarian-king",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 30,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "32a199dd-8df9-4189-85c9-e417277003d4",
+    "sourceId": "dark-crown",
+    "name": "Dark Crown",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "minion-prince",
+    "abilityType": "Passive",
+    "unlockTownHall": 8,
+    "sortOrder": 40,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "05c1b641-8c0f-4382-8446-51bb3051edbc",
+    "sourceId": "dark-orb",
+    "name": "Dark Orb",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "minion-prince",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 50,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "23ddad70-21ed-4091-8801-ef3ccbee9cec",
+    "sourceId": "earthquake-boots",
+    "name": "Earthquake Boots",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "barbarian-king",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 60,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "af9dc753-73f0-4349-8c6d-2adb8d45275c",
+    "sourceId": "electro-boots",
+    "name": "Electro Boots",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "royal-champion",
+    "abilityType": "Passive",
+    "unlockTownHall": 8,
+    "sortOrder": 70,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "6b8c50a9-d2df-4b63-823c-0bc1d4cda04c",
+    "sourceId": "eternal-tome",
+    "name": "Eternal Tome",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "grand-warden",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 80,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "7900c4a8-0a3d-4191-8d74-f008ddc07524",
+    "sourceId": "fire-heart",
+    "name": "Fire Heart",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "dragon-duke",
+    "abilityType": "Passive",
+    "unlockTownHall": 8,
+    "sortOrder": 90,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "2dcfa310-1092-4fe2-8530-0f27e34c7d68",
+    "sourceId": "fireball",
+    "name": "Fireball",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "grand-warden",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 100,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "6e12e60f-6705-4774-8a12-75017f464b4e",
+    "sourceId": "flame-blower",
+    "name": "Flame Blower",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "dragon-duke",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 110,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "5a20001d-a62c-43f0-8cfd-ca34e2ef0ef4",
+    "sourceId": "frost-flake",
+    "name": "Frost Flake",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "royal-champion",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 120,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "d3ac5339-d982-4179-807d-c1078967c5cd",
+    "sourceId": "frozen-arrow",
+    "name": "Frozen Arrow",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "archer-queen",
+    "abilityType": "Passive",
+    "unlockTownHall": 8,
+    "sortOrder": 130,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "26de5cd5-4c3a-4aaa-822b-4a3c1810b462",
+    "sourceId": "giant-arrow",
+    "name": "Giant Arrow",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "archer-queen",
+    "abilityType": "Active",
+    "unlockTownHall": 9,
+    "sortOrder": 140,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 9,
+        "requiredFacilityLevel": 2,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "bba59699-c422-45ee-8c54-df807d9ecc58",
+    "sourceId": "giant-gauntlet",
+    "name": "Giant Gauntlet",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "barbarian-king",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 150,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "f1cf4239-5431-43e9-8300-ef47bdb27b53",
+    "sourceId": "haste-vial",
+    "name": "Haste Vial",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "royal-champion",
+    "abilityType": "Active",
+    "unlockTownHall": 15,
+    "sortOrder": 160,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "1839e0c5-3d4f-4ed1-8181-3caca4197352",
+    "sourceId": "healer-puppet",
+    "name": "Healer Puppet",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "archer-queen",
+    "abilityType": "Active",
+    "unlockTownHall": 12,
+    "sortOrder": 170,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "0efc1dec-0f12-4563-8727-f0fabd50042a",
+    "sourceId": "healing-tome",
+    "name": "Healing Tome",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "grand-warden",
+    "abilityType": "Active",
+    "unlockTownHall": 13,
+    "sortOrder": 180,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 13,
+        "requiredFacilityLevel": 6,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "8f20cbbe-07b0-44bd-87ad-808f288787a7",
+    "sourceId": "henchmen-puppet",
+    "name": "Henchmen Puppet",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "minion-prince",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 190,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "ea74d560-f95b-4c61-8d09-a324c38e4406",
+    "sourceId": "heroic-torch",
+    "name": "Heroic Torch",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "grand-warden",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 200,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "6623f7f5-9043-4848-82bf-f7e17e7aba1f",
+    "sourceId": "hog-rider-puppet",
+    "name": "Hog Rider Puppet",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "royal-champion",
+    "abilityType": "Active",
+    "unlockTownHall": 14,
+    "sortOrder": 210,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "fb0eb774-7775-40d3-856d-d954b162f679",
+    "sourceId": "invisibility-vial",
+    "name": "Invisibility Vial",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "archer-queen",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 220,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "0381517c-2c2c-44ee-83fe-8123a6744009",
+    "sourceId": "lavaloon-puppet",
+    "name": "Lavaloon Puppet",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "grand-warden",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 230,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "1f1e18c5-6fac-4049-810c-a184b5218fce",
+    "sourceId": "life-gem",
+    "name": "Life Gem",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "grand-warden",
+    "abilityType": "Passive",
+    "unlockTownHall": 8,
+    "sortOrder": 240,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "0f8136ec-5609-4332-89f5-9b937f78e719",
+    "sourceId": "magic-mirror",
+    "name": "Magic Mirror",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "archer-queen",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 250,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "ed911d4a-ab54-4842-8b33-737e8370261a",
+    "sourceId": "metal-pants",
+    "name": "Metal Pants",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "minion-prince",
+    "abilityType": "Active",
+    "unlockTownHall": 10,
+    "sortOrder": 260,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "a65d8550-ff4d-4ce2-8fea-0e73ecb47c0e",
+    "sourceId": "meteor-staff",
+    "name": "Meteor Staff",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "minion-prince",
+    "abilityType": "Passive",
+    "unlockTownHall": 8,
+    "sortOrder": 270,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "34b4df96-c8ae-4344-81e3-0ffe04c8e107",
+    "sourceId": "noble-iron",
+    "name": "Noble Iron",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "minion-prince",
+    "abilityType": "Passive",
+    "unlockTownHall": 12,
+    "sortOrder": 280,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "11f0f989-f3bb-4e89-8b91-5273a2c996f4",
+    "sourceId": "rage-gem",
+    "name": "Rage Gem",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "grand-warden",
+    "abilityType": "Passive",
+    "unlockTownHall": 11,
+    "sortOrder": 290,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 11,
+        "requiredFacilityLevel": 4,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "64b58ce2-622b-4b07-88bd-5190aeeafe1c",
+    "sourceId": "rage-vial",
+    "name": "Rage Vial",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "barbarian-king",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 300,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "551758a4-e8b4-46e4-8b45-4dbdb544c246",
+    "sourceId": "rocket-backpack",
+    "name": "Rocket Backpack",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "dragon-duke",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 310,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "0170ee7d-d419-4135-82ec-6096937f809b",
+    "sourceId": "rocket-spear",
+    "name": "Rocket Spear",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "royal-champion",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 320,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "5d348714-6106-4295-8507-f00777dafeba",
+    "sourceId": "royal-gem",
+    "name": "Royal Gem",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "royal-champion",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 330,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "00c785e0-b10e-4d77-8294-733498d80182",
+    "sourceId": "seeking-shield",
+    "name": "Seeking Shield",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "royal-champion",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 340,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 0,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "88c262b6-9bb3-4210-8a42-79131f95b93c",
+    "sourceId": "snake-bracelet",
+    "name": "Snake Bracelet",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "barbarian-king",
+    "abilityType": "Passive",
+    "unlockTownHall": 8,
+    "sortOrder": 350,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "f28a2d5b-1056-4860-8f21-37dea9e8553f",
+    "sourceId": "spiky-ball",
+    "name": "Spiky Ball",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "barbarian-king",
+    "abilityType": "Active",
+    "unlockTownHall": 8,
+    "sortOrder": 360,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "af0ca9b0-f770-4897-84cf-f1336b1e91a6",
+    "sourceId": "stick-horse",
+    "name": "Stick Horse",
+    "aliases": [],
+    "category": "Epic",
+    "heroSourceId": "barbarian-king",
+    "abilityType": "Passive",
+    "unlockTownHall": 8,
+    "sortOrder": 370,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 10
+      },
+      {
+        "level": 10,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 8,
+        "requiredFacilityLevel": 1,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 20
+      },
+      {
+        "level": 13,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 30
+      },
+      {
+        "level": 16,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 50
+      },
+      {
+        "level": 19,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2800,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 20,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 21,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 3000,
+        "glowyOreCost": 600,
+        "starryOreCost": 100
+      },
+      {
+        "level": 22,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3100,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 23,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 24,
+        "townHall": 15,
+        "requiredFacilityLevel": 8,
+        "shinyOreCost": 3300,
+        "glowyOreCost": 600,
+        "starryOreCost": 120
+      },
+      {
+        "level": 25,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 26,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 27,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 3600,
+        "glowyOreCost": 600,
+        "starryOreCost": 150
+      }
+    ]
+  },
+  {
+    "id": "cf967917-e630-4002-84aa-1d464a1b19ad",
+    "sourceId": "stun-blaster",
+    "name": "Stun Blaster",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "dragon-duke",
+    "abilityType": "Active",
+    "unlockTownHall": 16,
+    "sortOrder": 380,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 940,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 16,
+        "requiredFacilityLevel": 9,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  },
+  {
+    "id": "587ccc3a-71db-4f25-87ec-72cd22b5fdf6",
+    "sourceId": "vampstache",
+    "name": "Vampstache",
+    "aliases": [],
+    "category": "Common",
+    "heroSourceId": "barbarian-king",
+    "abilityType": "Passive",
+    "unlockTownHall": 10,
+    "sortOrder": 390,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 0,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 2,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 240,
+        "glowyOreCost": 20,
+        "starryOreCost": 0
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 400,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 5,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 6,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 840,
+        "glowyOreCost": 100,
+        "starryOreCost": 0
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1120,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 8,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1440,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 9,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1800,
+        "glowyOreCost": 200,
+        "starryOreCost": 0
+      },
+      {
+        "level": 10,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 1900,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 11,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2000,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 12,
+        "townHall": 10,
+        "requiredFacilityLevel": 3,
+        "shinyOreCost": 2100,
+        "glowyOreCost": 400,
+        "starryOreCost": 0
+      },
+      {
+        "level": 13,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2200,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 14,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2300,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 15,
+        "townHall": 12,
+        "requiredFacilityLevel": 5,
+        "shinyOreCost": 2400,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      },
+      {
+        "level": 16,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2500,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 17,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2600,
+        "glowyOreCost": 0,
+        "starryOreCost": 0
+      },
+      {
+        "level": 18,
+        "townHall": 14,
+        "requiredFacilityLevel": 7,
+        "shinyOreCost": 2700,
+        "glowyOreCost": 600,
+        "starryOreCost": 0
+      }
+    ]
+  }
+]
