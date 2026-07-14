@@ -82,6 +82,7 @@ export type ScreenshotDetection = ScreenshotEntity & {
   detectionId: string;
   screenshotId: string;
   detectedLevel: number | null;
+  visualSuggestedLevel?: number | null;
   recognizedText: string;
   boundingBox?: BoundingBox;
   objectConfidence: number;
@@ -109,6 +110,7 @@ export type ScreenshotProposedChange = {
   name: string;
   previousLevel: number;
   proposedLevel: number | null;
+  suggestedLevel?: number | null;
   changeType: ScreenshotChangeType;
   confidence: number;
   confidenceBand: ConfidenceBand;
@@ -609,7 +611,7 @@ export function parseScreenshotDetections(params: {
       ? `${visualMatch.entityType}:${normalizeScreenshotText(visualMatch.sourceId)}`
       : "";
     const visualUseIndex = visualUseKey ? visualInstanceUseCount.get(visualUseKey) || 0 : 0;
-    const visualEntity = visualCandidates.length
+    const visualEntity = visualCandidates.length && visualUseIndex < visualCandidates.length
       ? visualCandidates[Math.min(visualUseIndex, visualCandidates.length - 1)]
       : null;
     if (visualMatch && visualEntity)
@@ -711,6 +713,8 @@ export function parseScreenshotDetections(params: {
       detectionId: `${screenshotId}:${lineIndex}:${entity.id}`,
       screenshotId,
       detectedLevel,
+      visualSuggestedLevel:
+        params.screenType === "village" ? visualMatch?.visualLevel ?? null : null,
       recognizedText: adjacentLevel ? `${line} · ${adjacentLevel.line.text}` : line,
       boundingBox: lineResult.boundingBox,
       objectConfidence,
@@ -799,6 +803,7 @@ export function mergeScreenshotDetections(
       name: best.name,
       previousLevel: best.currentLevel,
       proposedLevel,
+      suggestedLevel: proposedLevel === null ? best.visualSuggestedLevel ?? null : null,
       changeType,
       confidence,
       confidenceBand,

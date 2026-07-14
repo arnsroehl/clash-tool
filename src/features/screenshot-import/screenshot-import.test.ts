@@ -24,6 +24,7 @@ import {
   laboratoryStartGridIsVerified,
   laboratoryStartGridSourceId,
   matchObjectFingerprint,
+  selectVillageObjectMatches,
 } from "@/services/screenshotObjectRecognitionService";
 import { createLaboratoryGridCells } from "@/services/screenshotRecognitionService";
 
@@ -670,5 +671,36 @@ test("reports visual-only village buildings without inventing their levels", () 
   });
   assert.deepEqual(detections.map((item) => item.id), ["cannon:1", "cannon:2"]);
   assert.deepEqual(detections.map((item) => item.detectedLevel), [null, null]);
+  assert.deepEqual(detections.map((item) => item.visualSuggestedLevel), [20, 21]);
   assert.ok(detections.every((item) => item.validationMessages.some((message) => /nicht ohne sichtbare Levelzahl/.test(message))));
+  const changes = mergeScreenshotDetections(detections);
+  assert.deepEqual(changes.map((item) => item.suggestedLevel), [20, 21]);
+  assert.ok(changes.every((item) => item.status === "manual_required"));
+});
+
+test("does not assign more visual village matches than existing instances", () => {
+  const detections = parseScreenshotDetections({
+    text: "",
+    entities: [
+      { id: "cannon:1", name: "Kanone 1", aliases: ["cannon"], currentLevel: 18, maxLevel: 21, type: "building" },
+    ],
+    screenType: "village",
+    objectMatches: [
+      { sourceId: "cannon", entityType: "building", visualLevel: 20, confidence: 0.98, lineIndex: -1, boundingBox: { x: 0.1, y: 0.2, width: 0.1, height: 0.1 }, alternatives: [] },
+      { sourceId: "cannon", entityType: "building", visualLevel: 21, confidence: 0.97, lineIndex: -1, boundingBox: { x: 0.7, y: 0.6, width: 0.1, height: 0.1 }, alternatives: [] },
+    ],
+  });
+  assert.equal(detections.length, 1);
+  assert.equal(detections[0].id, "cannon:1");
+});
+
+test("keeps supported village proposals and suppresses overlapping detections", () => {
+  const matches = selectVillageObjectMatches([
+    { sourceId: "cannon", entityType: "building", visualLevel: 20, confidence: 0.95, lineIndex: -1, boundingBox: { x: 0.1, y: 0.1, width: 0.15, height: 0.15 }, alternatives: [] },
+    { sourceId: "cannon", entityType: "building", visualLevel: 20, confidence: 0.94, lineIndex: -1, boundingBox: { x: 0.12, y: 0.12, width: 0.15, height: 0.15 }, alternatives: [] },
+    { sourceId: "mortar", entityType: "building", visualLevel: 15, confidence: 0.93, lineIndex: -1, boundingBox: { x: 0.7, y: 0.7, width: 0.12, height: 0.12 }, alternatives: [] },
+  ]);
+  assert.equal(matches.length, 1);
+  assert.equal(matches[0].sourceId, "cannon");
+  assert.equal(matches[0].confidence, 0.95);
 });
