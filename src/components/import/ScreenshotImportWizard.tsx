@@ -295,16 +295,12 @@ export function ScreenshotImportWizard({
               processingStatus: "analyzing",
             });
           if (uploaded.duplicate) {
-            nextScreenshots.push({
-              id: uploaded.id,
-              name: file.name,
-              previewUrl,
-              qualityScore: normalized.quality.score,
+            await updateScreenshotAnalysis({
+              screenshotId: uploaded.id,
               screenType: "unknown",
               screenTypeConfidence: 0,
-              duplicate: true,
+              processingStatus: "analyzing",
             });
-            continue;
           }
           activeJobId = await createAnalysisJob({
             sessionId: session.id,
@@ -313,10 +309,15 @@ export function ScreenshotImportWizard({
             status: "running",
             payload: { language, filename: file.name },
           });
-          const recognition = await recognizeScreenshotDetailed(normalized.file, (ocr) => {
-            const fileBase = index / inputs.length;
-            setProgress(Math.round((fileBase + ocr / 100 / inputs.length) * 100));
-          }, { width: normalized.width, height: normalized.height });
+          const recognition = await recognizeScreenshotDetailed(
+            normalized.file,
+            (ocr) => {
+              const fileBase = index / inputs.length;
+              setProgress(Math.round((fileBase + ocr / 100 / inputs.length) * 100));
+            },
+            { width: normalized.width, height: normalized.height },
+            importType,
+          );
           await updateAnalysisJob({
             jobId: activeJobId,
             status: "completed",
@@ -421,7 +422,7 @@ export function ScreenshotImportWizard({
             qualityScore: normalized.quality.score,
             screenType: classification.screenType,
             screenTypeConfidence: classification.confidence,
-            duplicate: uploaded.duplicate,
+            duplicate: false,
             error: mismatch
               ? en
                 ? `This appears to be a ${classification.screenType} screenshot, not ${importType}.`

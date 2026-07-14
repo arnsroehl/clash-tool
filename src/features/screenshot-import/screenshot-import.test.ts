@@ -81,6 +81,25 @@ test("recovers a German Dragon level from stylized laboratory OCR", () => {
   assert.match(detections[0].validationMessages[0], /OCR-Ziffernfehler/);
 });
 
+test("removes a trailing OCR zero when the explicit level exceeds the known maximum", () => {
+  const detections = parseScreenshotDetections({
+    text: "Drache (Level 130)",
+    entities: [
+      {
+        id: "dragon",
+        name: "Dragon",
+        aliases: ["Drache"],
+        currentLevel: 12,
+        maxLevel: 13,
+        type: "troop",
+      },
+    ],
+    screenType: "laboratory",
+  });
+  assert.equal(detections[0].detectedLevel, 13);
+  assert.equal(detections[0].validationConfidence, 0.78);
+});
+
 test("does not invent a level when stylized OCR contains no digit", () => {
   const detections = parseScreenshotDetections({
     text: "Ballon (Eeveliin)",

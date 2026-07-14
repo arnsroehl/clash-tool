@@ -402,6 +402,16 @@ function parseOcrLevelToken(
     digits = digits.slice(1);
     value = Number(digits);
   }
+  while (
+    maxLevel !== undefined &&
+    value > maxLevel &&
+    digits.length > 1 &&
+    digits.endsWith("0") &&
+    Number(digits.slice(0, -1)) <= maxLevel
+  ) {
+    digits = digits.slice(0, -1);
+    value = Number(digits);
+  }
   if (!Number.isInteger(value) || value < 1) return null;
   return {
     level: value,

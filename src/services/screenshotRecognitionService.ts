@@ -2,6 +2,7 @@ import {
   assessImageQuality,
   type BoundingBox,
   type ImageQualityResult,
+  type ScreenshotScreenType,
 } from "@/features/screenshot-import/screenshot-import";
 
 export type NormalizedScreenshot = {
@@ -115,19 +116,23 @@ export async function recognizeScreenshotDetailed(
   file: File,
   onProgress: (percent: number) => void,
   dimensions?: { width: number; height: number },
+  focusScreenType?: ScreenshotScreenType,
 ): Promise<ScreenshotRecognitionResult> {
   const { createWorker } = await import("tesseract.js");
+  const useLaboratoryFocus = focusScreenType === "laboratory" && Boolean(dimensions);
+  let progressStart = 0;
+  let progressSpan = useLaboratoryFocus ? 70 : 100;
   const worker = await createWorker("eng+deu", 1, {
     logger: (event) => {
       if (event.status === "recognizing text" && typeof event.progress === "number")
-        onProgress(Math.round(event.progress * 100));
+        onProgress(Math.round(progressStart + event.progress * progressSpan));
     },
   });
   try {
     const result = await worker.recognize(file, {}, { text: true, blocks: true });
     const width = Math.max(1, dimensions?.width || 1);
     const height = Math.max(1, dimensions?.height || 1);
-    const lines = (result.data.blocks || []).flatMap((block) =>
+    const baseLines = (result.data.blocks || []).flatMap((block) =>
       block.paragraphs.flatMap((paragraph) =>
         paragraph.lines.map((line) => ({
           text: line.text.trim(),
@@ -141,9 +146,82 @@ export async function recognizeScreenshotDetailed(
         })),
       ),
     ).filter((line) => line.text.length > 0);
+    let focusedText = "";
+    let focusedConfidence = 0;
+    let focusedLines: ScreenshotRecognitionResult["lines"] = [];
+    if (useLaboratoryFocus) {
+      progressStart = 70;
+      progressSpan = 30;
+      const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+      const cropTop = Math.round(bitmap.height * 0.08);
+      const cropHeight = Math.max(1, Math.round(bitmap.height * 0.34));
+      const scale = 1.5;
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(cropHeight * scale);
+      const context = canvas.getContext("2d");
+      if (context) {
+        context.filter = "grayscale(1) contrast(1.8)";
+        context.drawImage(
+          bitmap,
+          0,
+          cropTop,
+          bitmap.width,
+          cropHeight,
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        );
+        const focusedBlob = await new Promise<Blob>((resolve, reject) =>
+          canvas.toBlob(
+            (blob) =>
+              blob
+                ? resolve(blob)
+                : reject(new Error("Laborbereich konnte nicht vorbereitet werden.")),
+            "image/png",
+          ),
+        );
+        const focusedResult = await worker.recognize(
+          focusedBlob,
+          {},
+          { text: true, blocks: true },
+        );
+        focusedText = focusedResult.data.text;
+        focusedConfidence = Math.min(
+          1,
+          Math.max(0, focusedResult.data.confidence / 100),
+        );
+        focusedLines = (focusedResult.data.blocks || []).flatMap((block) =>
+          block.paragraphs.flatMap((paragraph) =>
+            paragraph.lines.map((line) => ({
+              text: line.text.trim(),
+              confidence: Math.min(1, Math.max(0, line.confidence / 100)),
+              boundingBox: {
+                x: line.bbox.x0 / scale / width,
+                y: (cropTop + line.bbox.y0 / scale) / height,
+                width: (line.bbox.x1 - line.bbox.x0) / scale / width,
+                height: (line.bbox.y1 - line.bbox.y0) / scale / height,
+              },
+            })),
+          ),
+        ).filter((line) => line.text.length > 0);
+      }
+      bitmap.close();
+    }
+    const lineKeys = new Set<string>();
+    const lines = [...focusedLines, ...baseLines].filter((line) => {
+      const key = `${line.text.toLocaleLowerCase("de-DE").replace(/\s/g, "")}:${Math.round(line.boundingBox.y * 100)}`;
+      if (lineKeys.has(key)) return false;
+      lineKeys.add(key);
+      return true;
+    });
     return {
-      text: result.data.text,
-      confidence: Math.min(1, Math.max(0, result.data.confidence / 100)),
+      text: [result.data.text, focusedText].filter(Boolean).join("\n"),
+      confidence: Math.max(
+        Math.min(1, Math.max(0, result.data.confidence / 100)),
+        focusedConfidence,
+      ),
       lines,
     };
   } finally {
