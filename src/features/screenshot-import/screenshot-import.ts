@@ -187,6 +187,85 @@ export const normalizeScreenshotText = (value: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
 
+const GERMAN_SCREENSHOT_ALIASES: Record<string, string[]> = {
+  "apprentice-warden": ["Lehrlingswächter"],
+  archer: ["Bogenschützin"],
+  "baby-dragon": ["Babydrache", "Baby-Drache"],
+  balloon: ["Ballon"],
+  dragon: ["Drache"],
+  "dragon-rider": ["Drachenreiter"],
+  "electro-dragon": ["Elektrodrache", "Elektro-Drache"],
+  "electro-titan": ["Elektrotitan", "Elektro-Titan"],
+  giant: ["Riese"],
+  healer: ["Heilerin"],
+  "hog-rider": ["Schweinereiter"],
+  "ice-golem": ["Eisgolem"],
+  "lava-hound": ["Lavahund", "Lava-Hund"],
+  minion: ["Lakai"],
+  "root-rider": ["Wurzelreiter", "Wurzelreiterin"],
+  valkyrie: ["Walküre"],
+  "wall-breaker": ["Mauerbrecher"],
+  witch: ["Hexe"],
+  wizard: ["Magier"],
+  "bat-spell": ["Fledermauszauber"],
+  "clone-spell": ["Klonzauber"],
+  "earthquake-spell": ["Erdbebenzauber"],
+  "freeze-spell": ["Frostzauber"],
+  "haste-spell": ["Eilezauber"],
+  "healing-spell": ["Heilzauber"],
+  "invisibility-spell": ["Unsichtbarkeitszauber"],
+  "jump-spell": ["Sprungzauber"],
+  "lightning-spell": ["Blitzzauber"],
+  "overgrowth-spell": ["Überwucherungszauber"],
+  "poison-spell": ["Giftzauber"],
+  "rage-spell": ["Wutzauber"],
+  "recall-spell": ["Rückrufzauber"],
+  "skeleton-spell": ["Skelettzauber"],
+  "battle-blimp": ["Kampfzeppelin"],
+  "battle-drill": ["Kampfbohrer"],
+  "flame-flinger": ["Flammenwerfer"],
+  "log-launcher": ["Holzwerfer"],
+  "siege-barracks": ["Belagerungskaserne"],
+  "stone-slammer": ["Steinschleuder"],
+  "wall-wrecker": ["Mauerbrecher"],
+};
+
+const CURRENT_SCREENSHOT_MAX_LEVELS: Record<string, number> = {
+  barbarian: 13,
+  goblin: 10,
+  valkyrie: 12,
+  golem: 15,
+  dragon: 13,
+  balloon: 13,
+  yeti: 8,
+  headhunter: 4,
+  "root-rider": 4,
+  druid: 6,
+  "battle-drill": 6,
+  "siege-barracks": 6,
+  "log-launcher": 6,
+  "battle-blimp": 6,
+  "rage-spell": 7,
+  "freeze-spell": 8,
+  "clone-spell": 9,
+  "recall-spell": 7,
+  "overgrowth-spell": 5,
+  "ice-block-spell": 6,
+};
+
+export function getScreenshotAliases(sourceId?: string | null): string[] {
+  return sourceId ? GERMAN_SCREENSHOT_ALIASES[sourceId] || [] : [];
+}
+
+export function getCurrentScreenshotMaxLevel(
+  sourceId: string | null | undefined,
+  fallback: number,
+): number {
+  return sourceId
+    ? Math.max(fallback, CURRENT_SCREENSHOT_MAX_LEVELS[sourceId] || 0)
+    : fallback;
+}
+
 export function getConfidenceBand(confidence: number): ConfidenceBand {
   if (confidence >= 0.95) return "very_high";
   if (confidence >= 0.8) return "high";
@@ -238,6 +317,10 @@ const SCREEN_HINTS: Record<Exclude<ScreenshotScreenType, "unknown">, string[]> =
     "troops",
     "zauber",
     "spells",
+    "verbesserung läuft",
+    "gesamtdauer",
+    "direkt verbessern",
+    "max. level",
   ],
   heroes: ["helden", "heroes", "barbarenkonig", "barbarian king", "archer queen"],
   pets: ["haustiere", "pets", "pet house", "tierhaus"],
@@ -294,27 +377,67 @@ function bestEntityForLine(line: string, entities: ScreenshotEntity[]) {
   return { best: candidates[0], candidates };
 }
 
-function extractLevel(line: string): number | null {
-  const explicit = line.match(/(?:level|lvl|stufe)\s*[:=]?\s*(\d{1,3})/i);
-  if (explicit) return Number(explicit[1]);
+type ExtractedLevel = { level: number; normalizedOcr: boolean };
+
+function parseOcrLevelToken(
+  token: string,
+  maxLevel?: number,
+): ExtractedLevel | null {
+  const hasDigit = /\d/.test(token);
+  const normalized = token
+    .replace(/[oO]/g, "0")
+    .replace(/[iIl|jJ]/g, "1")
+    .replace(/[^0-9]/g, "");
+  if (!normalized || (!hasDigit && !/^\d+$/.test(token))) return null;
+  const usedCharacterNormalization = normalized !== token;
+  let digits = normalized;
+  let value = Number(digits);
+  while (
+    usedCharacterNormalization &&
+    maxLevel !== undefined &&
+    value > maxLevel &&
+    digits.length > 1 &&
+    digits.startsWith("1")
+  ) {
+    digits = digits.slice(1);
+    value = Number(digits);
+  }
+  if (!Number.isInteger(value) || value < 1) return null;
+  return {
+    level: value,
+    normalizedOcr: usedCharacterNormalization || digits !== normalized,
+  };
+}
+
+function extractLevel(line: string, maxLevel?: number): ExtractedLevel | null {
+  const explicit = line.match(
+    /(?:level|lvl|stufe)\s*[^a-z0-9]{0,3}([a-z0-9|]{1,6})/i,
+  );
+  if (explicit) {
+    const parsed = parseOcrLevelToken(explicit[1], maxLevel);
+    if (parsed) return parsed;
+  }
   const assignment = line.match(/(?:=|→|->)\s*(\d{1,3})(?:\D|$)/);
-  if (assignment) return Number(assignment[1]);
+  if (assignment) return { level: Number(assignment[1]), normalizedOcr: false };
   const numbers = line.match(/\d{1,3}/g)?.map(Number) || [];
-  return numbers.length ? numbers[numbers.length - 1] : null;
+  return numbers.length
+    ? { level: numbers[numbers.length - 1], normalizedOcr: false }
+    : null;
 }
 
 function findAdjacentLevel(
   lines: Array<{ text: string; confidence: number; boundingBox?: BoundingBox }>,
   sourceIndex: number,
-): { level: number; line: (typeof lines)[number] } | null {
+  maxLevel?: number,
+): { level: number; line: (typeof lines)[number]; normalizedOcr: boolean } | null {
   const source = lines[sourceIndex];
   const candidates = lines.flatMap((line, index) => {
     if (index === sourceIndex) return [];
-    const match = line.text.match(/(?:level|lvl|stufe)\s*[:=]?\s*(\d{1,3})/i);
+    const match = extractLevel(line.text, maxLevel);
     if (!match) return [];
     if (!source.boundingBox || !line.boundingBox) {
       return Math.abs(index - sourceIndex) === 1
-        ? [{ line, level: Number(match[1]), distance: Math.abs(index - sourceIndex) }]
+        ? [{ line, level: match.level, normalizedOcr: match.normalizedOcr, distance: Math.abs(index - sourceIndex) }]
         : [];
     }
     const sourceCenterX = source.boundingBox.x + source.boundingBox.width / 2;
@@ -327,11 +450,17 @@ function findAdjacentLevel(
       xDistance <= Math.max(0.22, source.boundingBox.width * 1.5) &&
       yDistance <= Math.max(0.16, source.boundingBox.height * 5);
     return sameCard
-      ? [{ line, level: Number(match[1]), distance: xDistance + yDistance }]
+      ? [{ line, level: match.level, normalizedOcr: match.normalizedOcr, distance: xDistance + yDistance }]
       : [];
   });
   candidates.sort((left, right) => left.distance - right.distance);
-  return candidates[0] ? { level: candidates[0].level, line: candidates[0].line } : null;
+  return candidates[0]
+    ? {
+        level: candidates[0].level,
+        line: candidates[0].line,
+        normalizedOcr: candidates[0].normalizedOcr,
+      }
+    : null;
 }
 
 export function calculateDetectionConfidence(parts: {
@@ -414,12 +543,16 @@ export function parseScreenshotDetections(params: {
       : visualCandidates.map((entity) => ({ entity, matchedName: visualMatch?.sourceId }));
     if (!best) return;
     const entity = best.entity;
-    const directLevel = extractLevel(line);
-    const adjacentLevel = directLevel === null ? findAdjacentLevel(lines, lineIndex) : null;
-    const detectedLevel = directLevel ?? adjacentLevel?.level ?? null;
+    const maxLevel = entity.maxLevelForTownHall ?? entity.maxLevel;
+    const directLevel = extractLevel(line, maxLevel);
+    const adjacentLevel = directLevel === null ? findAdjacentLevel(lines, lineIndex, maxLevel) : null;
+    const detectedLevel = directLevel?.level ?? adjacentLevel?.level ?? null;
     const validationMessages: string[] = [];
     let validationConfidence = 1;
-    const maxLevel = entity.maxLevelForTownHall ?? entity.maxLevel;
+    if (directLevel?.normalizedOcr || adjacentLevel?.normalizedOcr) {
+      validationMessages.push("Typische OCR-Ziffernfehler im Level wurden normalisiert.");
+      validationConfidence = 0.78;
+    }
     if (detectedLevel === null) {
       validationMessages.push("Kein Level in der erkannten Zeile gefunden.");
       validationConfidence = 0.25;

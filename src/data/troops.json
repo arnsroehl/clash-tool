@@ -814,6 +814,15 @@
         "elixirCost": 18500000,
         "darkElixirCost": 0,
         "hitpoints": 5700
+      },
+      {
+        "level": 13,
+        "townHall": 18,
+        "upgradeTimeHours": 360,
+        "goldCost": 0,
+        "elixirCost": 28500000,
+        "darkElixirCost": 0,
+        "hitpoints": 6000
       }
     ]
   },
