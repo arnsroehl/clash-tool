@@ -1,4 +1,4 @@
-import type { ScreenshotScreenType } from "@/features/screenshot-import/screenshot-import";
+import type { ScreenshotImportType } from "@/features/screenshot-import/screenshot-import";
 
 export type ScreenshotImportPublicEnvironment = {
   enabled?: string;
@@ -47,7 +47,7 @@ export const SCREENSHOT_IMPORT_CONFIG = resolveScreenshotImportConfig({
 });
 
 export function isScreenshotImportTypeEnabled(
-  type: Exclude<ScreenshotScreenType, "unknown">,
+  type: ScreenshotImportType,
   config: ScreenshotImportConfig = SCREENSHOT_IMPORT_CONFIG,
 ): boolean {
   if (!config.enabled) return false;

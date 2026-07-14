@@ -7,7 +7,7 @@ create table if not exists public.screenshot_import_sessions (
   account_id uuid not null references public.accounts(id) on delete cascade,
   selected_import_type text not null check (selected_import_type in (
     'laboratory', 'heroes', 'pets', 'equipment', 'builders', 'buildings',
-    'walls', 'village', 'resources', 'profile'
+    'walls', 'village', 'resources', 'profile', 'full'
   )),
   status text not null default 'draft' check (status in (
     'draft', 'uploaded', 'preprocessing', 'analyzing', 'validating',

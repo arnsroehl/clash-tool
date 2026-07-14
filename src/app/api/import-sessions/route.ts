@@ -4,11 +4,12 @@ import {
   isScreenshotImportTypeEnabled,
   isSupportedGameUiVersion,
 } from "@/config/screenshotImport";
-import type { ScreenshotScreenType } from "@/features/screenshot-import/screenshot-import";
+import type { ScreenshotImportType } from "@/features/screenshot-import/screenshot-import";
 
 const IMPORT_TYPES = new Set([
   "laboratory", "heroes", "pets", "equipment", "builders",
   "buildings", "walls", "village", "resources", "profile",
+  "full",
 ]);
 
 export async function GET(request: NextRequest) {
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
   const language = body?.language === "en" ? "en" : "de";
   if (!accountId || !IMPORT_TYPES.has(importType))
     return NextResponse.json({ error: "Account oder Importbereich ist ungültig." }, { status: 400 });
-  const typedImport = importType as Exclude<ScreenshotScreenType, "unknown">;
+  const typedImport = importType as ScreenshotImportType;
   if (!isScreenshotImportTypeEnabled(typedImport))
     return NextResponse.json({ error: "Dieser Importbereich ist aktuell deaktiviert." }, { status: 503 });
   const gameVersion = typeof body?.gameVersion === "string" ? body.gameVersion : null;

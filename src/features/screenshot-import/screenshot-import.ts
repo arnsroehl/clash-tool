@@ -61,6 +61,56 @@ export type ScreenshotScreenType =
   | "profile"
   | "unknown";
 
+export type ScreenshotImportType =
+  | Exclude<ScreenshotScreenType, "unknown">
+  | "full";
+
+export type ScreenshotAnalysisTypeResolution = {
+  screenType: ScreenshotScreenType;
+  analysisType: Exclude<ScreenshotImportType, "full"> | null;
+  requiresManualSelection: boolean;
+  mismatch: boolean;
+};
+
+export function resolveScreenshotAnalysisType(params: {
+  selectedImportType: ScreenshotImportType;
+  classifiedScreenType: ScreenshotScreenType;
+  classificationConfidence: number;
+  manuallySelectedType?: Exclude<ScreenshotImportType, "full">;
+  compatibleClassification?: boolean;
+}): ScreenshotAnalysisTypeResolution {
+  const {
+    selectedImportType,
+    classifiedScreenType,
+    classificationConfidence,
+    manuallySelectedType,
+    compatibleClassification = false,
+  } = params;
+  const screenType: ScreenshotScreenType = manuallySelectedType
+    || (selectedImportType === "full"
+      ? classificationConfidence >= 0.5
+        ? classifiedScreenType
+        : "unknown"
+      : classifiedScreenType === "unknown" || compatibleClassification
+        ? selectedImportType
+        : classifiedScreenType);
+  const requiresManualSelection = selectedImportType === "full" && screenType === "unknown";
+  const mismatch =
+    selectedImportType !== "full" &&
+    classifiedScreenType !== "unknown" &&
+    classifiedScreenType !== selectedImportType &&
+    !compatibleClassification &&
+    classificationConfidence >= 0.72;
+  return {
+    screenType,
+    analysisType: screenType === "unknown"
+      ? null
+      : screenType as Exclude<ScreenshotImportType, "full">,
+    requiresManualSelection,
+    mismatch,
+  };
+}
+
 export type ConfidenceBand =
   | "very_high"
   | "high"

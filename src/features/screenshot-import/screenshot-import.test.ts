@@ -21,6 +21,7 @@ import {
   getMagicItemScreenshotAliases,
   parseUpgradeSlots,
   parseWallDistributions,
+  resolveScreenshotAnalysisType,
   summarizeScreenshotReview,
   shouldStoreScreenshotFeedback,
   validateProfileScreenshot,
@@ -950,6 +951,52 @@ test("resolves screenshot rollout flags and rejects unknown UI versions", () => 
   assert.equal(isSupportedGameUiVersion("coc-ui-test", config), true);
   assert.equal(isSupportedGameUiVersion("coc-ui-new", config), false);
   assert.equal(isSupportedGameUiVersion(null, config), false);
+});
+
+test("routes every classified view inside a complete-account import", () => {
+  const laboratory = resolveScreenshotAnalysisType({
+    selectedImportType: "full",
+    classifiedScreenType: "laboratory",
+    classificationConfidence: 0.97,
+  });
+  assert.equal(laboratory.analysisType, "laboratory");
+  assert.equal(laboratory.requiresManualSelection, false);
+  assert.equal(laboratory.mismatch, false);
+
+  const uncertain = resolveScreenshotAnalysisType({
+    selectedImportType: "full",
+    classifiedScreenType: "resources",
+    classificationConfidence: 0.42,
+  });
+  assert.equal(uncertain.analysisType, null);
+  assert.equal(uncertain.requiresManualSelection, true);
+
+  const corrected = resolveScreenshotAnalysisType({
+    selectedImportType: "full",
+    classifiedScreenType: "unknown",
+    classificationConfidence: 0,
+    manuallySelectedType: "equipment",
+  });
+  assert.equal(corrected.analysisType, "equipment");
+  assert.equal(corrected.requiresManualSelection, false);
+});
+
+test("keeps wrong views blocked for targeted imports", () => {
+  const mismatch = resolveScreenshotAnalysisType({
+    selectedImportType: "heroes",
+    classifiedScreenType: "laboratory",
+    classificationConfidence: 0.91,
+  });
+  assert.equal(mismatch.screenType, "laboratory");
+  assert.equal(mismatch.mismatch, true);
+
+  const selectedFallback = resolveScreenshotAnalysisType({
+    selectedImportType: "builders",
+    classifiedScreenType: "unknown",
+    classificationConfidence: 0.2,
+  });
+  assert.equal(selectedFallback.analysisType, "builders");
+  assert.equal(selectedFallback.mismatch, false);
 });
 
 test("global screenshot flag overrides individual import flags", () => {

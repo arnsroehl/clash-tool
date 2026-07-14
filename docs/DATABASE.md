@@ -47,6 +47,7 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/screenshot-import.sql` | Screenshot sessions, files, detections, proposed changes, events and feedback |
 | `src/scripts/sql/screenshot-progress-catalog.sql` | Screenshot catalog, account progress, wall distributions, upgrade slots, resource snapshots and analysis jobs |
 | `src/scripts/sql/screenshot-resource-capacities.sql` | Adds separately persisted resource storage capacities to existing screenshot snapshots |
+| `src/scripts/sql/screenshot-full-account-import.sql` | Allows one guided screenshot session to combine all supported account areas |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 

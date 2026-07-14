@@ -8,6 +8,7 @@ import {
   type ScreenshotProfileDetection,
   type ScreenshotResourceDetection,
   type ScreenshotMagicItemDetection,
+  type ScreenshotImportType,
   type ScreenshotScreenType,
   type UpgradeSlotDetection,
   type WallLevelDistribution,
@@ -34,7 +35,7 @@ export type ScreenshotAnalysisJobType =
 export type ScreenshotImportSession = {
   id: string;
   accountId: string;
-  selectedImportType: Exclude<ScreenshotScreenType, "unknown">;
+  selectedImportType: ScreenshotImportType;
   status: string;
   retainOriginals: boolean;
   gameVersion: string | null;
@@ -57,11 +58,12 @@ export type ResumableScreenshotImport = {
   resources: ScreenshotResourceDetection[];
   magicItems: ScreenshotMagicItemDetection[];
   profile: ScreenshotProfileDetection | null;
+  screenTypes: ScreenshotScreenType[];
 };
 
 export type ScreenshotImportHistoryEntry = {
   id: string;
-  selectedImportType: Exclude<ScreenshotScreenType, "unknown">;
+  selectedImportType: ScreenshotImportType;
   createdAt: string;
   confirmedAt: string | null;
   gameVersion: string | null;
@@ -137,7 +139,7 @@ export async function fetchLatestOpenScreenshotImport(
         .in("status", ["pending", "later"]),
       client
         .from("screenshot_import_files")
-        .select("id, storage_path, original_filename, processing_status")
+        .select("id, storage_path, original_filename, processing_status, screen_type")
         .eq("import_session_id", row.id)
         .is("deleted_at", null)
         .order("created_at"),
@@ -222,7 +224,10 @@ export async function fetchLatestOpenScreenshotImport(
     changes,
     fileCount: fileRows?.length || 0,
     pendingFiles: (fileRows || [])
-      .filter((file) => ["uploaded", "analyzing", "failed"].includes(String(file.processing_status)))
+      .filter((file) =>
+        ["uploaded", "analyzing", "failed"].includes(String(file.processing_status)) ||
+        (String(file.processing_status) === "review_required" && String(file.screen_type) === "unknown"),
+      )
       .map((file) => ({
         id: String(file.id),
         storagePath: String(file.storage_path),
@@ -234,6 +239,11 @@ export async function fetchLatestOpenScreenshotImport(
     resources: [...resourceMap.values()],
     magicItems: [...magicItemMap.values()],
     profile,
+    screenTypes: [...new Set(
+      (fileRows || [])
+        .map((file) => String(file.screen_type) as ScreenshotScreenType)
+        .filter((type) => type !== "unknown"),
+    )],
   };
 }
 
@@ -253,7 +263,7 @@ export async function downloadScreenshotFile(
 
 export async function createScreenshotImportSession(params: {
   accountId: string;
-  importType: Exclude<ScreenshotScreenType, "unknown">;
+  importType: ScreenshotImportType;
   language: "de" | "en";
   retainOriginals: boolean;
   gameVersion?: string;

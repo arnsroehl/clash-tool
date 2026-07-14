@@ -6,7 +6,7 @@ import {
   isSupportedGameUiVersion,
   SCREENSHOT_IMPORT_CONFIG,
 } from "@/config/screenshotImport";
-import type { ScreenshotScreenType } from "@/features/screenshot-import/screenshot-import";
+import type { ScreenshotImportType } from "@/features/screenshot-import/screenshot-import";
 
 type Context = { params: Promise<{ id: string }> };
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest, context: Context) {
     .single();
   if (sessionError || !session)
     return NextResponse.json({ error: "Importsitzung nicht gefunden." }, { status: 404 });
-  const importType = session.selected_import_type as Exclude<ScreenshotScreenType, "unknown">;
+  const importType = session.selected_import_type as ScreenshotImportType;
   if (!isScreenshotImportTypeEnabled(importType))
     return NextResponse.json({ error: "Dieser Importbereich ist aktuell deaktiviert." }, { status: 503 });
   if (!isSupportedGameUiVersion(session.game_version))

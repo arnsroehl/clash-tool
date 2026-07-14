@@ -117,6 +117,16 @@ quantity with the saved inventory and blocks conflicting screenshots until the
 user corrects them. Existing databases can add the capacity columns with
 `src/scripts/sql/screenshot-resource-capacities.sql`.
 
+The `Complete account` option combines all supported guided views in one
+private import session. Screenshots can be added in any order; each image is
+classified and routed to the matching laboratory, hero, pet, equipment,
+builder, building, wall, resource or profile parser. Low-confidence views are
+never guessed: the review asks the user to assign the correct view manually.
+Confirmation remains disabled until every Town-Hall-relevant view is present,
+while the whole session can be saved and resumed later. Existing databases can
+enable this session type with
+`src/scripts/sql/screenshot-full-account-import.sql`.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP

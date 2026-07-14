@@ -17,6 +17,7 @@ import {
   parseScreenshotMagicItems,
   parseScreenshotResources,
   parseProfileScreenshot,
+  resolveScreenshotAnalysisType,
   summarizeScreenshotReview,
   shouldStoreScreenshotFeedback,
   validateProfileScreenshot,
@@ -29,6 +30,7 @@ import {
   type ScreenshotResourceDetection,
   type ScreenshotMagicItemDefinition,
   type ScreenshotMagicItemDetection,
+  type ScreenshotImportType,
   type ScreenshotProfileDetection,
   type UpgradeSlotDetection,
   type WallLevelDistribution,
@@ -70,7 +72,8 @@ import {
   SCREENSHOT_IMPORT_CONFIG,
 } from "@/config/screenshotImport";
 
-type ImportType = Exclude<ScreenshotScreenType, "unknown">;
+type ImportType = ScreenshotImportType;
+type ConcreteImportType = Exclude<ScreenshotImportType, "full">;
 type CompletionState = "confirmed" | "partially_confirmed" | "saved_for_later" | "discarded";
 
 type Props = {
@@ -100,6 +103,10 @@ type ProcessedScreenshot = {
   screenTypeConfidence: number;
   duplicate: boolean;
   error?: string;
+  manualSelection?: {
+    file: File;
+    storagePath: string;
+  };
 };
 
 const IMPORT_TYPES: Array<{
@@ -109,6 +116,7 @@ const IMPORT_TYPES: Array<{
   hintDe: string;
   hintEn: string;
 }> = [
+  { id: "full", de: "Vollständiger Account", en: "Complete account", hintDe: "Alle unterstützten Bereiche in einer Importsitzung", hintEn: "All supported areas in one import session" },
   { id: "laboratory", de: "Labor", en: "Laboratory", hintDe: "Truppen, Zauber und Belagerungsmaschinen", hintEn: "Troops, spells and siege machines" },
   { id: "heroes", de: "Helden", en: "Heroes", hintDe: "Heldenlevel und laufende Upgrades", hintEn: "Hero levels and active upgrades" },
   { id: "pets", de: "Pets", en: "Pets", hintDe: "Pet-Level und Freischaltungen", hintEn: "Pet levels and unlocks" },
@@ -119,6 +127,18 @@ const IMPORT_TYPES: Array<{
   { id: "village", de: "Dorfansicht", en: "Village", hintDe: "Experimentelle freie Dorfansicht", hintEn: "Experimental free village view" },
   { id: "resources", de: "Ressourcen", en: "Resources", hintDe: "Ressourcen, Lagerstände und magische Gegenstände", hintEn: "Resources, storage levels and Magic Items" },
   { id: "profile", de: "Profil", en: "Profile", hintDe: "Spieler-Tag, Rathaus und Erfahrungslevel", hintEn: "Player tag, Town Hall and experience level" },
+];
+
+const FULL_IMPORT_STEPS: ConcreteImportType[] = [
+  "profile",
+  "laboratory",
+  "heroes",
+  "pets",
+  "equipment",
+  "builders",
+  "buildings",
+  "walls",
+  "resources",
 ];
 
 const BUILDING_SECTIONS: Array<{
@@ -170,6 +190,7 @@ export function ScreenshotImportWizard({
   const [pendingResumeFiles, setPendingResumeFiles] = useState<ResumableScreenshotFile[]>([]);
   const [restoredChanges, setRestoredChanges] = useState<ScreenshotProposedChange[]>([]);
   const [screenshots, setScreenshots] = useState<ProcessedScreenshot[]>([]);
+  const [restoredScreenTypes, setRestoredScreenTypes] = useState<ScreenshotScreenType[]>([]);
   const [detections, setDetections] = useState<ScreenshotDetection[]>([]);
   const [wallDistributions, setWallDistributions] = useState<WallLevelDistribution[]>([]);
   const [upgradeSlots, setUpgradeSlots] = useState<UpgradeSlotDetection[]>([]);
@@ -293,6 +314,7 @@ export function ScreenshotImportWizard({
   );
   const coverage = useMemo(() => {
     const typesByImport: Partial<Record<ImportType, ScreenshotEntity["type"][]>> = {
+      full: ["building", "hero", "troop", "spell", "siege_machine", "pet", "equipment", "wall"],
       laboratory: ["troop", "spell", "siege_machine"],
       heroes: ["hero"],
       pets: ["pet"],
@@ -310,6 +332,51 @@ export function ScreenshotImportWizard({
       missing: expected.filter((entity) => !detected.has(entity.id)),
     };
   }, [buildingSection, detections, entities, importType]);
+  const fullImportCoverage = useMemo(() => {
+    const recognized = new Set([
+      ...restoredScreenTypes,
+      ...screenshots
+        .filter((screenshot) => !screenshot.error && screenshot.screenType !== "unknown")
+        .map((screenshot) => screenshot.screenType),
+    ]);
+    const hasUnlocked = (types: ScreenshotEntity["type"][]) => entities.some(
+      (entity) =>
+        types.includes(entity.type) &&
+        (entity.unlockTownHallLevel === undefined || entity.unlockTownHallLevel <= townHallLevel),
+    );
+    const hasRecognizedData = (type: ConcreteImportType) => {
+      if (type === "laboratory")
+        return changes.some((change) => ["troop", "spell", "siege_machine"].includes(change.entityType));
+      if (type === "heroes") return changes.some((change) => change.entityType === "hero");
+      if (type === "pets") return changes.some((change) => change.entityType === "pet");
+      if (type === "equipment") return changes.some((change) => change.entityType === "equipment");
+      if (type === "buildings") return changes.some((change) => change.entityType === "building");
+      if (type === "walls") return wallDistributions.length > 0;
+      if (type === "builders") return upgradeSlots.length > 0;
+      if (type === "resources") return resourceDetections.length > 0 || magicItemDetections.length > 0;
+      if (type === "profile") return Boolean(profileDetection && profileDetection.confidence >= 0.5);
+      return true;
+    };
+    return FULL_IMPORT_STEPS.filter((type) => {
+      if (type === "laboratory") return hasUnlocked(["troop", "spell", "siege_machine"]);
+      if (type === "heroes") return hasUnlocked(["hero"]);
+      if (type === "pets") return hasUnlocked(["pet"]);
+      if (type === "equipment") return hasUnlocked(["equipment"]);
+      if (type === "buildings") return hasUnlocked(["building"]);
+      if (type === "walls") return expectedWallCount > 0;
+      return true;
+    }).map((type) => ({
+      type,
+      complete: recognized.has(type) && hasRecognizedData(type),
+      label: IMPORT_TYPES.find((item) => item.id === type),
+    }));
+  }, [changes, entities, expectedWallCount, magicItemDetections.length, profileDetection, resourceDetections.length, restoredScreenTypes, screenshots, townHallLevel, upgradeSlots.length, wallDistributions.length]);
+  const hasUnclassifiedFullScreenshots = importType === "full" && screenshots.some(
+    (screenshot) => Boolean(screenshot.manualSelection),
+  );
+  const hasIncompleteFullImport = importType === "full" && fullImportCoverage.some(
+    (item) => !item.complete,
+  );
   const selectedType = IMPORT_TYPES.find((item) => item.id === importType) || IMPORT_TYPES[0];
   const selectedTypeEnabled = isScreenshotImportTypeEnabled(importType);
 
@@ -326,6 +393,7 @@ export function ScreenshotImportWizard({
         gameVersion: SCREENSHOT_IMPORT_CONFIG.supportedGameUiVersion,
       });
       setSession(created);
+      setRestoredScreenTypes([]);
       if (importType === "walls" && existingWallLevels.length) {
         setWallDistributions(existingWallLevels.map((wall) => ({
           id: `wall:${wall.level}`,
@@ -368,6 +436,7 @@ export function ScreenshotImportWizard({
       name: entities.find((entity) => entity.id === change.entityId)?.name || change.name,
     }));
     setSession(resumeCandidate.session);
+    setRestoredScreenTypes(resumeCandidate.screenTypes);
     setImportType(resumeCandidate.session.selectedImportType);
     setRetainOriginals(resumeCandidate.session.retainOriginals);
     setRestoredChanges(namedChanges);
@@ -391,7 +460,11 @@ export function ScreenshotImportWizard({
   };
 
   const processFiles = async (
-    inputs: Array<{ file: File; existing?: ResumableScreenshotFile }>,
+    inputs: Array<{
+      file: File;
+      existing?: ResumableScreenshotFile;
+      forcedType?: ConcreteImportType;
+    }>,
   ) => {
     if (!session || !inputs.length) return;
     if (!isScreenshotImportTypeEnabled(session.selectedImportType)) {
@@ -421,7 +494,7 @@ export function ScreenshotImportWizard({
     const nextScreenshots: ProcessedScreenshot[] = [];
     try {
       for (let index = 0; index < inputs.length; index += 1) {
-        const { file, existing } = inputs[index];
+        const { file, existing, forcedType } = inputs[index];
         let activeJobId: string | null = null;
         setProgress(Math.round((index / inputs.length) * 100));
         try {
@@ -479,15 +552,34 @@ export function ScreenshotImportWizard({
               layoutVersion: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
             },
           });
-          const recognition = await recognizeScreenshotDetailed(
+          const initialFocusType = forcedType || (importType === "full" ? undefined : importType);
+          let recognition = await recognizeScreenshotDetailed(
             normalized.file,
             (ocr) => {
               const fileBase = index / inputs.length;
               setProgress(Math.round((fileBase + ocr / 100 / inputs.length) * 100));
             },
             { width: normalized.width, height: normalized.height },
-            importType,
+            initialFocusType,
           );
+          let classification = classifyScreenshotText(recognition.text);
+          if (
+            importType === "full" &&
+            !forcedType &&
+            classification.screenType === "laboratory" &&
+            classification.confidence >= 0.5
+          ) {
+            recognition = await recognizeScreenshotDetailed(
+              normalized.file,
+              (ocr) => {
+                const fileBase = index / inputs.length;
+                setProgress(Math.round((fileBase + ocr / 100 / inputs.length) * 100));
+              },
+              { width: normalized.width, height: normalized.height },
+              "laboratory",
+            );
+            classification = classifyScreenshotText(recognition.text);
+          }
           await updateAnalysisJob({
             jobId: activeJobId,
             status: "completed",
@@ -510,26 +602,55 @@ export function ScreenshotImportWizard({
             jobType: "classify_screen",
             status: "running",
           });
-          const classification = classifyScreenshotText(recognition.text);
           const compatibleBuildingClassification =
             importType === "buildings" &&
             (classification.screenType === "buildings" ||
               (buildingSection === "resources" && classification.screenType === "resources"));
-          const effectiveScreenType =
-            classification.screenType === "unknown" || compatibleBuildingClassification
-              ? importType
-              : classification.screenType;
+          const typeResolution = resolveScreenshotAnalysisType({
+            selectedImportType: importType,
+            classifiedScreenType: classification.screenType,
+            classificationConfidence: classification.confidence,
+            manuallySelectedType: forcedType,
+            compatibleClassification: compatibleBuildingClassification,
+          });
+          const effectiveScreenType = typeResolution.screenType;
           await updateAnalysisJob({
             jobId: activeJobId,
             status: "completed",
             progress: 100,
-            result: classification,
+            result: { ...classification, manuallySelectedType: forcedType || null },
           });
           await updateScreenshotAnalysis({
             screenshotId: uploaded.id,
-            screenType: classification.screenType,
-            screenTypeConfidence: classification.confidence,
+            screenType: effectiveScreenType,
+            screenTypeConfidence: forcedType ? 1 : classification.confidence,
           });
+          if (typeResolution.requiresManualSelection) {
+            await updateScreenshotAnalysis({
+              screenshotId: uploaded.id,
+              screenType: "unknown",
+              screenTypeConfidence: classification.confidence,
+              processingStatus: "review_required",
+            });
+            activeJobId = null;
+            nextScreenshots.push({
+              id: uploaded.id,
+              name: file.name,
+              previewUrl,
+              qualityScore: normalized.quality.score,
+              screenType: "unknown",
+              screenTypeConfidence: classification.confidence,
+              duplicate: uploaded.duplicate,
+              error: en
+                ? "The view could not be classified safely. Select the matching area."
+                : "Die Ansicht konnte nicht sicher klassifiziert werden. Wähle den passenden Bereich.",
+              manualSelection: {
+                file: normalized.file,
+                storagePath: uploaded.storagePath,
+              },
+            });
+            continue;
+          }
           activeJobId = await createAnalysisJob({
             sessionId: session.id,
             screenshotId: uploaded.id,
@@ -548,18 +669,15 @@ export function ScreenshotImportWizard({
             progress: 100,
             result: { matches: objectMatches },
           });
-          const mismatch =
-            classification.screenType !== "unknown" &&
-            classification.screenType !== importType &&
-            !compatibleBuildingClassification &&
-            classification.confidence >= 0.72;
+          const mismatch = typeResolution.mismatch;
+          const analysisImportType = typeResolution.analysisType as ConcreteImportType;
           activeJobId = await createAnalysisJob({
             sessionId: session.id,
             screenshotId: uploaded.id,
             jobType: "validate_results",
             status: "running",
           });
-          const analysisEntities = importType === "buildings"
+          const analysisEntities = analysisImportType === "buildings" && importType === "buildings"
             ? filterBuildingImportEntities(entities, buildingSection)
             : entities;
           const currentDetections = parseScreenshotDetections({
@@ -569,11 +687,11 @@ export function ScreenshotImportWizard({
             screenType: effectiveScreenType,
             townHallLevel,
             ocrConfidence: recognition.confidence,
-            layoutConfidence: classification.confidence,
+            layoutConfidence: forcedType ? 1 : classification.confidence,
             ocrLines: recognition.lines,
             objectMatches,
           });
-          const currentWalls = importType === "walls"
+          const currentWalls = analysisImportType === "walls"
             ? parseWallDistributions(recognition.text, {
                 maxLevel: maxWallLevel || undefined,
                 previous: existingWallLevels,
@@ -586,21 +704,21 @@ export function ScreenshotImportWizard({
             equipment: "blacksmith",
           } as const;
           const fallbackSlotType =
-            fallbackSlotTypeByImport[importType as keyof typeof fallbackSlotTypeByImport];
+            fallbackSlotTypeByImport[analysisImportType as keyof typeof fallbackSlotTypeByImport];
           const currentSlots =
-            importType === "builders" || fallbackSlotType
+            analysisImportType === "builders" || fallbackSlotType
               ? parseUpgradeSlots(recognition.text, {
                   fallbackSlotType,
-                  inferBuilderSummary: importType === "builders",
+                  inferBuilderSummary: analysisImportType === "builders",
                   entities: entities
                     .filter((entity) =>
-                      importType === "builders"
+                      analysisImportType === "builders"
                         ? entity.type === "building" || entity.type === "hero"
-                        : importType === "heroes"
+                        : analysisImportType === "heroes"
                         ? entity.type === "hero"
-                        : importType === "pets"
+                        : analysisImportType === "pets"
                           ? entity.type === "pet"
-                          : importType === "equipment"
+                          : analysisImportType === "equipment"
                             ? entity.type === "equipment"
                             : true,
                     )
@@ -608,13 +726,13 @@ export function ScreenshotImportWizard({
                 })
               : [];
           const currentResources =
-            importType === "resources" || importType === "equipment"
+            analysisImportType === "resources" || analysisImportType === "equipment"
               ? parseScreenshotResources(recognition.text)
               : [];
-          const currentMagicItems = importType === "resources"
+          const currentMagicItems = analysisImportType === "resources"
             ? parseScreenshotMagicItems(recognition.text, magicItems)
             : [];
-          const currentProfile = importType === "profile" ? parseProfileScreenshot(recognition.text) : null;
+          const currentProfile = analysisImportType === "profile" ? parseProfileScreenshot(recognition.text) : null;
           if (!mismatch) {
             combinedDetections.push(...currentDetections);
             currentWalls.forEach((item) => {
@@ -666,11 +784,12 @@ export function ScreenshotImportWizard({
             progress: 100,
             result: {
               detections: currentDetections.length,
-              wallDistributions: currentWalls,
-              upgradeSlotDetections: currentSlots,
-              resourceDetections: currentResources,
+              analyzedScreenType: analysisImportType,
+              wallDistributions: mismatch ? [] : currentWalls,
+              upgradeSlotDetections: mismatch ? [] : currentSlots,
+              resourceDetections: mismatch ? [] : currentResources,
               magicItemDetections: mismatch ? [] : currentMagicItems,
-              profileDetection: currentProfile,
+              profileDetection: mismatch ? null : currentProfile,
               mismatch,
             },
           });
@@ -680,9 +799,9 @@ export function ScreenshotImportWizard({
             name: file.name,
             previewUrl,
             qualityScore: normalized.quality.score,
-            screenType: classification.screenType,
-            screenTypeConfidence: classification.confidence,
-            duplicate: false,
+            screenType: effectiveScreenType,
+            screenTypeConfidence: forcedType ? 1 : classification.confidence,
+            duplicate: uploaded.duplicate,
             error: mismatch
               ? en
                 ? `This appears to be a ${classification.screenType} screenshot, not ${importType}.`
@@ -716,7 +835,13 @@ export function ScreenshotImportWizard({
       setResourceDetections([...combinedResources.values()]);
       setMagicItemDetections([...combinedMagicItems.values()]);
       setProfileDetection(combinedProfile);
-      setScreenshots((current) => [...current, ...nextScreenshots]);
+      setScreenshots((current) => {
+        const replacedIds = new Set(nextScreenshots.map((screenshot) => screenshot.id));
+        return [
+          ...current.filter((screenshot) => !replacedIds.has(screenshot.id)),
+          ...nextScreenshots,
+        ];
+      });
       setPendingResumeFiles((current) =>
         current.filter((pending) => !inputs.some((input) => input.existing?.id === pending.id)),
       );
@@ -738,6 +863,23 @@ export function ScreenshotImportWizard({
     const files = [...(event.target.files || [])];
     event.target.value = "";
     await processFiles(files.map((file) => ({ file })));
+  };
+
+  const classifyFullImportScreenshot = async (
+    screenshot: ProcessedScreenshot,
+    forcedType: ConcreteImportType,
+  ) => {
+    if (!screenshot.manualSelection) return;
+    await processFiles([{
+      file: screenshot.manualSelection.file,
+      existing: {
+        id: screenshot.id,
+        storagePath: screenshot.manualSelection.storagePath,
+        originalFilename: screenshot.name,
+        processingStatus: "review_required",
+      },
+      forcedType,
+    }]);
   };
 
   const processResumedFiles = async () => {
@@ -955,6 +1097,7 @@ export function ScreenshotImportWizard({
     previewUrls.current.clear();
     setSession(null);
     setScreenshots([]);
+    setRestoredScreenTypes([]);
     setDetections([]);
     setWallDistributions([]);
     setUpgradeSlots([]);
@@ -1154,13 +1297,34 @@ export function ScreenshotImportWizard({
               ) : null}
             </fieldset>
           ) : null}
-          <div className="mt-4 rounded-xl bg-sky-400/10 p-4 text-sm text-sky-100">
-            <b>{en ? "Open this view in Clash of Clans:" : "Öffne diese Ansicht in Clash of Clans:"}</b>{" "}
-            {en ? selectedType.hintEn : selectedType.hintDe}.{" "}
-            {en
-              ? "Capture the complete overview without notifications or other overlays."
-              : "Fotografiere die vollständige Übersicht ohne Benachrichtigungen oder andere Overlays."}
-          </div>
+          {importType === "full" ? (
+            <div className="mt-4 rounded-xl bg-sky-400/10 p-4 text-sm text-sky-100">
+              <b>{en ? "Guided complete-account import" : "Geführter vollständiger Account-Import"}</b>
+              <p className="mt-1 text-xs opacity-90">
+                {en
+                  ? "Add screenshots from the listed views in any order. Clash Tool classifies every image and combines all results in one review."
+                  : "Füge Screenshots der aufgeführten Ansichten in beliebiger Reihenfolge hinzu. Clash Tool klassifiziert jedes Bild und führt alle Ergebnisse in einer Prüfung zusammen."}
+              </p>
+              <ul className="mt-3 grid gap-1 text-xs sm:grid-cols-2">
+                {fullImportCoverage.map((item) => (
+                  <li key={item.type}>○ {en ? item.label?.en : item.label?.de}</li>
+                ))}
+              </ul>
+              <p className="mt-2 text-xs opacity-75">
+                {en
+                  ? "Capture complete views without notifications or overlays. Unknown views can be assigned manually after upload."
+                  : "Nimm vollständige Ansichten ohne Benachrichtigungen oder Overlays auf. Unbekannte Ansichten kannst du nach dem Upload manuell zuordnen."}
+              </p>
+            </div>
+          ) : (
+            <div className="mt-4 rounded-xl bg-sky-400/10 p-4 text-sm text-sky-100">
+              <b>{en ? "Open this view in Clash of Clans:" : "Öffne diese Ansicht in Clash of Clans:"}</b>{" "}
+              {en ? selectedType.hintEn : selectedType.hintDe}.{" "}
+              {en
+                ? "Capture the complete overview without notifications or other overlays."
+                : "Fotografiere die vollständige Übersicht ohne Benachrichtigungen oder andere Overlays."}
+            </div>
+          )}
           {importType === "village" ? (
             <div className="mt-3 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
               <b>{en ? "For the experimental village import:" : "Für den experimentellen Dorfimport:"}</b>
@@ -1235,6 +1399,30 @@ export function ScreenshotImportWizard({
 
       {step === "upload" || step === "review" ? (
         <div className="mt-5">
+          {importType === "full" ? (
+            <div className="mb-4 rounded-xl border border-sky-400/20 bg-sky-400/5 p-4">
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <b className="text-sky-100">{en ? "Complete-account coverage" : "Vollimport-Abdeckung"}</b>
+                <span className="text-sky-300">
+                  {fullImportCoverage.filter((item) => item.complete).length}/{fullImportCoverage.length}
+                </span>
+              </div>
+              <ul className="mt-2 grid gap-1 text-xs sm:grid-cols-2 lg:grid-cols-3">
+                {fullImportCoverage.map((item) => (
+                  <li key={item.type} className={item.complete ? "text-emerald-200" : "text-slate-400"}>
+                    {item.complete ? "✓" : "○"} {en ? item.label?.en : item.label?.de}
+                  </li>
+                ))}
+              </ul>
+              {hasIncompleteFullImport ? (
+                <p className="mt-2 text-xs text-amber-200">
+                  {en
+                    ? "Add the missing views or save this import for later before confirming."
+                    : "Füge die fehlenden Ansichten hinzu oder speichere den Import vor der Bestätigung für später."}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
           <label className="block cursor-pointer rounded-2xl border border-dashed border-amber-400/40 bg-amber-400/5 p-6 text-center">
             <input
               type="file"
@@ -1292,6 +1480,29 @@ export function ScreenshotImportWizard({
                     </span>
                     {screenshot.duplicate ? <p className="mt-1 text-sky-300">{en ? "Duplicate ignored" : "Dublette ignoriert"}</p> : null}
                     {screenshot.error ? <p className="mt-1 text-rose-300">{screenshot.error}</p> : null}
+                    {screenshot.manualSelection ? (
+                      <label className="mt-2 block text-slate-300">
+                        {en ? "Select view" : "Ansicht auswählen"}
+                        <select
+                          aria-label={`${screenshot.name} ${en ? "view" : "Ansicht"}`}
+                          defaultValue=""
+                          disabled={busy}
+                          onChange={(event) => {
+                            if (!event.target.value) return;
+                            void classifyFullImportScreenshot(
+                              screenshot,
+                              event.target.value as ConcreteImportType,
+                            );
+                          }}
+                          className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"
+                        >
+                          <option value="">{en ? "Choose…" : "Auswählen…"}</option>
+                          {IMPORT_TYPES.filter((item): item is typeof item & { id: ConcreteImportType } => item.id !== "full").map((item) => (
+                            <option key={item.id} value={item.id}>{en ? item.en : item.de}</option>
+                          ))}
+                        </select>
+                      </label>
+                    ) : null}
                   </div>
                 </article>
               ))}
@@ -1734,7 +1945,7 @@ export function ScreenshotImportWizard({
             </span>
           </label>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || hasInvalidResourceDetection || hasInvalidMagicItemDetection || (profileValidation !== null && !profileValidation.canApply) || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !magicItemDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
+            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || hasInvalidResourceDetection || hasInvalidMagicItemDetection || hasUnclassifiedFullScreenshots || hasIncompleteFullImport || (profileValidation !== null && !profileValidation.canApply) || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !magicItemDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
               {en ? "Confirm selected changes" : "Ausgewählte Änderungen bestätigen"}
             </button>
             <button type="button" disabled={busy} onClick={() => void saveEntireImportForLater()} className="rounded-xl border border-sky-400/30 px-5 py-3 font-bold text-sky-200 disabled:opacity-40">
