@@ -126,7 +126,11 @@ export async function fetchLatestOpenScreenshotImport(
     { data: fileRows, error: fileError },
     { data: jobRows, error: jobError },
   ] = await Promise.all([
-      client.from("screenshot_import_changes").select("entity_type, entity_id, change_type, previous_value, proposed_value, confidence, status, reasons").eq("import_session_id", row.id),
+      client
+        .from("screenshot_import_changes")
+        .select("entity_type, entity_id, change_type, previous_value, proposed_value, user_corrected_value, confidence, status, reasons")
+        .eq("import_session_id", row.id)
+        .in("status", ["pending", "later"]),
       client
         .from("screenshot_import_files")
         .select("id, storage_path, original_filename, processing_status")
@@ -141,6 +145,7 @@ export async function fetchLatestOpenScreenshotImport(
     const confidence = Number(change.confidence || 0);
     const previous = (change.previous_value || {}) as { level?: number };
     const proposed = (change.proposed_value || {}) as { level?: number | null };
+    const corrected = (change.user_corrected_value || {}) as { level?: number | null };
     const status = String(change.status);
     return {
       id: `change:${change.entity_id}`,
@@ -148,7 +153,7 @@ export async function fetchLatestOpenScreenshotImport(
       entityType: change.entity_type as ScreenshotProposedChange["entityType"],
       name: String(change.entity_id),
       previousLevel: Number(previous.level || 0),
-      proposedLevel: proposed.level ?? null,
+      proposedLevel: corrected.level ?? proposed.level ?? null,
       changeType: change.change_type as ScreenshotProposedChange["changeType"],
       confidence,
       confidenceBand: confidenceBand(confidence),
@@ -666,6 +671,43 @@ export async function confirmScreenshotImport(
   if (sessionError) throw new Error(sessionError.message);
   await appendImportEvent(session.id, "import_confirmed", {
     originals_retained: session.retainOriginals,
+  });
+}
+
+export async function discardScreenshotImport(
+  session: ScreenshotImportSession,
+): Promise<void> {
+  const client = getSupabaseClient();
+  const { data: files, error } = await client
+    .from("screenshot_import_files")
+    .select("storage_path")
+    .eq("import_session_id", session.id)
+    .is("deleted_at", null);
+  if (error) throw new Error(error.message);
+  const paths = (files || []).map((file) => String(file.storage_path));
+  if (paths.length) {
+    const { error: removeError } = await client.storage.from(BUCKET).remove(paths);
+    if (removeError) throw new Error(removeError.message);
+    const { error: fileUpdateError } = await client
+      .from("screenshot_import_files")
+      .update({ processing_status: "deleted", deleted_at: new Date().toISOString() })
+      .eq("import_session_id", session.id)
+      .is("deleted_at", null);
+    if (fileUpdateError) throw new Error(fileUpdateError.message);
+  }
+  const now = new Date().toISOString();
+  const { error: sessionError } = await client
+    .from("screenshot_import_sessions")
+    .update({
+      status: "cancelled",
+      completed_at: now,
+      updated_at: now,
+    })
+    .eq("id", session.id);
+  if (sessionError) throw new Error(sessionError.message);
+  await appendImportEvent(session.id, "import_discarded", {
+    rejected_changes: true,
+    deleted_originals: paths.length,
   });
 }
 

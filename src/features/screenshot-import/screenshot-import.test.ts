@@ -11,12 +11,14 @@ import {
   parseDurationSeconds,
   parseBuilderAvailability,
   filterBuildingImportEntities,
+  filterScreenshotReviewChanges,
   getBuildingImportSection,
   parseUpgradeSlots,
   parseWallDistributions,
   summarizeScreenshotReview,
   shouldStoreScreenshotFeedback,
   type ScreenshotEntity,
+  type ScreenshotProposedChange,
 } from "./screenshot-import";
 import {
   createDifferenceHash,
@@ -374,6 +376,27 @@ test("summarizes safe, unchanged and conflicting results", () => {
     conflicts: 0,
     unusable: 0,
   });
+});
+
+test("filters screenshot review values without hiding regressions from conflicts", () => {
+  const reviewChanges = [
+    { id: "same", changeType: "unchanged" },
+    { id: "up", changeType: "level_increased" },
+    { id: "conflict", changeType: "conflict" },
+    { id: "regression", changeType: "level_regression" },
+  ] as ScreenshotProposedChange[];
+  assert.deepEqual(
+    filterScreenshotReviewChanges(reviewChanges, "all").map((change) => change.id),
+    ["same", "up", "conflict", "regression"],
+  );
+  assert.deepEqual(
+    filterScreenshotReviewChanges(reviewChanges, "changes").map((change) => change.id),
+    ["up", "conflict", "regression"],
+  );
+  assert.deepEqual(
+    filterScreenshotReviewChanges(reviewChanges, "conflicts").map((change) => change.id),
+    ["conflict", "regression"],
+  );
 });
 
 test("assigns OCR levels to exact building instances", () => {

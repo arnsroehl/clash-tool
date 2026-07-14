@@ -5,6 +5,7 @@ import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "
 import {
   classifyScreenshotText,
   filterBuildingImportEntities,
+  filterScreenshotReviewChanges,
   getBuildingImportSection,
   mergeScreenshotDetections,
   parseUpgradeSlots,
@@ -19,6 +20,7 @@ import {
   type ScreenshotEntity,
   type ScreenshotProposedChange,
   type ScreenshotScreenType,
+  type ScreenshotReviewFilter,
   type ScreenshotResourceDetection,
   type ScreenshotProfileDetection,
   type UpgradeSlotDetection,
@@ -29,6 +31,7 @@ import {
   createAnalysisJob,
   createScreenshotImportSession,
   deleteScreenshotImportSession,
+  discardScreenshotImport,
   deleteScreenshotOriginals,
   downloadScreenshotFile,
   fetchScreenshotImportHistory,
@@ -61,6 +64,7 @@ import {
 } from "@/config/screenshotImport";
 
 type ImportType = Exclude<ScreenshotScreenType, "unknown">;
+type CompletionState = "confirmed" | "partially_confirmed" | "saved_for_later" | "discarded";
 
 type Props = {
   accountId: string;
@@ -166,7 +170,8 @@ export function ScreenshotImportWizard({
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
-  const [savedForLater, setSavedForLater] = useState(false);
+  const [completionState, setCompletionState] = useState<CompletionState>("confirmed");
+  const [reviewFilter, setReviewFilter] = useState<ScreenshotReviewFilter>("changes");
   const [history, setHistory] = useState<ScreenshotImportHistoryEntry[]>([]);
   const [deletingOriginalsFor, setDeletingOriginalsFor] = useState<string | null>(null);
   const previewUrls = useRef(new Set<string>());
@@ -222,15 +227,13 @@ export function ScreenshotImportWizard({
   }, [expectedWallCount, wallDistributions, wallTotal]);
   const groupedChanges = useMemo(() => {
     const groups = new Map<string, ScreenshotProposedChange[]>();
-    changes
-      .filter((change) => change.changeType !== "unchanged")
-      .forEach((change) => {
-        const current = groups.get(change.entityType) || [];
-        current.push(change);
-        groups.set(change.entityType, current);
-      });
+    filterScreenshotReviewChanges(changes, reviewFilter).forEach((change) => {
+      const current = groups.get(change.entityType) || [];
+      current.push(change);
+      groups.set(change.entityType, current);
+    });
     return [...groups.entries()];
-  }, [changes]);
+  }, [changes, reviewFilter]);
   const buildingSectionCounts = useMemo(
     () => Object.fromEntries(BUILDING_SECTIONS.map((section) => [
       section.id,
@@ -771,10 +774,63 @@ export function ScreenshotImportWizard({
       if (hasDeferredChanges) await saveScreenshotImportForLater(session.id);
       else await confirmScreenshotImport(session);
       if (!hasDeferredChanges) await refreshHistory().catch(() => undefined);
-      setSavedForLater(hasDeferredChanges);
+      setCompletionState(hasDeferredChanges ? "partially_confirmed" : "confirmed");
       setStep("done");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Import fehlgeschlagen.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const saveEntireImportForLater = async () => {
+    if (!session) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      await recordChangeDecisions(
+        session.id,
+        changes.map((change) => ({
+          entityType: change.entityType,
+          entityId: change.entityId,
+          status: "later",
+          correctedLevel: correctedLevels[change.id],
+        })),
+      );
+      await saveScreenshotImportForLater(session.id);
+      setCompletionState("saved_for_later");
+      setStep("done");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Import konnte nicht gespeichert werden.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const discardAllChanges = async () => {
+    if (!session) return;
+    const approved = window.confirm(
+      en
+        ? "Discard every proposed change and close this import? No account values will be changed."
+        : "Alle vorgeschlagenen Änderungen verwerfen und diesen Import abschließen? Es werden keine Accountwerte geändert.",
+    );
+    if (!approved) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      await recordChangeDecisions(
+        session.id,
+        changes.map((change) => ({
+          entityType: change.entityType,
+          entityId: change.entityId,
+          status: "rejected",
+        })),
+      );
+      await discardScreenshotImport(session);
+      setCompletionState("discarded");
+      setStep("done");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Änderungen konnten nicht verworfen werden.");
     } finally {
       setBusy(false);
     }
@@ -826,25 +882,44 @@ export function ScreenshotImportWizard({
     setRestoredChanges([]);
     setResumeCandidate(null);
     setPendingResumeFiles([]);
-    setSavedForLater(false);
+    setCompletionState("confirmed");
+    setReviewFilter("changes");
     setGameUiVersionKnown(true);
     setProgress(0);
     setMessage(null);
     setStep("select");
+    void fetchLatestOpenScreenshotImport(accountId)
+      .then(setResumeCandidate)
+      .catch(() => undefined);
+    void refreshHistory().catch(() => undefined);
   };
 
   if (step === "done")
     return (
       <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-5">
-        <h3 className="font-bold text-emerald-200">{en ? "Import completed" : "Import abgeschlossen"}</h3>
+        <h3 className="font-bold text-emerald-200">
+          {completionState === "saved_for_later" || completionState === "partially_confirmed"
+            ? (en ? "Import saved" : "Import gespeichert")
+            : completionState === "discarded"
+              ? (en ? "Changes discarded" : "Änderungen verworfen")
+              : (en ? "Import completed" : "Import abgeschlossen")}
+        </h3>
         <p className="mt-2 text-sm text-slate-300">
-          {savedForLater
+          {completionState === "partially_confirmed"
             ? en
-              ? "Confirmed values were saved. Deferred changes remain in the import and can be continued later."
-              : "Bestätigte Werte wurden gespeichert. Zurückgestellte Änderungen bleiben im Import und können später fortgesetzt werden."
-            : en
-            ? "The confirmed values were saved. Original screenshots were deleted according to your retention choice."
-            : "Die bestätigten Werte wurden gespeichert. Originalbilder wurden gemäß deiner Speicherwahl gelöscht."}
+              ? "Confirmed values were applied. Deferred changes remain private and can be continued later."
+              : "Bestätigte Werte wurden übernommen. Zurückgestellte Änderungen bleiben privat gespeichert und können später fortgesetzt werden."
+            : completionState === "saved_for_later"
+            ? en
+              ? "The import remains private and can be continued later. No additional values were applied."
+              : "Der Import bleibt privat gespeichert und kann später fortgesetzt werden. Es wurden keine zusätzlichen Werte übernommen."
+            : completionState === "discarded"
+              ? en
+                ? "No proposed account values were applied. Uploaded originals were deleted and the rejection was logged."
+                : "Es wurden keine vorgeschlagenen Accountwerte übernommen. Hochgeladene Originale wurden gelöscht und die Ablehnung protokolliert."
+              : en
+                ? "The confirmed values were saved. Original screenshots were deleted according to your retention choice."
+                : "Die bestätigten Werte wurden gespeichert. Originalbilder wurden gemäß deiner Speicherwahl gelöscht."}
         </p>
         <button
           type="button"
@@ -1171,8 +1246,29 @@ export function ScreenshotImportWizard({
               {en ? "Accept all safe changes" : "Alle sicheren Änderungen übernehmen"}
             </button>
             <button type="button" onClick={() => setAccepted({})} className="rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-slate-300">
-              {en ? "Discard selections" : "Auswahl verwerfen"}
+              {en ? "Reset selection" : "Auswahl zurücksetzen"}
             </button>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2" aria-label={en ? "Review filters" : "Prüffilter"}>
+            {([
+              ["changes", en ? "Hide unchanged" : "Unveränderte ausblenden"],
+              ["all", en ? "Show all values" : "Alle Werte anzeigen"],
+              ["conflicts", en ? "Conflicts only" : "Nur Konflikte"],
+            ] as Array<[ScreenshotReviewFilter, string]>).map(([filter, label]) => (
+              <button
+                type="button"
+                key={filter}
+                aria-pressed={reviewFilter === filter}
+                onClick={() => setReviewFilter(filter)}
+                className={`rounded-lg border px-3 py-2 text-xs font-bold ${
+                  reviewFilter === filter
+                    ? "border-sky-300 bg-sky-300/15 text-sky-100"
+                    : "border-white/10 text-slate-400"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
           <div className="mt-4 space-y-5">
             {groupedChanges.map(([entityType, group]) => (
@@ -1218,6 +1314,13 @@ export function ScreenshotImportWizard({
                 </div>
               </section>
             ))}
+            {!groupedChanges.length ? (
+              <p className="rounded-xl border border-white/10 bg-slate-950 p-4 text-sm text-slate-400">
+                {reviewFilter === "conflicts"
+                  ? (en ? "No conflicts were found." : "Es wurden keine Konflikte gefunden.")
+                  : (en ? "No values match this filter." : "Für diesen Filter gibt es keine Werte.")}
+              </p>
+            ) : null}
           </div>
           {wallDistributions.length ? (
             <div className="mt-5">
@@ -1403,8 +1506,14 @@ export function ScreenshotImportWizard({
             <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
               {en ? "Confirm selected changes" : "Ausgewählte Änderungen bestätigen"}
             </button>
+            <button type="button" disabled={busy} onClick={() => void saveEntireImportForLater()} className="rounded-xl border border-sky-400/30 px-5 py-3 font-bold text-sky-200 disabled:opacity-40">
+              {en ? "Save and continue later" : "Speichern und später fortsetzen"}
+            </button>
+            <button type="button" disabled={busy} onClick={() => void discardAllChanges()} className="rounded-xl border border-amber-400/30 px-5 py-3 font-bold text-amber-200 disabled:opacity-40">
+              {en ? "Discard all changes" : "Alle Änderungen verwerfen"}
+            </button>
             <button type="button" disabled={busy} onClick={() => void cancel()} className="rounded-xl border border-rose-400/30 px-5 py-3 font-bold text-rose-200 disabled:opacity-40">
-              {en ? "Delete import" : "Import löschen"}
+              {en ? "Delete import completely" : "Import vollständig löschen"}
             </button>
           </div>
         </div>

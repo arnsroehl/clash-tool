@@ -129,6 +129,21 @@ export type ScreenshotReviewSummary = {
   unusable: number;
 };
 
+export type ScreenshotReviewFilter = "changes" | "all" | "conflicts";
+
+export function filterScreenshotReviewChanges(
+  changes: ScreenshotProposedChange[],
+  filter: ScreenshotReviewFilter,
+): ScreenshotProposedChange[] {
+  if (filter === "all") return changes;
+  if (filter === "conflicts")
+    return changes.filter(
+      (change) =>
+        change.changeType === "conflict" || change.changeType === "level_regression",
+    );
+  return changes.filter((change) => change.changeType !== "unchanged");
+}
+
 export type WallLevelDistribution = {
   id: string;
   level: number;
