@@ -134,6 +134,14 @@ are stored on the linked account using
 `src/scripts/sql/screenshot-profile-details.sql` when the optional official API
 is disabled.
 
+Every accepted screenshot is orientation-corrected, capped at 2400 pixels and
+re-encoded as JPEG before private Storage upload. This removes original EXIF and
+GPS blocks. The import record keeps only the original filename, MIME type and
+byte size, normalized byte size, image dimensions and a coarse device platform
+(`ios`, `android`, `macos`, `windows`, `linux`, `chromeos`, `other` or
+`unknown`). Raw user-agent strings are not stored. Existing databases can add
+these columns with `src/scripts/sql/screenshot-file-metadata.sql`.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP

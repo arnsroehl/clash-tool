@@ -63,6 +63,7 @@ import {
 import {
   normalizeScreenshot,
   recognizeScreenshotDetailed,
+  type ScreenshotSourceMetadata,
 } from "@/services/screenshotRecognitionService";
 import { recognizeScreenshotObjects } from "@/services/screenshotObjectRecognitionService";
 import type { ImportChange } from "@/services/playerImportService";
@@ -103,9 +104,13 @@ type ProcessedScreenshot = {
   screenTypeConfidence: number;
   duplicate: boolean;
   error?: string;
+  sourceMetadata?: ScreenshotSourceMetadata & {
+    normalizedSizeBytes: number;
+  };
   manualSelection?: {
     file: File;
     storagePath: string;
+    sourceMetadata: ScreenshotSourceMetadata;
   };
 };
 
@@ -162,6 +167,13 @@ const qualityIssueText: Record<string, { de: string; en: string }> = {
   likely_rotated: { de: "Der Screenshot ist vermutlich gedreht", en: "The screenshot appears to be rotated" },
   unexpected_aspect_ratio: { de: "Das Seitenverhältnis wirkt stark zugeschnitten", en: "The aspect ratio appears heavily cropped" },
 };
+
+function formatScreenshotBytes(bytes: number, language: "de" | "en"): string {
+  return new Intl.NumberFormat(language === "en" ? "en-US" : "de-DE", {
+    maximumFractionDigits: bytes >= 1024 * 1024 ? 1 : 0,
+  }).format(bytes >= 1024 * 1024 ? bytes / 1024 / 1024 : bytes / 1024) +
+    (bytes >= 1024 * 1024 ? " MB" : " KB");
+}
 
 export function ScreenshotImportWizard({
   accountId,
@@ -464,6 +476,7 @@ export function ScreenshotImportWizard({
       file: File;
       existing?: ResumableScreenshotFile;
       forcedType?: ConcreteImportType;
+      sourceMetadata?: ScreenshotSourceMetadata;
     }>,
   ) => {
     if (!session || !inputs.length) return;
@@ -494,22 +507,37 @@ export function ScreenshotImportWizard({
     const nextScreenshots: ProcessedScreenshot[] = [];
     try {
       for (let index = 0; index < inputs.length; index += 1) {
-        const { file, existing, forcedType } = inputs[index];
+        const { file, existing, forcedType, sourceMetadata } = inputs[index];
         let activeJobId: string | null = null;
         setProgress(Math.round((index / inputs.length) * 100));
         try {
-          const normalized = await normalizeScreenshot(file);
+          const normalized = await normalizeScreenshot(
+            file,
+            sourceMetadata || (existing ? {
+              originalFilename: existing.originalFilename,
+              originalMimeType: existing.originalMimeType,
+              originalSizeBytes: existing.originalSizeBytes,
+              devicePlatform: existing.devicePlatform,
+            } : undefined),
+          );
           const previewUrl = URL.createObjectURL(normalized.file);
           previewUrls.current.add(previewUrl);
           if (!normalized.quality.accepted) {
             nextScreenshots.push({
               id: crypto.randomUUID(),
-              name: file.name,
+              name: normalized.originalFilename,
               previewUrl,
               qualityScore: normalized.quality.score,
               screenType: "unknown",
               screenTypeConfidence: 0,
               duplicate: false,
+              sourceMetadata: {
+                originalFilename: normalized.originalFilename,
+                originalMimeType: normalized.originalMimeType,
+                originalSizeBytes: normalized.originalSizeBytes,
+                devicePlatform: normalized.devicePlatform,
+                normalizedSizeBytes: normalized.normalizedSizeBytes,
+              },
               error: normalized.quality.issues
                 .map((issue) => qualityIssueText[issue]?.[language] || issue)
                 .join(", "),
@@ -546,7 +574,7 @@ export function ScreenshotImportWizard({
             status: "running",
             payload: {
               language,
-              filename: file.name,
+              filename: normalized.originalFilename,
               gameVersion: session.gameVersion,
               modelVersion: SCREENSHOT_IMPORT_CONFIG.modelVersion,
               layoutVersion: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
@@ -635,18 +663,31 @@ export function ScreenshotImportWizard({
             activeJobId = null;
             nextScreenshots.push({
               id: uploaded.id,
-              name: file.name,
+              name: normalized.originalFilename,
               previewUrl,
               qualityScore: normalized.quality.score,
               screenType: "unknown",
               screenTypeConfidence: classification.confidence,
               duplicate: uploaded.duplicate,
+              sourceMetadata: {
+                originalFilename: normalized.originalFilename,
+                originalMimeType: normalized.originalMimeType,
+                originalSizeBytes: normalized.originalSizeBytes,
+                devicePlatform: normalized.devicePlatform,
+                normalizedSizeBytes: normalized.normalizedSizeBytes,
+              },
               error: en
                 ? "The view could not be classified safely. Select the matching area."
                 : "Die Ansicht konnte nicht sicher klassifiziert werden. Wähle den passenden Bereich.",
               manualSelection: {
                 file: normalized.file,
                 storagePath: uploaded.storagePath,
+                sourceMetadata: {
+                  originalFilename: normalized.originalFilename,
+                  originalMimeType: normalized.originalMimeType,
+                  originalSizeBytes: normalized.originalSizeBytes,
+                  devicePlatform: normalized.devicePlatform,
+                },
               },
             });
             continue;
@@ -796,12 +837,19 @@ export function ScreenshotImportWizard({
           activeJobId = null;
           nextScreenshots.push({
             id: uploaded.id,
-            name: file.name,
+            name: normalized.originalFilename,
             previewUrl,
             qualityScore: normalized.quality.score,
             screenType: effectiveScreenType,
             screenTypeConfidence: forcedType ? 1 : classification.confidence,
             duplicate: uploaded.duplicate,
+            sourceMetadata: {
+              originalFilename: normalized.originalFilename,
+              originalMimeType: normalized.originalMimeType,
+              originalSizeBytes: normalized.originalSizeBytes,
+              devicePlatform: normalized.devicePlatform,
+              normalizedSizeBytes: normalized.normalizedSizeBytes,
+            },
             error: mismatch
               ? en
                 ? `This appears to be a ${classification.screenType} screenshot, not ${importType}.`
@@ -875,10 +923,14 @@ export function ScreenshotImportWizard({
       existing: {
         id: screenshot.id,
         storagePath: screenshot.manualSelection.storagePath,
-        originalFilename: screenshot.name,
+        originalFilename: screenshot.manualSelection.sourceMetadata.originalFilename,
+        originalMimeType: screenshot.manualSelection.sourceMetadata.originalMimeType,
+        originalSizeBytes: screenshot.manualSelection.sourceMetadata.originalSizeBytes,
+        devicePlatform: screenshot.manualSelection.sourceMetadata.devicePlatform,
         processingStatus: "review_required",
       },
       forcedType,
+      sourceMetadata: screenshot.manualSelection.sourceMetadata,
     }]);
   };
 
@@ -1478,6 +1530,14 @@ export function ScreenshotImportWizard({
                     <span className="text-slate-400">
                       {screenshot.screenType} · {Math.round(screenshot.screenTypeConfidence * 100)}% · Q {Math.round(screenshot.qualityScore * 100)}%
                     </span>
+                    {screenshot.sourceMetadata ? (
+                      <span className="mt-1 block text-slate-500">
+                        {screenshot.sourceMetadata.originalMimeType.replace(/^image\//, "").toUpperCase()}
+                        {` · ${formatScreenshotBytes(screenshot.sourceMetadata.originalSizeBytes, language)}`}
+                        {` → JPEG ${formatScreenshotBytes(screenshot.sourceMetadata.normalizedSizeBytes, language)}`}
+                        {` · ${screenshot.sourceMetadata.devicePlatform}`}
+                      </span>
+                    ) : null}
                     {screenshot.duplicate ? <p className="mt-1 text-sky-300">{en ? "Duplicate ignored" : "Dublette ignoriert"}</p> : null}
                     {screenshot.error ? <p className="mt-1 text-rose-300">{screenshot.error}</p> : null}
                     {screenshot.manualSelection ? (

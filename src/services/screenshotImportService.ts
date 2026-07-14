@@ -13,7 +13,11 @@ import {
   type UpgradeSlotDetection,
   type WallLevelDistribution,
 } from "@/features/screenshot-import/screenshot-import";
-import type { NormalizedScreenshot } from "@/services/screenshotRecognitionService";
+import type {
+  NormalizedScreenshot,
+  ScreenshotDevicePlatform,
+  ScreenshotSourceMetadata,
+} from "@/services/screenshotRecognitionService";
 import {
   isScreenshotImportTypeEnabled,
   isSupportedGameUiVersion,
@@ -41,7 +45,7 @@ export type ScreenshotImportSession = {
   gameVersion: string | null;
 };
 
-export type ResumableScreenshotFile = {
+export type ResumableScreenshotFile = ScreenshotSourceMetadata & {
   id: string;
   storagePath: string;
   originalFilename: string;
@@ -139,7 +143,7 @@ export async function fetchLatestOpenScreenshotImport(
         .in("status", ["pending", "later"]),
       client
         .from("screenshot_import_files")
-        .select("id, storage_path, original_filename, processing_status, screen_type")
+        .select("id, storage_path, original_filename, original_mime_type, original_size_bytes, normalized_size_bytes, device_platform, processing_status, screen_type")
         .eq("import_session_id", row.id)
         .is("deleted_at", null)
         .order("created_at"),
@@ -232,6 +236,9 @@ export async function fetchLatestOpenScreenshotImport(
         id: String(file.id),
         storagePath: String(file.storage_path),
         originalFilename: String(file.original_filename || "screenshot.jpg"),
+        originalMimeType: String(file.original_mime_type || "image/jpeg"),
+        originalSizeBytes: Number(file.original_size_bytes || 0),
+        devicePlatform: String(file.device_platform || "unknown") as ScreenshotDevicePlatform,
         processingStatus: String(file.processing_status),
       })),
     wallDistributions: [...wallMap.values()],
@@ -347,7 +354,12 @@ export async function uploadScreenshot(params: {
     import_session_id: params.session.id,
     user_id: user.id,
     storage_path: storagePath,
-    original_filename: params.screenshot.file.name,
+    original_filename: params.screenshot.originalFilename,
+    original_mime_type: params.screenshot.originalMimeType,
+    original_size_bytes: params.screenshot.originalSizeBytes,
+    normalized_mime_type: params.screenshot.normalizedMimeType,
+    normalized_size_bytes: params.screenshot.normalizedSizeBytes,
+    device_platform: params.screenshot.devicePlatform,
     content_hash: params.screenshot.contentHash,
     width: params.screenshot.width,
     height: params.screenshot.height,

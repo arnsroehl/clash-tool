@@ -37,7 +37,10 @@ import {
   matchObjectFingerprint,
   selectVillageObjectMatches,
 } from "@/services/screenshotObjectRecognitionService";
-import { createLaboratoryGridCells } from "@/services/screenshotRecognitionService";
+import {
+  createLaboratoryGridCells,
+  detectScreenshotDevicePlatform,
+} from "@/services/screenshotRecognitionService";
 import {
   isScreenshotImportTypeEnabled,
   isSupportedGameUiVersion,
@@ -289,6 +292,14 @@ test("rejects likely rotated game screenshots and warns about heavy crops", () =
       "unexpected_aspect_ratio",
     ),
   );
+});
+
+test("stores only a coarse screenshot device platform", () => {
+  assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (iPhone)", "iPhone"), "ios");
+  assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (Linux; Android 15)", "Linux"), "android");
+  assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (Macintosh)", "MacIntel"), "macos");
+  assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (X11; CrOS x86_64)", "Linux"), "chromeos");
+  assert.equal(detectScreenshotDevicePlatform(undefined, undefined), "unknown");
 });
 
 test("extracts supported entity levels and English aliases", () => {

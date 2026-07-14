@@ -5,11 +5,30 @@ import {
   type ScreenshotScreenType,
 } from "@/features/screenshot-import/screenshot-import";
 
-export type NormalizedScreenshot = {
+export type ScreenshotDevicePlatform =
+  | "ios"
+  | "android"
+  | "macos"
+  | "windows"
+  | "linux"
+  | "chromeos"
+  | "other"
+  | "unknown";
+
+export type ScreenshotSourceMetadata = {
+  originalFilename: string;
+  originalMimeType: string;
+  originalSizeBytes: number;
+  devicePlatform: ScreenshotDevicePlatform;
+};
+
+export type NormalizedScreenshot = ScreenshotSourceMetadata & {
   file: File;
   width: number;
   height: number;
   contentHash: string;
+  normalizedMimeType: "image/jpeg";
+  normalizedSizeBytes: number;
   quality: ImageQualityResult;
 };
 
@@ -31,6 +50,22 @@ export type LaboratoryGridCellRecognition = {
 };
 
 const MAX_IMAGE_EDGE = 2400;
+
+export function detectScreenshotDevicePlatform(
+  userAgent: string | undefined,
+  platform: string | undefined,
+): ScreenshotDevicePlatform {
+  const value = `${userAgent || ""} ${platform || ""}`.toLowerCase();
+  if (!value.trim()) return "unknown";
+  if (/iphone|ipad|ipod/.test(value) || (/macintosh/.test(value) && /mobile/.test(value)))
+    return "ios";
+  if (/android/.test(value)) return "android";
+  if (/cros/.test(value)) return "chromeos";
+  if (/windows|win32|win64/.test(value)) return "windows";
+  if (/macintosh|macintel|mac os/.test(value)) return "macos";
+  if (/linux/.test(value)) return "linux";
+  return "other";
+}
 
 const LABORATORY_GRID = {
   x: 195 / 2360,
@@ -216,7 +251,10 @@ function measureImageData(imageData: ImageData) {
   };
 }
 
-export async function normalizeScreenshot(file: File): Promise<NormalizedScreenshot> {
+export async function normalizeScreenshot(
+  file: File,
+  sourceMetadata?: ScreenshotSourceMetadata,
+): Promise<NormalizedScreenshot> {
   if (!file.type.startsWith("image/")) throw new Error("Bitte wähle eine Bilddatei aus.");
   if (file.size > 20 * 1024 * 1024)
     throw new Error("Der Screenshot darf höchstens 20 MB groß sein.");
@@ -258,11 +296,22 @@ export async function normalizeScreenshot(file: File): Promise<NormalizedScreens
     type: "image/jpeg",
     lastModified: Date.now(),
   });
+  if (normalizedFile.size > 20 * 1024 * 1024)
+    throw new Error("Das normalisierte Bild ist größer als 20 MB.");
   return {
     file: normalizedFile,
+    originalFilename: sourceMetadata?.originalFilename || file.name || "screenshot",
+    originalMimeType: sourceMetadata?.originalMimeType || file.type.toLowerCase(),
+    originalSizeBytes: sourceMetadata?.originalSizeBytes || file.size,
+    devicePlatform: sourceMetadata?.devicePlatform || detectScreenshotDevicePlatform(
+      typeof navigator === "undefined" ? undefined : navigator.userAgent,
+      typeof navigator === "undefined" ? undefined : navigator.platform,
+    ),
     width,
     height,
     contentHash: await fileHash(normalizedFile),
+    normalizedMimeType: "image/jpeg",
+    normalizedSizeBytes: normalizedFile.size,
     quality,
   };
 }

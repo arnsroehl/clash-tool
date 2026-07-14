@@ -29,6 +29,13 @@ create table if not exists public.screenshot_import_files (
   user_id uuid not null references auth.users(id) on delete cascade,
   storage_path text not null unique,
   original_filename text not null,
+  original_mime_type text check (original_mime_type is null or original_mime_type ~ '^image/'),
+  original_size_bytes bigint check (original_size_bytes is null or original_size_bytes between 1 and 20971520),
+  normalized_mime_type text check (normalized_mime_type is null or normalized_mime_type = 'image/jpeg'),
+  normalized_size_bytes bigint check (normalized_size_bytes is null or normalized_size_bytes between 1 and 20971520),
+  device_platform text not null default 'unknown' check (device_platform in (
+    'ios', 'android', 'macos', 'windows', 'linux', 'chromeos', 'other', 'unknown'
+  )),
   content_hash text,
   width integer not null check (width > 0),
   height integer not null check (height > 0),
