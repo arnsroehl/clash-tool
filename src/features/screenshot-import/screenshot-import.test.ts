@@ -408,6 +408,55 @@ test("parses localized durations and occupied upgrade slots", () => {
   );
 });
 
+test("recognizes multi-line hero and pet upgrades from their selected views", () => {
+  const heroSlots = parseUpgradeSlots(
+    "Barbarian King\nUpgrade in progress to level 96\nRemaining 2d 3h",
+    {
+      fallbackSlotType: "builder",
+      entities: [{ name: "Barbarian King", aliases: ["Barbarenkönig"] }],
+    },
+  );
+  assert.equal(heroSlots.length, 1);
+  assert.deepEqual(
+    heroSlots.map(({ slotType, entityName, targetLevel, remainingSeconds }) => [
+      slotType,
+      entityName,
+      targetLevel,
+      remainingSeconds,
+    ]),
+    [["builder", "Barbarian King", 96, 183_600]],
+  );
+
+  const petSlots = parseUpgradeSlots(
+    "L.A.S.S.I\nVerbesserung läuft auf Level 11\nNoch 1 Tag 2 Stunden",
+    {
+      fallbackSlotType: "pet_house",
+      entities: [{ name: "L.A.S.S.I", aliases: ["lassi"] }],
+    },
+  );
+  assert.equal(petSlots.length, 1);
+  assert.equal(petSlots[0].slotType, "pet_house");
+  assert.equal(petSlots[0].entityName, "L.A.S.S.I");
+  assert.equal(petSlots[0].targetLevel, 11);
+  assert.equal(petSlots[0].remainingSeconds, 93_600);
+});
+
+test("does not treat a facility requirement on a locked pet as its level", () => {
+  const detections = parseScreenshotDetections({
+    text: "Angry Jelly locked – requires Pet House level 10",
+    entities: [{
+      id: "angry-jelly",
+      name: "Angry Jelly",
+      aliases: ["angry-jelly"],
+      currentLevel: 0,
+      maxLevel: 10,
+      type: "pet",
+    }],
+    screenType: "pets",
+  });
+  assert.equal(detections.length, 0);
+});
+
 test("parses only explicitly labelled resource values and compact numbers", () => {
   const resources = parseScreenshotResources(
     "Gold 12.500.000\nElixier: 9,5 Mio\nDunkles Elixier 245000\nShiny Ore 1.2K\nunlabelled 999999",
