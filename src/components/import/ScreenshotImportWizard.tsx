@@ -396,8 +396,34 @@ export function ScreenshotImportWizard({
             objectMatches,
           });
           const currentWalls = importType === "walls" ? parseWallDistributions(recognition.text) : [];
-          const currentSlots = importType === "builders" ? parseUpgradeSlots(recognition.text) : [];
-          const currentResources = importType === "resources" ? parseScreenshotResources(recognition.text) : [];
+          const phaseTwoSlotType = {
+            heroes: "builder",
+            pets: "pet_house",
+            equipment: "blacksmith",
+          } as const;
+          const fallbackSlotType =
+            phaseTwoSlotType[importType as keyof typeof phaseTwoSlotType];
+          const currentSlots =
+            importType === "builders" || fallbackSlotType
+              ? parseUpgradeSlots(recognition.text, {
+                  fallbackSlotType,
+                  entities: entities
+                    .filter((entity) =>
+                      importType === "heroes"
+                        ? entity.type === "hero"
+                        : importType === "pets"
+                          ? entity.type === "pet"
+                          : importType === "equipment"
+                            ? entity.type === "equipment"
+                            : true,
+                    )
+                    .map(({ name, aliases }) => ({ name, aliases })),
+                })
+              : [];
+          const currentResources =
+            importType === "resources" || importType === "equipment"
+              ? parseScreenshotResources(recognition.text)
+              : [];
           const currentProfile = importType === "profile" ? parseProfileScreenshot(recognition.text) : null;
           if (!mismatch) {
             combinedDetections.push(...currentDetections);

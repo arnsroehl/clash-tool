@@ -126,6 +126,11 @@ export type UpgradeSlotDetection = {
   sourceText: string;
 };
 
+export type UpgradeSlotParseOptions = {
+  fallbackSlotType?: UpgradeSlotType;
+  entities?: Array<Pick<ScreenshotEntity, "name" | "aliases">>;
+};
+
 export type ScreenshotResourceType =
   | "gold"
   | "elixir"
@@ -557,6 +562,12 @@ export function parseScreenshotDetections(params: {
       ? textMatch.candidates
       : visualCandidates.map((entity) => ({ entity, matchedName: visualMatch?.sourceId }));
     if (!best) return;
+    if (
+      /(?:gesperrt|locked|noch\s+nicht\s+freigeschaltet|not\s+unlocked|requires?|ben[oö]tigt)\b/i.test(
+        line,
+      )
+    )
+      return;
     const entity = best.entity;
     const maxLevel = entity.maxLevelForTownHall ?? entity.maxLevel;
     const directLevel = extractLevel(line, maxLevel);
@@ -837,12 +848,27 @@ export function parseDurationSeconds(value: string): number | null {
   return matched ? total : null;
 }
 
-export function parseUpgradeSlots(text: string): UpgradeSlotDetection[] {
+export function parseUpgradeSlots(
+  text: string,
+  options?: UpgradeSlotParseOptions,
+): UpgradeSlotDetection[] {
   const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
-  const slots: UpgradeSlotDetection[] = [];
+  const candidates = [
+    ...lines,
+    ...(options?.fallbackSlotType
+      ? lines.flatMap((line, index) => [
+          [line, lines[index + 1]].filter(Boolean).join(" "),
+          [line, lines[index + 1], lines[index + 2]].filter(Boolean).join(" "),
+        ])
+      : []),
+  ];
+  const parsed = new Map<
+    string,
+    Omit<UpgradeSlotDetection, "id" | "slotIndex">
+  >();
   const slotCounts = new Map<UpgradeSlotType, number>();
   const nextIndex = (type: UpgradeSlotType) => {
     const value = (slotCounts.get(type) || 0) + 1;
@@ -850,37 +876,63 @@ export function parseUpgradeSlots(text: string): UpgradeSlotDetection[] {
     return value;
   };
 
-  lines.forEach((line) => {
+  candidates.forEach((line) => {
     const normalized = normalizeScreenshotText(line);
     let slotType: UpgradeSlotType | null = null;
+    let usedFallbackSlotType = false;
     if (/(?:bauarbeiter|builder)/i.test(line)) slotType = "builder";
     else if (/(?:labor|laboratory|forschung|research)/i.test(line)) slotType = "laboratory";
     else if (/(?:tierhaus|pet house|pethouse)/i.test(line)) slotType = "pet_house";
     else if (/(?:schmied|blacksmith)/i.test(line)) slotType = "blacksmith";
     else if (/(?:helfer|helper)/i.test(line)) slotType = "helper";
+    const duration = parseDurationSeconds(line);
+    const hasRunningSignal = /(?:verbesserunglauft|wirdverbessert|upgradeinprogress|upgrading|remaining|noch\d)/.test(
+      normalized,
+    );
+    if (!slotType && options?.fallbackSlotType && hasRunningSignal && duration !== null) {
+      slotType = options.fallbackSlotType;
+      usedFallbackSlotType = true;
+    }
     if (!slotType) return;
 
     const available = /(?:verfugbar|frei|available|idle|free)/.test(normalized);
     const occupied = /(?:belegt|beschaftigt|upgrading|upgrade|researching|busy)/.test(normalized);
     const targetMatch = line.match(/(?:→|->|auf|to|ziel(?:level)?|target)\s*(?:level|lvl|stufe)?\s*(\d{1,3})/i);
-    const duration = parseDurationSeconds(line);
     const separator = line.match(/[:\-]\s*([^,;|]+?)(?=\s+(?:→|->|auf\s|to\s|noch\s|remaining\s|\d+\s*(?:d|h|std|tag|day))|$)/i);
-    const parsedEntityName = separator?.[1]?.trim() || null;
+    const matchedEntity = options?.entities
+      ?.flatMap((entity) =>
+        [entity.name, ...(entity.aliases || [])].map((name) => ({
+          entityName: entity.name,
+          match: normalizeScreenshotText(name),
+        })),
+      )
+      .filter((candidate) => candidate.match && normalized.includes(candidate.match))
+      .sort((left, right) => right.match.length - left.match.length)[0];
+    if (usedFallbackSlotType && options?.entities?.length && !matchedEntity) return;
+    const parsedEntityName = matchedEntity?.entityName || separator?.[1]?.trim() || null;
     const isAvailable = available && !occupied && duration === null;
     const entityName = isAvailable ? null : parsedEntityName;
-    slots.push({
-      id: `slot:${slotType}:${nextIndex(slotType)}`,
+    const key = [slotType, entityName, targetMatch?.[1] || "", duration, isAvailable].join(":");
+    parsed.set(key, {
       slotType,
-      slotIndex: slotCounts.get(slotType) as number,
       isAvailable,
       entityName,
       targetLevel: targetMatch ? Number(targetMatch[1]) : null,
       remainingSeconds: duration,
-      confidence: duration !== null || isAvailable ? 0.9 : 0.62,
+      confidence:
+        duration !== null && entityName
+          ? 0.94
+          : duration !== null || isAvailable
+            ? 0.9
+            : 0.62,
       sourceText: line,
     });
   });
-  return slots;
+  return [...parsed.values()].map((slot) => ({
+    ...slot,
+    id: `slot:${slot.slotType}:${nextIndex(slot.slotType)}`,
+    slotIndex: slotCounts.get(slot.slotType) as number,
+  }));
 }
 
 function parseCompactNumber(raw: string, suffix?: string): number | null {
