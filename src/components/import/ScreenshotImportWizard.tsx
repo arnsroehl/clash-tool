@@ -5,6 +5,7 @@ import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "
 import {
   classifyScreenshotText,
   assessScreenshotContentQuality,
+  detectScreenshotLanguage,
   filterBuildingImportEntities,
   filterScreenshotReviewChanges,
   getBuildingImportSection,
@@ -103,6 +104,8 @@ type ProcessedScreenshot = {
   qualityScore: number;
   screenType: ScreenshotScreenType;
   screenTypeConfidence: number;
+  detectedLanguage?: "de" | "en" | "unknown";
+  languageConfidence?: number;
   duplicate: boolean;
   error?: string;
   warnings?: string[];
@@ -596,6 +599,7 @@ export function ScreenshotImportWizard({
             { width: normalized.width, height: normalized.height },
             initialFocusType,
           );
+          let languageDetection = detectScreenshotLanguage(recognition.text);
           let classification = classifyScreenshotText(recognition.text);
           if (
             importType === "full" &&
@@ -612,6 +616,7 @@ export function ScreenshotImportWizard({
               { width: normalized.width, height: normalized.height },
               "laboratory",
             );
+            languageDetection = detectScreenshotLanguage(recognition.text);
             classification = classifyScreenshotText(recognition.text);
           }
           await updateAnalysisJob({
@@ -629,6 +634,7 @@ export function ScreenshotImportWizard({
                 (cell) => cell.isMaxLevel,
               ).length,
               preprocessingApplied: recognition.preprocessingApplied,
+              languageDetection,
             },
           });
           activeJobId = await createAnalysisJob({
@@ -681,6 +687,8 @@ export function ScreenshotImportWizard({
             screenTypeConfidence: forcedType ? 1 : classification.confidence,
             qualityScore: combinedQualityScore,
             qualityIssues: combinedQualityIssues,
+            detectedLanguage: languageDetection.language,
+            languageConfidence: languageDetection.confidence,
           });
           if (!contentQuality.accepted) {
             await updateScreenshotAnalysis({
@@ -690,6 +698,8 @@ export function ScreenshotImportWizard({
               processingStatus: "review_required",
               qualityScore: combinedQualityScore,
               qualityIssues: combinedQualityIssues,
+              detectedLanguage: languageDetection.language,
+              languageConfidence: languageDetection.confidence,
             });
             activeJobId = null;
             nextScreenshots.push({
@@ -699,6 +709,8 @@ export function ScreenshotImportWizard({
               qualityScore: combinedQualityScore,
               screenType: effectiveScreenType,
               screenTypeConfidence: forcedType ? 1 : classification.confidence,
+              detectedLanguage: languageDetection.language,
+              languageConfidence: languageDetection.confidence,
               duplicate: uploaded.duplicate,
               sourceMetadata: {
                 originalFilename: normalized.originalFilename,
@@ -726,6 +738,8 @@ export function ScreenshotImportWizard({
               qualityScore: combinedQualityScore,
               screenType: "unknown",
               screenTypeConfidence: classification.confidence,
+              detectedLanguage: languageDetection.language,
+              languageConfidence: languageDetection.confidence,
               duplicate: uploaded.duplicate,
               sourceMetadata: {
                 originalFilename: normalized.originalFilename,
@@ -901,6 +915,8 @@ export function ScreenshotImportWizard({
             qualityScore: combinedQualityScore,
             screenType: effectiveScreenType,
             screenTypeConfidence: forcedType ? 1 : classification.confidence,
+            detectedLanguage: languageDetection.language,
+            languageConfidence: languageDetection.confidence,
             duplicate: uploaded.duplicate,
             sourceMetadata: {
               originalFilename: normalized.originalFilename,
@@ -988,6 +1004,8 @@ export function ScreenshotImportWizard({
         originalSizeBytes: screenshot.manualSelection.sourceMetadata.originalSizeBytes,
         devicePlatform: screenshot.manualSelection.sourceMetadata.devicePlatform,
         processingStatus: "review_required",
+        detectedLanguage: screenshot.detectedLanguage || "unknown",
+        languageConfidence: screenshot.languageConfidence || 0,
       },
       forcedType,
       sourceMetadata: screenshot.manualSelection.sourceMetadata,
@@ -1596,6 +1614,18 @@ export function ScreenshotImportWizard({
                         {` · ${formatScreenshotBytes(screenshot.sourceMetadata.originalSizeBytes, language)}`}
                         {` → JPEG ${formatScreenshotBytes(screenshot.sourceMetadata.normalizedSizeBytes, language)}`}
                         {` · ${screenshot.sourceMetadata.devicePlatform}`}
+                      </span>
+                    ) : null}
+                    {screenshot.detectedLanguage ? (
+                      <span className="mt-1 block text-slate-500">
+                        {en ? "Screenshot language" : "Screenshot-Sprache"}: {screenshot.detectedLanguage === "de"
+                          ? "Deutsch"
+                          : screenshot.detectedLanguage === "en"
+                            ? "English"
+                            : en ? "not reliably detected (DE + EN OCR)" : "nicht sicher erkannt (DE- und EN-OCR)"}
+                        {screenshot.detectedLanguage !== "unknown"
+                          ? ` · ${Math.round((screenshot.languageConfidence || 0) * 100)}%`
+                          : ""}
                       </span>
                     ) : null}
                     {screenshot.duplicate ? <p className="mt-1 text-sky-300">{en ? "Duplicate ignored" : "Dublette ignoriert"}</p> : null}

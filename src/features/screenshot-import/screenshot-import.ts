@@ -559,6 +559,47 @@ export const normalizeScreenshotText = (value: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
 
+export type ScreenshotLanguage = "de" | "en" | "unknown";
+
+const SCREENSHOT_LANGUAGE_MARKERS: Record<Exclude<ScreenshotLanguage, "unknown">, string[]> = {
+  de: [
+    "verbessern", "gesamtdauer", "bauarbeiter", "verfugbar", "forschung",
+    "truppen", "zauber", "helden", "haustiere", "ausrustung", "schmied",
+    "ressourcen", "spielerprofil", "spielertag", "rathaus", "mauern",
+    "verteidigung", "angreifen", "dunkles elixier",
+  ],
+  en: [
+    "upgrade", "total time", "builder", "available", "research", "troops",
+    "spells", "heroes", "pets", "equipment", "blacksmith", "resources",
+    "player profile", "player tag", "town hall", "walls", "defense",
+    "attack", "dark elixir",
+  ],
+};
+
+export function detectScreenshotLanguage(text: string): {
+  language: ScreenshotLanguage;
+  confidence: number;
+  matchedMarkers: string[];
+} {
+  const normalized = normalizeScreenshotText(text);
+  const ranked = (Object.entries(SCREENSHOT_LANGUAGE_MARKERS) as Array<
+    [Exclude<ScreenshotLanguage, "unknown">, string[]]
+  >).map(([language, markers]) => {
+    const matchedMarkers = markers.filter((marker) =>
+      normalized.includes(normalizeScreenshotText(marker)),
+    );
+    return { language, matchedMarkers, score: matchedMarkers.length };
+  }).sort((left, right) => right.score - left.score);
+  const best = ranked[0];
+  const runnerUp = ranked[1];
+  if (!best || best.score === 0 || best.score === runnerUp?.score)
+    return { language: "unknown", confidence: 0, matchedMarkers: [] };
+  const confidence = clamp(
+    0.55 + best.score * 0.07 + (best.score - (runnerUp?.score || 0)) * 0.08,
+  );
+  return { language: best.language, confidence, matchedMarkers: best.matchedMarkers };
+}
+
 const GERMAN_SCREENSHOT_ALIASES: Record<string, string[]> = {
   "apprentice-warden": ["Lehrlingswächter"],
   archer: ["Bogenschützin"],

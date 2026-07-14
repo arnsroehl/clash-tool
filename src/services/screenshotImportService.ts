@@ -9,6 +9,7 @@ import {
   type ScreenshotResourceDetection,
   type ScreenshotMagicItemDetection,
   type ScreenshotImportType,
+  type ScreenshotLanguage,
   type ScreenshotScreenType,
   type UpgradeSlotDetection,
   type WallLevelDistribution,
@@ -50,6 +51,8 @@ export type ResumableScreenshotFile = ScreenshotSourceMetadata & {
   storagePath: string;
   originalFilename: string;
   processingStatus: string;
+  detectedLanguage: ScreenshotLanguage;
+  languageConfidence: number;
 };
 
 export type ResumableScreenshotImport = {
@@ -143,7 +146,7 @@ export async function fetchLatestOpenScreenshotImport(
         .in("status", ["pending", "later"]),
       client
         .from("screenshot_import_files")
-        .select("id, storage_path, original_filename, original_mime_type, original_size_bytes, normalized_size_bytes, device_platform, processing_status, screen_type")
+        .select("id, storage_path, original_filename, original_mime_type, original_size_bytes, normalized_size_bytes, device_platform, processing_status, screen_type, detected_language, language_confidence")
         .eq("import_session_id", row.id)
         .is("deleted_at", null)
         .order("created_at"),
@@ -240,6 +243,8 @@ export async function fetchLatestOpenScreenshotImport(
         originalSizeBytes: Number(file.original_size_bytes || 0),
         devicePlatform: String(file.device_platform || "unknown") as ScreenshotDevicePlatform,
         processingStatus: String(file.processing_status),
+        detectedLanguage: String(file.detected_language || "unknown") as ScreenshotLanguage,
+        languageConfidence: Number(file.language_confidence || 0),
       })),
     wallDistributions: [...wallMap.values()],
     upgradeSlots: [...slotMap.values()],
@@ -360,6 +365,8 @@ export async function uploadScreenshot(params: {
     normalized_mime_type: params.screenshot.normalizedMimeType,
     normalized_size_bytes: params.screenshot.normalizedSizeBytes,
     device_platform: params.screenshot.devicePlatform,
+    detected_language: "unknown",
+    language_confidence: 0,
     content_hash: params.screenshot.contentHash,
     width: params.screenshot.width,
     height: params.screenshot.height,
@@ -386,6 +393,8 @@ export async function updateScreenshotAnalysis(params: {
   processingStatus?: string;
   qualityScore?: number;
   qualityIssues?: string[];
+  detectedLanguage?: ScreenshotLanguage;
+  languageConfidence?: number;
 }): Promise<void> {
   const quality = params.qualityScore === undefined
     ? {}
@@ -399,6 +408,12 @@ export async function updateScreenshotAnalysis(params: {
       model_version: SCREENSHOT_IMPORT_CONFIG.modelVersion,
       layout_version: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
       ...quality,
+      ...(params.detectedLanguage === undefined
+        ? {}
+        : {
+            detected_language: params.detectedLanguage,
+            language_confidence: params.languageConfidence || 0,
+          }),
     })
     .eq("id", params.screenshotId);
   if (error) throw new Error(error.message);

@@ -141,6 +141,11 @@ byte size, normalized byte size, image dimensions and a coarse device platform
 (`ios`, `android`, `macos`, `windows`, `linux`, `chromeos`, `other` or
 `unknown`). Raw user-agent strings are not stored. Existing databases can add
 these columns with `src/scripts/sql/screenshot-file-metadata.sql`.
+German and English screenshot language is detected per image from OCR markers,
+stored with a confidence value and displayed independently from the app
+language. Ambiguous images keep the combined German/English OCR fallback.
+Existing databases can add these fields with
+`src/scripts/sql/screenshot-language-detection.sql`.
 
 ### Clash API Proxy
 

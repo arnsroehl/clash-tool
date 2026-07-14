@@ -9,7 +9,7 @@ export async function GET(request: NextRequest, context: Context) {
   const { id } = await context.params;
   const [session, files, changes, jobs] = await Promise.all([
     auth.client.from("screenshot_import_sessions").select("*").eq("id", id).single(),
-    auth.client.from("screenshot_import_files").select("id, original_filename, original_mime_type, original_size_bytes, normalized_mime_type, normalized_size_bytes, device_platform, width, height, screen_type, screen_type_confidence, quality_score, quality_issues, processing_status, model_version, layout_version, created_at, deleted_at").eq("import_session_id", id).order("created_at"),
+    auth.client.from("screenshot_import_files").select("id, original_filename, original_mime_type, original_size_bytes, normalized_mime_type, normalized_size_bytes, device_platform, detected_language, language_confidence, width, height, screen_type, screen_type_confidence, quality_score, quality_issues, processing_status, model_version, layout_version, created_at, deleted_at").eq("import_session_id", id).order("created_at"),
     auth.client.from("screenshot_import_changes").select("*").eq("import_session_id", id).order("created_at"),
     auth.client.from("screenshot_analysis_jobs").select("id, screenshot_id, job_type, status, progress, result, error_message, created_at, updated_at").eq("import_session_id", id).order("created_at"),
   ]);

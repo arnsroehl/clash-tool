@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   assessImageQuality,
   assessScreenshotContentQuality,
+  detectScreenshotLanguage,
   classifyScreenshotText,
   mergeScreenshotDetections,
   mergeProfileScreenshotDetections,
@@ -87,6 +88,26 @@ test("classifies German and English laboratory screenshots", () => {
     "laboratory",
   );
   assert.equal(classifyScreenshotText("unrelated content").screenType, "unknown");
+});
+
+test("detects screenshot language independently from the app language", () => {
+  const german = detectScreenshotLanguage(
+    "Labor Forschung Truppen Zauber Gesamtdauer Direkt verbessern",
+  );
+  assert.equal(german.language, "de");
+  assert.ok(german.confidence >= 0.8);
+
+  const english = detectScreenshotLanguage(
+    "Laboratory Research Troops Spells Total time Upgrade",
+  );
+  assert.equal(english.language, "en");
+  assert.ok(english.confidence >= 0.8);
+
+  assert.deepEqual(detectScreenshotLanguage("Dragon 12"), {
+    language: "unknown",
+    confidence: 0,
+    matchedMarkers: [],
+  });
 });
 
 test("recovers a German Dragon level from stylized laboratory OCR", () => {

@@ -50,6 +50,7 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/screenshot-full-account-import.sql` | Allows one guided screenshot session to combine all supported account areas |
 | `src/scripts/sql/screenshot-profile-details.sql` | Adds confirmed experience-level and clan-name fields to accounts |
 | `src/scripts/sql/screenshot-file-metadata.sql` | Adds privacy-minimized source/normalized file metadata and coarse device platform |
+| `src/scripts/sql/screenshot-language-detection.sql` | Stores detected German/English screenshot language and confidence independently from app language |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 

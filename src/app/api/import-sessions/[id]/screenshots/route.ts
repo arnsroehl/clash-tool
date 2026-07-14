@@ -96,6 +96,8 @@ export async function POST(request: NextRequest, context: Context) {
       normalized_mime_type: "image/jpeg",
       normalized_size_bytes: normalized.data.byteLength,
       device_platform: devicePlatform,
+      detected_language: "unknown",
+      language_confidence: 0,
       content_hash: contentHash,
       width: normalized.info.width,
       height: normalized.info.height,
@@ -107,7 +109,7 @@ export async function POST(request: NextRequest, context: Context) {
       model_version: SCREENSHOT_IMPORT_CONFIG.modelVersion,
       layout_version: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
     })
-    .select("id, original_filename, original_mime_type, original_size_bytes, normalized_mime_type, normalized_size_bytes, device_platform, width, height, processing_status, created_at")
+    .select("id, original_filename, original_mime_type, original_size_bytes, normalized_mime_type, normalized_size_bytes, device_platform, detected_language, language_confidence, width, height, processing_status, created_at")
     .single();
   if (error) {
     await auth.client.storage.from("screenshot-imports").remove([storagePath]);

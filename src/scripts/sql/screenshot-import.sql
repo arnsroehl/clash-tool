@@ -36,6 +36,8 @@ create table if not exists public.screenshot_import_files (
   device_platform text not null default 'unknown' check (device_platform in (
     'ios', 'android', 'macos', 'windows', 'linux', 'chromeos', 'other', 'unknown'
   )),
+  detected_language text not null default 'unknown' check (detected_language in ('de', 'en', 'unknown')),
+  language_confidence numeric(5,4) not null default 0 check (language_confidence between 0 and 1),
   content_hash text,
   width integer not null check (width > 0),
   height integer not null check (height > 0),
