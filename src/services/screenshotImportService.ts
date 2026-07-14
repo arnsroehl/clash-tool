@@ -185,7 +185,12 @@ export async function fetchLatestOpenScreenshotImport(
       slotMap.set(`${item.slotType}:${item.slotIndex}`, item),
     );
     (result.resourceDetections || []).forEach((item) =>
-      resourceMap.set(item.resourceType, item),
+      resourceMap.set(item.resourceType, {
+        ...item,
+        amount: item.amount ?? null,
+        capacity: item.capacity ?? null,
+        reasons: item.reasons || [],
+      }),
     );
     if (result.profileDetection) profileDetections.push(result.profileDetection);
   });
@@ -499,7 +504,9 @@ export async function saveResourceSnapshot(params: {
     updated_at: new Date().toISOString(),
   };
   params.resources.forEach((resource) => {
-    row[resource.resourceType] = resource.amount;
+    if (typeof resource.amount === "number") row[resource.resourceType] = resource.amount;
+    if (typeof resource.capacity === "number")
+      row[`${resource.resourceType}_capacity`] = resource.capacity;
   });
   const { error } = await getSupabaseClient()
     .from("account_resource_snapshots")

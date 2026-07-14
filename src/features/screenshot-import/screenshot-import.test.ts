@@ -5,6 +5,7 @@ import {
   classifyScreenshotText,
   mergeScreenshotDetections,
   mergeProfileScreenshotDetections,
+  mergeScreenshotResourceDetections,
   normalizePlayerTag,
   parseScreenshotDetections,
   parseScreenshotLevels,
@@ -631,6 +632,43 @@ test("parses only explicitly labelled resource values and compact numbers", () =
       ["shiny_ore", 1_200],
     ],
   );
+});
+
+test("parses resource amounts and storage capacities from combined or separate lines", () => {
+  const resources = parseScreenshotResources(
+    "Gold 12.500.000 / 22.000.000\nElixier 9,5 Mio von 22 Mio\nDunkles Elixier 245000\nDunkles Elixier Lagerkapazität 360000\nShiny Ore capacity 50K",
+  );
+  assert.deepEqual(
+    resources.map(({ resourceType, amount, capacity }) => [resourceType, amount, capacity]),
+    [
+      ["gold", 12_500_000, 22_000_000],
+      ["elixir", 9_500_000, 22_000_000],
+      ["dark_elixir", 245_000, 360_000],
+      ["shiny_ore", null, 50_000],
+    ],
+  );
+});
+
+test("marks a resource result as uncertain when the amount exceeds capacity", () => {
+  const [gold] = parseScreenshotResources("Gold 23 Mio / 22 Mio");
+  assert.equal(gold.confidence, 0.49);
+  assert.match(gold.reasons[0], /über der erkannten Lagerkapazität/);
+});
+
+test("merges complementary resource screenshots and exposes contradictions", () => {
+  const amountOnly = parseScreenshotResources("Gold 12 Mio")[0];
+  const capacityOnly = parseScreenshotResources("Gold Lagerkapazität 22 Mio")[0];
+  const complete = mergeScreenshotResourceDetections(amountOnly, capacityOnly);
+  assert.deepEqual([complete.amount, complete.capacity], [12_000_000, 22_000_000]);
+  assert.equal(complete.confidence, 0.82);
+
+  const conflict = mergeScreenshotResourceDetections(
+    complete,
+    parseScreenshotResources("Gold 13 Mio / 23 Mio")[0],
+  );
+  assert.equal(conflict.confidence, 0.49);
+  assert.ok(conflict.reasons.some((reason) => /unterschiedliche Bestände/.test(reason)));
+  assert.ok(conflict.reasons.some((reason) => /unterschiedliche Lagerkapazitäten/.test(reason)));
 });
 
 test("parses stable profile identifiers without guessing a player name", () => {

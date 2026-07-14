@@ -42,6 +42,9 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/troops.sql` | `troops`, `troop_levels`, `account_troops` |
 | `src/scripts/sql/spells.sql` | `spells`, `spell_levels`, `account_spells` |
 | `src/scripts/sql/siege-machines.sql` | `siege_machines`, `siege_machine_levels`, `account_siege_machines` |
+| `src/scripts/sql/screenshot-import.sql` | Screenshot sessions, files, detections, proposed changes, events and feedback |
+| `src/scripts/sql/screenshot-progress-catalog.sql` | Screenshot catalog, account progress, wall distributions, upgrade slots, resource snapshots and analysis jobs |
+| `src/scripts/sql/screenshot-resource-capacities.sql` | Adds separately persisted resource storage capacities to existing screenshot snapshots |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 
@@ -76,6 +79,10 @@ Account services read and write:
 - created timestamp
 
 Progress tables store `current_level` per `account_id` and game-data id.
+
+Screenshot resource snapshots store current resource amounts and their optional
+storage capacities separately. Row-level ownership continues to be derived from
+the linked account; a confirmed import session is retained as the source.
 
 ## Game Data
 

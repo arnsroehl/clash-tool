@@ -200,10 +200,54 @@ export type ScreenshotResourceType =
 
 export type ScreenshotResourceDetection = {
   resourceType: ScreenshotResourceType;
-  amount: number;
+  amount: number | null;
+  capacity: number | null;
   confidence: number;
   sourceText: string;
+  reasons: string[];
 };
+
+export function mergeScreenshotResourceDetections(
+  existing: ScreenshotResourceDetection | undefined,
+  next: ScreenshotResourceDetection,
+): ScreenshotResourceDetection {
+  if (!existing) return next;
+  if (existing.resourceType !== next.resourceType)
+    throw new Error("Nur Werte derselben Ressourcenart können zusammengeführt werden.");
+  const amountConflict =
+    existing.amount !== null && next.amount !== null && existing.amount !== next.amount;
+  const capacityConflict =
+    existing.capacity !== null &&
+    next.capacity !== null &&
+    existing.capacity !== next.capacity;
+  const preferNext = next.confidence > existing.confidence;
+  const amount = amountConflict
+    ? preferNext ? next.amount : existing.amount
+    : next.amount ?? existing.amount;
+  const capacity = capacityConflict
+    ? preferNext ? next.capacity : existing.capacity
+    : next.capacity ?? existing.capacity;
+  const reasons = [...(existing.reasons || []), ...(next.reasons || [])];
+  if (amountConflict)
+    reasons.push(
+      `Mehrere Screenshots zeigen unterschiedliche Bestände (${existing.amount} und ${next.amount}).`,
+    );
+  if (capacityConflict)
+    reasons.push(
+      `Mehrere Screenshots zeigen unterschiedliche Lagerkapazitäten (${existing.capacity} und ${next.capacity}).`,
+    );
+  return {
+    resourceType: existing.resourceType,
+    amount,
+    capacity,
+    confidence:
+      amountConflict || capacityConflict
+        ? Math.min(existing.confidence, next.confidence, 0.49)
+        : Math.max(existing.confidence, next.confidence),
+    sourceText: `${existing.sourceText} · ${next.sourceText}`,
+    reasons: [...new Set(reasons)],
+  };
+}
 
 export type ScreenshotProfileDetection = {
   playerTag: string | null;
@@ -1242,16 +1286,46 @@ export function parseScreenshotResources(text: string): ScreenshotResourceDetect
     const definition = definitions.find(({ pattern }) => pattern.test(line));
     if (!definition) return;
     const withoutName = line.replace(definition.pattern, " ");
-    const amountMatch = withoutName.match(/(\d[\d.,\s]*\d|\d)(?:\s*(k|m|tsd|mio|thousand|million))?\b/i);
-    if (!amountMatch) return;
-    const amount = parseCompactNumber(amountMatch[1], amountMatch[2]);
-    if (amount === null) return;
-    const confidence = amountMatch[2] ? 0.82 : 0.96;
+    const valuePattern = /(\d[\d.,\s]*\d|\d)(?:\s*(k|m|tsd|mio|thousand|million))?\b/gi;
+    const parseFirstValue = (value: string) => {
+      const match = [...value.matchAll(valuePattern)][0];
+      return match ? parseCompactNumber(match[1], match[2]) : null;
+    };
+    const separator = withoutName.match(/^(.*?)(?:\/|\bvon\b|\bof\b)(.*)$/i);
+    const capacityOnly = /(?:kapazit[aä]t|capacity|lager(?:platz)?|storage|max(?:imum)?)/i.test(
+      withoutName,
+    );
+    const amount = separator
+      ? parseFirstValue(separator[1])
+      : capacityOnly
+        ? null
+        : parseFirstValue(withoutName);
+    const capacity = separator
+      ? parseFirstValue(separator[2])
+      : capacityOnly
+        ? parseFirstValue(withoutName)
+        : null;
+    if (amount === null && capacity === null) return;
+    const previous = result.get(definition.type);
+    const mergedAmount = amount ?? previous?.amount ?? null;
+    const mergedCapacity = capacity ?? previous?.capacity ?? null;
+    const reasons = [...(previous?.reasons || [])];
+    let confidence = Math.min(previous?.confidence ?? 1, /(?:k|m|tsd|mio|thousand|million)\b/i.test(withoutName) ? 0.82 : 0.96);
+    if (
+      mergedAmount !== null &&
+      mergedCapacity !== null &&
+      mergedAmount > mergedCapacity
+    ) {
+      confidence = Math.min(confidence, 0.49);
+      reasons.push("Der erkannte Bestand liegt über der erkannten Lagerkapazität.");
+    }
     result.set(definition.type, {
       resourceType: definition.type,
-      amount,
+      amount: mergedAmount,
+      capacity: mergedCapacity,
       confidence,
-      sourceText: line,
+      sourceText: previous ? `${previous.sourceText} · ${line}` : line,
+      reasons: [...new Set(reasons)],
     });
   });
   return [...result.values()];

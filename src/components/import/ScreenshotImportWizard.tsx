@@ -8,6 +8,7 @@ import {
   filterScreenshotReviewChanges,
   getBuildingImportSection,
   mergeProfileScreenshotDetections,
+  mergeScreenshotResourceDetections,
   mergeScreenshotDetections,
   parseUpgradeSlots,
   parseWallDistributions,
@@ -218,6 +219,17 @@ export function ScreenshotImportWizard({
   const hasIncompleteUpgradeSlots = useMemo(
     () => upgradeSlots.some((slot) => !slot.isAvailable && slot.remainingSeconds === null),
     [upgradeSlots],
+  );
+  const hasInvalidResourceDetection = useMemo(
+    () => resourceDetections.some(
+      (resource) =>
+        resource.confidence < 0.5 ||
+        (resource.amount === null && resource.capacity === null) ||
+        (resource.amount !== null &&
+          resource.capacity !== null &&
+          resource.amount > resource.capacity),
+    ),
+    [resourceDetections],
   );
   const wallTotal = useMemo(
     () => wallDistributions.reduce((sum, wall) => sum + wall.count, 0),
@@ -590,7 +602,15 @@ export function ScreenshotImportWizard({
                 : item);
             });
             currentSlots.forEach((item) => combinedSlots.set(`${item.slotType}:${item.slotIndex}`, item));
-            currentResources.forEach((item) => combinedResources.set(item.resourceType, item));
+            currentResources.forEach((item) =>
+              combinedResources.set(
+                item.resourceType,
+                mergeScreenshotResourceDetections(
+                  combinedResources.get(item.resourceType),
+                  item,
+                ),
+              ),
+            );
             if (currentProfile && currentProfile.confidence > 0)
               combinedProfile = mergeProfileScreenshotDetections(
                 [combinedProfile, currentProfile].filter(
@@ -1487,20 +1507,52 @@ export function ScreenshotImportWizard({
             <div className="mt-5">
               <h4 className="font-bold">{en ? "Resources" : "Ressourcen"}</h4>
               <p className="mt-1 text-xs text-slate-400">
-                {en ? "Compact values such as 9.5M require individual review." : "Verkürzte Werte wie 9,5 Mio müssen einzeln geprüft werden."}
+                {en ? "Current amount and storage capacity are shown separately. Compact values such as 9.5M require individual review." : "Aktueller Bestand und Lagerkapazität werden getrennt angezeigt. Verkürzte Werte wie 9,5 Mio müssen einzeln geprüft werden."}
               </p>
+              {hasInvalidResourceDetection ? (
+                <p className="mt-2 rounded-lg bg-amber-400/10 p-2 text-xs text-amber-200">
+                  {en
+                    ? "Correct empty, contradictory or implausible resource values before confirming."
+                    : "Korrigiere leere, widersprüchliche oder unplausible Ressourcenwerte, bevor du bestätigst."}
+                </p>
+              ) : null}
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 {resourceDetections.map((resource) => (
-                  <label key={resource.resourceType} className="flex items-center justify-between rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
-                    <span>{resource.resourceType.replaceAll("_", " ")} · {Math.round(resource.confidence * 100)}%</span>
-                    <input
-                      type="number"
-                      min={0}
-                      value={resource.amount}
-                      onChange={(event) => setResourceDetections((current) => current.map((item) => item.resourceType === resource.resourceType ? { ...item, amount: Number(event.target.value), confidence: 1 } : item))}
-                      className="w-32 rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-white"
-                    />
-                  </label>
+                  <div key={resource.resourceType} className="rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <b>{resource.resourceType.replaceAll("_", " ")}</b>
+                      <span className={resource.confidence < 0.5 ? "text-amber-200" : "text-slate-400"}>
+                        {Math.round(resource.confidence * 100)}%
+                      </span>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <label className="text-xs text-slate-400">
+                        {en ? "Current" : "Bestand"}
+                        <input
+                          aria-label={`${resource.resourceType} ${en ? "current amount" : "Bestand"}`}
+                          type="number"
+                          min={0}
+                          value={resource.amount ?? ""}
+                          onChange={(event) => setResourceDetections((current) => current.map((item) => item.resourceType === resource.resourceType ? { ...item, amount: event.target.value ? Number(event.target.value) : null, confidence: 1, reasons: [] } : item))}
+                          className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-white"
+                        />
+                      </label>
+                      <label className="text-xs text-slate-400">
+                        {en ? "Capacity" : "Kapazität"}
+                        <input
+                          aria-label={`${resource.resourceType} ${en ? "storage capacity" : "Lagerkapazität"}`}
+                          type="number"
+                          min={0}
+                          value={resource.capacity ?? ""}
+                          onChange={(event) => setResourceDetections((current) => current.map((item) => item.resourceType === resource.resourceType ? { ...item, capacity: event.target.value ? Number(event.target.value) : null, confidence: 1, reasons: [] } : item))}
+                          className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-white"
+                        />
+                      </label>
+                    </div>
+                    {resource.reasons?.length ? (
+                      <p className="mt-2 text-xs text-amber-200">{resource.reasons.join(" ")}</p>
+                    ) : null}
+                  </div>
                 ))}
               </div>
             </div>
@@ -1585,7 +1637,7 @@ export function ScreenshotImportWizard({
             </span>
           </label>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || (profileValidation !== null && !profileValidation.canApply) || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
+            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || hasInvalidWallDistribution || hasInvalidResourceDetection || (profileValidation !== null && !profileValidation.canApply) || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
               {en ? "Confirm selected changes" : "Ausgewählte Änderungen bestätigen"}
             </button>
             <button type="button" disabled={busy} onClick={() => void saveEntireImportForLater()} className="rounded-xl border border-sky-400/30 px-5 py-3 font-bold text-sky-200 disabled:opacity-40">

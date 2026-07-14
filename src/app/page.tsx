@@ -237,6 +237,11 @@ export default function Home() {
         elixir: screenshotResourceSnapshot.elixir ?? current.elixir,
         darkElixir: screenshotResourceSnapshot.darkElixir ?? current.darkElixir,
       }));
+      setStorageCapacities((current) => ({
+        gold: screenshotResourceSnapshot.goldCapacity ?? current.gold,
+        elixir: screenshotResourceSnapshot.elixirCapacity ?? current.elixir,
+        darkElixir: screenshotResourceSnapshot.darkElixirCapacity ?? current.darkElixir,
+      }));
     }, 0);
     return () => window.clearTimeout(timeout);
   }, [activeScenario, screenshotResourceSnapshot]);
@@ -820,11 +825,25 @@ export default function Home() {
             extraScreenshotEntities={screenshotProgressEntities}
             language={language}
             onResourcesImported={(detected) => {
-              const values = Object.fromEntries(detected.map((item) => [item.resourceType, item.amount]));
+              const values = Object.fromEntries(
+                detected
+                  .filter((item) => item.amount !== null)
+                  .map((item) => [item.resourceType, item.amount]),
+              );
+              const capacities = Object.fromEntries(
+                detected
+                  .filter((item) => item.capacity !== null)
+                  .map((item) => [item.resourceType, item.capacity]),
+              );
               setResources((current) => ({
                 gold: values.gold ?? current.gold,
                 elixir: values.elixir ?? current.elixir,
                 darkElixir: values.dark_elixir ?? current.darkElixir,
+              }));
+              setStorageCapacities((current) => ({
+                gold: capacities.gold ?? current.gold,
+                elixir: capacities.elixir ?? current.elixir,
+                darkElixir: capacities.dark_elixir ?? current.darkElixir,
               }));
             }}
             onUpgradeSlotsImported={refreshScreenshotProgress}

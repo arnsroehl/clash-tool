@@ -119,7 +119,7 @@ export async function fetchAccountResourceSnapshot(
 ): Promise<ScreenshotResourceSnapshot | null> {
   const { data, error } = await getSupabaseClient()
     .from("account_resource_snapshots")
-    .select("gold, elixir, dark_elixir, shiny_ore, glowy_ore, starry_ore, captured_at")
+    .select("gold, elixir, dark_elixir, shiny_ore, glowy_ore, starry_ore, gold_capacity, elixir_capacity, dark_elixir_capacity, shiny_ore_capacity, glowy_ore_capacity, starry_ore_capacity, captured_at")
     .eq("account_id", accountId)
     .maybeSingle();
   if (error) throw new Error(error.message);
@@ -132,6 +132,12 @@ export async function fetchAccountResourceSnapshot(
     shinyOre: numeric(data.shiny_ore),
     glowyOre: numeric(data.glowy_ore),
     starryOre: numeric(data.starry_ore),
+    goldCapacity: numeric(data.gold_capacity),
+    elixirCapacity: numeric(data.elixir_capacity),
+    darkElixirCapacity: numeric(data.dark_elixir_capacity),
+    shinyOreCapacity: numeric(data.shiny_ore_capacity),
+    glowyOreCapacity: numeric(data.glowy_ore_capacity),
+    starryOreCapacity: numeric(data.starry_ore_capacity),
     capturedAt: String(data.captured_at),
   };
 }
