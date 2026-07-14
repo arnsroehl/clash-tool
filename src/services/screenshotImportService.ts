@@ -391,6 +391,25 @@ export async function saveUpgradeSlots(params: {
     { onConflict: "account_id,slot_type,slot_index" },
   );
   if (error) throw new Error(error.message);
+  const slotsByType = params.slots.reduce<Map<UpgradeSlotDetection["slotType"], UpgradeSlotDetection[]>>(
+    (groups, slot) => {
+      groups.set(slot.slotType, [...(groups.get(slot.slotType) || []), slot]);
+      return groups;
+    },
+    new Map(),
+  );
+  const cleanupResults = await Promise.all(
+    [...slotsByType.entries()].map(([slotType, slots]) =>
+      client
+        .from("account_upgrade_slots")
+        .delete()
+        .eq("account_id", params.accountId)
+        .eq("slot_type", slotType)
+        .gt("slot_index", Math.max(...slots.map((slot) => slot.slotIndex))),
+    ),
+  );
+  const failedCleanup = cleanupResults.find((result) => result.error);
+  if (failedCleanup?.error) throw new Error(failedCleanup.error.message);
 }
 
 export async function saveResourceSnapshot(params: {

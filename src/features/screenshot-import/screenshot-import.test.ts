@@ -9,6 +9,9 @@ import {
   parseScreenshotResources,
   parseProfileScreenshot,
   parseDurationSeconds,
+  parseBuilderAvailability,
+  filterBuildingImportEntities,
+  getBuildingImportSection,
   parseUpgradeSlots,
   parseWallDistributions,
   summarizeScreenshotReview,
@@ -377,6 +380,35 @@ test("assigns OCR levels to exact building instances", () => {
   );
 });
 
+test("assigns repeated unnumbered building cards to separate instances", () => {
+  const matches = parseScreenshotLevels("Kanone Level 19\nKanone Level 20", [
+    { id: "cannon:1", name: "Kanone 1", aliases: ["Kanone"], currentLevel: 18, maxLevel: 21, type: "building" },
+    { id: "cannon:2", name: "Kanone 2", aliases: ["Kanone"], currentLevel: 18, maxLevel: 21, type: "building" },
+  ]);
+  assert.deepEqual(
+    matches.map((match) => [match.id, match.detectedLevel]),
+    [["cannon:1", 19], ["cannon:2", 20]],
+  );
+});
+
+test("filters structured building imports by database category", () => {
+  const buildingEntities: ScreenshotEntity[] = [
+    { id: "cannon", name: "Kanone", category: "Verteidigung", currentLevel: 1, type: "building" },
+    { id: "camp", name: "Armeelager", category: "Armee", currentLevel: 1, type: "building" },
+    { id: "mine", name: "Goldmine", category: "Ressourcen", currentLevel: 1, type: "building" },
+    { id: "bomb", name: "Bombe", category: "Fallen", currentLevel: 1, type: "building" },
+  ];
+  assert.equal(getBuildingImportSection("Defense"), "defense");
+  assert.deepEqual(
+    filterBuildingImportEntities(buildingEntities, "resources").map((entity) => entity.id),
+    ["mine"],
+  );
+  assert.deepEqual(
+    filterBuildingImportEntities(buildingEntities, "traps").map((entity) => entity.id),
+    ["bomb"],
+  );
+});
+
 test("parses German and English wall distributions and flags conflicts", () => {
   const walls = parseWallDistributions(
     "Level 16: 120 Mauern\nWalls level 17: 205 walls\nLevel 16: 119 Mauern",
@@ -406,6 +438,49 @@ test("parses localized durations and occupied upgrade slots", () => {
       ["blacksmith", false, 12, 183_600],
     ],
   );
+});
+
+test("parses a builder summary and creates exact occupied and available slots", () => {
+  assert.deepEqual(parseBuilderAvailability("2 von 6 Bauarbeitern verfügbar"), {
+    available: 2,
+    total: 6,
+    sourceText: "2 von 6 Bauarbeitern verfügbar",
+  });
+  const slots = parseUpgradeSlots(
+    "2/6\nKanone 2\nVerbesserung läuft auf Level 20\nNoch 4 Tage 8 Stunden",
+    {
+      fallbackSlotType: "builder",
+      inferBuilderSummary: true,
+      entities: [{ name: "Kanone 2", aliases: ["cannon-2"] }],
+    },
+  );
+  assert.equal(slots.length, 6);
+  assert.equal(slots.filter((slot) => slot.isAvailable).length, 2);
+  assert.equal(slots.filter((slot) => !slot.isAvailable).length, 4);
+  assert.deepEqual(
+    slots.map((slot) => slot.slotIndex),
+    [1, 2, 3, 4, 5, 6],
+  );
+  assert.deepEqual(
+    slots.find((slot) => slot.entityName === "Kanone 2"),
+    {
+      id: "slot:builder:1",
+      slotType: "builder",
+      slotIndex: 1,
+      isAvailable: false,
+      entityName: "Kanone 2",
+      targetLevel: 20,
+      remainingSeconds: 374_400,
+      confidence: 0.94,
+      sourceText: "Kanone 2 Verbesserung läuft auf Level 20 Noch 4 Tage 8 Stunden",
+    },
+  );
+  const compactSlot = parseUpgradeSlots("Kanone 2 Level 20 · 4d 8h", {
+    fallbackSlotType: "builder",
+    entities: [{ name: "Kanone 2", aliases: [] }],
+  });
+  assert.equal(compactSlot[0].targetLevel, 20);
+  assert.equal(compactSlot[0].remainingSeconds, 374_400);
 });
 
 test("recognizes multi-line hero and pet upgrades from their selected views", () => {

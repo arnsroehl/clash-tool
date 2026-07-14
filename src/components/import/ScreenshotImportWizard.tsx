@@ -4,6 +4,8 @@ import Image from "next/image";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   classifyScreenshotText,
+  filterBuildingImportEntities,
+  getBuildingImportSection,
   mergeScreenshotDetections,
   parseUpgradeSlots,
   parseWallDistributions,
@@ -12,6 +14,7 @@ import {
   parseProfileScreenshot,
   summarizeScreenshotReview,
   type ScreenshotDetection,
+  type BuildingImportSection,
   type ScreenshotEntity,
   type ScreenshotProposedChange,
   type ScreenshotScreenType,
@@ -58,6 +61,7 @@ type Props = {
   onConfirm: (changes: ImportChange[]) => Promise<void>;
   onResourcesConfirmed?: (resources: ScreenshotResourceDetection[]) => void;
   onProfileConfirmed?: (profile: ScreenshotProfileDetection) => Promise<void>;
+  onUpgradeSlotsConfirmed?: () => Promise<void> | void;
 };
 
 type ProcessedScreenshot = {
@@ -90,6 +94,19 @@ const IMPORT_TYPES: Array<{
   { id: "profile", de: "Profil", en: "Profile", hintDe: "Spieler-Tag, Rathaus und Erfahrungslevel", hintEn: "Player tag, Town Hall and experience level" },
 ];
 
+const BUILDING_SECTIONS: Array<{
+  id: BuildingImportSection;
+  de: string;
+  en: string;
+}> = [
+  { id: "all", de: "Alle", en: "All" },
+  { id: "core", de: "Hauptgebäude", en: "Core" },
+  { id: "defense", de: "Verteidigung", en: "Defense" },
+  { id: "offense", de: "Armee", en: "Offense" },
+  { id: "resources", de: "Ressourcen", en: "Resources" },
+  { id: "traps", de: "Fallen", en: "Traps" },
+];
+
 const qualityIssueText: Record<string, { de: string; en: string }> = {
   too_small: { de: "Bildauflösung ist zu niedrig", en: "Image resolution is too low" },
   too_blurry: { de: "Bild ist zu unscharf", en: "Image is too blurry" },
@@ -107,10 +124,12 @@ export function ScreenshotImportWizard({
   onConfirm,
   onResourcesConfirmed,
   onProfileConfirmed,
+  onUpgradeSlotsConfirmed,
 }: Props) {
   const en = language === "en";
   const [step, setStep] = useState<"select" | "upload" | "review" | "done">("select");
   const [importType, setImportType] = useState<ImportType>("laboratory");
+  const [buildingSection, setBuildingSection] = useState<BuildingImportSection>("all");
   const [session, setSession] = useState<ScreenshotImportSession | null>(null);
   const [resumeCandidate, setResumeCandidate] = useState<ResumableScreenshotImport | null>(null);
   const [pendingResumeFiles, setPendingResumeFiles] = useState<ResumableScreenshotFile[]>([]);
@@ -158,6 +177,10 @@ export function ScreenshotImportWizard({
     return [...combined.values()];
   }, [detections, restoredChanges]);
   const summary = useMemo(() => summarizeScreenshotReview(changes), [changes]);
+  const hasIncompleteUpgradeSlots = useMemo(
+    () => upgradeSlots.some((slot) => !slot.isAvailable && slot.remainingSeconds === null),
+    [upgradeSlots],
+  );
   const groupedChanges = useMemo(() => {
     const groups = new Map<string, ScreenshotProposedChange[]>();
     changes
@@ -169,6 +192,17 @@ export function ScreenshotImportWizard({
       });
     return [...groups.entries()];
   }, [changes]);
+  const buildingSectionCounts = useMemo(
+    () => Object.fromEntries(BUILDING_SECTIONS.map((section) => [
+      section.id,
+      section.id === "all"
+        ? entities.filter((entity) => entity.type === "building").length
+        : entities.filter(
+            (entity) => entity.type === "building" && getBuildingImportSection(entity.category) === section.id,
+          ).length,
+    ])) as Record<BuildingImportSection, number>,
+    [entities],
+  );
   const coverage = useMemo(() => {
     const typesByImport: Partial<Record<ImportType, ScreenshotEntity["type"][]>> = {
       laboratory: ["troop", "spell", "siege_machine"],
@@ -177,16 +211,16 @@ export function ScreenshotImportWizard({
       equipment: ["equipment"],
       buildings: ["building"],
     };
-    const expected = entities.filter((entity) =>
-      (typesByImport[importType] || []).includes(entity.type),
-    );
+    const expected = importType === "buildings"
+      ? filterBuildingImportEntities(entities, buildingSection)
+      : entities.filter((entity) => (typesByImport[importType] || []).includes(entity.type));
     const detected = new Set(detections.map((detection) => detection.id));
     return {
       expected: expected.length,
       detected: expected.filter((entity) => detected.has(entity.id)).length,
       missing: expected.filter((entity) => !detected.has(entity.id)),
     };
-  }, [detections, entities, importType]);
+  }, [buildingSection, detections, entities, importType]);
   const selectedType = IMPORT_TYPES.find((item) => item.id === importType) || IMPORT_TYPES[0];
 
   const startSession = async () => {
@@ -341,8 +375,12 @@ export function ScreenshotImportWizard({
             status: "running",
           });
           const classification = classifyScreenshotText(recognition.text);
+          const compatibleBuildingClassification =
+            importType === "buildings" &&
+            (classification.screenType === "buildings" ||
+              (buildingSection === "resources" && classification.screenType === "resources"));
           const effectiveScreenType =
-            classification.screenType === "unknown"
+            classification.screenType === "unknown" || compatibleBuildingClassification
               ? importType
               : classification.screenType;
           await updateAnalysisJob({
@@ -377,6 +415,7 @@ export function ScreenshotImportWizard({
           const mismatch =
             classification.screenType !== "unknown" &&
             classification.screenType !== importType &&
+            !compatibleBuildingClassification &&
             classification.confidence >= 0.72;
           activeJobId = await createAnalysisJob({
             sessionId: session.id,
@@ -384,9 +423,12 @@ export function ScreenshotImportWizard({
             jobType: "validate_results",
             status: "running",
           });
+          const analysisEntities = importType === "buildings"
+            ? filterBuildingImportEntities(entities, buildingSection)
+            : entities;
           const currentDetections = parseScreenshotDetections({
             text: recognition.text,
-            entities,
+            entities: analysisEntities,
             screenshotId: uploaded.id,
             screenType: effectiveScreenType,
             townHallLevel,
@@ -396,20 +438,24 @@ export function ScreenshotImportWizard({
             objectMatches,
           });
           const currentWalls = importType === "walls" ? parseWallDistributions(recognition.text) : [];
-          const phaseTwoSlotType = {
+          const fallbackSlotTypeByImport = {
+            builders: "builder",
             heroes: "builder",
             pets: "pet_house",
             equipment: "blacksmith",
           } as const;
           const fallbackSlotType =
-            phaseTwoSlotType[importType as keyof typeof phaseTwoSlotType];
+            fallbackSlotTypeByImport[importType as keyof typeof fallbackSlotTypeByImport];
           const currentSlots =
             importType === "builders" || fallbackSlotType
               ? parseUpgradeSlots(recognition.text, {
                   fallbackSlotType,
+                  inferBuilderSummary: importType === "builders",
                   entities: entities
                     .filter((entity) =>
-                      importType === "heroes"
+                      importType === "builders"
+                        ? entity.type === "building" || entity.type === "hero"
+                        : importType === "heroes"
                         ? entity.type === "hero"
                         : importType === "pets"
                           ? entity.type === "pet"
@@ -572,8 +618,10 @@ export function ScreenshotImportWizard({
       if (importChanges.length) await onConfirm(importChanges);
       if (wallDistributions.length)
         await saveWallDistributions(accountId, wallDistributions);
-      if (upgradeSlots.length)
+      if (upgradeSlots.length) {
         await saveUpgradeSlots({ accountId, sessionId: session.id, slots: upgradeSlots });
+        await onUpgradeSlotsConfirmed?.();
+      }
       if (resourceDetections.length) {
         await saveResourceSnapshot({ accountId, sessionId: session.id, resources: resourceDetections });
         onResourcesConfirmed?.(resourceDetections);
@@ -723,6 +771,38 @@ export function ScreenshotImportWizard({
               </button>
             ))}
           </div>
+          {importType === "buildings" ? (
+            <fieldset className="mt-4">
+              <legend className="text-sm font-bold text-slate-200">
+                {en ? "Which building overview are you importing?" : "Welche Gebäudeübersicht importierst du?"}
+              </legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {BUILDING_SECTIONS.map((section) => (
+                  <button
+                    type="button"
+                    key={section.id}
+                    onClick={() => setBuildingSection(section.id)}
+                    disabled={buildingSectionCounts[section.id] === 0}
+                    aria-pressed={buildingSection === section.id}
+                    className={`rounded-lg border px-3 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-35 ${
+                      buildingSection === section.id
+                        ? "border-amber-400 bg-amber-400/10 text-amber-100"
+                        : "border-white/10 bg-slate-950 text-slate-300"
+                    }`}
+                  >
+                    {en ? section.en : section.de} ({buildingSectionCounts[section.id]})
+                  </button>
+                ))}
+              </div>
+              {buildingSectionCounts.traps === 0 ? (
+                <p className="mt-2 text-xs text-amber-200">
+                  {en
+                    ? "Trap catalog data is not available yet; trap screenshots remain disabled to avoid invented levels."
+                    : "Für Fallen fehlen noch Katalogdaten; der Fallen-Import bleibt deaktiviert, damit keine Level erfunden werden."}
+                </p>
+              ) : null}
+            </fieldset>
+          ) : null}
           <div className="mt-4 rounded-xl bg-sky-400/10 p-4 text-sm text-sky-100">
             <b>{en ? "Open this view in Clash of Clans:" : "Öffne diese Ansicht in Clash of Clans:"}</b>{" "}
             {en ? selectedType.hintEn : selectedType.hintDe}.{" "}
@@ -927,12 +1007,57 @@ export function ScreenshotImportWizard({
               <div className="mt-2 space-y-2">
                 {upgradeSlots.map((slot) => (
                   <article key={slot.id} className="rounded-xl border border-white/10 bg-slate-950 p-3 text-sm">
-                    <b>{slot.slotType.replace("_", " ")} {slot.slotIndex}</b>
-                    <span className="ml-2 text-slate-400">
-                      {slot.isAvailable ? (en ? "available" : "frei") : slot.entityName || (en ? "occupied" : "belegt")}
-                      {slot.targetLevel ? ` → ${slot.targetLevel}` : ""}
-                      {slot.remainingSeconds !== null ? ` · ${Math.round(slot.remainingSeconds / 3600)} h` : ""}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <b>{slot.slotType.replace("_", " ")} {slot.slotIndex}</b>
+                      <select
+                        aria-label={`${slot.slotType} ${slot.slotIndex} ${en ? "status" : "Status"}`}
+                        value={slot.isAvailable ? "available" : "occupied"}
+                        onChange={(event) => setUpgradeSlots((current) => current.map((item) => item.id === slot.id
+                          ? event.target.value === "available"
+                            ? { ...item, isAvailable: true, entityName: null, targetLevel: null, remainingSeconds: null, confidence: 1 }
+                            : { ...item, isAvailable: false, confidence: 1 }
+                          : item))}
+                        className="rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                      >
+                        <option value="available">{en ? "available" : "frei"}</option>
+                        <option value="occupied">{en ? "occupied" : "belegt"}</option>
+                      </select>
+                      {!slot.isAvailable ? (
+                        <>
+                          <input
+                            aria-label={`${slot.slotType} ${slot.slotIndex} ${en ? "upgrade" : "Upgrade"}`}
+                            value={slot.entityName || ""}
+                            placeholder={en ? "Upgrade" : "Upgrade"}
+                            onChange={(event) => setUpgradeSlots((current) => current.map((item) => item.id === slot.id ? { ...item, entityName: event.target.value || null, confidence: 1 } : item))}
+                            className="min-w-40 flex-1 rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                          />
+                          <input
+                            aria-label={`${slot.slotType} ${slot.slotIndex} ${en ? "target level" : "Ziellevel"}`}
+                            type="number"
+                            min={1}
+                            value={slot.targetLevel ?? ""}
+                            placeholder={en ? "Target" : "Ziellevel"}
+                            onChange={(event) => setUpgradeSlots((current) => current.map((item) => item.id === slot.id ? { ...item, targetLevel: event.target.value ? Number(event.target.value) : null, confidence: 1 } : item))}
+                            className="w-24 rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                          />
+                          <input
+                            aria-label={`${slot.slotType} ${slot.slotIndex} ${en ? "remaining hours" : "Reststunden"}`}
+                            type="number"
+                            min={0}
+                            step="0.5"
+                            value={slot.remainingSeconds === null ? "" : slot.remainingSeconds / 3600}
+                            placeholder={en ? "Hours left" : "Reststunden"}
+                            onChange={(event) => setUpgradeSlots((current) => current.map((item) => item.id === slot.id ? { ...item, remainingSeconds: event.target.value ? Math.round(Number(event.target.value) * 3600) : null, confidence: 1 } : item))}
+                            className="w-28 rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                          />
+                        </>
+                      ) : null}
+                    </div>
+                    {!slot.isAvailable && slot.remainingSeconds === null ? (
+                      <p className="mt-2 text-xs text-amber-200">
+                        {en ? "Remaining time was not recognized. Enter it before confirming for an exact simulation." : "Restzeit wurde nicht erkannt. Für eine genaue Simulation bitte vor dem Bestätigen eintragen."}
+                      </p>
+                    ) : null}
                   </article>
                 ))}
               </div>
@@ -985,7 +1110,7 @@ export function ScreenshotImportWizard({
             </span>
           </label>
           <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" disabled={busy || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
+            <button type="button" disabled={busy || hasIncompleteUpgradeSlots || (!Object.values(accepted).some(Boolean) && !Object.values(deferred).some(Boolean) && !wallDistributions.length && !upgradeSlots.length && !resourceDetections.length && !profileDetection)} onClick={() => void confirm()} className="rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:opacity-40">
               {en ? "Confirm selected changes" : "Ausgewählte Änderungen bestätigen"}
             </button>
             <button type="button" disabled={busy} onClick={() => void cancel()} className="rounded-xl border border-rose-400/30 px-5 py-3 font-bold text-rose-200 disabled:opacity-40">

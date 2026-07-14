@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   fetchAccountScreenshotProgress,
   fetchAccountUpgradeSlots,
@@ -26,6 +26,18 @@ export function useScreenshotProgress(
   const [accountLevels, setAccountLevels] = useState<ScreenshotProgressLevelMap>({});
   const [upgradeSlots, setUpgradeSlots] = useState<ScreenshotUpgradeSlot[]>([]);
   const [resourceSnapshot, setResourceSnapshot] = useState<ScreenshotResourceSnapshot | null>(null);
+
+  const refreshAccountProgress = useCallback(async () => {
+    if (!enabled || !selectedAccount) return;
+    const [loadedLevels, loadedSlots, loadedResources] = await Promise.all([
+      fetchAccountScreenshotProgress(selectedAccount.id),
+      fetchAccountUpgradeSlots(selectedAccount.id),
+      fetchAccountResourceSnapshot(selectedAccount.id),
+    ]);
+    setAccountLevels(loadedLevels);
+    setUpgradeSlots(loadedSlots);
+    setResourceSnapshot(loadedResources);
+  }, [enabled, selectedAccount]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -86,5 +98,6 @@ export function useScreenshotProgress(
     accountLevels: selectedAccount ? accountLevels : {},
     upgradeSlots: selectedAccount ? upgradeSlots : [],
     resourceSnapshot: selectedAccount ? resourceSnapshot : null,
+    refreshAccountProgress,
   };
 }

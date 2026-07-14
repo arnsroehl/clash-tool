@@ -192,6 +192,7 @@ export default function Home() {
     accountLevels: screenshotEntityLevels,
     upgradeSlots: screenshotUpgradeSlots,
     resourceSnapshot: screenshotResourceSnapshot,
+    refreshAccountProgress: refreshScreenshotProgress,
   } =
     useScreenshotProgress(selectedAccount, handleError, Boolean(user));
   const screenshotProgressEntities = useMemo(
@@ -294,6 +295,7 @@ export default function Home() {
     isLoadingBuildings,
     isSavingBuildingId,
     updateBuildingLevel,
+    refreshAccountBuildings,
   } = useBuildings({
     selectedAccount,
     onError: handleError,
@@ -824,6 +826,8 @@ export default function Home() {
                 darkElixir: values.dark_elixir ?? current.darkElixir,
               }));
             }}
+            onUpgradeSlotsImported={refreshScreenshotProgress}
+            onProgressImported={refreshAccountBuildings}
             onProfileImported={async (detected) => {
               if (!selectedAccount) return;
               await applyPlayerImport(selectedAccount, {
