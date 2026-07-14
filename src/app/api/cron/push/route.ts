@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import webPush from "web-push";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+type DuePushDelivery = {
+  endpoint: string;
+  p256dh: string;
+  auth_key: string;
+  notification_id: string;
+  subscription_id: string;
+  title: string;
+  message: string;
+};
 
 export async function GET(request: NextRequest) {
   if (
@@ -20,15 +29,27 @@ export async function GET(request: NextRequest) {
       { error: "Push-Umgebung ist unvollständig." },
       { status: 503 },
     );
-  const client = createClient(url, secretKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { data: due, error } = await client.rpc("get_due_push_deliveries", {
-    cron_token: process.env.CRON_SECRET,
-    batch_size: 100,
-  });
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const dueResponse = await fetch(
+    `${url.replace(/\/$/, "")}/rest/v1/rpc/get_due_push_deliveries`,
+    {
+      method: "POST",
+      headers: {
+        apikey: secretKey,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        cron_token: process.env.CRON_SECRET,
+        batch_size: 100,
+      }),
+      cache: "no-store",
+    },
+  );
+  if (!dueResponse.ok)
+    return NextResponse.json(
+      { error: "Fällige Push-Nachrichten konnten nicht geladen werden." },
+      { status: 500 },
+    );
+  const due = (await dueResponse.json()) as DuePushDelivery[];
   if (!due?.length) return NextResponse.json({ sent: 0, notifications: 0 });
   webPush.setVapidDetails(
     process.env.WEB_PUSH_VAPID_SUBJECT || "mailto:admin@example.com",
@@ -58,17 +79,25 @@ export async function GET(request: NextRequest) {
         expired.add(target.subscription_id);
     }
   }
-  const { error: finalizeError } = await client.rpc(
-    "finalize_push_deliveries",
+  const finalizeResponse = await fetch(
+    `${url.replace(/\/$/, "")}/rest/v1/rpc/finalize_push_deliveries`,
     {
-      cron_token: process.env.CRON_SECRET,
-      sent_notification_ids: [...delivered],
-      expired_subscription_ids: [...expired],
+      method: "POST",
+      headers: {
+        apikey: secretKey,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        cron_token: process.env.CRON_SECRET,
+        sent_notification_ids: [...delivered],
+        expired_subscription_ids: [...expired],
+      }),
+      cache: "no-store",
     },
   );
-  if (finalizeError)
+  if (!finalizeResponse.ok)
     return NextResponse.json(
-      { error: finalizeError.message, sent },
+      { error: "Push-Zustellungen konnten nicht abgeschlossen werden.", sent },
       { status: 500 },
     );
   return NextResponse.json({

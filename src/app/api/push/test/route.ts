@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import webPush from "web-push";
 
 export const runtime = "nodejs";
+
+type PushSubscriptionRow = {
+  id: string;
+  endpoint: string;
+  p256dh: string;
+  auth_key: string;
+};
 
 export async function POST(request: NextRequest) {
   const jwt = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
@@ -35,15 +41,20 @@ export async function POST(request: NextRequest) {
   const user = (await userResponse.json()) as { id?: string };
   if (!user.id)
     return NextResponse.json({ error: "Ungültige Sitzung." }, { status: 401 });
-  const client = createClient(supabaseUrl, supabaseSecretKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { data: subscriptions, error } = await client
-    .from("push_subscriptions")
-    .select("id,endpoint,p256dh,auth_key")
-    .eq("user_id", user.id);
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const subscriptionsResponse = await fetch(
+    `${supabaseUrl.replace(/\/$/, "")}/rest/v1/push_subscriptions?select=id,endpoint,p256dh,auth_key&user_id=eq.${encodeURIComponent(user.id)}`,
+    {
+      headers: { apikey: supabaseSecretKey },
+      cache: "no-store",
+    },
+  );
+  if (!subscriptionsResponse.ok)
+    return NextResponse.json(
+      { error: "Push-Abonnements konnten nicht geladen werden." },
+      { status: 500 },
+    );
+  const subscriptions =
+    (await subscriptionsResponse.json()) as PushSubscriptionRow[];
   if (!subscriptions?.length)
     return NextResponse.json(
       { error: "Auf diesem Account ist noch kein Push-Gerät registriert." },
@@ -71,10 +82,13 @@ export async function POST(request: NextRequest) {
           ? Number(pushError.statusCode)
           : 0;
       if (statusCode === 404 || statusCode === 410)
-        await client
-          .from("push_subscriptions")
-          .delete()
-          .eq("id", subscription.id);
+        await fetch(
+          `${supabaseUrl.replace(/\/$/, "")}/rest/v1/push_subscriptions?id=eq.${encodeURIComponent(subscription.id)}`,
+          {
+            method: "DELETE",
+            headers: { apikey: supabaseSecretKey },
+          },
+        );
     }
   }
   return NextResponse.json({ sent });
