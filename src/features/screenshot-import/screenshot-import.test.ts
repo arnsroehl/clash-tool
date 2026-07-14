@@ -17,6 +17,7 @@ import {
 import {
   createDifferenceHash,
   hammingDistance,
+  laboratoryStartGridCanBeMapped,
   laboratoryStartGridIsVerified,
   laboratoryStartGridSourceId,
   matchObjectFingerprint,
@@ -188,6 +189,23 @@ test("requires five visual confirmations before trusting laboratory grid order",
     hashes: catalog.slice(0, 4).map((item) => item.hash),
     catalog,
   }), false);
+});
+
+test("maps a nearly complete calibrated laboratory grid when Safari hashes drift", () => {
+  assert.equal(
+    laboratoryStartGridCanBeMapped({
+      visualVerificationPassed: false,
+      recognizedCells: 11,
+    }),
+    true,
+  );
+  assert.equal(
+    laboratoryStartGridCanBeMapped({
+      visualVerificationPassed: false,
+      recognizedCells: 7,
+    }),
+    false,
+  );
 });
 
 test("does not invent a level when stylized OCR contains no digit", () => {

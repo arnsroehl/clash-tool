@@ -69,6 +69,16 @@ export function laboratoryStartGridIsVerified(params: {
   return confirmations >= 5;
 }
 
+export function laboratoryStartGridCanBeMapped(params: {
+  visualVerificationPassed: boolean;
+  recognizedCells: number;
+}): boolean {
+  // Safari's 9 × 8 canvas resampling can make icon fingerprints unstable.
+  // A nearly complete OCR result at the calibrated twelve-card position is a
+  // second independent signal. Imports still require explicit user review.
+  return params.visualVerificationPassed || params.recognizedCells >= 8;
+}
+
 export function hammingDistance(left: string, right: string): number {
   let distance = 0;
   const width = Math.max(left.length, right.length);
@@ -246,7 +256,19 @@ export async function recognizeScreenshotObjects(params: {
     const gridHashes = params.laboratoryGridCells.map((cell) =>
       hashRegion(bitmap, context, cell.cardBox),
     );
-    if (laboratoryStartGridIsVerified({ hashes: gridHashes, catalog })) {
+    const visualVerificationPassed = laboratoryStartGridIsVerified({
+      hashes: gridHashes,
+      catalog,
+    });
+    const recognizedCells = params.laboratoryGridCells.filter(
+      (cell) => cell.lineIndex >= 0,
+    ).length;
+    if (
+      laboratoryStartGridCanBeMapped({
+        visualVerificationPassed,
+        recognizedCells,
+      })
+    ) {
       params.laboratoryGridCells.forEach((cell) => {
         const sourceId = laboratoryStartGridSourceId(cell.index);
         if (!sourceId || cell.lineIndex < 0) return;
