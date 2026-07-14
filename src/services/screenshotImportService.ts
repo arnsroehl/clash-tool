@@ -343,6 +343,7 @@ export async function updateAnalysisJob(params: {
 export async function saveWallDistributions(
   accountId: string,
   distributions: WallLevelDistribution[],
+  replaceAll = false,
 ): Promise<void> {
   const client = getSupabaseClient();
   if (!distributions.length) return;
@@ -356,6 +357,7 @@ export async function saveWallDistributions(
     { onConflict: "account_id,wall_level" },
   );
   if (error) throw new Error(error.message);
+  if (!replaceAll) return;
   const levels = distributions.map((item) => item.level).join(",");
   const { error: cleanupError } = await client
     .from("account_wall_levels")

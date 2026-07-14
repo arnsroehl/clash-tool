@@ -418,6 +418,21 @@ test("parses German and English wall distributions and flags conflicts", () => {
   assert.match(walls[0].reasons[0], /Widersprüchliche/);
 });
 
+test("parses compact and maxed wall summaries with saved counts", () => {
+  const walls = parseWallDistributions(
+    "Mauern\nLevel 18: 125\nMax Level 200 Mauern",
+    {
+      maxLevel: 19,
+      previous: [{ level: 18, count: 150 }, { level: 19, count: 175 }],
+    },
+  );
+  assert.deepEqual(
+    walls.map(({ level, count, previousCount }) => [level, count, previousCount]),
+    [[18, 125, 150], [19, 200, 175]],
+  );
+  assert.match(walls[0].reasons[0], /Gespeichert: 150/);
+});
+
 test("parses localized durations and occupied upgrade slots", () => {
   assert.equal(parseDurationSeconds("noch 4 Tage 8 Stunden"), 374_400);
   assert.equal(parseDurationSeconds("remaining 2d 3h 15m"), 184_500);

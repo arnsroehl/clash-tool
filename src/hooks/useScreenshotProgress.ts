@@ -5,6 +5,7 @@ import {
   fetchAccountScreenshotProgress,
   fetchAccountUpgradeSlots,
   fetchAccountResourceSnapshot,
+  fetchAccountWallLevels,
   fetchScreenshotProgressCatalog,
 } from "@/services/screenshotProgressService";
 import type { ClashAccount } from "@/types/account";
@@ -14,6 +15,7 @@ import type {
   ScreenshotProgressLevelMap,
   ScreenshotUpgradeSlot,
   ScreenshotResourceSnapshot,
+  ScreenshotWallLevel,
 } from "@/types/screenshotProgress";
 
 export function useScreenshotProgress(
@@ -26,17 +28,20 @@ export function useScreenshotProgress(
   const [accountLevels, setAccountLevels] = useState<ScreenshotProgressLevelMap>({});
   const [upgradeSlots, setUpgradeSlots] = useState<ScreenshotUpgradeSlot[]>([]);
   const [resourceSnapshot, setResourceSnapshot] = useState<ScreenshotResourceSnapshot | null>(null);
+  const [wallLevels, setWallLevels] = useState<ScreenshotWallLevel[]>([]);
 
   const refreshAccountProgress = useCallback(async () => {
     if (!enabled || !selectedAccount) return;
-    const [loadedLevels, loadedSlots, loadedResources] = await Promise.all([
+    const [loadedLevels, loadedSlots, loadedResources, loadedWalls] = await Promise.all([
       fetchAccountScreenshotProgress(selectedAccount.id),
       fetchAccountUpgradeSlots(selectedAccount.id),
       fetchAccountResourceSnapshot(selectedAccount.id),
+      fetchAccountWallLevels(selectedAccount.id),
     ]);
     setAccountLevels(loadedLevels);
     setUpgradeSlots(loadedSlots);
     setResourceSnapshot(loadedResources);
+    setWallLevels(loadedWalls);
   }, [enabled, selectedAccount]);
 
   useEffect(() => {
@@ -61,17 +66,19 @@ export function useScreenshotProgress(
       fetchAccountScreenshotProgress(selectedAccount.id),
       fetchAccountUpgradeSlots(selectedAccount.id),
       fetchAccountResourceSnapshot(selectedAccount.id),
+      fetchAccountWallLevels(selectedAccount.id),
     ])
-      .then(([loadedLevels, loadedSlots, loadedResources]) => {
+      .then(([loadedLevels, loadedSlots, loadedResources, loadedWalls]) => {
         setAccountLevels(loadedLevels);
         setUpgradeSlots(loadedSlots);
         setResourceSnapshot(loadedResources);
+        setWallLevels(loadedWalls);
       })
       .catch((error) =>
         onError(
           error instanceof Error
             ? error.message
-            : "Pet- und Ausrüstungslevel konnten nicht geladen werden.",
+            : "Screenshot-Fortschritt konnte nicht geladen werden.",
         ),
       );
   }, [enabled, onError, selectedAccount]);
@@ -98,6 +105,7 @@ export function useScreenshotProgress(
     accountLevels: selectedAccount ? accountLevels : {},
     upgradeSlots: selectedAccount ? upgradeSlots : [],
     resourceSnapshot: selectedAccount ? resourceSnapshot : null,
+    wallLevels: selectedAccount ? wallLevels : [],
     refreshAccountProgress,
   };
 }

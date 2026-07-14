@@ -26,6 +26,7 @@ import type { ClashAccount } from "@/types/account";
 import type { Building, BuildingInstanceLevelMap } from "@/types/building";
 import type { Hero } from "@/types/hero";
 import type { SiegeMachine, Spell, Troop } from "@/types/laboratory";
+import type { ScreenshotWallLevel } from "@/types/screenshotProgress";
 
 type Props = {
   officialApiEnabled?: boolean;
@@ -46,6 +47,8 @@ type Props = {
   onProfileImported?: (profile: ScreenshotProfileDetection) => Promise<void>;
   onUpgradeSlotsImported?: () => Promise<void> | void;
   onProgressImported?: () => Promise<void> | void;
+  wallLevels?: ScreenshotWallLevel[];
+  onWallLevelsImported?: () => Promise<void> | void;
 };
 const normalize = (name: string) =>
   name
@@ -146,6 +149,7 @@ export function PlayerImportCenter(props: Props) {
       ),
     [entities],
   );
+  const wallBuilding = props.buildings.find((building) => building.sourceId === "wall");
   const changesFromItems = useCallback(
     (groups: { name: string; level: number }[][]): ImportChange[] =>
       groups.flat().flatMap((item) => {
@@ -376,6 +380,10 @@ export function PlayerImportCenter(props: Props) {
             onResourcesConfirmed={props.onResourcesImported}
             onProfileConfirmed={props.onProfileImported}
             onUpgradeSlotsConfirmed={props.onUpgradeSlotsImported}
+            existingWallLevels={props.wallLevels || []}
+            expectedWallCount={wallBuilding?.buildingCount || 0}
+            maxWallLevel={wallBuilding?.maxLevel || 0}
+            onWallLevelsConfirmed={props.onWallLevelsImported}
           />
         </div>
       ) : null}

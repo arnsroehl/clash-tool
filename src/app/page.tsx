@@ -192,6 +192,7 @@ export default function Home() {
     accountLevels: screenshotEntityLevels,
     upgradeSlots: screenshotUpgradeSlots,
     resourceSnapshot: screenshotResourceSnapshot,
+    wallLevels: screenshotWallLevels,
     refreshAccountProgress: refreshScreenshotProgress,
   } =
     useScreenshotProgress(selectedAccount, handleError, Boolean(user));
@@ -828,6 +829,8 @@ export default function Home() {
             }}
             onUpgradeSlotsImported={refreshScreenshotProgress}
             onProgressImported={refreshAccountBuildings}
+            wallLevels={screenshotWallLevels}
+            onWallLevelsImported={refreshScreenshotProgress}
             onProfileImported={async (detected) => {
               if (!selectedAccount) return;
               await applyPlayerImport(selectedAccount, {
