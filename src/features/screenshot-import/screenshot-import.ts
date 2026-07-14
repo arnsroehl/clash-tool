@@ -706,7 +706,11 @@ export function parseScreenshotDetections(params: {
       textMatch.candidates.length > 1 &&
       textMatch.candidates[1]?.matchedName === textBest.matchedName
     ) {
-      const textUseKey = `${textBest.entity.type}:${textBest.matchedName}`;
+      // Building instances share the stable `<building-id>:<index>` identity.
+      // Count all localized aliases against that identity so `Bombe` followed
+      // by `Bomb` advances to the second physical trap instead of reusing #1.
+      const instanceGroupId = textBest.entity.id.replace(/:\d+$/, "");
+      const textUseKey = `${textBest.entity.type}:${instanceGroupId}`;
       const textUseIndex = textInstanceUseCount.get(textUseKey) || 0;
       const sameNameCandidates = textMatch.candidates.filter(
         (candidate) => candidate.matchedName === textBest?.matchedName,

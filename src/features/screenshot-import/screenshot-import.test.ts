@@ -38,6 +38,7 @@ import {
   isSupportedGameUiVersion,
   resolveScreenshotImportConfig,
 } from "@/config/screenshotImport";
+import trapCatalog from "@/data/traps.json";
 
 const entities: ScreenshotEntity[] = [
   {
@@ -439,6 +440,43 @@ test("filters structured building imports by database category", () => {
   assert.deepEqual(
     filterBuildingImportEntities(buildingEntities, "traps").map((entity) => entity.id),
     ["bomb"],
+  );
+});
+
+test("ships every Home Village trap with TH18 levels and instance counts", () => {
+  assert.deepEqual(
+    trapCatalog.map((trap) => trap.sourceId),
+    [
+      "air-bomb",
+      "bomb",
+      "giant-bomb",
+      "giga-bomb",
+      "seeking-air-mine",
+      "skeleton-trap",
+      "spring-trap",
+      "tornado-trap",
+    ],
+  );
+  assert.deepEqual(
+    trapCatalog.map((trap) => Math.max(...trap.levels.map((level) => level.level))),
+    [13, 14, 11, 4, 8, 5, 13, 3],
+  );
+  assert.deepEqual(
+    trapCatalog.map((trap) =>
+      trap.availability.find((availability) => availability.townHallLevel === 18)?.count,
+    ),
+    [7, 8, 8, 1, 9, 4, 9, 1],
+  );
+});
+
+test("assigns repeated trap cards to separate database instances", () => {
+  const matches = parseScreenshotLevels("Bombe Level 14\nBomb Level 13", [
+    { id: "bomb:1", name: "Bombe 1", aliases: ["Bombe", "Bomb"], currentLevel: 12, maxLevel: 14, type: "building" },
+    { id: "bomb:2", name: "Bombe 2", aliases: ["Bombe", "Bomb"], currentLevel: 12, maxLevel: 14, type: "building" },
+  ]);
+  assert.deepEqual(
+    matches.map((match) => [match.id, match.detectedLevel]),
+    [["bomb:1", 14], ["bomb:2", 13]],
   );
 });
 

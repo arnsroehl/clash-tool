@@ -20,6 +20,13 @@ type GameBuilding = {
   unlockTownHall: number;
   sortOrder: number;
   levels: GameBuildingLevel[];
+  availability?: GameBuildingAvailability[];
+};
+
+type GameBuildingAvailability = {
+  townHallLevel: number;
+  count: number;
+  countAfterMerges: number;
 };
 
 type GameHero = {
@@ -51,6 +58,13 @@ type BuildingLevelUpsertRow = {
   elixir_cost: number;
   dark_elixir_cost: number;
   hitpoints: number;
+};
+
+type BuildingAvailabilityUpsertRow = {
+  building_id: string;
+  town_hall_level: number;
+  building_count: number;
+  count_after_merges: number;
 };
 
 type HeroUpsertRow = {
@@ -102,6 +116,7 @@ type ExistingHeroRow = {
 };
 
 const BUILDINGS_FILE = path.join(process.cwd(), "src/data/buildings.json");
+const TRAPS_FILE = path.join(process.cwd(), "src/data/traps.json");
 const HEROES_FILE = path.join(process.cwd(), "src/data/heroes.json");
 const TROOPS_FILE = path.join(process.cwd(), "src/data/troops.json");
 const SPELLS_FILE = path.join(process.cwd(), "src/data/spells.json");
@@ -237,7 +252,7 @@ function validateBuilding(value: unknown): GameBuilding {
     throw new Error("Ein Gebäude-Eintrag ist kein Objekt.");
   }
 
-  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels } =
+  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels, availability } =
     value;
 
   if (
@@ -272,6 +287,10 @@ function validateBuilding(value: unknown): GameBuilding {
     levelNumbers.add(level.level);
   });
 
+  const validatedAvailability = availability === undefined
+    ? undefined
+    : validateBuildingAvailability(availability, id);
+
   return {
     id,
     sourceId,
@@ -280,7 +299,35 @@ function validateBuilding(value: unknown): GameBuilding {
     unlockTownHall,
     sortOrder,
     levels: validatedLevels,
+    availability: validatedAvailability,
   };
+}
+
+function validateBuildingAvailability(
+  value: unknown,
+  buildingId: string,
+): GameBuildingAvailability[] {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error(`"${buildingId}" braucht eine nicht leere Verfügbarkeitsliste.`);
+  }
+
+  const townHalls = new Set<number>();
+  return value.map((entry) => {
+    if (!isRecord(entry))
+      throw new Error(`Verfügbarkeit in "${buildingId}" ist kein Objekt.`);
+    const { townHallLevel, count, countAfterMerges } = entry;
+    if (
+      !isPositiveInteger(townHallLevel) ||
+      !isNonNegativeInteger(count) ||
+      !isNonNegativeInteger(countAfterMerges) ||
+      countAfterMerges > count
+    )
+      throw new Error(`Verfügbarkeit in "${buildingId}" enthält ungültige Anzahlen.`);
+    if (townHalls.has(townHallLevel))
+      throw new Error(`"${buildingId}" enthält Rathaus ${townHallLevel} mehrfach.`);
+    townHalls.add(townHallLevel);
+    return { townHallLevel, count, countAfterMerges };
+  });
 }
 
 function validateBuildings(value: unknown): GameBuilding[] {
@@ -380,10 +427,19 @@ function isMissingTableErrorMessage(message: string): boolean {
 }
 
 async function readBuildings(): Promise<GameBuilding[]> {
-  const fileContent = await readFile(BUILDINGS_FILE, "utf8");
-  const parsedJson: unknown = JSON.parse(fileContent);
+  const [buildingFile, trapFile] = await Promise.all([
+    readFile(BUILDINGS_FILE, "utf8"),
+    readFile(TRAPS_FILE, "utf8"),
+  ]);
+  const buildings = validateBuildings(JSON.parse(buildingFile) as unknown);
+  const traps = validateBuildings(JSON.parse(trapFile) as unknown);
+  const sourceIds = new Set(buildings.map((building) => building.sourceId));
+  traps.forEach((trap) => {
+    if (sourceIds.has(trap.sourceId))
+      throw new Error(`Gebäude-Source-ID "${trap.sourceId}" ist doppelt vorhanden.`);
+  });
 
-  return validateBuildings(parsedJson);
+  return [...buildings, ...traps];
 }
 
 async function readHeroes(): Promise<GameHero[]> {
@@ -520,6 +576,20 @@ function toBuildingLevelRows(
       elixir_cost: level.elixirCost,
       dark_elixir_cost: level.darkElixirCost,
       hitpoints: level.hitpoints,
+    })),
+  );
+}
+
+function toBuildingAvailabilityRows(
+  buildings: GameBuilding[],
+  existingBuildingIds: Map<string, string>,
+): BuildingAvailabilityUpsertRow[] {
+  return buildings.flatMap((building) =>
+    (building.availability || []).map((availability) => ({
+      building_id: resolveBuildingId(building, existingBuildingIds),
+      town_hall_level: availability.townHallLevel,
+      building_count: availability.count,
+      count_after_merges: availability.countAfterMerges,
     })),
   );
 }
@@ -735,6 +805,7 @@ async function runImport() {
   const existingBuildingIds = await resolveBuildingIds(supabase);
   const buildingRows = toBuildingRows(buildings, existingBuildingIds);
   const buildingLevelRows = toBuildingLevelRows(buildings, existingBuildingIds);
+  const buildingAvailabilityRows = toBuildingAvailabilityRows(buildings, existingBuildingIds);
   const existingBuildingCount = buildings.filter(
     (building) =>
       existingBuildingIds.has(building.sourceId) ||
@@ -765,6 +836,19 @@ async function runImport() {
     throw new Error(
       `building_levels Import fehlgeschlagen: ${levelsError.message}`,
     );
+  }
+
+  if (buildingAvailabilityRows.length > 0) {
+    console.log("Upsert building_town_hall_availability...");
+    const { error: availabilityError } = await supabase
+      .from("building_town_hall_availability")
+      .upsert(buildingAvailabilityRows, { onConflict: "building_id,town_hall_level" });
+
+    if (availabilityError) {
+      throw new Error(
+        `building_town_hall_availability Import fehlgeschlagen: ${availabilityError.message}`,
+      );
+    }
   }
 
   console.log("Lese und validiere src/data/heroes.json...");
