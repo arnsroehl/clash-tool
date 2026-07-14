@@ -132,6 +132,9 @@ create index if not exists screenshot_analysis_jobs_user_idx
   on public.screenshot_analysis_jobs (user_id);
 create index if not exists screenshot_analysis_jobs_queue_idx
   on public.screenshot_analysis_jobs (status, available_at, created_at) where status = 'queued';
+create unique index if not exists screenshot_analysis_jobs_one_active_stage_idx
+  on public.screenshot_analysis_jobs (import_session_id, screenshot_id, job_type)
+  where screenshot_id is not null and status in ('queued', 'running');
 
 alter table public.screenshot_catalog_entities enable row level security;
 alter table public.screenshot_catalog_levels enable row level security;

@@ -147,6 +147,14 @@ language. Ambiguous images keep the combined German/English OCR fallback.
 Existing databases can add these fields with
 `src/scripts/sql/screenshot-language-detection.sql`.
 
+Screenshot OCR starts through the authenticated
+`POST /api/import-sessions/:id/start-analysis` route. The route verifies session
+and file ownership through the caller's Supabase JWT, rejects terminal sessions
+and reuses an already active recognition job. A partial unique index from
+`src/scripts/sql/screenshot-analysis-job-idempotency.sql` closes concurrent
+duplicate-start races while completed and failed jobs remain available as
+history and can be retried.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP

@@ -451,6 +451,34 @@ export async function createAnalysisJob(params: {
   return data.id as string;
 }
 
+export async function startScreenshotAnalysis(params: {
+  sessionId: string;
+  screenshotId: string;
+}): Promise<string> {
+  const {
+    data: { session },
+  } = await getSupabaseClient().auth.getSession();
+  if (!session) throw new Error("Bitte melde dich erneut an.");
+  const response = await fetch(
+    `/api/import-sessions/${encodeURIComponent(params.sessionId)}/start-analysis`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${session.access_token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ screenshotId: params.screenshotId }),
+    },
+  );
+  const payload = (await response.json().catch(() => null)) as {
+    job?: { id?: string };
+    error?: string;
+  } | null;
+  if (!response.ok || !payload?.job?.id)
+    throw new Error(payload?.error || "Die Screenshot-Analyse konnte nicht gestartet werden.");
+  return payload.job.id;
+}
+
 export async function updateAnalysisJob(params: {
   jobId: string;
   status: "running" | "completed" | "failed" | "cancelled";

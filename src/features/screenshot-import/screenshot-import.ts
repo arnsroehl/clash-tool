@@ -65,6 +65,10 @@ export type ScreenshotImportType =
   | Exclude<ScreenshotScreenType, "unknown">
   | "full";
 
+export function canStartScreenshotAnalysis(sessionStatus: string): boolean {
+  return !["confirmed", "cancelled"].includes(sessionStatus);
+}
+
 export type ScreenshotAnalysisTypeResolution = {
   screenType: ScreenshotScreenType;
   analysisType: Exclude<ScreenshotImportType, "full"> | null;

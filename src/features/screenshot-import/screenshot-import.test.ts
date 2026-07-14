@@ -5,6 +5,7 @@ import {
   assessScreenshotContentQuality,
   detectScreenshotLanguage,
   classifyScreenshotText,
+  canStartScreenshotAnalysis,
   compareUpgradeSlotState,
   mergeScreenshotDetections,
   mergeProfileScreenshotDetections,
@@ -89,6 +90,13 @@ test("classifies German and English laboratory screenshots", () => {
     "laboratory",
   );
   assert.equal(classifyScreenshotText("unrelated content").screenType, "unknown");
+});
+
+test("starts analysis only for non-terminal import sessions", () => {
+  ["draft", "uploaded", "preprocessing", "analyzing", "validating", "review_required", "ready", "failed"]
+    .forEach((status) => assert.equal(canStartScreenshotAnalysis(status), true));
+  assert.equal(canStartScreenshotAnalysis("confirmed"), false);
+  assert.equal(canStartScreenshotAnalysis("cancelled"), false);
 });
 
 test("detects screenshot language independently from the app language", () => {

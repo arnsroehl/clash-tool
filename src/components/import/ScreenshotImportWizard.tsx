@@ -56,6 +56,7 @@ import {
   saveResourceSnapshot,
   saveScreenshotImportForLater,
   saveWallDistributions,
+  startScreenshotAnalysis,
   updateAnalysisJob,
   updateScreenshotAnalysis,
   uploadScreenshot,
@@ -617,18 +618,9 @@ export function ScreenshotImportWizard({
               processingStatus: "analyzing",
             });
           }
-          activeJobId = await createAnalysisJob({
+          activeJobId = await startScreenshotAnalysis({
             sessionId: session.id,
             screenshotId: uploaded.id,
-            jobType: "recognize_text",
-            status: "running",
-            payload: {
-              language,
-              filename: normalized.originalFilename,
-              gameVersion: session.gameVersion,
-              modelVersion: SCREENSHOT_IMPORT_CONFIG.modelVersion,
-              layoutVersion: SCREENSHOT_IMPORT_CONFIG.layoutVersion,
-            },
           });
           const initialFocusType = forcedType || (importType === "full" ? undefined : importType);
           let recognition = await recognizeScreenshotDetailed(
