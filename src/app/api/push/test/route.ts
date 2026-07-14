@@ -7,27 +7,37 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   const jwt = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabasePublicKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
-  const publicKey = process.env.NEXT_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY;
+  const vapidPublicKey = process.env.NEXT_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY;
   const privateKey = process.env.WEB_PUSH_VAPID_PRIVATE_KEY;
   const subject =
     process.env.WEB_PUSH_VAPID_SUBJECT || "mailto:admin@example.com";
-  if (!jwt || !supabaseUrl || !supabaseSecretKey)
+  if (!jwt || !supabaseUrl || !supabasePublicKey || !supabaseSecretKey)
     return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
-  if (!publicKey || !privateKey)
+  if (!vapidPublicKey || !privateKey)
     return NextResponse.json(
       { error: "Web Push ist noch nicht vollständig konfiguriert." },
       { status: 503 },
     );
+  const userResponse = await fetch(
+    `${supabaseUrl.replace(/\/$/, "")}/auth/v1/user`,
+    {
+      headers: {
+        apikey: supabasePublicKey,
+        authorization: `Bearer ${jwt}`,
+      },
+      cache: "no-store",
+    },
+  );
+  if (!userResponse.ok)
+    return NextResponse.json({ error: "Ungültige Sitzung." }, { status: 401 });
+  const user = (await userResponse.json()) as { id?: string };
+  if (!user.id)
+    return NextResponse.json({ error: "Ungültige Sitzung." }, { status: 401 });
   const client = createClient(supabaseUrl, supabaseSecretKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  const {
-    data: { user },
-    error: authError,
-  } = await client.auth.getUser(jwt);
-  if (authError || !user)
-    return NextResponse.json({ error: "Ungültige Sitzung." }, { status: 401 });
   const { data: subscriptions, error } = await client
     .from("push_subscriptions")
     .select("id,endpoint,p256dh,auth_key")
@@ -39,7 +49,7 @@ export async function POST(request: NextRequest) {
       { error: "Auf diesem Account ist noch kein Push-Gerät registriert." },
       { status: 400 },
     );
-  webPush.setVapidDetails(subject, publicKey, privateKey);
+  webPush.setVapidDetails(subject, vapidPublicKey, privateKey);
   let sent = 0;
   for (const subscription of subscriptions) {
     try {
