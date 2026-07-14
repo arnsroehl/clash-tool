@@ -322,7 +322,17 @@ export function ScreenshotImportWizard({
             jobId: activeJobId,
             status: "completed",
             progress: 100,
-            result: { confidence: recognition.confidence, textLength: recognition.text.length },
+            result: {
+              confidence: recognition.confidence,
+              textLength: recognition.text.length,
+              laboratoryGridCells: recognition.laboratoryGridCells.length,
+              laboratoryGridLevels: recognition.laboratoryGridCells.filter(
+                (cell) => cell.level !== null,
+              ).length,
+              laboratoryMaxLevelCells: recognition.laboratoryGridCells.filter(
+                (cell) => cell.isMaxLevel,
+              ).length,
+            },
           });
           activeJobId = await createAnalysisJob({
             sessionId: session.id,

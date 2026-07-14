@@ -45,6 +45,26 @@ const LABORATORY_GRID = {
   badgeHeight: 45 / 300,
 } as const;
 
+const LABORATORY_BADGE_ATTEMPTS = [
+  { x: 15 / 300, y: 160 / 300, width: 50 / 300, height: 45 / 300, threshold: 240 },
+  { x: 15 / 300, y: 160 / 300, width: 50 / 300, height: 45 / 300, threshold: 220 },
+  { x: 15 / 300, y: 160 / 300, width: 50 / 300, height: 45 / 300, threshold: 110 },
+  { x: 2 / 300, y: 155 / 300, width: 65 / 300, height: 50 / 300, threshold: 240 },
+  { x: 2 / 300, y: 155 / 300, width: 65 / 300, height: 50 / 300, threshold: 220 },
+] as const;
+
+function laboratoryBadgeBox(
+  cardBox: BoundingBox,
+  attempt: (typeof LABORATORY_BADGE_ATTEMPTS)[number],
+): BoundingBox {
+  return {
+    x: cardBox.x + cardBox.width * attempt.x,
+    y: cardBox.y + cardBox.height * attempt.y,
+    width: cardBox.width * attempt.width,
+    height: cardBox.height * attempt.height,
+  };
+}
+
 export function createLaboratoryGridCells(): Array<
   Pick<LaboratoryGridCellRecognition, "index" | "cardBox" | "badgeBox">
 > {
@@ -81,12 +101,14 @@ function cropToCanvas(
   canvas.height = height;
   const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context) throw new Error("Labor-Kachel konnte nicht vorbereitet werden.");
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
   context.drawImage(
     bitmap,
-    box.x * bitmap.width,
-    box.y * bitmap.height,
-    box.width * bitmap.width,
-    box.height * bitmap.height,
+    Math.round(box.x * bitmap.width),
+    Math.round(box.y * bitmap.height),
+    Math.round(box.width * bitmap.width),
+    Math.round(box.height * bitmap.height),
     0,
     0,
     width,
@@ -111,6 +133,18 @@ function thresholdBadge(canvas: HTMLCanvasElement, threshold: number): void {
     image.data[index + 3] = 255;
   }
   context.putImageData(image, 0, 0);
+}
+
+function canvasToPng(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) =>
+    canvas.toBlob(
+      (blob) =>
+        blob
+          ? resolve(blob)
+          : reject(new Error("Labor-Levelbadge konnte nicht gelesen werden.")),
+      "image/png",
+    ),
+  );
 }
 
 function averageCardChroma(bitmap: ImageBitmap, box: BoundingBox): number {
@@ -349,9 +383,14 @@ export async function recognizeScreenshotDetailed(
         let level: number | null = null;
         let confidence = isMaxLevel ? 0.9 : 0;
         if (!isMaxLevel) {
-          for (const threshold of [110, 220]) {
-            const badge = cropToCanvas(bitmap, cell.badgeBox, 400, 360);
-            thresholdBadge(badge, threshold);
+          for (const [attemptIndex, attempt] of LABORATORY_BADGE_ATTEMPTS.entries()) {
+            const badge = cropToCanvas(
+              bitmap,
+              laboratoryBadgeBox(cell.cardBox, attempt),
+              400,
+              360,
+            );
+            thresholdBadge(badge, attempt.threshold);
             const padded = document.createElement("canvas");
             padded.width = 520;
             padded.height = 480;
@@ -360,10 +399,13 @@ export async function recognizeScreenshotDetailed(
             paddedContext.fillStyle = "#fff";
             paddedContext.fillRect(0, 0, padded.width, padded.height);
             paddedContext.drawImage(badge, 60, 60);
-            const badgeResult = await worker.recognize(padded);
+            // Passing a canvas directly is unreliable in Safari/WebKit because it
+            // crosses the Tesseract worker boundary. A PNG blob is transferable
+            // and produces the same input in every supported browser.
+            const badgeResult = await worker.recognize(await canvasToPng(padded));
             level = parseBadgeLevel(badgeResult.data.text);
             if (level !== null) {
-              confidence = threshold === 110 ? 0.9 : 0.82;
+              confidence = Math.max(0.78, 0.94 - attemptIndex * 0.04);
               break;
             }
           }
