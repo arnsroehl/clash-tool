@@ -191,6 +191,31 @@ function overlap(left: BoundingBox, right: BoundingBox): number {
   return union > 0 ? intersection / union : 0;
 }
 
+export function selectVillageObjectMatches(
+  candidates: ScreenshotObjectMatch[],
+  limit = 40,
+): ScreenshotObjectMatch[] {
+  const ranked = [...candidates].sort((left, right) => right.confidence - left.confidence);
+  const supported = ranked.filter((candidate) => {
+    const support = ranked.filter(
+      (other) =>
+        other !== candidate &&
+        other.sourceId === candidate.sourceId &&
+        overlap(other.boundingBox, candidate.boundingBox) >= 0.12,
+    ).length;
+    return candidate.confidence >= 0.97 || support > 0;
+  });
+  const selected: ScreenshotObjectMatch[] = [];
+  supported.forEach((candidate) => {
+    if (selected.length >= limit) return;
+    const overlapsSelected = selected.some(
+      (existing) => overlap(existing.boundingBox, candidate.boundingBox) >= 0.3,
+    );
+    if (!overlapsSelected) selected.push(candidate);
+  });
+  return selected;
+}
+
 function hashRegion(
   bitmap: ImageBitmap,
   context: CanvasRenderingContext2D,
@@ -292,14 +317,8 @@ export async function recognizeScreenshotObjects(params: {
       return match && match.confidence >= 0.92
         ? [{ ...match, lineIndex: -1, boundingBox: box }]
         : [];
-    }).sort((left, right) => right.confidence - left.confidence);
-    proposals.forEach((candidate) => {
-      if (matches.length >= 40) return;
-      const duplicate = matches.some((existing) =>
-        existing.sourceId === candidate.sourceId && overlap(existing.boundingBox, candidate.boundingBox) >= 0.35,
-      );
-      if (!duplicate) matches.push(candidate);
     });
+    matches.push(...selectVillageObjectMatches(proposals, Math.max(0, 40 - matches.length)));
   }
   bitmap.close();
   return matches;

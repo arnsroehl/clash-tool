@@ -228,6 +228,7 @@ export function ScreenshotImportWizard({
       pets: ["pet"],
       equipment: ["equipment"],
       buildings: ["building"],
+      village: ["building"],
     };
     const expected = importType === "buildings"
       ? filterBuildingImportEntities(entities, buildingSection)
@@ -859,6 +860,16 @@ export function ScreenshotImportWizard({
               ? "Capture the complete overview without notifications or other overlays."
               : "Fotografiere die vollständige Übersicht ohne Benachrichtigungen oder andere Overlays."}
           </div>
+          {importType === "village" ? (
+            <div className="mt-3 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+              <b>{en ? "For the experimental village import:" : "Für den experimentellen Dorfimport:"}</b>
+              <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs">
+                <li>{en ? "Zoom out until the complete home village is visible." : "Zoome so weit heraus, dass das gesamte Heimatdorf sichtbar ist."}</li>
+                <li>{en ? "Close menus, labels and pop-ups and take an upright screenshot." : "Schließe Menüs, Beschriftungen und Pop-ups und erstelle einen geraden Screenshot."}</li>
+                <li>{en ? "Every visually estimated level must be confirmed manually." : "Jedes nur optisch geschätzte Level muss manuell bestätigt werden."}</li>
+              </ol>
+            </div>
+          ) : null}
           <label className="mt-4 flex items-start gap-3 text-sm text-slate-300">
             <input
               type="checkbox"
@@ -1020,6 +1031,11 @@ export function ScreenshotImportWizard({
                       }}
                       onLevel={(level) => {
                         setCorrectedLevels((current) => ({ ...current, [change.id]: level }));
+                        setAccepted((current) => ({ ...current, [change.id]: true }));
+                      }}
+                      onSuggestedLevel={() => {
+                        if (change.suggestedLevel === null || change.suggestedLevel === undefined) return;
+                        setCorrectedLevels((current) => ({ ...current, [change.id]: change.suggestedLevel as number }));
                         setAccepted((current) => ({ ...current, [change.id]: true }));
                       }}
                     />
@@ -1233,6 +1249,7 @@ function ChangeReviewCard({
   onChecked,
   onLater,
   onLevel,
+  onSuggestedLevel,
   crop,
 }: {
   change: ScreenshotProposedChange;
@@ -1243,6 +1260,7 @@ function ChangeReviewCard({
   onChecked: (checked: boolean) => void;
   onLater: () => void;
   onLevel: (level: number) => void;
+  onSuggestedLevel: () => void;
   crop?: { url: string; box: { x: number; y: number; width: number; height: number } };
 }) {
   const en = language === "en";
@@ -1292,6 +1310,22 @@ function ChangeReviewCard({
         <p className="mt-2 text-xs text-amber-200">
           {en ? "Possible alternatives" : "Mögliche Alternativen"}: {change.alternatives.map((alternative) => `${alternative.name} (${Math.round(alternative.confidence * 100)}%)`).join(", ")}
         </p>
+      ) : null}
+      {change.suggestedLevel !== null && change.suggestedLevel !== undefined ? (
+        <div className="mt-3 rounded-lg border border-amber-300/20 bg-amber-300/10 p-3 text-xs text-amber-100">
+          <span>
+            {en
+              ? `Visual suggestion: level ${change.suggestedLevel}. Confirm only if the crop matches.`
+              : `Optischer Vorschlag: Level ${change.suggestedLevel}. Nur übernehmen, wenn der Ausschnitt passt.`}
+          </span>
+          <button
+            type="button"
+            onClick={onSuggestedLevel}
+            className="mt-2 block rounded-lg border border-amber-300/40 px-2 py-1 font-bold"
+          >
+            {en ? "Use suggestion" : "Vorschlag verwenden"}
+          </button>
+        </div>
       ) : null}
       <label className="mt-3 flex items-center gap-2 text-xs text-slate-400">
         {en ? "Correct level" : "Level korrigieren"}
