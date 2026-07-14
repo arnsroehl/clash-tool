@@ -351,6 +351,7 @@ export function ScreenshotImportWizard({
           const objectMatches = await recognizeScreenshotObjects({
             file: normalized.file,
             lines: recognition.lines,
+            laboratoryGridCells: recognition.laboratoryGridCells,
             screenType:
               classification.screenType === "unknown"
                 ? importType
