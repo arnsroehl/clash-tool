@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import {
+  ClashApiConfigurationError,
+  ClashApiConnectionError,
+  requestClashApi,
+} from "@/lib/clash-api";
 
 type ApiItem = {
   name: string;
@@ -43,33 +48,29 @@ export async function GET(request: NextRequest) {
       { error: "Ungültiger Spieler-Tag." },
       { status: 400 },
     );
-  const apiToken = process.env.CLASH_OF_CLANS_API_TOKEN;
-  if (!apiToken)
+  let result;
+  try {
+    result = await requestClashApi<ApiPlayer>(
+      `/v1/players/${encodeURIComponent(tag)}`,
+    );
+  } catch (error) {
+    if (
+      error instanceof ClashApiConfigurationError ||
+      error instanceof ClashApiConnectionError
+    )
+      return NextResponse.json({ error: error.message }, { status: 503 });
+    throw error;
+  }
+  if (!result.ok)
     return NextResponse.json(
       {
         error:
-          "Der Clash-of-Clans-API-Schlüssel ist noch nicht in Vercel konfiguriert.",
+          (result.body as { message?: string }).message ||
+          "Spieler konnte nicht geladen werden.",
       },
-      { status: 503 },
+      { status: result.status },
     );
-
-  const response = await fetch(
-    `https://api.clashofclans.com/v1/players/${encodeURIComponent(tag)}`,
-    {
-      headers: {
-        authorization: `Bearer ${apiToken}`,
-        accept: "application/json",
-      },
-      cache: "no-store",
-    },
-  );
-  const body = await response.json();
-  if (!response.ok)
-    return NextResponse.json(
-      { error: body?.message || "Spieler konnte nicht geladen werden." },
-      { status: response.status },
-    );
-  const player = body as ApiPlayer;
+  const player = result.body as ApiPlayer;
   const home = (items: ApiItem[] = []) =>
     items
       .filter((item) => !item.village || item.village === "home")

@@ -8,6 +8,7 @@ Clash Tool ist eine Next.js-Anwendung zum Verwalten von Clash of Clans Accounts,
 - [Tech Stack](#tech-stack)
 - [Local Setup](#local-setup)
 - [Supabase](#supabase)
+- [Clash API Proxy](#clash-api-proxy)
 - [Scripts](#scripts)
 - [Architecture](#architecture)
 - [Development Workflow](#development-workflow)
@@ -73,6 +74,45 @@ src/scripts/sql/
 
 These SQL files are setup helpers and are not executed automatically by the app.
 
+## Clash API Proxy
+
+The official Clash of Clans API restricts every key to configured outbound IP
+addresses. Vercel Hobby uses changing outbound IPs, so production imports should
+use the small authenticated proxy in `services/clash-api-proxy`.
+
+The repository includes `render.yaml` for a Render Blueprint. The proxy only
+accepts validated player and clan paths, requires a 32+ character shared secret,
+and keeps the official Clash token outside Vercel.
+
+Setup order:
+
+1. In Render, create a Blueprint from this repository and select `render.yaml`.
+2. Initially set `CLASH_OF_CLANS_API_TOKEN` to a temporary non-empty value.
+3. Generate a random shared secret and set it as `CLASH_PROXY_SHARED_SECRET`:
+
+   ```bash
+   openssl rand -hex 32
+   ```
+
+4. After the Render service exists, open **Connect → Outbound** and copy every
+   outbound CIDR range for its region.
+5. In the Clash of Clans Developer Portal, create a key for this proxy and add
+   every Render outbound range under **Allowed IP Addresses**.
+6. Replace the temporary Render token with the generated official API token and
+   redeploy the proxy. `/health` must return `{ "status": "ok" }`.
+7. Add the following sensitive values to Vercel Preview and Production:
+
+   ```text
+   CLASH_OF_CLANS_API_PROXY_URL=https://<service-name>.onrender.com
+   CLASH_OF_CLANS_API_PROXY_SECRET=<same shared secret as Render>
+   ```
+
+8. Redeploy the Next.js app. Do not put the official Clash token in Vercel when
+   using the proxy.
+
+For a host that already has a fixed outbound IP, omit the two proxy variables
+and set `CLASH_OF_CLANS_API_TOKEN` directly instead.
+
 ## Scripts
 
 | Command | Purpose |
@@ -82,6 +122,7 @@ These SQL files are setup helpers and are not executed automatically by the app.
 | `npm run lint` | Runs ESLint |
 | `npm test` | Runs planner tests |
 | `npm run import-game-data` | Imports validated JSON game data with a server-only Supabase secret key |
+| `npm --prefix services/clash-api-proxy test` | Tests the standalone Clash API proxy |
 
 Run the game-data importer after Supabase tables and local environment variables are configured:
 

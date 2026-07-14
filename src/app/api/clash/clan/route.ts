@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { ClanRole, OfficialClan } from "@/types/clan";
+import {
+  ClashApiConfigurationError,
+  ClashApiConnectionError,
+  requestClashApi,
+} from "@/lib/clash-api";
 
 type ApiMember = {
   tag: string;
@@ -52,33 +57,29 @@ export async function GET(request: NextRequest) {
       { error: "Ungültiger Clan-Tag." },
       { status: 400 },
     );
-  const apiToken = process.env.CLASH_OF_CLANS_API_TOKEN;
-  if (!apiToken)
+  let apiResult;
+  try {
+    apiResult = await requestClashApi<ApiClan>(
+      `/v1/clans/${encodeURIComponent(tag)}`,
+    );
+  } catch (error) {
+    if (
+      error instanceof ClashApiConfigurationError ||
+      error instanceof ClashApiConnectionError
+    )
+      return NextResponse.json({ error: error.message }, { status: 503 });
+    throw error;
+  }
+  if (!apiResult.ok)
     return NextResponse.json(
       {
         error:
-          "Der Clash-of-Clans-API-Schlüssel ist noch nicht in Vercel konfiguriert.",
+          (apiResult.body as { message?: string }).message ||
+          "Clan konnte nicht geladen werden.",
       },
-      { status: 503 },
+      { status: apiResult.status },
     );
-
-  const response = await fetch(
-    `https://api.clashofclans.com/v1/clans/${encodeURIComponent(tag)}`,
-    {
-      headers: {
-        authorization: `Bearer ${apiToken}`,
-        accept: "application/json",
-      },
-      cache: "no-store",
-    },
-  );
-  const body = await response.json();
-  if (!response.ok)
-    return NextResponse.json(
-      { error: body?.message || "Clan konnte nicht geladen werden." },
-      { status: response.status },
-    );
-  const clan = body as ApiClan;
+  const clan = apiResult.body as ApiClan;
   const result: OfficialClan = {
     clanTag: clan.tag,
     name: clan.name,

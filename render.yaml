@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: clash-tool-api-proxy
+    runtime: node
+    plan: free
+    rootDir: services/clash-api-proxy
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: CLASH_OF_CLANS_API_TOKEN
+        sync: false
+      - key: CLASH_PROXY_SHARED_SECRET
+        sync: false
