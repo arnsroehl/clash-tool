@@ -48,7 +48,7 @@ create policy "Legacy upgrade queue is inaccessible"
 revoke execute on function public.join_clan_with_invite(uuid) from anon, public;
 grant execute on function public.join_clan_with_invite(uuid) to authenticated;
 
-revoke execute on function public.get_due_push_deliveries(text, integer) from authenticated, public;
-revoke execute on function public.finalize_push_deliveries(text, uuid[], uuid[]) from authenticated, public;
-grant execute on function public.get_due_push_deliveries(text, integer) to anon;
-grant execute on function public.finalize_push_deliveries(text, uuid[], uuid[]) to anon;
+revoke execute on function public.get_due_push_deliveries(text, integer) from anon, authenticated, public;
+revoke execute on function public.finalize_push_deliveries(text, uuid[], uuid[]) from anon, authenticated, public;
+grant execute on function public.get_due_push_deliveries(text, integer) to service_role;
+grant execute on function public.finalize_push_deliveries(text, uuid[], uuid[]) to service_role;

@@ -12,15 +12,15 @@ export async function GET(request: NextRequest) {
   )
     return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const secretKey = process.env.SUPABASE_SECRET_KEY;
   const publicKey = process.env.NEXT_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY;
   const privateKey = process.env.WEB_PUSH_VAPID_PRIVATE_KEY;
-  if (!url || !anonKey || !publicKey || !privateKey)
+  if (!url || !secretKey || !publicKey || !privateKey)
     return NextResponse.json(
       { error: "Push-Umgebung ist unvollständig." },
       { status: 503 },
     );
-  const client = createClient(url, anonKey, {
+  const client = createClient(url, secretKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const { data: due, error } = await client.rpc("get_due_push_deliveries", {
