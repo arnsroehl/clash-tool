@@ -42,21 +42,28 @@ const commands = [
 const endpoint = guildId
   ? `https://discord.com/api/v10/applications/${applicationId}/guilds/${guildId}/commands`
   : `https://discord.com/api/v10/applications/${applicationId}/commands`;
-const response = await fetch(endpoint, {
-  method: "PUT",
-  headers: {
-    authorization: `Bot ${botToken}`,
-    "content-type": "application/json",
-  },
-  body: JSON.stringify(commands),
-});
+async function registerCommands() {
+  const response = await fetch(endpoint, {
+    method: "PUT",
+    headers: {
+      authorization: `Bot ${botToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(commands),
+  });
 
-if (!response.ok) {
-  throw new Error(
-    `Discord command registration failed (${response.status}): ${await response.text()}`,
+  if (!response.ok) {
+    throw new Error(
+      `Discord command registration failed (${response.status}): ${await response.text()}`,
+    );
+  }
+
+  console.log(
+    `${commands.length} Discord-Befehle ${guildId ? "für den Testserver" : "global"} registriert.`,
   );
 }
 
-console.log(
-  `${commands.length} Discord-Befehle ${guildId ? "für den Testserver" : "global"} registriert.`,
-);
+registerCommands().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});
