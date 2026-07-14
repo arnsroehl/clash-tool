@@ -7,20 +7,19 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   const jwt = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
   const publicKey = process.env.NEXT_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY;
   const privateKey = process.env.WEB_PUSH_VAPID_PRIVATE_KEY;
   const subject =
     process.env.WEB_PUSH_VAPID_SUBJECT || "mailto:admin@example.com";
-  if (!jwt || !supabaseUrl || !supabaseKey)
+  if (!jwt || !supabaseUrl || !supabaseSecretKey)
     return NextResponse.json({ error: "Nicht autorisiert." }, { status: 401 });
   if (!publicKey || !privateKey)
     return NextResponse.json(
       { error: "Web Push ist noch nicht vollständig konfiguriert." },
       { status: 503 },
     );
-  const client = createClient(supabaseUrl, supabaseKey, {
-    global: { headers: { authorization: `Bearer ${jwt}` } },
+  const client = createClient(supabaseUrl, supabaseSecretKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const {
