@@ -5,6 +5,7 @@ import type {
   ScreenshotScreenType,
 } from "@/features/screenshot-import/screenshot-import";
 import type { ScreenshotRecognitionResult } from "@/services/screenshotRecognitionService";
+import type { LaboratoryGridCellRecognition } from "@/services/screenshotRecognitionService";
 
 export type ScreenshotIconSignature = {
   sourceId: string;
@@ -25,6 +26,48 @@ export type ScreenshotObjectMatch = {
 
 const signatures = signatureData.signatures as ScreenshotIconSignature[];
 const BIT_COUNTS = [0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4];
+const LABORATORY_START_GRID = [
+  "barbarian",
+  "giant",
+  "wall-breaker",
+  "wizard",
+  "dragon",
+  "baby-dragon",
+  "archer",
+  "goblin",
+  "balloon",
+  "healer",
+  "pekka",
+  "miner",
+] as const;
+
+export function laboratoryStartGridSourceId(index: number): string | null {
+  return LABORATORY_START_GRID[index] || null;
+}
+
+export function laboratoryStartGridIsVerified(params: {
+  hashes: string[];
+  catalog: ScreenshotIconSignature[];
+}): boolean {
+  let confirmations = 0;
+  params.hashes.forEach((hash, index) => {
+    const expectedSourceId = laboratoryStartGridSourceId(index);
+    if (!expectedSourceId) return;
+    const ranked = params.catalog
+      .filter((signature) => signature.entityType === "troop")
+      .map((signature) => ({
+        sourceId: signature.sourceId,
+        distance: hammingDistance(hash, signature.hash),
+      }))
+      .sort((left, right) => left.distance - right.distance);
+    if (
+      ranked[0]?.sourceId === expectedSourceId &&
+      ranked[0].distance <= 22
+    )
+      confirmations += 1;
+  });
+  return confirmations >= 5;
+}
 
 export function hammingDistance(left: string, right: string): number {
   let distance = 0;
@@ -170,6 +213,7 @@ export async function recognizeScreenshotObjects(params: {
   file: File;
   lines: ScreenshotRecognitionResult["lines"];
   screenType: ScreenshotScreenType;
+  laboratoryGridCells?: LaboratoryGridCellRecognition[];
 }): Promise<ScreenshotObjectMatch[]> {
   const types = allowedTypes(params.screenType);
   if (!types.size || (!params.lines.length && params.screenType !== "village")) return [];
@@ -195,6 +239,29 @@ export async function recognizeScreenshotObjects(params: {
     });
     if (best) matches.push(best);
   });
+  if (
+    params.screenType === "laboratory" &&
+    params.laboratoryGridCells?.length === LABORATORY_START_GRID.length
+  ) {
+    const gridHashes = params.laboratoryGridCells.map((cell) =>
+      hashRegion(bitmap, context, cell.cardBox),
+    );
+    if (laboratoryStartGridIsVerified({ hashes: gridHashes, catalog })) {
+      params.laboratoryGridCells.forEach((cell) => {
+        const sourceId = laboratoryStartGridSourceId(cell.index);
+        if (!sourceId || cell.lineIndex < 0) return;
+        matches.push({
+          sourceId,
+          entityType: "troop",
+          visualLevel: cell.level,
+          confidence: Math.max(0.86, cell.confidence),
+          lineIndex: cell.lineIndex,
+          boundingBox: cell.cardBox,
+          alternatives: [],
+        });
+      });
+    }
+  }
   if (params.screenType === "village") {
     const proposals = villageProposalBoxes().flatMap((box) => {
       const match = matchObjectFingerprint(hashRegion(bitmap, context, box), catalog);

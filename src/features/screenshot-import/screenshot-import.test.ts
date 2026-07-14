@@ -17,8 +17,11 @@ import {
 import {
   createDifferenceHash,
   hammingDistance,
+  laboratoryStartGridIsVerified,
+  laboratoryStartGridSourceId,
   matchObjectFingerprint,
 } from "@/services/screenshotObjectRecognitionService";
+import { createLaboratoryGridCells } from "@/services/screenshotRecognitionService";
 
 const entities: ScreenshotEntity[] = [
   {
@@ -98,6 +101,93 @@ test("removes a trailing OCR zero when the explicit level exceeds the known maxi
   });
   assert.equal(detections[0].detectedLevel, 13);
   assert.equal(detections[0].validationConfidence, 0.78);
+});
+
+test("uses the known maximum for a laboratory card labelled Max Level", () => {
+  const detections = parseScreenshotDetections({
+    text: "Max. Level",
+    entities: [{
+      id: "wizard",
+      name: "Wizard",
+      aliases: ["wizard"],
+      currentLevel: 13,
+      maxLevel: 14,
+      type: "troop",
+    }],
+    screenType: "laboratory",
+    ocrLines: [{
+      text: "Max. Level",
+      confidence: 0.9,
+      boundingBox: { x: 0.5, y: 0.5, width: 0.1, height: 0.05 },
+    }],
+    objectMatches: [{
+      sourceId: "wizard",
+      entityType: "troop",
+      visualLevel: null,
+      confidence: 0.9,
+      lineIndex: 0,
+      boundingBox: { x: 0.45, y: 0.4, width: 0.15, height: 0.2 },
+      alternatives: [],
+    }],
+  });
+  assert.equal(detections[0].detectedLevel, 14);
+});
+
+test("prefers a named running laboratory upgrade over its older grid badge", () => {
+  const detections = parseScreenshotDetections({
+    text: "Ballon Level 11\nLevel 10",
+    entities,
+    screenType: "laboratory",
+    ocrLines: [
+      {
+        text: "Ballon Level 11",
+        confidence: 0.9,
+        boundingBox: { x: 0.6, y: 0.2, width: 0.2, height: 0.05 },
+      },
+      {
+        text: "Level 10",
+        confidence: 0.9,
+        boundingBox: { x: 0.35, y: 0.7, width: 0.05, height: 0.04 },
+      },
+    ],
+    objectMatches: [{
+      sourceId: "balloon",
+      entityType: "troop",
+      visualLevel: 10,
+      confidence: 0.9,
+      lineIndex: 1,
+      boundingBox: { x: 0.34, y: 0.55, width: 0.12, height: 0.18 },
+      alternatives: [],
+    }],
+  });
+  assert.deepEqual(detections.map((detection) => detection.detectedLevel), [11]);
+});
+
+test("describes the twelve visible cells of the default laboratory grid", () => {
+  const cells = createLaboratoryGridCells();
+  assert.equal(cells.length, 12);
+  assert.equal(laboratoryStartGridSourceId(0), "barbarian");
+  assert.equal(laboratoryStartGridSourceId(5), "baby-dragon");
+  assert.equal(laboratoryStartGridSourceId(11), "miner");
+  assert.ok(cells[6].cardBox.y > cells[0].cardBox.y);
+  assert.ok(cells[5].cardBox.x > cells[0].cardBox.x);
+});
+
+test("requires five visual confirmations before trusting laboratory grid order", () => {
+  const catalog = Array.from({ length: 12 }, (_, index) => ({
+    sourceId: laboratoryStartGridSourceId(index) || "unknown",
+    entityType: "troop" as const,
+    level: null,
+    hash: index.toString(16).padStart(16, "0"),
+  }));
+  assert.equal(laboratoryStartGridIsVerified({
+    hashes: catalog.slice(0, 5).map((item) => item.hash),
+    catalog,
+  }), true);
+  assert.equal(laboratoryStartGridIsVerified({
+    hashes: catalog.slice(0, 4).map((item) => item.hash),
+    catalog,
+  }), false);
 });
 
 test("does not invent a level when stylized OCR contains no digit", () => {

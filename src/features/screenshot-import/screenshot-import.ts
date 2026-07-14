@@ -420,6 +420,11 @@ function parseOcrLevelToken(
 }
 
 function extractLevel(line: string, maxLevel?: number): ExtractedLevel | null {
+  if (
+    maxLevel !== undefined &&
+    /(?:max\W*level|maxitevel|max\W*stufe)/i.test(line)
+  )
+    return { level: maxLevel, normalizedOcr: false };
   const explicit = line.match(
     /(?:level|lvl|stufe)\s*[^a-z0-9]{0,3}([a-z0-9|]{1,6})/i,
   );
@@ -656,7 +661,22 @@ export function parseScreenshotDetections(params: {
     });
   });
 
-  return detections;
+  const entitiesWithNamedDetection = new Set(
+    detections
+      .filter((detection) => {
+        const normalizedText = normalizeScreenshotText(detection.recognizedText);
+        return [detection.name, ...(detection.aliases || [])]
+          .map(normalizeScreenshotText)
+          .some((name) => name && normalizedText.includes(name));
+      })
+      .map((detection) => detection.id),
+  );
+  return detections.filter((detection) => {
+    const isUnlabelledGridLevel = /^(?:level\s*\d{1,3}|max\W*level)$/i.test(
+      detection.recognizedText.trim(),
+    );
+    return !isUnlabelledGridLevel || !entitiesWithNamedDetection.has(detection.id);
+  });
 }
 
 export function mergeScreenshotDetections(

@@ -17,9 +17,130 @@ export type ScreenshotRecognitionResult = {
   text: string;
   confidence: number;
   lines: Array<{ text: string; confidence: number; boundingBox: BoundingBox }>;
+  laboratoryGridCells: LaboratoryGridCellRecognition[];
+};
+
+export type LaboratoryGridCellRecognition = {
+  index: number;
+  lineIndex: number;
+  level: number | null;
+  isMaxLevel: boolean;
+  confidence: number;
+  cardBox: BoundingBox;
+  badgeBox: BoundingBox;
 };
 
 const MAX_IMAGE_EDGE = 2400;
+
+const LABORATORY_GRID = {
+  x: 195 / 2360,
+  y: 802 / 1640,
+  columnStep: 337 / 2360,
+  rowStep: 337 / 1640,
+  cardWidth: 300 / 2360,
+  cardHeight: 300 / 1640,
+  badgeX: 15 / 300,
+  badgeY: 160 / 300,
+  badgeWidth: 50 / 300,
+  badgeHeight: 45 / 300,
+} as const;
+
+export function createLaboratoryGridCells(): Array<
+  Pick<LaboratoryGridCellRecognition, "index" | "cardBox" | "badgeBox">
+> {
+  return Array.from({ length: 12 }, (_, index) => {
+    const row = Math.floor(index / 6);
+    const column = index % 6;
+    const cardBox = {
+      x: LABORATORY_GRID.x + column * LABORATORY_GRID.columnStep,
+      y: LABORATORY_GRID.y + row * LABORATORY_GRID.rowStep,
+      width: LABORATORY_GRID.cardWidth,
+      height: LABORATORY_GRID.cardHeight,
+    };
+    return {
+      index,
+      cardBox,
+      badgeBox: {
+        x: cardBox.x + cardBox.width * LABORATORY_GRID.badgeX,
+        y: cardBox.y + cardBox.height * LABORATORY_GRID.badgeY,
+        width: cardBox.width * LABORATORY_GRID.badgeWidth,
+        height: cardBox.height * LABORATORY_GRID.badgeHeight,
+      },
+    };
+  });
+}
+
+function cropToCanvas(
+  bitmap: ImageBitmap,
+  box: BoundingBox,
+  width: number,
+  height: number,
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) throw new Error("Labor-Kachel konnte nicht vorbereitet werden.");
+  context.drawImage(
+    bitmap,
+    box.x * bitmap.width,
+    box.y * bitmap.height,
+    box.width * bitmap.width,
+    box.height * bitmap.height,
+    0,
+    0,
+    width,
+    height,
+  );
+  return canvas;
+}
+
+function thresholdBadge(canvas: HTMLCanvasElement, threshold: number): void {
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) return;
+  const image = context.getImageData(0, 0, canvas.width, canvas.height);
+  for (let index = 0; index < image.data.length; index += 4) {
+    const gray =
+      image.data[index] * 0.2126 +
+      image.data[index + 1] * 0.7152 +
+      image.data[index + 2] * 0.0722;
+    const value = gray >= threshold ? 0 : 255;
+    image.data[index] = value;
+    image.data[index + 1] = value;
+    image.data[index + 2] = value;
+    image.data[index + 3] = 255;
+  }
+  context.putImageData(image, 0, 0);
+}
+
+function averageCardChroma(bitmap: ImageBitmap, box: BoundingBox): number {
+  const portrait = {
+    x: box.x + box.width * 0.08,
+    y: box.y + box.height * 0.07,
+    width: box.width * 0.84,
+    height: box.height * 0.7,
+  };
+  const canvas = cropToCanvas(bitmap, portrait, 30, 25);
+  const pixels = canvas
+    .getContext("2d", { willReadFrequently: true })
+    ?.getImageData(0, 0, canvas.width, canvas.height).data;
+  if (!pixels) return 1;
+  let chroma = 0;
+  for (let index = 0; index < pixels.length; index += 4) {
+    const red = pixels[index];
+    const green = pixels[index + 1];
+    const blue = pixels[index + 2];
+    chroma += (Math.max(red, green, blue) - Math.min(red, green, blue)) / 255;
+  }
+  return chroma / Math.max(1, pixels.length / 4);
+}
+
+function parseBadgeLevel(text: string): number | null {
+  const digits = text.replace(/\D/g, "");
+  if (!/^\d{1,2}$/.test(digits)) return null;
+  const level = Number(digits);
+  return level >= 1 && level <= 99 ? level : null;
+}
 
 async function fileHash(file: Blob): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
@@ -118,10 +239,10 @@ export async function recognizeScreenshotDetailed(
   dimensions?: { width: number; height: number },
   focusScreenType?: ScreenshotScreenType,
 ): Promise<ScreenshotRecognitionResult> {
-  const { createWorker } = await import("tesseract.js");
+  const { createWorker, PSM } = await import("tesseract.js");
   const useLaboratoryFocus = focusScreenType === "laboratory" && Boolean(dimensions);
   let progressStart = 0;
-  let progressSpan = useLaboratoryFocus ? 70 : 100;
+  let progressSpan = useLaboratoryFocus ? 55 : 100;
   const worker = await createWorker("eng+deu", 1, {
     logger: (event) => {
       if (event.status === "recognizing text" && typeof event.progress === "number")
@@ -149,9 +270,10 @@ export async function recognizeScreenshotDetailed(
     let focusedText = "";
     let focusedConfidence = 0;
     let focusedLines: ScreenshotRecognitionResult["lines"] = [];
+    let laboratoryGridCells: LaboratoryGridCellRecognition[] = [];
     if (useLaboratoryFocus) {
-      progressStart = 70;
-      progressSpan = 30;
+      progressStart = 55;
+      progressSpan = 20;
       const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
       const cropTop = Math.round(bitmap.height * 0.08);
       const cropHeight = Math.max(1, Math.round(bitmap.height * 0.34));
@@ -207,6 +329,54 @@ export async function recognizeScreenshotDetailed(
           ),
         ).filter((line) => line.text.length > 0);
       }
+      const hasMaxLevelText = /(?:max\W*level|maxitevel|max\W*stufe)/i.test(
+        `${result.data.text}\n${focusedText}`,
+      );
+      const grid = createLaboratoryGridCells();
+      const grayscaleCells = new Set(
+        grid
+          .filter((cell) => averageCardChroma(bitmap, cell.cardBox) < 0.08)
+          .map((cell) => cell.index),
+      );
+      await worker.setParameters({
+        tessedit_char_whitelist: "0123456789",
+        tessedit_pageseg_mode: PSM.SINGLE_WORD,
+      });
+      progressStart = 100;
+      progressSpan = 0;
+      for (const cell of grid) {
+        const isMaxLevel = hasMaxLevelText && grayscaleCells.has(cell.index);
+        let level: number | null = null;
+        let confidence = isMaxLevel ? 0.9 : 0;
+        if (!isMaxLevel) {
+          for (const threshold of [110, 220]) {
+            const badge = cropToCanvas(bitmap, cell.badgeBox, 400, 360);
+            thresholdBadge(badge, threshold);
+            const padded = document.createElement("canvas");
+            padded.width = 520;
+            padded.height = 480;
+            const paddedContext = padded.getContext("2d");
+            if (!paddedContext) continue;
+            paddedContext.fillStyle = "#fff";
+            paddedContext.fillRect(0, 0, padded.width, padded.height);
+            paddedContext.drawImage(badge, 60, 60);
+            const badgeResult = await worker.recognize(padded);
+            level = parseBadgeLevel(badgeResult.data.text);
+            if (level !== null) {
+              confidence = threshold === 110 ? 0.9 : 0.82;
+              break;
+            }
+          }
+        }
+        laboratoryGridCells.push({
+          ...cell,
+          lineIndex: -1,
+          level,
+          isMaxLevel,
+          confidence,
+        });
+        onProgress(75 + Math.round(((cell.index + 1) / grid.length) * 25));
+      }
       bitmap.close();
     }
     const lineKeys = new Set<string>();
@@ -216,6 +386,16 @@ export async function recognizeScreenshotDetailed(
       lineKeys.add(key);
       return true;
     });
+    laboratoryGridCells = laboratoryGridCells.map((cell) => {
+      if (cell.level === null && !cell.isMaxLevel) return cell;
+      const lineIndex = lines.length;
+      lines.push({
+        text: cell.isMaxLevel ? "Max Level" : `Level ${cell.level}`,
+        confidence: cell.confidence,
+        boundingBox: cell.badgeBox,
+      });
+      return { ...cell, lineIndex };
+    });
     return {
       text: [result.data.text, focusedText].filter(Boolean).join("\n"),
       confidence: Math.max(
@@ -223,6 +403,7 @@ export async function recognizeScreenshotDetailed(
         focusedConfidence,
       ),
       lines,
+      laboratoryGridCells,
     };
   } finally {
     await worker.terminate();
