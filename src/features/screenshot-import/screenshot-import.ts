@@ -422,7 +422,7 @@ function parseOcrLevelToken(
 function extractLevel(line: string, maxLevel?: number): ExtractedLevel | null {
   if (
     maxLevel !== undefined &&
-    /(?:max\W*level|maxitevel|max\W*stufe)/i.test(line)
+    /(?:max[\W_]*level|maxitevel|max[\W_]*stufe)/i.test(line)
   )
     return { level: maxLevel, normalizedOcr: false };
   const explicit = line.match(
@@ -672,7 +672,7 @@ export function parseScreenshotDetections(params: {
       .map((detection) => detection.id),
   );
   return detections.filter((detection) => {
-    const isUnlabelledGridLevel = /^(?:level\s*\d{1,3}|max\W*level)$/i.test(
+    const isUnlabelledGridLevel = /^(?:level\s*\d{1,3}|max[\W_]*level)$/i.test(
       detection.recognizedText.trim(),
     );
     return !isUnlabelledGridLevel || !entitiesWithNamedDetection.has(detection.id);

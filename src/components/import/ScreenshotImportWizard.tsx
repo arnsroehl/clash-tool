@@ -341,6 +341,10 @@ export function ScreenshotImportWizard({
             status: "running",
           });
           const classification = classifyScreenshotText(recognition.text);
+          const effectiveScreenType =
+            classification.screenType === "unknown"
+              ? importType
+              : classification.screenType;
           await updateAnalysisJob({
             jobId: activeJobId,
             status: "completed",
@@ -362,10 +366,7 @@ export function ScreenshotImportWizard({
             file: normalized.file,
             lines: recognition.lines,
             laboratoryGridCells: recognition.laboratoryGridCells,
-            screenType:
-              classification.screenType === "unknown"
-                ? importType
-                : classification.screenType,
+            screenType: effectiveScreenType,
           });
           await updateAnalysisJob({
             jobId: activeJobId,
@@ -387,7 +388,7 @@ export function ScreenshotImportWizard({
             text: recognition.text,
             entities,
             screenshotId: uploaded.id,
-            screenType: classification.screenType,
+            screenType: effectiveScreenType,
             townHallLevel,
             ocrConfidence: recognition.confidence,
             layoutConfidence: classification.confidence,
@@ -597,6 +598,10 @@ export function ScreenshotImportWizard({
 
   const cancel = async () => {
     if (session) await deleteScreenshotImportSession(session.id);
+    resetWizard();
+  };
+
+  const resetWizard = () => {
     screenshots.forEach((screenshot) => {
       if (screenshot.previewUrl) URL.revokeObjectURL(screenshot.previewUrl);
     });
@@ -615,6 +620,9 @@ export function ScreenshotImportWizard({
     setRestoredChanges([]);
     setResumeCandidate(null);
     setPendingResumeFiles([]);
+    setSavedForLater(false);
+    setProgress(0);
+    setMessage(null);
     setStep("select");
   };
 
@@ -631,6 +639,13 @@ export function ScreenshotImportWizard({
             ? "The confirmed values were saved. Original screenshots were deleted according to your retention choice."
             : "Die bestätigten Werte wurden gespeichert. Originalbilder wurden gemäß deiner Speicherwahl gelöscht."}
         </p>
+        <button
+          type="button"
+          onClick={resetWizard}
+          className="mt-4 rounded-xl bg-emerald-300 px-4 py-2.5 text-sm font-bold text-slate-950"
+        >
+          {en ? "Start another import" : "Neuen Import starten"}
+        </button>
       </div>
     );
 

@@ -167,6 +167,8 @@ function candidateBoxes(line: BoundingBox): BoundingBox[] {
   return [
     clampBox({ x: centerX - side / 2, y: line.y - side * 1.08, width: side, height: side }),
     clampBox({ x: line.x - side * 1.05, y: centerY - side / 2, width: side, height: side }),
+    clampBox({ x: line.x + line.width + side * 0.05, y: centerY - side / 2, width: side, height: side }),
+    clampBox({ x: centerX - side / 2, y: line.y + line.height + side * 0.08, width: side, height: side }),
   ];
 }
 

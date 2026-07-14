@@ -134,6 +134,36 @@ test("uses the known maximum for a laboratory card labelled Max Level", () => {
   assert.equal(detections[0].detectedLevel, 14);
 });
 
+test("uses the known maximum when Safari OCR separates Max Level with an underscore", () => {
+  const detections = parseScreenshotDetections({
+    text: "Max_Level",
+    entities: [{
+      id: "unicorn",
+      name: "Unicorn",
+      aliases: ["unicorn"],
+      currentLevel: 14,
+      maxLevel: 15,
+      type: "pet",
+    }],
+    screenType: "pets",
+    ocrLines: [{
+      text: "Max_Level",
+      confidence: 0.88,
+      boundingBox: { x: 0.5, y: 0.5, width: 0.1, height: 0.05 },
+    }],
+    objectMatches: [{
+      sourceId: "unicorn",
+      entityType: "pet",
+      visualLevel: null,
+      confidence: 0.9,
+      lineIndex: 0,
+      boundingBox: { x: 0.45, y: 0.4, width: 0.15, height: 0.2 },
+      alternatives: [],
+    }],
+  });
+  assert.equal(detections[0].detectedLevel, 15);
+});
+
 test("prefers a named running laboratory upgrade over its older grid badge", () => {
   const detections = parseScreenshotDetections({
     text: "Ballon Level 11\nLevel 10",
