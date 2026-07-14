@@ -40,6 +40,7 @@ import {
 import {
   createLaboratoryGridCells,
   detectScreenshotDevicePlatform,
+  enhanceScreenshotPixelsForOcr,
 } from "@/services/screenshotRecognitionService";
 import {
   isScreenshotImportTypeEnabled,
@@ -300,6 +301,27 @@ test("stores only a coarse screenshot device platform", () => {
   assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (Macintosh)", "MacIntel"), "macos");
   assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (X11; CrOS x86_64)", "Linux"), "chromeos");
   assert.equal(detectScreenshotDevicePlatform(undefined, undefined), "unknown");
+});
+
+test("creates a contrast-normalized grayscale OCR variant without changing the source", () => {
+  const source = new Uint8ClampedArray([
+    50, 50, 50, 255,
+    100, 100, 100, 255,
+    200, 200, 200, 255,
+  ]);
+  const enhanced = enhanceScreenshotPixelsForOcr(source, 3, 1);
+  assert.deepEqual([...source], [
+    50, 50, 50, 255,
+    100, 100, 100, 255,
+    200, 200, 200, 255,
+  ]);
+  assert.equal(enhanced[0], enhanced[1]);
+  assert.equal(enhanced[1], enhanced[2]);
+  assert.equal(enhanced[3], 255);
+  assert.ok(enhanced[0] < enhanced[4]);
+  assert.ok(enhanced[4] < enhanced[8]);
+  assert.ok(enhanced[0] < 20);
+  assert.ok(enhanced[8] > 230);
 });
 
 test("extracts supported entity levels and English aliases", () => {

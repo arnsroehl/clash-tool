@@ -622,6 +622,7 @@ export function ScreenshotImportWizard({
               laboratoryMaxLevelCells: recognition.laboratoryGridCells.filter(
                 (cell) => cell.isMaxLevel,
               ).length,
+              preprocessingApplied: recognition.preprocessingApplied,
             },
           });
           activeJobId = await createAnalysisJob({
