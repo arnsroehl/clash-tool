@@ -12,12 +12,41 @@ export type ScreenshotEntity = {
   id: string;
   name: string;
   aliases?: string[];
+  category?: string;
   currentLevel: number;
   maxLevel?: number;
   maxLevelForTownHall?: number;
   unlockTownHallLevel?: number;
   type: ScreenshotEntityType;
 };
+
+export type BuildingImportSection =
+  | "all"
+  | "core"
+  | "defense"
+  | "offense"
+  | "resources"
+  | "traps";
+
+export function getBuildingImportSection(category?: string): Exclude<BuildingImportSection, "all"> | null {
+  const normalized = normalizeScreenshotText(category || "");
+  if (/(?:fallen|traps?)/.test(normalized)) return "traps";
+  if (/(?:verteidigung|defen[cs]e)/.test(normalized)) return "defense";
+  if (/(?:armee|offen[cs]e|army)/.test(normalized)) return "offense";
+  if (/(?:ressourcen|resources?)/.test(normalized)) return "resources";
+  if (/(?:hauptgebaude|core|townhall)/.test(normalized)) return "core";
+  return null;
+}
+
+export function filterBuildingImportEntities(
+  entities: ScreenshotEntity[],
+  section: BuildingImportSection,
+): ScreenshotEntity[] {
+  const buildings = entities.filter((entity) => entity.type === "building");
+  return section === "all"
+    ? buildings
+    : buildings.filter((entity) => getBuildingImportSection(entity.category) === section);
+}
 
 export type ScreenshotScreenType =
   | "laboratory"
@@ -541,10 +570,25 @@ export function parseScreenshotDetections(params: {
   ];
   const detections: ScreenshotDetection[] = [];
   const visualInstanceUseCount = new Map<string, number>();
+  const textInstanceUseCount = new Map<string, number>();
 
   lines.forEach((lineResult, lineIndex) => {
     const line = lineResult.text;
     const textMatch = bestEntityForLine(line, params.entities);
+    let textBest = textMatch.best;
+    if (
+      textBest?.matchedName &&
+      textMatch.candidates.length > 1 &&
+      textMatch.candidates[1]?.matchedName === textBest.matchedName
+    ) {
+      const textUseKey = `${textBest.entity.type}:${textBest.matchedName}`;
+      const textUseIndex = textInstanceUseCount.get(textUseKey) || 0;
+      const sameNameCandidates = textMatch.candidates.filter(
+        (candidate) => candidate.matchedName === textBest?.matchedName,
+      );
+      textBest = sameNameCandidates[Math.min(textUseIndex, sameNameCandidates.length - 1)];
+      textInstanceUseCount.set(textUseKey, textUseIndex + 1);
+    }
     const visualMatch = visualMatchesByLine.get(lineIndex);
     const visualCandidates = visualMatch
       ? params.entities.filter((entity) => {
@@ -564,7 +608,7 @@ export function parseScreenshotDetections(params: {
       : null;
     if (visualMatch && visualEntity)
       visualInstanceUseCount.set(visualUseKey, visualUseIndex + 1);
-    const best = textMatch.best || (visualEntity ? { entity: visualEntity, matchedName: visualMatch?.sourceId } : undefined);
+    const best = textBest || (visualEntity ? { entity: visualEntity, matchedName: visualMatch?.sourceId } : undefined);
     const candidates = textMatch.candidates.length
       ? textMatch.candidates
       : visualCandidates.map((entity) => ({ entity, matchedName: visualMatch?.sourceId }));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   fetchAccountBuildingLevels,
   fetchBuildingAvailability,
@@ -90,6 +90,14 @@ export function useBuildings({
   const [isSavingBuildingId, setIsSavingBuildingId] = useState<string | null>(
     null,
   );
+
+  const refreshAccountBuildings = useCallback(async () => {
+    if (!selectedAccount) {
+      setBuildingInstanceLevels({});
+      return;
+    }
+    setBuildingInstanceLevels(await fetchAccountBuildingLevels(selectedAccount.id));
+  }, [selectedAccount]);
 
   useEffect(() => {
     async function loadBuildings() {
@@ -249,5 +257,6 @@ export function useBuildings({
     isLoadingBuildings,
     isSavingBuildingId,
     updateBuildingLevel,
+    refreshAccountBuildings,
   };
 }

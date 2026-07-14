@@ -10,6 +10,8 @@ import {
   parseProfileScreenshot,
   parseDurationSeconds,
   parseBuilderAvailability,
+  filterBuildingImportEntities,
+  getBuildingImportSection,
   parseUpgradeSlots,
   parseWallDistributions,
   summarizeScreenshotReview,
@@ -375,6 +377,35 @@ test("assigns OCR levels to exact building instances", () => {
   assert.deepEqual(
     matches.map((match) => [match.id, match.detectedLevel]),
     [["cannon:2", 20]],
+  );
+});
+
+test("assigns repeated unnumbered building cards to separate instances", () => {
+  const matches = parseScreenshotLevels("Kanone Level 19\nKanone Level 20", [
+    { id: "cannon:1", name: "Kanone 1", aliases: ["Kanone"], currentLevel: 18, maxLevel: 21, type: "building" },
+    { id: "cannon:2", name: "Kanone 2", aliases: ["Kanone"], currentLevel: 18, maxLevel: 21, type: "building" },
+  ]);
+  assert.deepEqual(
+    matches.map((match) => [match.id, match.detectedLevel]),
+    [["cannon:1", 19], ["cannon:2", 20]],
+  );
+});
+
+test("filters structured building imports by database category", () => {
+  const buildingEntities: ScreenshotEntity[] = [
+    { id: "cannon", name: "Kanone", category: "Verteidigung", currentLevel: 1, type: "building" },
+    { id: "camp", name: "Armeelager", category: "Armee", currentLevel: 1, type: "building" },
+    { id: "mine", name: "Goldmine", category: "Ressourcen", currentLevel: 1, type: "building" },
+    { id: "bomb", name: "Bombe", category: "Fallen", currentLevel: 1, type: "building" },
+  ];
+  assert.equal(getBuildingImportSection("Defense"), "defense");
+  assert.deepEqual(
+    filterBuildingImportEntities(buildingEntities, "resources").map((entity) => entity.id),
+    ["mine"],
+  );
+  assert.deepEqual(
+    filterBuildingImportEntities(buildingEntities, "traps").map((entity) => entity.id),
+    ["bomb"],
   );
 });
 

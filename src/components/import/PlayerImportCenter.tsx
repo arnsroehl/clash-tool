@@ -45,6 +45,7 @@ type Props = {
   onResourcesImported?: (resources: ScreenshotResourceDetection[]) => void;
   onProfileImported?: (profile: ScreenshotProfileDetection) => Promise<void>;
   onUpgradeSlotsImported?: () => Promise<void> | void;
+  onProgressImported?: () => Promise<void> | void;
 };
 const normalize = (name: string) =>
   name
@@ -74,6 +75,7 @@ export function PlayerImportCenter(props: Props) {
           id: `${item.id}:${index + 1}`,
           name: `${item.name} ${index + 1}`,
           aliases: item.sourceId ? [item.sourceId, `${item.sourceId}-${index + 1}`] : [],
+          category: item.category,
           type: "building" as const,
           currentLevel: props.buildingInstanceLevels[item.id]?.[index] || 0,
           maxLevel: item.maxLevel,
@@ -261,6 +263,7 @@ export function PlayerImportCenter(props: Props) {
       townHallTo: props.account.townHallLevel,
       changes,
     });
+    await props.onProgressImported?.();
   };
   const apply = async () => {
     if (!props.account || !preview) return;

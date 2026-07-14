@@ -4,6 +4,8 @@ import Image from "next/image";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   classifyScreenshotText,
+  filterBuildingImportEntities,
+  getBuildingImportSection,
   mergeScreenshotDetections,
   parseUpgradeSlots,
   parseWallDistributions,
@@ -12,6 +14,7 @@ import {
   parseProfileScreenshot,
   summarizeScreenshotReview,
   type ScreenshotDetection,
+  type BuildingImportSection,
   type ScreenshotEntity,
   type ScreenshotProposedChange,
   type ScreenshotScreenType,
@@ -91,6 +94,19 @@ const IMPORT_TYPES: Array<{
   { id: "profile", de: "Profil", en: "Profile", hintDe: "Spieler-Tag, Rathaus und Erfahrungslevel", hintEn: "Player tag, Town Hall and experience level" },
 ];
 
+const BUILDING_SECTIONS: Array<{
+  id: BuildingImportSection;
+  de: string;
+  en: string;
+}> = [
+  { id: "all", de: "Alle", en: "All" },
+  { id: "core", de: "Hauptgebäude", en: "Core" },
+  { id: "defense", de: "Verteidigung", en: "Defense" },
+  { id: "offense", de: "Armee", en: "Offense" },
+  { id: "resources", de: "Ressourcen", en: "Resources" },
+  { id: "traps", de: "Fallen", en: "Traps" },
+];
+
 const qualityIssueText: Record<string, { de: string; en: string }> = {
   too_small: { de: "Bildauflösung ist zu niedrig", en: "Image resolution is too low" },
   too_blurry: { de: "Bild ist zu unscharf", en: "Image is too blurry" },
@@ -113,6 +129,7 @@ export function ScreenshotImportWizard({
   const en = language === "en";
   const [step, setStep] = useState<"select" | "upload" | "review" | "done">("select");
   const [importType, setImportType] = useState<ImportType>("laboratory");
+  const [buildingSection, setBuildingSection] = useState<BuildingImportSection>("all");
   const [session, setSession] = useState<ScreenshotImportSession | null>(null);
   const [resumeCandidate, setResumeCandidate] = useState<ResumableScreenshotImport | null>(null);
   const [pendingResumeFiles, setPendingResumeFiles] = useState<ResumableScreenshotFile[]>([]);
@@ -175,6 +192,17 @@ export function ScreenshotImportWizard({
       });
     return [...groups.entries()];
   }, [changes]);
+  const buildingSectionCounts = useMemo(
+    () => Object.fromEntries(BUILDING_SECTIONS.map((section) => [
+      section.id,
+      section.id === "all"
+        ? entities.filter((entity) => entity.type === "building").length
+        : entities.filter(
+            (entity) => entity.type === "building" && getBuildingImportSection(entity.category) === section.id,
+          ).length,
+    ])) as Record<BuildingImportSection, number>,
+    [entities],
+  );
   const coverage = useMemo(() => {
     const typesByImport: Partial<Record<ImportType, ScreenshotEntity["type"][]>> = {
       laboratory: ["troop", "spell", "siege_machine"],
@@ -183,16 +211,16 @@ export function ScreenshotImportWizard({
       equipment: ["equipment"],
       buildings: ["building"],
     };
-    const expected = entities.filter((entity) =>
-      (typesByImport[importType] || []).includes(entity.type),
-    );
+    const expected = importType === "buildings"
+      ? filterBuildingImportEntities(entities, buildingSection)
+      : entities.filter((entity) => (typesByImport[importType] || []).includes(entity.type));
     const detected = new Set(detections.map((detection) => detection.id));
     return {
       expected: expected.length,
       detected: expected.filter((entity) => detected.has(entity.id)).length,
       missing: expected.filter((entity) => !detected.has(entity.id)),
     };
-  }, [detections, entities, importType]);
+  }, [buildingSection, detections, entities, importType]);
   const selectedType = IMPORT_TYPES.find((item) => item.id === importType) || IMPORT_TYPES[0];
 
   const startSession = async () => {
@@ -347,8 +375,12 @@ export function ScreenshotImportWizard({
             status: "running",
           });
           const classification = classifyScreenshotText(recognition.text);
+          const compatibleBuildingClassification =
+            importType === "buildings" &&
+            (classification.screenType === "buildings" ||
+              (buildingSection === "resources" && classification.screenType === "resources"));
           const effectiveScreenType =
-            classification.screenType === "unknown"
+            classification.screenType === "unknown" || compatibleBuildingClassification
               ? importType
               : classification.screenType;
           await updateAnalysisJob({
@@ -383,6 +415,7 @@ export function ScreenshotImportWizard({
           const mismatch =
             classification.screenType !== "unknown" &&
             classification.screenType !== importType &&
+            !compatibleBuildingClassification &&
             classification.confidence >= 0.72;
           activeJobId = await createAnalysisJob({
             sessionId: session.id,
@@ -390,9 +423,12 @@ export function ScreenshotImportWizard({
             jobType: "validate_results",
             status: "running",
           });
+          const analysisEntities = importType === "buildings"
+            ? filterBuildingImportEntities(entities, buildingSection)
+            : entities;
           const currentDetections = parseScreenshotDetections({
             text: recognition.text,
-            entities,
+            entities: analysisEntities,
             screenshotId: uploaded.id,
             screenType: effectiveScreenType,
             townHallLevel,
@@ -735,6 +771,38 @@ export function ScreenshotImportWizard({
               </button>
             ))}
           </div>
+          {importType === "buildings" ? (
+            <fieldset className="mt-4">
+              <legend className="text-sm font-bold text-slate-200">
+                {en ? "Which building overview are you importing?" : "Welche Gebäudeübersicht importierst du?"}
+              </legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {BUILDING_SECTIONS.map((section) => (
+                  <button
+                    type="button"
+                    key={section.id}
+                    onClick={() => setBuildingSection(section.id)}
+                    disabled={buildingSectionCounts[section.id] === 0}
+                    aria-pressed={buildingSection === section.id}
+                    className={`rounded-lg border px-3 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-35 ${
+                      buildingSection === section.id
+                        ? "border-amber-400 bg-amber-400/10 text-amber-100"
+                        : "border-white/10 bg-slate-950 text-slate-300"
+                    }`}
+                  >
+                    {en ? section.en : section.de} ({buildingSectionCounts[section.id]})
+                  </button>
+                ))}
+              </div>
+              {buildingSectionCounts.traps === 0 ? (
+                <p className="mt-2 text-xs text-amber-200">
+                  {en
+                    ? "Trap catalog data is not available yet; trap screenshots remain disabled to avoid invented levels."
+                    : "Für Fallen fehlen noch Katalogdaten; der Fallen-Import bleibt deaktiviert, damit keine Level erfunden werden."}
+                </p>
+              ) : null}
+            </fieldset>
+          ) : null}
           <div className="mt-4 rounded-xl bg-sky-400/10 p-4 text-sm text-sky-100">
             <b>{en ? "Open this view in Clash of Clans:" : "Öffne diese Ansicht in Clash of Clans:"}</b>{" "}
             {en ? selectedType.hintEn : selectedType.hintDe}.{" "}

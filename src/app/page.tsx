@@ -295,6 +295,7 @@ export default function Home() {
     isLoadingBuildings,
     isSavingBuildingId,
     updateBuildingLevel,
+    refreshAccountBuildings,
   } = useBuildings({
     selectedAccount,
     onError: handleError,
@@ -826,6 +827,7 @@ export default function Home() {
               }));
             }}
             onUpgradeSlotsImported={refreshScreenshotProgress}
+            onProgressImported={refreshAccountBuildings}
             onProfileImported={async (detected) => {
               if (!selectedAccount) return;
               await applyPlayerImport(selectedAccount, {
