@@ -9,6 +9,8 @@ import {
 } from "react";
 import { ScreenshotImportWizard } from "@/components/import/ScreenshotImportWizard";
 import {
+  getCurrentScreenshotMaxLevel,
+  getScreenshotAliases,
   parseScreenshotLevels,
   type ScreenshotEntity,
   type ScreenshotResourceDetection,
@@ -50,6 +52,11 @@ const normalize = (name: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
 
+const screenshotAliases = (...values: Array<string | null | undefined>) => [
+  ...values.filter((value): value is string => Boolean(value)),
+  ...values.flatMap((value) => getScreenshotAliases(value)),
+];
+
 export function PlayerImportCenter(props: Props) {
   const en = props.language === "en";
   const officialApiEnabled = props.officialApiEnabled === true;
@@ -84,28 +91,28 @@ export function PlayerImportCenter(props: Props) {
       ...props.troops.map((item) => ({
         id: item.id,
         name: item.name,
-        aliases: [item.apiName, item.sourceId].filter((value): value is string => Boolean(value)),
+        aliases: screenshotAliases(item.apiName, item.sourceId),
         type: "troop" as const,
         currentLevel: props.troopLevels[item.id] || 0,
-        maxLevel: item.maxLevel,
+        maxLevel: getCurrentScreenshotMaxLevel(item.sourceId, item.maxLevel),
         unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...props.spells.map((item) => ({
         id: item.id,
         name: item.name,
-        aliases: [item.apiName, item.sourceId].filter((value): value is string => Boolean(value)),
+        aliases: screenshotAliases(item.apiName, item.sourceId),
         type: "spell" as const,
         currentLevel: props.spellLevels[item.id] || 0,
-        maxLevel: item.maxLevel,
+        maxLevel: getCurrentScreenshotMaxLevel(item.sourceId, item.maxLevel),
         unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...props.siegeMachines.map((item) => ({
         id: item.id,
         name: item.name,
-        aliases: [item.apiName, item.sourceId].filter((value): value is string => Boolean(value)),
+        aliases: screenshotAliases(item.apiName, item.sourceId),
         type: "siege_machine" as const,
         currentLevel: props.siegeLevels[item.id] || 0,
-        maxLevel: item.maxLevel,
+        maxLevel: getCurrentScreenshotMaxLevel(item.sourceId, item.maxLevel),
         unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...(props.extraScreenshotEntities || []),
