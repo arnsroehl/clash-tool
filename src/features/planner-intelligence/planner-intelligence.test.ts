@@ -137,11 +137,14 @@ describe("Planner Intelligence", () => {
   });
 
   it("findet ungünstige Endzeiten mit einer konkreten Alternative", () => {
+    const localMidnight = new Date(2026, 6, 15, 0, 0, 0, 0).toISOString();
     const a = assignment({ endHour: 24 });
     const insights = createPlannerInsights(input({
       simulation: { assignments: [a], totalDurationHours: 24, totalDurationDays: 1, builderCount: 1, idleTimeHours: 0, builderAssignmentCount: 1, laboratoryAssignmentCount: 0 },
+      recommendations: [recommendation({ nextLevelTime: { hours: 8 } })],
       queue: [queueItem()],
       resources: { gold: 1000, elixir: 0, darkElixir: 0 },
+      simulationStartsAt: localMidnight,
     }));
     assert.ok(insights.some((item) => item.reasonCode === "UNFAVORABLE_FINISH_TIME" && item.alternativeItemKey));
   });
