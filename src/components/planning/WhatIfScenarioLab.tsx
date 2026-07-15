@@ -149,7 +149,7 @@ export function WhatIfScenarioLab({
   };
 
   return (
-    <section className="rounded-3xl border border-indigo-400/20 bg-indigo-400/5 p-5 md:p-7">
+    <section id="what-if-scenarios" className="rounded-3xl border border-indigo-400/20 bg-indigo-400/5 p-5 md:p-7">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-indigo-300">{en ? "What-if laboratory" : "Was-wäre-wenn-Labor"}</p>
@@ -197,6 +197,7 @@ export function WhatIfScenarioLab({
         <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-5">
           <h3 className="font-bold">{en ? "Town Hall and play pause" : "Rathaus und Spielpause"}</h3>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <label className="text-xs text-slate-400 sm:col-span-2">{en ? "Simulation starts" : "Simulation beginnt"}<input type="datetime-local" value={draft.assumptions.simulationStartsAt?.slice(0, 16) || ""} onChange={(event) => updateAssumptions({ simulationStartsAt: event.target.value ? new Date(event.target.value).toISOString() : null })} className="mt-1 w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white" /></label>
             <label className="text-xs text-slate-400">{en ? "Town Hall change" : "Rathauswechsel"}<select value={draft.assumptions.townHallMode} onChange={(event) => updateAssumptions({ townHallMode: event.target.value as ScenarioDraft["assumptions"]["townHallMode"] })} className="mt-1 w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white"><option value="unchanged">{en ? "No change" : "Unverändert"}</option><option value="immediate">{en ? "Upgrade immediately" : "Sofort upgraden"}</option><option value="scheduled">{en ? "Upgrade on date" : "An Datum upgraden"}</option></select></label>
             <label className="text-xs text-slate-400">{en ? "Target TH" : "Ziel-Rathaus"}<input type="number" min={context.townHallLevel} max={18} value={draft.assumptions.townHallTargetLevel || context.townHallLevel} onChange={(event) => updateAssumptions({ townHallTargetLevel: Number(event.target.value) })} className="mt-1 w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white" /></label>
             {draft.assumptions.townHallMode === "scheduled" ? <label className="text-xs text-slate-400 sm:col-span-2">{en ? "Town Hall upgrade date" : "Rathaus-Upgrade am"}<input type="datetime-local" value={draft.assumptions.townHallUpgradeAt?.slice(0, 16) || ""} onChange={(event) => updateAssumptions({ townHallUpgradeAt: event.target.value ? new Date(event.target.value).toISOString() : null })} className="mt-1 w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white" /></label> : null}

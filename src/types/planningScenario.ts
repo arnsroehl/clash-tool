@@ -21,6 +21,7 @@ export type ScenarioMagicItemUse = {
 };
 
 export type ScenarioAssumptions = {
+  simulationStartsAt: string | null;
   townHallMode: ScenarioTownHallMode;
   townHallTargetLevel: number | null;
   townHallUpgradeAt: string | null;

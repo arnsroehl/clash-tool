@@ -28,6 +28,7 @@ import { PlanningControlCenter } from "@/components/planning/PlanningControlCent
 import { PlannerInsights } from "@/components/planning/PlannerInsights";
 import { WhatIfScenarioLab } from "@/components/planning/WhatIfScenarioLab";
 import { ProgressHistoryDashboard } from "@/components/history/ProgressHistoryDashboard";
+import { AccountTimeline } from "@/components/timeline/AccountTimeline";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
@@ -39,8 +40,10 @@ import { calculateAccountHealth } from "@/features/account-health/account-health
 import { createPlannerInsights } from "@/features/planner-intelligence/planner-intelligence";
 import {
   buildPlanningScenarioInput,
+  createScenarioDraft,
   type ScenarioEvaluationContext,
 } from "@/features/planning-scenarios/planning-scenario.engine";
+import { buildTimeline } from "@/features/timeline/timeline.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
 import {
   buildingInstanceId,
@@ -91,6 +94,7 @@ import type { ProgressForecastResult } from "@/features/progress-forecast/progre
 import type { HealthEntity } from "@/features/account-health/account-health.types";
 import type { PlannerInsight } from "@/features/planner-intelligence/planner-intelligence.types";
 import type { ProgressSnapshotSource } from "@/features/progress-history/progress-history.types";
+import type { TimelineEvent } from "@/features/timeline/timeline.types";
 import type { PlanningScenario, ScenarioDraft } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
@@ -1018,6 +1022,41 @@ export default function Home() {
     handleError,
     remindersEnabled,
   );
+  const timelineEvents = useMemo(() => selectedAccount ? buildTimeline({
+    accountId: selectedAccount.id,
+    now: simulationStartsAt,
+    assignments: builderSimulation.assignments,
+    queue: queueItems,
+    goals: effectivePlanningGoals,
+    events: effectivePlanningEvents,
+    magicItems: inventory,
+    history: progressHistorySnapshots,
+    recommendations: upgradeRecommendations,
+    resources: effectivePlanningResources,
+    capacities: storageCapacities,
+    dailyIncome,
+    notifications: plannerNotifications.notifications,
+  }) : [], [builderSimulation.assignments, dailyIncome, effectivePlanningEvents, effectivePlanningGoals, effectivePlanningResources, inventory, plannerNotifications.notifications, progressHistorySnapshots, queueItems, selectedAccount, simulationStartsAt, storageCapacities, upgradeRecommendations]);
+  const setTimelineReminder = useCallback((item: TimelineEvent) => {
+    if (!selectedAccount) return;
+    const eventTime = new Date(item.startsAt).getTime();
+    const notifyAt = new Date(Math.max(Date.now(), eventTime - 60 * 60 * 1000)).toISOString();
+    void plannerNotifications.addManual({ accountId: selectedAccount.id, type: "queue_adjustment", notifyAt, title: item.title, message: item.description });
+  }, [plannerNotifications, selectedAccount]);
+  const createTimelineScenario = useCallback((item: TimelineEvent) => {
+    if (!scenarioContext) return;
+    const daysUntil = Math.max(1, Math.ceil((new Date(item.startsAt).getTime() - new Date(simulationStartsAt).getTime()) / 86_400_000));
+    const draft = createScenarioDraft(scenarioContext, { horizonDays: daysUntil, goalPercent, strategyWeights });
+    draft.name = `${notificationLanguage === "en" ? "Timeline" : "Zeitlinie"}: ${item.title}`.slice(0, 80);
+    draft.description = `${notificationLanguage === "en" ? "Scenario starting at" : "Szenario ab"} ${new Date(item.startsAt).toLocaleString(notificationLanguage === "en" ? "en-GB" : "de-DE")}.`;
+    draft.assumptions.simulationStartsAt = item.startsAt;
+    void saveScenario(buildPlanningScenarioInput(draft, scenarioContext, false));
+    document.getElementById("what-if-scenarios")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [goalPercent, notificationLanguage, saveScenario, scenarioContext, simulationStartsAt, strategyWeights]);
+  const viewFutureFromTimeline = useCallback((item: TimelineEvent) => {
+    setHorizonDays(Math.max(1, Math.ceil((new Date(item.startsAt).getTime() - new Date(simulationStartsAt).getTime()) / 86_400_000)));
+    document.getElementById("future-account-view")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [simulationStartsAt]);
 
   if (isLoadingAuth || !user) {
     return (
@@ -1343,6 +1382,17 @@ export default function Home() {
           <BuilderSimulationOverview
             simulation={builderSimulation}
             language={language}
+          />
+        </CollapsibleSection>
+
+        <CollapsibleSection title={en ? "Central timeline" : "Zentrale Timeline"} defaultOpen={isHardcoreProfile}>
+          <AccountTimeline
+            items={timelineEvents}
+            language={language}
+            onMoveUpgrade={moveQueueItem}
+            onSetReminder={setTimelineReminder}
+            onCreateScenario={createTimelineScenario}
+            onViewFuture={viewFutureFromTimeline}
           />
         </CollapsibleSection>
 

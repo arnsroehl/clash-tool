@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  addManualPlannerNotification,
   getPlannerNotifications,
   markPlannerNotificationRead,
   replacePlannerNotifications,
@@ -78,5 +79,15 @@ export function usePlannerNotifications(
     await enableWebPush();
     await sendTestPush();
   };
-  return { notifications, isBusy, refresh, markRead, enableBrowser };
+  const addManual = async (draft: PlannerNotificationDraft) => {
+    try {
+      const created = await addManualPlannerNotification(draft);
+      setNotifications((current) => [...current, created].sort((a, b) => a.notifyAt.localeCompare(b.notifyAt)));
+      return created;
+    } catch (error) {
+      onError(error instanceof Error ? error.message : "Erinnerung konnte nicht gespeichert werden.");
+      return null;
+    }
+  };
+  return { notifications, isBusy, refresh, markRead, enableBrowser, addManual };
 }

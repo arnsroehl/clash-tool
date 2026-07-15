@@ -96,6 +96,7 @@ export function defaultScenarioAssumptions(
   builderCount: number,
 ): ScenarioAssumptions {
   return {
+    simulationStartsAt: null,
     townHallMode: "unchanged",
     townHallTargetLevel: Math.min(18, townHallLevel + 1),
     townHallUpgradeAt: null,
@@ -260,7 +261,7 @@ export function evaluatePlanningScenario(
   const baseState = createScenarioBaseState(context);
   const queue = applyMagicItems(resolveQueue(draft, context), draft, baseState);
   const events = resolvedEvents(draft, baseState);
-  const startsAt = context.simulationStartsAt;
+  const startsAt = draft.assumptions.simulationStartsAt || context.simulationStartsAt;
   const simulationStartMs = new Date(startsAt).getTime();
   const earliestStartHoursByQueueItem = Object.fromEntries(queue.flatMap((item) =>
     item.notBeforeAt

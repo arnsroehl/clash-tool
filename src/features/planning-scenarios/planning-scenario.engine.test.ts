@@ -146,6 +146,12 @@ describe("Was-wäre-wenn-Szenarien", () => {
     assert.deepEqual(result.queue.map((item) => item.itemId), ["locked", "hero", "defense"]);
   });
 
+  it("startet ein aus der Timeline erzeugtes Szenario am gewählten Zeitpunkt", () => {
+    const assumptions = { ...defaultScenarioAssumptions(16, 1), simulationStartsAt: "2026-08-01T12:00:00.000Z" };
+    const result = evaluatePlanningScenario(draft({ assumptions }), context({ builderCount: 1 }));
+    assert.equal(result.results.simulatedAt, assumptions.simulationStartsAt);
+  });
+
   it("dupliziert alle Annahmen und die Queue ohne gemeinsame Referenzen", () => {
     const source = { ...draft(), baseState: {} as never, results: {} as never, isActive: false, schemaVersion: "scenario-v2" as const };
     const copy = duplicateScenarioDraft(source);

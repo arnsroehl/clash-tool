@@ -64,6 +64,7 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/planner-insight-preferences.sql` | RLS-protected Planner Intelligence category and action controls |
 | `src/scripts/sql/planning-scenarios-v2.sql` | Extends scenarios with isolated state/results and a security-invoker adoption transaction |
 | `src/scripts/sql/account-progress-history.sql` | Adds immutable account history, owner-only RLS and idempotent snapshot capture |
+| `src/scripts/sql/manual-timeline-reminders.sql` | Preserves explicitly created timeline reminders during generated reminder refreshes |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 
