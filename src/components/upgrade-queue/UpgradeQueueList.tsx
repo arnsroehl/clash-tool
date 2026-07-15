@@ -77,7 +77,7 @@ export function UpgradeQueueList({
     new Intl.NumberFormat(en ? "en-US" : "de-DE").format(value);
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+    <section id="upgrade-queue" className="rounded-3xl border border-white/10 bg-white/5 p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-2xl font-bold">Upgrade Queue</h2>

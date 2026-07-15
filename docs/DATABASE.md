@@ -35,6 +35,12 @@ This document describes database tables referenced by the current code and SQL h
 | `account_siege_machines` | Per-account siege machine levels | `siegeMachineService` |
 | `magic_item_catalog` | Stable Magic-Item IDs and planner effects | `magicItemService`, screenshot import |
 | `account_magic_items` | Per-account quantities and queue reservations | `magicItemService`, screenshot import |
+| `account_upgrade_preferences` | Per-account preferred, avoided or excluded Decision Engine candidates | `decisionPreferenceService` |
+| `account_health_snapshots` | Daily Account Health, strategy fit, balance and rush-risk history | `accountHealthService` |
+| `account_insight_settings` | Disabled Planner Intelligence categories per account | `plannerInsightService` |
+| `account_insight_actions` | Stable dismiss and snooze state for individual insights | `plannerInsightService` |
+| `planning_scenarios` | Isolated scenario-v2 base states, assumptions, queues, forecasts and results | `planningScenarioService` |
+| `account_progress_snapshots` | Immutable history-v1 daily/event snapshots, plan-vs-actual data and cumulative statistics | `progressHistoryService` |
 
 ## SQL Files Present in Repository
 
@@ -53,6 +59,12 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/screenshot-language-detection.sql` | Stores detected German/English screenshot language and confidence independently from app language |
 | `src/scripts/sql/screenshot-analysis-job-idempotency.sql` | Allows only one queued/running analysis stage per screenshot and job type |
 | `src/scripts/sql/screenshot-import-audit-triggers.sql` | RLS-preserving lifecycle audit triggers for sessions, uploads and original deletion |
+| `src/scripts/sql/decision-engine-preferences.sql` | RLS-protected manual Decision Engine priorities and exclusions |
+| `src/scripts/sql/account-health-snapshots.sql` | RLS-protected daily Account Health history |
+| `src/scripts/sql/planner-insight-preferences.sql` | RLS-protected Planner Intelligence category and action controls |
+| `src/scripts/sql/planning-scenarios-v2.sql` | Extends scenarios with isolated state/results and a security-invoker adoption transaction |
+| `src/scripts/sql/account-progress-history.sql` | Adds immutable account history, owner-only RLS and idempotent snapshot capture |
+| `src/scripts/sql/manual-timeline-reminders.sql` | Preserves explicitly created timeline reminders during generated reminder refreshes |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 

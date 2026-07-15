@@ -68,34 +68,32 @@ export function useUpgradeQueue({
     null,
   );
 
-  useEffect(() => {
-    async function loadQueueItems() {
-      if (!selectedAccount) {
-        setQueueItems([]);
-        setQueueErrorMessage(null);
-        return;
-      }
-
-      setIsLoadingQueue(true);
-
-      try {
-        const loadedItems = await getUpgradeQueueItems(selectedAccount.id);
-        setQueueItems(loadedItems);
-        setQueueErrorMessage(null);
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Upgrade Queue konnte nicht geladen werden.";
-        setQueueErrorMessage(message);
-        onError(message);
-      } finally {
-        setIsLoadingQueue(false);
-      }
+  const refreshQueue = useCallback(async () => {
+    if (!selectedAccount) {
+      setQueueItems([]);
+      setQueueErrorMessage(null);
+      return;
     }
-
-    loadQueueItems();
+    setIsLoadingQueue(true);
+    try {
+      const loadedItems = await getUpgradeQueueItems(selectedAccount.id);
+      setQueueItems(loadedItems);
+      setQueueErrorMessage(null);
+    } catch (error) {
+      const message = error instanceof Error
+        ? error.message
+        : "Upgrade Queue konnte nicht geladen werden.";
+      setQueueErrorMessage(message);
+      onError(message);
+    } finally {
+      setIsLoadingQueue(false);
+    }
   }, [onError, selectedAccount]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => void refreshQueue(), 0);
+    return () => window.clearTimeout(timeout);
+  }, [refreshQueue]);
 
   const addQueueItem = useCallback(
     async (input: CreateUpgradeQueueItemInput) => {
@@ -359,5 +357,6 @@ export function useUpgradeQueue({
     changeQueueItemStatus,
     reorderQueueItems,
     toggleQueueItemLock,
+    refreshQueue,
   };
 }

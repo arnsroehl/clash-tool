@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccountForm } from "@/components/accounts/AccountForm";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { PersonalAssistant } from "@/components/assistant/PersonalAssistant";
@@ -13,6 +13,7 @@ import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
+import { AccountHealthCard } from "@/components/dashboard/AccountHealthCard";
 import { HeroList } from "@/components/heroes/HeroList";
 import { PlayerImportCenter } from "@/components/import/PlayerImportCenter";
 import { GoalPlanner } from "@/components/goals/GoalPlanner";
@@ -24,19 +25,35 @@ import { MagicItemsAndEvents } from "@/components/magic-items/MagicItemsAndEvent
 import { DataPortability } from "@/components/export/DataPortability";
 import { PlatformInstallCard } from "@/components/platform/PlatformInstallCard";
 import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
+import { PlannerInsights } from "@/components/planning/PlannerInsights";
+import { WhatIfScenarioLab } from "@/components/planning/WhatIfScenarioLab";
+import { ProgressHistoryDashboard } from "@/components/history/ProgressHistoryDashboard";
+import { AccountTimeline } from "@/components/timeline/AccountTimeline";
+import { TownHallDecisionCard } from "@/components/town-hall/TownHallDecisionCard";
+import { DeepAccountAnalysis } from "@/components/account-analysis/DeepAccountAnalysis";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
 import { FutureAccountView } from "@/components/progress-forecast/FutureAccountView";
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
+import { runDecisionEngine } from "@/features/decision-engine/decision-engine.service";
+import { calculateAccountHealth } from "@/features/account-health/account-health";
+import { createPlannerInsights } from "@/features/planner-intelligence/planner-intelligence";
+import {
+  buildPlanningScenarioInput,
+  createScenarioDraft,
+  type ScenarioEvaluationContext,
+} from "@/features/planning-scenarios/planning-scenario.engine";
+import { buildTimeline } from "@/features/timeline/timeline.engine";
+import { analyzeTownHallDecision } from "@/features/town-hall-decision/town-hall-decision.engine";
+import { analyzeAccountStructure } from "@/features/account-analysis/account-analysis.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
 import {
   buildingInstanceId,
   createBuildingInstancePlannerData,
 } from "@/features/planner/building-instance-planner";
 import {
-  rankRecommendations,
   type PlanningStrategy,
   type StrategyWeights,
 } from "@/features/planning-control/planning-control";
@@ -62,10 +79,15 @@ import { useSpells } from "@/hooks/useSpells";
 import { useTroops } from "@/hooks/useTroops";
 import { useUpgradeQueue } from "@/hooks/useUpgradeQueue";
 import { useScreenshotProgress } from "@/hooks/useScreenshotProgress";
+import { useDecisionPreferences } from "@/hooks/useDecisionPreferences";
+import { useAccountHealthHistory } from "@/hooks/useAccountHealthHistory";
+import { usePlannerInsights } from "@/hooks/usePlannerInsights";
+import { useProgressHistory } from "@/hooks/useProgressHistory";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type {
   PlannerItem,
   PlannerItemLevels,
+  PlannerInput,
   PlannerResult,
   PlannerUpgradeLevel,
   ResourceSnapshot,
@@ -73,7 +95,13 @@ import type {
 } from "@/features/planner/planner.types";
 import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
-import type { PlanningScenario } from "@/types/planningScenario";
+import type { HealthEntity } from "@/features/account-health/account-health.types";
+import type { PlannerInsight } from "@/features/planner-intelligence/planner-intelligence.types";
+import type { ProgressSnapshotSource } from "@/features/progress-history/progress-history.types";
+import type { TimelineEvent } from "@/features/timeline/timeline.types";
+import type { TownHallEntity, TownHallVariant } from "@/features/town-hall-decision/town-hall-decision.types";
+import type { AccountAnalysisAction } from "@/features/account-analysis/account-analysis.types";
+import type { PlanningScenario, ScenarioDraft } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
   SiegeMachine,
@@ -155,6 +183,16 @@ export default function Home() {
     spell: 50,
     siege_machine: 50,
   });
+  const [pendingProgressSnapshotSource, setPendingProgressSnapshotSource] = useState<ProgressSnapshotSource | null>(null);
+  const observedCompletedGoals = useRef<{ accountId?: string; ids: Set<string> }>({ ids: new Set() });
+  useEffect(() => {
+    const pending = window.sessionStorage.getItem("clash-tool:pending-progress-snapshot");
+    if (pending === "api_sync") {
+      window.sessionStorage.removeItem("clash-tool:pending-progress-snapshot");
+      const timeout = window.setTimeout(() => setPendingProgressSnapshotSource("api_sync"), 0);
+      return () => window.clearTimeout(timeout);
+    }
+  }, []);
   const clearError = useCallback(() => setErrorMessage(null), []);
   const handleError = useCallback((message: string) => {
     setErrorMessage(message);
@@ -217,10 +255,10 @@ export default function Home() {
     scenarios: planningScenarios,
     isBusy: isScenarioBusy,
     save: saveScenario,
-    activate: activateScenario,
+    apply: applyScenario,
     remove: removeScenario,
   } = usePlanningScenarios(selectedAccount?.id, handleError);
-  const applyPlanningScenario = useCallback((scenario: PlanningScenario) => {
+  const applyScenarioControls = useCallback((scenario: PlanningScenario) => {
     setPlanningStrategy(scenario.strategy);
     setResources(scenario.resources);
     setStorageCapacities(scenario.storageCapacities);
@@ -232,6 +270,7 @@ export default function Home() {
   const activeScenario = planningScenarios.find(
     (scenario) => scenario.isActive,
   );
+  const effectiveBuilderCount = activeScenario?.assumptions.builderCount || selectedAccount?.builderCount || 0;
   useEffect(() => {
     if (!screenshotResourceSnapshot || activeScenario) return;
     const timeout = window.setTimeout(() => {
@@ -251,49 +290,11 @@ export default function Home() {
   useEffect(() => {
     if (!activeScenario) return;
     const timeout = window.setTimeout(
-      () => applyPlanningScenario(activeScenario),
+      () => applyScenarioControls(activeScenario),
       0,
     );
     return () => window.clearTimeout(timeout);
-  }, [activeScenario, applyPlanningScenario]);
-  const loadPlanningScenario = useCallback(
-    (scenario: PlanningScenario) => {
-      applyPlanningScenario(scenario);
-      void activateScenario(scenario.id);
-    },
-    [activateScenario, applyPlanningScenario],
-  );
-  const saveCurrentScenario = useCallback(
-    (name: string, id?: string) => {
-      if (!selectedAccount) return;
-      void saveScenario(
-        {
-          accountId: selectedAccount.id,
-          name,
-          strategy: planningStrategy,
-          horizonDays,
-          goalPercent,
-          resources,
-          storageCapacities,
-          dailyIncome,
-          strategyWeights,
-          isActive: true,
-        },
-        id,
-      );
-    },
-    [
-      dailyIncome,
-      goalPercent,
-      horizonDays,
-      planningStrategy,
-      resources,
-      saveScenario,
-      selectedAccount,
-      storageCapacities,
-      strategyWeights,
-    ],
-  );
+  }, [activeScenario, applyScenarioControls]);
 
   const {
     buildings,
@@ -384,6 +385,7 @@ export default function Home() {
     changeQueueItemStatus,
     reorderQueueItems,
     toggleQueueItemLock,
+    refreshQueue,
   } = useUpgradeQueue({
     selectedAccount,
     onError: handleError,
@@ -422,7 +424,7 @@ export default function Home() {
     selectedAccount,
   ]);
 
-  const plannerResult = useMemo<PlannerResult | null>(() => {
+  const plannerInput = useMemo<PlannerInput | null>(() => {
     if (!selectedAccount) {
       return null;
     }
@@ -478,12 +480,12 @@ export default function Home() {
       ),
     ];
 
-    return planUpgrades({
+    return {
       account: selectedAccount,
       items: plannerItems,
       itemLevels: plannerLevels,
       upgradeLevels: plannerUpgradeLevels,
-    });
+    };
   }, [
     availableBuildings,
     availableHeroes,
@@ -502,14 +504,10 @@ export default function Home() {
     troopLevels,
     troopMaxLevels,
   ]);
-
-  const upgradeRecommendations = useMemo(() => {
-    return rankRecommendations(
-      plannerResult?.recommendations || [],
-      planningStrategy,
-      strategyWeights,
-    );
-  }, [plannerResult, planningStrategy, strategyWeights]);
+  const plannerResult = useMemo<PlannerResult | null>(
+    () => plannerInput ? planUpgrades(plannerInput) : null,
+    [plannerInput],
+  );
   const currentItemLevels = useMemo(
     () =>
       Object.fromEntries([
@@ -556,18 +554,46 @@ export default function Home() {
     removeEvent,
   } = useMagicItems(selectedAccount?.id, handleError);
   const simulationStartsAt = useMemo(() => new Date().toISOString(), []);
+  const effectivePlanningEvents = useMemo(() => {
+    if (!activeScenario) return events;
+    const scenarioEvents = [
+      ...activeScenario.baseState.events.filter(
+        (event) => !activeScenario.assumptions.removedEventIds.includes(event.id),
+      ),
+      ...activeScenario.assumptions.addedEvents,
+    ];
+    if (activeScenario.assumptions.goldPassEnabled) {
+      scenarioEvents.push({
+        id: "active-scenario:gold-pass",
+        accountId: activeScenario.accountId,
+        eventType: "gold_pass",
+        name: "Gold Pass",
+        startsAt: simulationStartsAt,
+        endsAt: null,
+        costDiscountPercent: 20,
+        timeDiscountPercent: 20,
+        resourceGold: 0,
+        resourceElixir: 0,
+        resourceDarkElixir: 0,
+        rewardType: "none",
+        rewardAmount: 0,
+        enabled: true,
+      });
+    }
+    return scenarioEvents;
+  }, [activeScenario, events, simulationStartsAt]);
   const activeEffects = useMemo(
-    () => getActivePlanningEffects(events, new Date(simulationStartsAt)),
-    [events, simulationStartsAt],
+    () => getActivePlanningEffects(effectivePlanningEvents, new Date(simulationStartsAt)),
+    [effectivePlanningEvents, simulationStartsAt],
   );
   const scheduledResourcePayouts = useMemo(
     () =>
       getScheduledResourcePayouts(
-        events,
+        effectivePlanningEvents,
         new Date(simulationStartsAt),
         horizonDays,
       ),
-    [events, horizonDays, simulationStartsAt],
+    [effectivePlanningEvents, horizonDays, simulationStartsAt],
   );
   const scheduledResourceBonus = useMemo<ResourceSnapshot>(
     () =>
@@ -599,31 +625,44 @@ export default function Home() {
       addRawGoalRecommendationsToQueue(recommendations),
     [addRawGoalRecommendationsToQueue],
   );
-  const builderSimulation = useMemo<BuilderSimulationResult>(() => {
+  const decisionSlotAvailability = useMemo(() => {
     const builderSlots = screenshotUpgradeSlots.filter((slot) => slot.slotType === "builder");
     const laboratorySlot = screenshotUpgradeSlots.find((slot) => slot.slotType === "laboratory");
-    return simulateBuilderQueue({
-      builderCount: selectedAccount?.builderCount || 0,
-      queueItems,
-      simulationStartsAt,
-      initialBuilderAvailabilityHours: Array.from(
-        { length: selectedAccount?.builderCount || 0 },
+    return {
+      builderHours: Array.from(
+        { length: effectiveBuilderCount },
         (_, index) => {
           const slot = builderSlots.find((item) => item.slotIndex === index + 1);
           return slot?.isAvailable ? 0 : (slot?.remainingSeconds || 0) / 3_600;
         },
       ),
-      initialLaboratoryAvailabilityHours: laboratorySlot?.isAvailable
+      laboratoryHours: laboratorySlot?.isAvailable
         ? 0
         : (laboratorySlot?.remainingSeconds || 0) / 3_600,
-      timeDiscountWindows: events
+    };
+  }, [effectiveBuilderCount, screenshotUpgradeSlots]);
+  const builderSimulation = useMemo<BuilderSimulationResult>(() => {
+    return simulateBuilderQueue({
+      builderCount: effectiveBuilderCount,
+      queueItems,
+      simulationStartsAt,
+      initialBuilderAvailabilityHours: decisionSlotAvailability.builderHours,
+      initialLaboratoryAvailabilityHours: decisionSlotAvailability.laboratoryHours,
+      earliestStartHoursByQueueItem: Object.fromEntries(queueItems.flatMap((item) =>
+        item.plannedStartAt
+          ? [[item.id, Math.max(0, (new Date(item.plannedStartAt).getTime() - new Date(simulationStartsAt).getTime()) / 3_600_000)]]
+          : [])),
+      pauseWindows: activeScenario?.assumptions.pauseStartsAt && activeScenario.assumptions.pauseEndsAt
+        ? [{ startsAt: activeScenario.assumptions.pauseStartsAt, endsAt: activeScenario.assumptions.pauseEndsAt }]
+        : [],
+      timeDiscountWindows: effectivePlanningEvents
         .filter((event) => event.enabled && event.timeDiscountPercent > 0)
         .map((event) => ({
           startsAt: event.startsAt,
           endsAt: event.endsAt,
           percent: event.timeDiscountPercent,
         })),
-      costDiscountWindows: events
+      costDiscountWindows: effectivePlanningEvents
         .filter((event) => event.enabled && event.costDiscountPercent > 0)
         .map((event) => ({
           startsAt: event.startsAt,
@@ -631,7 +670,7 @@ export default function Home() {
           percent: event.costDiscountPercent,
         })),
     });
-  }, [events, queueItems, screenshotUpgradeSlots, selectedAccount, simulationStartsAt]);
+  }, [activeScenario, decisionSlotAvailability, effectiveBuilderCount, effectivePlanningEvents, queueItems, simulationStartsAt]);
 
   const progressForecast = useMemo<ProgressForecastResult>(() => {
     return createProgressForecast({
@@ -645,6 +684,348 @@ export default function Home() {
     handleError,
     currentItemLevels,
   );
+  const effectivePlanningGoals = useMemo(
+    () => activeScenario
+      ? goals.map((goal) => ({
+          ...goal,
+          targetDate: activeScenario.assumptions.goalDateOverrides[goal.id] || goal.targetDate,
+        }))
+      : goals,
+    [activeScenario, goals],
+  );
+  const decisionPreferences = useDecisionPreferences(
+    selectedAccount?.id,
+    handleError,
+  );
+  const decisionResult = useMemo(
+    () => plannerInput ? runDecisionEngine({
+      plannerInput,
+      strategy: planningStrategy,
+      strategyWeights,
+      goals: effectivePlanningGoals,
+      queue: queueItems,
+      schedule: builderSimulation.assignments,
+      slotAvailability: decisionSlotAvailability,
+      resources: effectivePlanningResources,
+      storageCapacities,
+      dailyIncome,
+      events: effectivePlanningEvents,
+      magicItems: inventory,
+      manualPreferences: decisionPreferences.preferences,
+      generatedAt: simulationStartsAt,
+    }) : null,
+    [
+      builderSimulation.assignments,
+      dailyIncome,
+      decisionPreferences.preferences,
+      decisionSlotAvailability,
+      effectivePlanningResources,
+      effectivePlanningEvents,
+      effectivePlanningGoals,
+      inventory,
+      plannerInput,
+      planningStrategy,
+      queueItems,
+      simulationStartsAt,
+      storageCapacities,
+      strategyWeights,
+    ],
+  );
+  const upgradeRecommendations = useMemo(
+    () => decisionResult?.recommendations || [],
+    [decisionResult],
+  );
+  const excludedRecommendations = useMemo(
+    () => decisionResult?.assessments.filter((recommendation) => !recommendation.eligible) || [],
+    [decisionResult],
+  );
+  const calculatedPlannerInsights = useMemo(
+    () => selectedAccount ? createPlannerInsights({
+      accountId: selectedAccount.id,
+      simulation: builderSimulation,
+      recommendations: upgradeRecommendations,
+      queue: queueItems,
+      goals: effectivePlanningGoals,
+      events: effectivePlanningEvents,
+      magicItems: inventory,
+      resources: effectivePlanningResources,
+      storageCapacities,
+      dailyIncome,
+      currentLevels: currentItemLevels,
+      simulationStartsAt,
+    }) : [],
+    [
+      builderSimulation,
+      currentItemLevels,
+      dailyIncome,
+      effectivePlanningResources,
+      effectivePlanningEvents,
+      effectivePlanningGoals,
+      inventory,
+      queueItems,
+      selectedAccount,
+      simulationStartsAt,
+      storageCapacities,
+      upgradeRecommendations,
+    ],
+  );
+  const plannerInsights = usePlannerInsights(
+    selectedAccount?.id,
+    calculatedPlannerInsights,
+    handleError,
+  );
+  const applyPlannerInsight = useCallback((insight: PlannerInsight) => {
+    const key = insight.action?.itemKey || insight.alternativeItemKey;
+    const recommendation = key
+      ? upgradeRecommendations.find((item) => `${item.itemType}:${item.itemId}` === key)
+      : undefined;
+    if (insight.action?.type === "add_to_queue" && recommendation) {
+      addRecommendationToQueue(recommendation);
+      return;
+    }
+    const targetId = insight.action?.type === "review_resources"
+      ? "planning-control-center"
+      : insight.action?.type === "review_goal"
+        ? "goal-planner"
+        : insight.action?.type === "review_magic_item"
+          ? "magic-items-and-events"
+          : "upgrade-recommendations";
+    document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [addRecommendationToQueue, upgradeRecommendations]);
+  const accountHealth = useMemo(() => {
+    if (!selectedAccount || !plannerInput?.items || !plannerInput.itemLevels) return null;
+    const upgradeLevels = plannerInput.upgradeLevels || [];
+    const plannerHealthEntities: HealthEntity[] = plannerInput.items
+      .filter((item) => !/^(mauer|wall)(\s+\d+)?$/i.test(item.name.trim()))
+      .map((item) => {
+        const matchingLevels = upgradeLevels.filter((level) => level.itemId === item.id);
+        return {
+          id: item.id,
+          type: item.type,
+          name: item.name,
+          category: item.category,
+          currentLevel: plannerInput.itemLevels?.[item.id] || 0,
+          maxLevel: item.maxLevel,
+          instanceGroupId: matchingLevels[0]?.buildingId,
+          upgradeLevels: matchingLevels.map((level) => ({
+            level: level.level,
+            timeHours: level.time.hours,
+          })),
+        };
+      });
+    const screenshotHealthEntities: HealthEntity[] = availableScreenshotEntities.map((entity) => ({
+      id: entity.id,
+      type: entity.type,
+      name: entity.name,
+      category: entity.category,
+      currentLevel: screenshotEntityLevels[entity.id] || 0,
+      maxLevel: entity.maxLevel,
+      upgradeLevels: screenshotCatalogLevels
+        .filter((level) => level.entityId === entity.id)
+        .map((level) => ({ level: level.level, timeHours: level.upgradeTimeHours })),
+    }));
+    const wallBuilding = availableBuildings.find((building) => /^(mauer|wall)$/i.test(building.name.trim()));
+    return calculateAccountHealth({
+      accountId: selectedAccount.id,
+      townHallLevel: selectedAccount.townHallLevel,
+      entities: [...plannerHealthEntities, ...screenshotHealthEntities],
+      walls: screenshotWallLevels,
+      maxWallLevel: wallBuilding?.maxLevel || null,
+      strategy: planningStrategy,
+      strategyWeights,
+      goals: effectivePlanningGoals,
+      upgradeSlots: screenshotUpgradeSlots,
+      builderUsagePercent: plannerResult?.summary.builderUsagePercent ?? null,
+      queueItemCount: queueItems.filter((item) => item.status === "planned" || item.status === "active").length,
+      unreservedMagicItemCount: inventory
+        .filter((item) => !item.reservedQueueItemId)
+        .reduce((sum, item) => sum + item.quantity, 0),
+      generatedAt: simulationStartsAt,
+    });
+  }, [
+    availableBuildings,
+    availableScreenshotEntities,
+    effectivePlanningGoals,
+    inventory,
+    plannerInput,
+    plannerResult?.summary.builderUsagePercent,
+    planningStrategy,
+    queueItems,
+    screenshotCatalogLevels,
+    screenshotEntityLevels,
+    screenshotUpgradeSlots,
+    screenshotWallLevels,
+    selectedAccount,
+    simulationStartsAt,
+    strategyWeights,
+  ]);
+  const accountHealthHistory = useAccountHealthHistory(
+    selectedAccount?.id,
+    accountHealth,
+    handleError,
+  );
+  const progressSnapshotInput = useMemo(() => {
+    if (!selectedAccount || !plannerResult) return null;
+    const completed = queueItems.filter((item) => item.status === "completed");
+    const withForecast = completed.filter((item) => item.plannedFinishAt);
+    const builderSlots = screenshotUpgradeSlots.filter((slot) => slot.slotType === "builder");
+    const laboratorySlot = screenshotUpgradeSlots.find((slot) => slot.slotType === "laboratory");
+    const laboratoryProgress = Math.round((troopProgress + spellProgress + siegeMachineProgress) / 3 * 10) / 10;
+    return {
+      sourceReference: null,
+      overallProgress: plannerResult.summary.progressPercent,
+      categoryProgress: { buildings: progress, heroes: heroProgress, troops: troopProgress, spells: spellProgress, siegeMachines: siegeMachineProgress, laboratory: laboratoryProgress },
+      healthScore: accountHealth?.score ?? null,
+      townHallLevel: selectedAccount.townHallLevel,
+      heroLevels,
+      laboratoryProgress,
+      wallLevels: screenshotWallLevels.map((wall) => ({ level: wall.level, count: wall.count })),
+      builderUtilization: builderSlots.length ? Math.round(builderSlots.filter((slot) => !slot.isAvailable).length / builderSlots.length * 1000) / 10 : plannerResult.summary.builderUsagePercent,
+      laboratoryUtilization: laboratorySlot ? (laboratorySlot.isAvailable ? 0 : 100) : null,
+      remainingUpgradeHours: plannerResult.summary.remainingBuildTimeHours,
+      remainingCosts: { gold: plannerResult.summary.remainingGoldCost, elixir: plannerResult.summary.remainingElixirCost, darkElixir: plannerResult.summary.remainingDarkElixirCost },
+      goals: effectivePlanningGoals.map((goal) => ({ id: goal.id, name: goal.name, currentLevel: goal.currentLevel, targetLevel: goal.targetLevel, status: goal.status })),
+      strategy: planningStrategy,
+      queueLength: queueItems.filter((item) => item.status === "planned" || item.status === "active").length,
+      completedUpgradeCount: completed.length,
+      completedLevelCount: completed.reduce((sum, item) => sum + Math.max(0, item.toLevel - item.fromLevel), 0),
+      completedUpgradeHours: completed.reduce((sum, item) => sum + item.durationHours, 0),
+      spentResources: { gold: completed.reduce((sum, item) => sum + item.goldCost, 0), elixir: completed.reduce((sum, item) => sum + item.elixirCost, 0), darkElixir: completed.reduce((sum, item) => sum + item.darkElixirCost, 0) },
+      eventSavedHours: 0,
+      eventSavedResources: { gold: 0, elixir: 0, darkElixir: 0 },
+      magicItemSavedHours: 0,
+      magicItemSavedResources: { gold: 0, elixir: 0, darkElixir: 0 },
+      onTimeCompletionCount: withForecast.filter((item) => new Date(item.updatedAt) <= new Date(item.plannedFinishAt as string)).length,
+      forecastedCompletionCount: withForecast.length,
+      forecastAbsoluteErrorHours: withForecast.reduce((sum, item) => sum + Math.abs(new Date(item.updatedAt).getTime() - new Date(item.plannedFinishAt as string).getTime()) / 3_600_000, 0),
+      forecastProgressPercent: progressForecast.projectedProgressPercent,
+    };
+  }, [accountHealth?.score, effectivePlanningGoals, heroLevels, heroProgress, plannerResult, planningStrategy, progress, progressForecast.projectedProgressPercent, queueItems, screenshotUpgradeSlots, screenshotWallLevels, selectedAccount, siegeMachineProgress, spellProgress, troopProgress]);
+  const {
+    snapshots: progressHistorySnapshots,
+    isSaving: isSavingProgressHistory,
+    capture: captureProgressSnapshot,
+  } = useProgressHistory(selectedAccount?.id, progressSnapshotInput, handleError);
+  useEffect(() => {
+    if (!pendingProgressSnapshotSource || !progressSnapshotInput) return;
+    const timeout = window.setTimeout(() => {
+      void captureProgressSnapshot(pendingProgressSnapshotSource);
+      setPendingProgressSnapshotSource(null);
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [captureProgressSnapshot, pendingProgressSnapshotSource, progressSnapshotInput]);
+  useEffect(() => {
+    const accountId = selectedAccount?.id;
+    const completedIds = new Set(goals.filter((goal) => goal.status === "completed").map((goal) => goal.id));
+    if (observedCompletedGoals.current.accountId !== accountId) {
+      observedCompletedGoals.current = { accountId, ids: completedIds };
+      return;
+    }
+    const newlyCompleted = [...completedIds].filter((id) => !observedCompletedGoals.current.ids.has(id));
+    observedCompletedGoals.current.ids = completedIds;
+    newlyCompleted.forEach((id) => void captureProgressSnapshot("goal_completed", id));
+  }, [captureProgressSnapshot, goals, selectedAccount?.id]);
+  const scenarioContext = useMemo<ScenarioEvaluationContext | null>(() => {
+    if (!selectedAccount || !plannerResult) return null;
+    return {
+      accountId: selectedAccount.id,
+      townHallLevel: selectedAccount.townHallLevel,
+      builderCount: effectiveBuilderCount,
+      plannerResult,
+      health: accountHealth,
+      recommendations: upgradeRecommendations,
+      activeQueue: queueItems,
+      goals: effectivePlanningGoals,
+      events: effectivePlanningEvents,
+      magicItems: inventory,
+      resources,
+      storageCapacities,
+      dailyIncome,
+      strategy: planningStrategy,
+      simulationStartsAt,
+      baseTotalDurationHours: builderSimulation.totalDurationHours,
+      initialBuilderAvailabilityHours: decisionSlotAvailability.builderHours,
+      initialLaboratoryAvailabilityHours: decisionSlotAvailability.laboratoryHours,
+    };
+  }, [
+    accountHealth,
+    builderSimulation.totalDurationHours,
+    dailyIncome,
+    decisionSlotAvailability,
+    effectivePlanningEvents,
+    effectivePlanningGoals,
+    inventory,
+    plannerResult,
+    planningStrategy,
+    queueItems,
+    resources,
+    selectedAccount,
+    effectiveBuilderCount,
+    simulationStartsAt,
+    storageCapacities,
+    upgradeRecommendations,
+  ]);
+  const saveWhatIfScenario = useCallback((draft: ScenarioDraft, id?: string) => {
+    if (!scenarioContext) return;
+    void saveScenario(buildPlanningScenarioInput(draft, scenarioContext, false), id);
+  }, [saveScenario, scenarioContext]);
+  const applyWhatIfScenario = useCallback(async (
+    scenario: PlanningScenario,
+    replaceLocked: boolean,
+  ) => {
+    const applied = await applyScenario(scenario.id, replaceLocked);
+    if (applied === null) return;
+    applyScenarioControls(scenario);
+    await refreshQueue();
+  }, [applyScenario, applyScenarioControls, refreshQueue]);
+  const townHallEntities = useMemo<TownHallEntity[]>(() => {
+    if (!plannerInput?.items) return [];
+    return plannerInput.items.map((item) => {
+      const currentLevel = plannerInput.itemLevels?.[item.id] || 0;
+      return {
+        id: item.id,
+        name: item.name,
+        type: item.type,
+        category: item.category,
+        currentLevel,
+        maxLevel: item.maxLevel,
+        remainingHours: (plannerInput.upgradeLevels || []).filter((level) => level.itemId === item.id && level.level > currentLevel && level.level <= item.maxLevel).reduce((sum, level) => sum + level.time.hours, 0),
+      };
+    });
+  }, [plannerInput]);
+  const townHallDecisionInput = useMemo(() => scenarioContext ? ({ context: scenarioContext, strategy: planningStrategy, health: accountHealth, entities: townHallEntities }) : null, [accountHealth, planningStrategy, scenarioContext, townHallEntities]);
+  const deepAccountAnalysis = useMemo(() => {
+    if (!townHallDecisionInput || !accountHealth) return null;
+    const scheduledAt = new Date(new Date(simulationStartsAt).getTime() + 14 * 86_400_000).toISOString();
+    return analyzeAccountStructure({
+      health: accountHealth,
+      townHall: analyzeTownHallDecision({ ...townHallDecisionInput, scheduledAt }).decision,
+      recommendations: upgradeRecommendations,
+      insights: plannerInsights.visibleInsights,
+      strategy: planningStrategy,
+    });
+  }, [accountHealth, plannerInsights.visibleInsights, planningStrategy, simulationStartsAt, townHallDecisionInput, upgradeRecommendations]);
+  const applyAccountAnalysisAction = useCallback((action: AccountAnalysisAction) => {
+    const recommendation = action.itemKey ? upgradeRecommendations.find((item) => `${item.itemType}:${item.itemId}` === action.itemKey) : undefined;
+    if (action.type === "add_queue" && recommendation) { void addRecommendationToQueue(recommendation); return; }
+    if (action.type === "create_goal" && recommendation && selectedAccount) {
+      void addGoal({ accountId: selectedAccount.id, itemType: recommendation.itemType, itemId: recommendation.itemId, name: recommendation.name, currentLevel: recommendation.currentLevel, targetLevel: recommendation.nextLevel, targetDate: null, estimatedHours: recommendation.nextLevelTime.hours });
+      return;
+    }
+    if (action.type === "set_strategy" && action.strategy) { setPlanningStrategy(action.strategy); document.getElementById("planning-control-center")?.scrollIntoView({ behavior: "smooth" }); return; }
+    document.getElementById(action.type === "open_magic" ? "magic-items-and-events" : "planning-control-center")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [addGoal, addRecommendationToQueue, selectedAccount, upgradeRecommendations]);
+  const createTownHallScenario = useCallback((variant: TownHallVariant, scheduledAt: string | null) => {
+    if (!scenarioContext) return;
+    const draft = createScenarioDraft(scenarioContext, { horizonDays: 365, goalPercent, strategyWeights });
+    draft.name = variant.nameDe;
+    draft.description = `Rathausvergleich · ${variant.id} · ${new Date().toLocaleDateString("de-DE")}`;
+    draft.assumptions.townHallMode = variant.id === "max_current" ? "unchanged" : variant.id === "upgrade_now" ? "immediate" : "scheduled";
+    draft.assumptions.townHallTargetLevel = Math.min(18, scenarioContext.townHallLevel + 1);
+    draft.assumptions.townHallUpgradeAt = scheduledAt;
+    void saveScenario(buildPlanningScenarioInput(draft, scenarioContext, false));
+    document.getElementById("what-if-scenarios")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [goalPercent, saveScenario, scenarioContext, strategyWeights]);
   const clanDashboard = useClanDashboard(user?.id, handleError);
   const selectedClanForProgress = clanDashboard.selectedClan;
   const syncOwnClanProgress = clanDashboard.syncOwnProgress;
@@ -662,8 +1043,8 @@ export default function Home() {
             accountId: selectedAccount.id,
             simulation: builderSimulation,
             recommendations: upgradeRecommendations,
-            goals,
-            events,
+            goals: effectivePlanningGoals,
+            events: effectivePlanningEvents,
             resources: effectivePlanningResources,
             storageCapacities,
             dailyIncome,
@@ -675,8 +1056,8 @@ export default function Home() {
         : [],
     [
       builderSimulation,
-      events,
-      goals,
+      effectivePlanningEvents,
+      effectivePlanningGoals,
       dailyIncome,
       currentItemLevels,
       notificationLanguage,
@@ -695,6 +1076,41 @@ export default function Home() {
     handleError,
     remindersEnabled,
   );
+  const timelineEvents = useMemo(() => selectedAccount ? buildTimeline({
+    accountId: selectedAccount.id,
+    now: simulationStartsAt,
+    assignments: builderSimulation.assignments,
+    queue: queueItems,
+    goals: effectivePlanningGoals,
+    events: effectivePlanningEvents,
+    magicItems: inventory,
+    history: progressHistorySnapshots,
+    recommendations: upgradeRecommendations,
+    resources: effectivePlanningResources,
+    capacities: storageCapacities,
+    dailyIncome,
+    notifications: plannerNotifications.notifications,
+  }) : [], [builderSimulation.assignments, dailyIncome, effectivePlanningEvents, effectivePlanningGoals, effectivePlanningResources, inventory, plannerNotifications.notifications, progressHistorySnapshots, queueItems, selectedAccount, simulationStartsAt, storageCapacities, upgradeRecommendations]);
+  const setTimelineReminder = useCallback((item: TimelineEvent) => {
+    if (!selectedAccount) return;
+    const eventTime = new Date(item.startsAt).getTime();
+    const notifyAt = new Date(Math.max(Date.now(), eventTime - 60 * 60 * 1000)).toISOString();
+    void plannerNotifications.addManual({ accountId: selectedAccount.id, type: "queue_adjustment", notifyAt, title: item.title, message: item.description });
+  }, [plannerNotifications, selectedAccount]);
+  const createTimelineScenario = useCallback((item: TimelineEvent) => {
+    if (!scenarioContext) return;
+    const daysUntil = Math.max(1, Math.ceil((new Date(item.startsAt).getTime() - new Date(simulationStartsAt).getTime()) / 86_400_000));
+    const draft = createScenarioDraft(scenarioContext, { horizonDays: daysUntil, goalPercent, strategyWeights });
+    draft.name = `${notificationLanguage === "en" ? "Timeline" : "Zeitlinie"}: ${item.title}`.slice(0, 80);
+    draft.description = `${notificationLanguage === "en" ? "Scenario starting at" : "Szenario ab"} ${new Date(item.startsAt).toLocaleString(notificationLanguage === "en" ? "en-GB" : "de-DE")}.`;
+    draft.assumptions.simulationStartsAt = item.startsAt;
+    void saveScenario(buildPlanningScenarioInput(draft, scenarioContext, false));
+    document.getElementById("what-if-scenarios")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [goalPercent, notificationLanguage, saveScenario, scenarioContext, simulationStartsAt, strategyWeights]);
+  const viewFutureFromTimeline = useCallback((item: TimelineEvent) => {
+    setHorizonDays(Math.max(1, Math.ceil((new Date(item.startsAt).getTime() - new Date(simulationStartsAt).getTime()) / 86_400_000)));
+    document.getElementById("future-account-view")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [simulationStartsAt]);
 
   if (isLoadingAuth || !user) {
     return (
@@ -801,7 +1217,7 @@ export default function Home() {
               simulation: builderSimulation,
               resources: effectivePlanningResources,
               inventory,
-              events,
+              events: effectivePlanningEvents,
               profile,
             }}
             language={language}
@@ -863,11 +1279,15 @@ export default function Home() {
             }
             onUpgradeSlotsImported={refreshScreenshotProgress}
             upgradeSlots={screenshotUpgradeSlots}
-            onProgressImported={refreshAccountBuildings}
+            onProgressImported={async () => {
+              await Promise.all([refreshAccountBuildings(), refreshScreenshotProgress()]);
+              setPendingProgressSnapshotSource("screenshot_import");
+            }}
             wallLevels={screenshotWallLevels}
             onWallLevelsImported={refreshScreenshotProgress}
             onProfileImported={async (detected) => {
               if (!selectedAccount) return;
+              const townHallChanged = Boolean(detected.townHallLevel && detected.townHallLevel !== selectedAccount.townHallLevel);
               await applyPlayerImport(selectedAccount, {
                 playerName: detected.playerName?.trim() || selectedAccount.name,
                 playerTag: detected.playerTag || undefined,
@@ -878,6 +1298,7 @@ export default function Home() {
                 changes: [],
               });
               await refreshAccounts();
+              if (townHallChanged) setPendingProgressSnapshotSource("town_hall_change");
             }}
           />
         </CollapsibleSection>
@@ -908,11 +1329,55 @@ export default function Home() {
             onGoalPercentChange={setGoalPercent}
             onDailyIncomeChange={setDailyIncome}
             onStrategyWeightsChange={setStrategyWeights}
-            scenarios={planningScenarios}
-            isScenarioBusy={isScenarioBusy}
-            onLoadScenario={loadPlanningScenario}
-            onSaveScenario={saveCurrentScenario}
-            onDeleteScenario={removeScenario}
+          />
+        </CollapsibleSection>
+
+        {deepAccountAnalysis ? (
+          <CollapsibleSection title={en ? "Deep account analysis" : "Tiefgehende Accountanalyse"} defaultOpen={!isCasualProfile}>
+            <DeepAccountAnalysis analysis={deepAccountAnalysis} language={language} onApply={applyAccountAnalysisAction} />
+          </CollapsibleSection>
+        ) : null}
+
+        {townHallDecisionInput ? (
+          <CollapsibleSection title={en ? "Town Hall decision" : "Rathaus-Entscheidung"} defaultOpen={isHardcoreProfile}>
+            <TownHallDecisionCard input={townHallDecisionInput} language={language} onCreateScenario={createTownHallScenario} />
+          </CollapsibleSection>
+        ) : null}
+
+        {scenarioContext ? (
+          <CollapsibleSection
+            title={en ? "What-if scenarios" : "Was-wäre-wenn-Szenarien"}
+            defaultOpen={isHardcoreProfile}
+          >
+            <WhatIfScenarioLab
+              key={selectedAccount?.id || "no-account"}
+              context={scenarioContext}
+              scenarios={planningScenarios}
+              horizonDays={horizonDays}
+              goalPercent={goalPercent}
+              strategyWeights={strategyWeights}
+              language={language}
+              isBusy={isScenarioBusy}
+              onSave={saveWhatIfScenario}
+              onApply={(scenario, replaceLocked) => void applyWhatIfScenario(scenario, replaceLocked)}
+              onDelete={removeScenario}
+            />
+          </CollapsibleSection>
+        ) : null}
+
+        <CollapsibleSection
+          title={en ? "Planner Intelligence" : "Planner Intelligence"}
+          defaultOpen
+        >
+          <PlannerInsights
+            insights={plannerInsights.visibleInsights}
+            disabledCategories={plannerInsights.disabledCategories}
+            language={language}
+            isSaving={plannerInsights.isSaving}
+            onDismiss={plannerInsights.dismiss}
+            onSnooze={plannerInsights.snooze}
+            onToggleCategory={plannerInsights.toggleCategory}
+            onApply={applyPlannerInsight}
           />
         </CollapsibleSection>
 
@@ -920,6 +1385,15 @@ export default function Home() {
           title={en ? "Planner & Progress" : "Planer & Fortschritt"}
           defaultOpen={!isCasualProfile}
         >
+          {accountHealth ? (
+            <div className="mb-6">
+              <AccountHealthCard
+                health={accountHealth}
+                history={accountHealthHistory}
+                language={language}
+              />
+            </div>
+          ) : null}
           <DashboardSummary
             language={language}
             selectedAccount={selectedAccount}
@@ -934,7 +1408,11 @@ export default function Home() {
             <UpgradeRecommendations
               plannerResult={plannerResult}
               recommendations={upgradeRecommendations}
+              excludedRecommendations={excludedRecommendations}
               language={language}
+              onAddRecommendation={addRecommendationToQueue}
+              onPreferenceChange={decisionPreferences.updatePreference}
+              preferenceSaving={decisionPreferences.isSaving}
             />
           </div>
 
@@ -973,6 +1451,17 @@ export default function Home() {
           />
         </CollapsibleSection>
 
+        <CollapsibleSection title={en ? "Central timeline" : "Zentrale Timeline"} defaultOpen={isHardcoreProfile}>
+          <AccountTimeline
+            items={timelineEvents}
+            language={language}
+            onMoveUpgrade={moveQueueItem}
+            onSetReminder={setTimelineReminder}
+            onCreateScenario={createTimelineScenario}
+            onViewFuture={viewFutureFromTimeline}
+          />
+        </CollapsibleSection>
+
         <CollapsibleSection
           title={en ? "Progress forecast" : "Fortschrittsprognose"}
           defaultOpen={!isCasualProfile}
@@ -987,6 +1476,20 @@ export default function Home() {
             language={language}
           />
         </CollapsibleSection>
+
+        {selectedAccount ? (
+          <CollapsibleSection
+            title={en ? "History & performance" : "Historie & Leistungsanalyse"}
+            defaultOpen={isHardcoreProfile}
+          >
+            <ProgressHistoryDashboard
+              snapshots={progressHistorySnapshots}
+              language={language}
+              isSaving={isSavingProgressHistory}
+              onCapture={() => void captureProgressSnapshot("manual_refresh")}
+            />
+          </CollapsibleSection>
+        ) : null}
 
         <CollapsibleSection
           title={en ? "Strategy comparison" : "Strategievergleich"}
@@ -1069,8 +1572,8 @@ export default function Home() {
               onOptimizeQueue={optimizeGoalQueue}
               isSaving={isSavingQueueItem}
               accountId={selectedAccount.id}
-              builderCount={selectedAccount.builderCount}
-              goals={goals}
+              builderCount={effectiveBuilderCount}
+              goals={effectivePlanningGoals}
               currentLevels={currentItemLevels}
               onSaveGoal={addGoal}
               onDeleteGoal={removeGoal}
@@ -1112,11 +1615,12 @@ export default function Home() {
               storageCapacities,
               dailyIncome,
               queue: queueItems,
-              goals,
-              events,
+              goals: effectivePlanningGoals,
+              events: effectivePlanningEvents,
               magicItems: inventory,
               planningProfile: profile,
               planningScenarios,
+              progressHistory: progressHistorySnapshots,
               clans: clanDashboard.clans,
               selectedClanMembers: clanDashboard.members,
               clanGoals: clanDashboard.goals,

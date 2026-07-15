@@ -11,6 +11,7 @@ import type {
   BuilderSimulationInput,
   BuilderSimulationResult,
   SimulationDiscountWindow,
+  SimulationPauseWindow,
 } from "@/features/builder-simulation/builder-simulation.types";
 
 function getDiscountPercent(
@@ -39,6 +40,29 @@ function getDiscountPercent(
       : maximum;
   }, 0);
   return Math.min(100, Math.max(base, windowDiscount));
+}
+
+function moveStartOutsidePauses(
+  startHour: number,
+  pauseWindows: SimulationPauseWindow[] | undefined,
+  simulationStartsAt: string | undefined,
+): number {
+  if (!pauseWindows?.length || !simulationStartsAt) return startHour;
+  const simulationStart = new Date(simulationStartsAt).getTime();
+  if (!Number.isFinite(simulationStart)) return startHour;
+  let adjusted = Math.max(0, startHour);
+  const windows = pauseWindows
+    .map((window) => ({
+      startHour: (new Date(window.startsAt).getTime() - simulationStart) / 3_600_000,
+      endHour: (new Date(window.endsAt).getTime() - simulationStart) / 3_600_000,
+    }))
+    .filter((window) => Number.isFinite(window.startHour) && Number.isFinite(window.endHour) && window.endHour > window.startHour)
+    .sort((a, b) => a.startHour - b.startHour);
+  for (const window of windows) {
+    if (adjusted >= window.startHour && adjusted < window.endHour)
+      adjusted = window.endHour;
+  }
+  return adjusted;
 }
 
 export function simulateBuilderQueue(
@@ -77,7 +101,14 @@ export function simulateBuilderQueue(
       : builderAvailability;
     const builderIndex = findNextAvailableBuilder(availability);
     if (builderIndex < 0) return currentAssignments;
-    const startHour = availability[builderIndex] || 0;
+    const startHour = moveStartOutsidePauses(
+      Math.max(
+        availability[builderIndex] || 0,
+        input.earliestStartHoursByQueueItem?.[queueItem.id] || 0,
+      ),
+      input.pauseWindows,
+      input.simulationStartsAt,
+    );
     const discount = getDiscountPercent(
       input.timeDiscountWindows,
       input.simulationStartsAt,
@@ -88,6 +119,7 @@ export function simulateBuilderQueue(
       input.costDiscountWindows,
       input.simulationStartsAt,
       startHour,
+      input.costDiscountPercent,
     );
     const durationHours = Math.max(
       Math.ceil(queueItem.durationHours * (1 - discount / 100)),

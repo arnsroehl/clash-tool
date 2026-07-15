@@ -182,7 +182,7 @@ export function GoalPlanner({
   }, [builderCount, en, recommendations]);
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
+    <section id="goal-planner" className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
       <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-bold">
           {en ? "Plan a specific goal" : "Konkretes Ziel planen"}

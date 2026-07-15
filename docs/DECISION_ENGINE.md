@@ -1,112 +1,63 @@
-# Decision Engine
+# Explainable Decision Engine
 
-## Table of Contents
+The Decision Engine is the deterministic ranking layer above the Planner. The
+Planner generates every currently valid next-level candidate; the Decision
+Engine evaluates those candidates against the account's actual planning state.
 
-- [Purpose](#purpose)
-- [Architecture](#architecture)
-- [Data Flow](#data-flow)
-- [Modules](#modules)
-- [Player Goals](#player-goals)
-- [Current Implementation](#current-implementation)
-- [Extensibility](#extensibility)
-- [Example Flow](#example-flow)
+## Inputs
 
-## Purpose
+- current levels, maximum levels, costs, times and Town Hall constraints
+- selected strategy and custom weights
+- active goals and target dates
+- current and locked queue entries
+- simulated builder/laboratory assignments
+- resources, capacities and daily income
+- active and future events
+- persisted per-account preference (`prefer`, `strongly_prefer`, `avoid`, or
+  `exclude`)
 
-The Decision Engine is the planned orchestration layer for Clash Tool recommendations. The Planner remains a core module, but it should eventually become one input among several decision modules.
+## Scoring contract
 
-## Architecture
+Ruleset `decision-v2.0.0` emits these separately testable components:
 
-```mermaid
-flowchart TD
-  Context[DecisionContext] --> DecisionEngine[src/features/decision-engine]
-  DecisionEngine --> Planner[src/features/planner]
-  DecisionEngine --> Queue[Upgrade Queue placeholder]
-  DecisionEngine --> Simulation[Builder Simulation placeholder]
-  DecisionEngine --> Forecast[Progress Forecast placeholder]
-  DecisionEngine --> Recommendations[Decision Recommendations]
+```text
+base + strategy + goal + timeBenefit + costBenefit + builderImpact
++ resourceImpact + dependency + progressGap + event + userPriority
+- conflicts
 ```
 
-The Decision Engine contains no React, Next.js, or Supabase dependencies. It coordinates plain data and returns a `DecisionResult`.
+The final score is clamped to 0–100. Ties are resolved by catalog sort order and
+stable upgrade ID, so identical inputs always produce identical output. Manual
+exclusion and an already queued exact upgrade make a candidate ineligible while
+preserving its assessment for diagnostics. Locked queue entries are never
+changed or bypassed.
 
-## Data Flow
+## Explainability
 
-1. A caller creates a `DecisionContext`.
-2. The context includes `playerGoal` and `plannerInput`.
-3. The Decision Engine selects a strategy from the player goal.
-4. The Decision Engine calls the existing Planner.
-5. Planner recommendations are mapped into Decision Engine recommendations.
-6. Placeholder queue, simulation, and forecast results are returned for future modules.
+Every factor is a structured Reason Code with polarity, score impact and
+optional numeric evidence. German and English text is generated exclusively
+from that structure; no language model invents explanations. Each visible
+recommendation includes:
 
-## Modules
+- rank and total score
+- the three strongest positive factors
+- calculated downsides
+- cost and duration
+- expected slot, start and finish
+- goal and strategy relationship
+- up to three alternatives with the decisive score difference
+- direct queue and preference actions
 
-| Module | Current status | Responsibility |
-| --- | --- | --- |
-| Planner | Integrated | Produces upgrade candidates and planner recommendations |
-| Upgrade Queue | Placeholder | Will create ordered upgrade queues |
-| Builder Simulation | Placeholder | Will assign upgrades to builders over time |
-| Progress Forecast | Placeholder | Will project future progress |
-| Recommendation Engine | Placeholder concept | Will combine module outputs into user-facing recommendations |
-| Strategy Engine | Initial strategy selection | Maps `PlayerGoal` to a strategy |
-| Resource Engine | Placeholder concept | Will reason about resources and overflow |
+## Boundaries and persistence
 
-## Player Goals
+All scoring lives in `src/features/decision-engine` and has no React, Next.js or
+Supabase imports. The page passes plain data from existing modules. Only manual
+preferences are persisted in `account_upgrade_preferences`; its RLS policy
+derives ownership through `accounts.user_id`.
 
-Supported goals:
+## Verification
 
-| Goal | Intent |
-| --- | --- |
-| `MAX` | Maximize overall account progress |
-| `FARMING` | Improve farming and resource efficiency |
-| `WAR` | Prioritize war-relevant strength |
-| `LEGENDS` | Prioritize legends performance |
-| `SMART_RUSH` | Support controlled rushing |
-
-## Current Implementation
-
-Current files:
-
-| File | Purpose |
-| --- | --- |
-| `decision-engine.types.ts` | Decision Engine contracts |
-| `decision-engine.utils.ts` | Strategy selection and recommendation mapping |
-| `decision-engine.ts` | Core orchestration |
-| `decision-engine.service.ts` | Service boundary |
-| `decision-engine.test.ts` | Unit tests |
-| `README.md` | Feature-local documentation |
-
-The first engine implementation:
-
-- calls the existing Planner
-- reuses the Planner result
-- creates a Recommendation list
-- returns placeholder results for queue, simulation, and forecast
-- allows `PlayerGoal` to influence strategy selection
-
-## Extensibility
-
-Future modules can be added behind the same `DecisionResult` shape:
-
-- queue creation can consume planner recommendations
-- builder simulation can consume queue results
-- forecast can consume simulation results
-- resource logic can add recommendation reasons
-- strategy logic can reorder or filter recommendations
-
-## Example Flow
-
-```ts
-runDecisionEngine({
-  playerGoal: "WAR",
-  plannerInput,
-});
-```
-
-The result includes:
-
-- selected strategy
-- planner result
-- placeholder queue result
-- placeholder simulation result
-- placeholder forecast result
-- decision recommendations with multiple reasons
+`decision-engine.test.ts` proves candidate coverage, max-level exclusion, exact
+score components, reproducibility, strategy/goal re-ranking, resource and event
+effects, schedule use, user exclusions, locked queue handling, alternatives and
+bilingual Reason Code rendering.

@@ -1,0 +1,9 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { buildTimeline, filterTimeline } from "@/features/timeline/timeline.engine";
+import type { TimelineInput } from "@/features/timeline/timeline.types";
+
+const input: TimelineInput = { accountId: "a", now: "2026-07-15T10:00:00.000Z", assignments: [{ builderIndex: 1, queueItemId: "q", name: "Kanone", itemType: "building", fromLevel: 20, toLevel: 21, startHour: 0, endHour: 24, durationHours: 24, costDiscountPercent: 0, originalCosts: { gold: 100, elixir: 0, darkElixir: 0 }, effectiveCosts: { gold: 100, elixir: 0, darkElixir: 0 }, slotType: "builder", slotLabel: "Builder 1" }], queue: [{ id: "q", accountId: "a", createdAt: "", updatedAt: "", itemType: "building", itemId: "cannon", name: "Kanone", fromLevel: 20, toLevel: 21, goldCost: 100, elixirCost: 0, darkElixirCost: 0, durationHours: 24, priorityScore: 1, queueOrder: 1, status: "planned", isLocked: false, slotType: null, plannedStartAt: null, plannedFinishAt: null }], goals: [], events: [], magicItems: [], history: [], recommendations: [], resources: { gold: 100, elixir: 0, darkElixir: 0 }, capacities: { gold: 1000, elixir: 1000, darkElixir: 1000 }, dailyIncome: { gold: 100, elixir: 100, darkElixir: 100 }, notifications: [] };
+
+test("Timeline verwendet exakt dieselben Start- und Endzeiten wie die Simulation", () => { const result = buildTimeline(input); assert.equal(result.find((item) => item.type === "UPGRADE_STARTED")?.startsAt, input.now); assert.equal(result.find((item) => item.type === "UPGRADE_COMPLETED")?.startsAt, "2026-07-16T10:00:00.000Z"); assert.ok(result.some((item) => item.type === "BUILDER_FREE")); });
+test("Timeline-Filter trennt Spuren und Zeiträume", () => { const items = buildTimeline(input); assert.ok(filterTimeline(items, "week", "builder", new Date(input.now)).every((item) => item.lane === "builder")); assert.equal(filterTimeline(items, "day", "goals", new Date(input.now)).length, 0); });

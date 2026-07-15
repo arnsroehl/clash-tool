@@ -1,26 +1,12 @@
 # Decision Engine
 
-The Decision Engine is the future orchestration layer for Clash Tool recommendations.
+Framework-independent business logic for deterministic upgrade assessment.
 
-## Responsibilities
+- `decision-engine.ts`: orchestration and ranking
+- `decision-engine.utils.ts`: scoring, constraints, schedule and alternatives
+- `decision-engine.explanations.ts`: consistent German/English Reason Code text
+- `decision-engine.types.ts`: versioned input and output contract
+- `decision-engine.test.ts`: executable scoring specification
 
-The module is designed to coordinate:
-
-- Planner
-- Upgrade Queue
-- Builder Simulation
-- Progress Forecast
-- Recommendation Engine
-- Strategy Engine
-- Resource Engine
-
-## Current Implementation
-
-The first implementation calls the existing Planner, maps planner recommendations into Decision Engine recommendations, selects a strategy from `PlayerGoal`, and returns placeholder results for modules that do not exist yet.
-
-## Boundaries
-
-- No React.
-- No Next.js.
-- No Supabase access.
-- Business logic only.
+The module may import other pure feature contracts, but never React, Next.js,
+Supabase or service code.

@@ -160,6 +160,23 @@ describe("Builder Simulation", () => {
     assert.equal(result.totalDurationHours, 8);
   });
 
+  it("wendet einen globalen Kostenrabatt auf alle Starts an", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      costDiscountPercent: 20,
+      queueItems: [
+        createQueueItem({
+          id: "discounted-cost",
+          queueOrder: 1,
+          durationHours: 10,
+          goldCost: 1_000,
+        }),
+      ],
+    });
+    assert.equal(result.assignments[0].effectiveCosts.gold, 800);
+    assert.equal(result.assignments[0].costDiscountPercent, 20);
+  });
+
   it("wendet zukünftige Event-Rabatte nach geplantem Upgrade-Start an", () => {
     const result = simulateBuilderQueue({
       builderCount: 1,
@@ -222,5 +239,38 @@ describe("Builder Simulation", () => {
     assert.equal(result.assignments[0].effectiveCosts.gold, 1_000);
     assert.equal(result.assignments[1].costDiscountPercent, 50);
     assert.equal(result.assignments[1].effectiveCosts.gold, 1_000);
+  });
+
+  it("respektiert früheste Starts und beginnt während einer Spielpause kein neues Upgrade", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      simulationStartsAt: "2026-07-14T00:00:00.000Z",
+      earliestStartHoursByQueueItem: { scheduled: 12 },
+      pauseWindows: [{
+        startsAt: "2026-07-14T10:00:00.000Z",
+        endsAt: "2026-07-15T10:00:00.000Z",
+      }],
+      queueItems: [createQueueItem({ id: "scheduled", queueOrder: 1, durationHours: 6 })],
+    });
+    assert.equal(result.assignments[0].startHour, 34);
+    assert.equal(result.assignments[0].endHour, 40);
+  });
+
+  it("lässt bereits laufende Upgrades während einer späteren Spielpause weiterlaufen", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      simulationStartsAt: "2026-07-14T00:00:00.000Z",
+      pauseWindows: [{
+        startsAt: "2026-07-14T05:00:00.000Z",
+        endsAt: "2026-07-15T05:00:00.000Z",
+      }],
+      queueItems: [
+        createQueueItem({ id: "running", queueOrder: 1, durationHours: 10 }),
+        createQueueItem({ id: "after", queueOrder: 2, durationHours: 2 }),
+      ],
+    });
+    assert.equal(result.assignments[0].startHour, 0);
+    assert.equal(result.assignments[0].endHour, 10);
+    assert.equal(result.assignments[1].startHour, 29);
   });
 });

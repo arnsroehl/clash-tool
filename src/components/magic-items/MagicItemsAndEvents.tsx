@@ -111,7 +111,7 @@ export function MagicItemsAndEvents({
   };
 
   return (
-    <section className="grid gap-6 lg:grid-cols-2">
+    <section id="magic-items-and-events" className="grid gap-6 lg:grid-cols-2">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-xl font-bold">
           {en ? "Magic items" : "Magische Gegenstände"}

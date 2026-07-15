@@ -281,6 +281,7 @@ export function PlayerImportCenter(props: Props) {
     setBusy(true);
     try {
       await applyPlayerImport(props.account, preview);
+      window.sessionStorage.setItem("clash-tool:pending-progress-snapshot", "api_sync");
       window.location.reload();
     } catch (error) {
       setMessage(

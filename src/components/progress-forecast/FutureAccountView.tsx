@@ -16,7 +16,7 @@ export function FutureAccountView({
     (item) => item.endHour <= horizonDays * 24,
   );
   return (
-    <section className="mt-5 rounded-2xl border border-white/10 bg-slate-900 p-5">
+    <section id="future-account-view" className="mt-5 rounded-2xl border border-white/10 bg-slate-900 p-5">
       <h3 className="font-bold">
         {en
           ? `Account in ${horizonDays} days`

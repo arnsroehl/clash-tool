@@ -7,15 +7,23 @@ export type SimulationDiscountWindow = {
   percent: number;
 };
 
+export type SimulationPauseWindow = {
+  startsAt: string;
+  endsAt: string;
+};
+
 export type BuilderSimulationInput = {
   builderCount: number;
   queueItems: UpgradeQueueItem[];
   timeDiscountPercent?: number;
+  costDiscountPercent?: number;
   simulationStartsAt?: string;
   timeDiscountWindows?: SimulationDiscountWindow[];
   costDiscountWindows?: SimulationDiscountWindow[];
   initialBuilderAvailabilityHours?: number[];
   initialLaboratoryAvailabilityHours?: number;
+  earliestStartHoursByQueueItem?: Record<string, number>;
+  pauseWindows?: SimulationPauseWindow[];
 };
 
 export type UpgradeSlotType = "builder" | "laboratory";

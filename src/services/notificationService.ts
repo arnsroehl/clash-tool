@@ -33,6 +33,7 @@ export async function replacePlannerNotifications(
     .from("planner_notifications")
     .delete()
     .eq("account_id", accountId)
+    .eq("is_manual", false)
     .eq("is_read", false);
   if (deleteError) throw new Error(deleteError.message);
   if (drafts.length) {
@@ -50,6 +51,25 @@ export async function replacePlannerNotifications(
     if (error) throw new Error(error.message);
   }
   return getPlannerNotifications(accountId);
+}
+
+export async function addManualPlannerNotification(
+  draft: PlannerNotificationDraft,
+): Promise<PlannerNotification> {
+  const { data, error } = await getSupabaseClient()
+    .from("planner_notifications")
+    .insert({
+      account_id: draft.accountId,
+      notification_type: draft.type,
+      notify_at: draft.notifyAt,
+      title: draft.title,
+      message: draft.message,
+      is_manual: true,
+    })
+    .select("id,account_id,notification_type,notify_at,title,message,is_read")
+    .single();
+  if (error) throw new Error(error.message);
+  return { id: data.id, accountId: data.account_id, type: data.notification_type, notifyAt: data.notify_at, title: data.title, message: data.message, isRead: data.is_read } as PlannerNotification;
 }
 
 export async function markPlannerNotificationRead(id: string): Promise<void> {
