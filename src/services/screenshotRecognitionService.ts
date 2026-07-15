@@ -5,11 +5,30 @@ import {
   type ScreenshotScreenType,
 } from "@/features/screenshot-import/screenshot-import";
 
-export type NormalizedScreenshot = {
+export type ScreenshotDevicePlatform =
+  | "ios"
+  | "android"
+  | "macos"
+  | "windows"
+  | "linux"
+  | "chromeos"
+  | "other"
+  | "unknown";
+
+export type ScreenshotSourceMetadata = {
+  originalFilename: string;
+  originalMimeType: string;
+  originalSizeBytes: number;
+  devicePlatform: ScreenshotDevicePlatform;
+};
+
+export type NormalizedScreenshot = ScreenshotSourceMetadata & {
   file: File;
   width: number;
   height: number;
   contentHash: string;
+  normalizedMimeType: "image/jpeg";
+  normalizedSizeBytes: number;
   quality: ImageQualityResult;
 };
 
@@ -18,7 +37,85 @@ export type ScreenshotRecognitionResult = {
   confidence: number;
   lines: Array<{ text: string; confidence: number; boundingBox: BoundingBox }>;
   laboratoryGridCells: LaboratoryGridCellRecognition[];
+  preprocessingApplied: boolean;
 };
+
+/**
+ * Produces a grayscale OCR variant with percentile-based contrast stretching,
+ * light Gaussian denoising and controlled unsharp masking. The original image
+ * remains untouched for icon matching and the review preview.
+ */
+export function enhanceScreenshotPixelsForOcr(
+  rgba: Uint8ClampedArray,
+  width: number,
+  height: number,
+): Uint8ClampedArray {
+  if (width < 1 || height < 1 || rgba.length < width * height * 4)
+    throw new Error("Ungültige Bilddaten für die OCR-Vorbereitung.");
+  const count = width * height;
+  const grayscale = new Uint8ClampedArray(count);
+  const histogram = new Uint32Array(256);
+  for (let index = 0; index < count; index += 1) {
+    const offset = index * 4;
+    const value = Math.round(
+      rgba[offset] * 0.299 + rgba[offset + 1] * 0.587 + rgba[offset + 2] * 0.114,
+    );
+    grayscale[index] = value;
+    histogram[value] += 1;
+  }
+  const percentile = (ratio: number) => {
+    const target = Math.max(1, Math.round(count * ratio));
+    let cumulative = 0;
+    for (let value = 0; value < histogram.length; value += 1) {
+      cumulative += histogram[value];
+      if (cumulative >= target) return value;
+    }
+    return 255;
+  };
+  const low = percentile(0.02);
+  const high = percentile(0.98);
+  const contrastRange = Math.max(16, high - low);
+  const output = new Uint8ClampedArray(rgba.length);
+  const pixel = (x: number, y: number) =>
+    grayscale[Math.min(height - 1, Math.max(0, y)) * width + Math.min(width - 1, Math.max(0, x))];
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const center = pixel(x, y);
+      const denoised = (
+        center * 4 +
+        (pixel(x - 1, y) + pixel(x + 1, y) + pixel(x, y - 1) + pixel(x, y + 1)) * 2 +
+        pixel(x - 1, y - 1) + pixel(x + 1, y - 1) +
+        pixel(x - 1, y + 1) + pixel(x + 1, y + 1)
+      ) / 16;
+      const sharpened = denoised + (center - denoised) * 0.65;
+      const normalized = Math.min(255, Math.max(0, (sharpened - low) * 255 / contrastRange));
+      const offset = (y * width + x) * 4;
+      output[offset] = normalized;
+      output[offset + 1] = normalized;
+      output[offset + 2] = normalized;
+      output[offset + 3] = 255;
+    }
+  }
+  return output;
+}
+
+async function createEnhancedOcrBlob(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) {
+    bitmap.close();
+    throw new Error("Die OCR-Optimierung konnte nicht vorbereitet werden.");
+  }
+  context.drawImage(bitmap, 0, 0);
+  bitmap.close();
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  imageData.data.set(enhanceScreenshotPixelsForOcr(imageData.data, canvas.width, canvas.height));
+  context.putImageData(imageData, 0, 0);
+  return canvasToPng(canvas);
+}
 
 export type LaboratoryGridCellRecognition = {
   index: number;
@@ -31,6 +128,22 @@ export type LaboratoryGridCellRecognition = {
 };
 
 const MAX_IMAGE_EDGE = 2400;
+
+export function detectScreenshotDevicePlatform(
+  userAgent: string | undefined,
+  platform: string | undefined,
+): ScreenshotDevicePlatform {
+  const value = `${userAgent || ""} ${platform || ""}`.toLowerCase();
+  if (!value.trim()) return "unknown";
+  if (/iphone|ipad|ipod/.test(value) || (/macintosh/.test(value) && /mobile/.test(value)))
+    return "ios";
+  if (/android/.test(value)) return "android";
+  if (/cros/.test(value)) return "chromeos";
+  if (/windows|win32|win64/.test(value)) return "windows";
+  if (/macintosh|macintel|mac os/.test(value)) return "macos";
+  if (/linux/.test(value)) return "linux";
+  return "other";
+}
 
 const LABORATORY_GRID = {
   x: 195 / 2360,
@@ -216,7 +329,10 @@ function measureImageData(imageData: ImageData) {
   };
 }
 
-export async function normalizeScreenshot(file: File): Promise<NormalizedScreenshot> {
+export async function normalizeScreenshot(
+  file: File,
+  sourceMetadata?: ScreenshotSourceMetadata,
+): Promise<NormalizedScreenshot> {
   if (!file.type.startsWith("image/")) throw new Error("Bitte wähle eine Bilddatei aus.");
   if (file.size > 20 * 1024 * 1024)
     throw new Error("Der Screenshot darf höchstens 20 MB groß sein.");
@@ -258,11 +374,22 @@ export async function normalizeScreenshot(file: File): Promise<NormalizedScreens
     type: "image/jpeg",
     lastModified: Date.now(),
   });
+  if (normalizedFile.size > 20 * 1024 * 1024)
+    throw new Error("Das normalisierte Bild ist größer als 20 MB.");
   return {
     file: normalizedFile,
+    originalFilename: sourceMetadata?.originalFilename || file.name || "screenshot",
+    originalMimeType: sourceMetadata?.originalMimeType || file.type.toLowerCase(),
+    originalSizeBytes: sourceMetadata?.originalSizeBytes || file.size,
+    devicePlatform: sourceMetadata?.devicePlatform || detectScreenshotDevicePlatform(
+      typeof navigator === "undefined" ? undefined : navigator.userAgent,
+      typeof navigator === "undefined" ? undefined : navigator.platform,
+    ),
     width,
     height,
     contentHash: await fileHash(normalizedFile),
+    normalizedMimeType: "image/jpeg",
+    normalizedSizeBytes: normalizedFile.size,
     quality,
   };
 }
@@ -276,7 +403,7 @@ export async function recognizeScreenshotDetailed(
   const { createWorker, PSM } = await import("tesseract.js");
   const useLaboratoryFocus = focusScreenType === "laboratory" && Boolean(dimensions);
   let progressStart = 0;
-  let progressSpan = useLaboratoryFocus ? 55 : 100;
+  let progressSpan = useLaboratoryFocus ? 55 : 65;
   const worker = await createWorker("eng+deu", 1, {
     logger: (event) => {
       if (event.status === "recognizing text" && typeof event.progress === "number")
@@ -301,6 +428,39 @@ export async function recognizeScreenshotDetailed(
         })),
       ),
     ).filter((line) => line.text.length > 0);
+    let enhancedText = "";
+    let enhancedConfidence = 0;
+    let enhancedLines: ScreenshotRecognitionResult["lines"] = [];
+    let preprocessingApplied = false;
+    const baseConfidence = Math.min(1, Math.max(0, result.data.confidence / 100));
+    if (!useLaboratoryFocus && (baseConfidence < 0.78 || baseLines.length < 4)) {
+      preprocessingApplied = true;
+      progressStart = 65;
+      progressSpan = 35;
+      const enhancedResult = await worker.recognize(
+        await createEnhancedOcrBlob(file),
+        {},
+        { text: true, blocks: true },
+      );
+      enhancedText = enhancedResult.data.text;
+      enhancedConfidence = Math.min(1, Math.max(0, enhancedResult.data.confidence / 100));
+      enhancedLines = (enhancedResult.data.blocks || []).flatMap((block) =>
+        block.paragraphs.flatMap((paragraph) =>
+          paragraph.lines.map((line) => ({
+            text: line.text.trim(),
+            confidence: Math.min(1, Math.max(0, line.confidence / 100)),
+            boundingBox: {
+              x: line.bbox.x0 / width,
+              y: line.bbox.y0 / height,
+              width: (line.bbox.x1 - line.bbox.x0) / width,
+              height: (line.bbox.y1 - line.bbox.y0) / height,
+            },
+          })),
+        ),
+      ).filter((line) => line.text.length > 0);
+    } else if (!useLaboratoryFocus) {
+      onProgress(100);
+    }
     let focusedText = "";
     let focusedConfidence = 0;
     let focusedLines: ScreenshotRecognitionResult["lines"] = [];
@@ -443,7 +603,7 @@ export async function recognizeScreenshotDetailed(
       bitmap.close();
     }
     const lineKeys = new Set<string>();
-    const lines = [...focusedLines, ...baseLines].filter((line) => {
+    const lines = [...focusedLines, ...enhancedLines, ...baseLines].filter((line) => {
       const key = `${line.text.toLocaleLowerCase("de-DE").replace(/\s/g, "")}:${Math.round(line.boundingBox.y * 100)}`;
       if (lineKeys.has(key)) return false;
       lineKeys.add(key);
@@ -460,13 +620,15 @@ export async function recognizeScreenshotDetailed(
       return { ...cell, lineIndex };
     });
     return {
-      text: [result.data.text, focusedText].filter(Boolean).join("\n"),
+      text: [result.data.text, enhancedText, focusedText].filter(Boolean).join("\n"),
       confidence: Math.max(
-        Math.min(1, Math.max(0, result.data.confidence / 100)),
+        baseConfidence,
+        enhancedConfidence,
         focusedConfidence,
       ),
       lines,
       laboratoryGridCells,
+      preprocessingApplied,
     };
   } finally {
     await worker.terminate();

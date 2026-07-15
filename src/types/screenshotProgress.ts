@@ -76,6 +76,12 @@ export type ScreenshotResourceSnapshot = {
   shinyOre: number | null;
   glowyOre: number | null;
   starryOre: number | null;
+  goldCapacity: number | null;
+  elixirCapacity: number | null;
+  darkElixirCapacity: number | null;
+  shinyOreCapacity: number | null;
+  glowyOreCapacity: number | null;
+  starryOreCapacity: number | null;
   capturedAt: string;
 };
 

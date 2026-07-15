@@ -182,6 +182,7 @@ export default function Home() {
     createAccount,
     deleteAccount,
     selectAccount,
+    refreshAccounts,
   } = useAccounts({
     onError: handleError,
     clearError,
@@ -236,6 +237,11 @@ export default function Home() {
         gold: screenshotResourceSnapshot.gold ?? current.gold,
         elixir: screenshotResourceSnapshot.elixir ?? current.elixir,
         darkElixir: screenshotResourceSnapshot.darkElixir ?? current.darkElixir,
+      }));
+      setStorageCapacities((current) => ({
+        gold: screenshotResourceSnapshot.goldCapacity ?? current.gold,
+        elixir: screenshotResourceSnapshot.elixirCapacity ?? current.elixir,
+        darkElixir: screenshotResourceSnapshot.darkElixirCapacity ?? current.darkElixir,
       }));
     }, 0);
     return () => window.clearTimeout(timeout);
@@ -543,6 +549,7 @@ export default function Home() {
     events,
     eventTemplates,
     updateItem,
+    importQuantities,
     addEvent,
     removeEvent,
   } = useMagicItems(selectedAccount?.id, handleError);
@@ -818,28 +825,56 @@ export default function Home() {
             siegeMachines={availableSiegeMachines}
             siegeLevels={siegeMachineLevels}
             extraScreenshotEntities={screenshotProgressEntities}
+            magicItems={inventory}
             language={language}
             onResourcesImported={(detected) => {
-              const values = Object.fromEntries(detected.map((item) => [item.resourceType, item.amount]));
+              const values = Object.fromEntries(
+                detected
+                  .filter((item) => item.amount !== null)
+                  .map((item) => [item.resourceType, item.amount]),
+              );
+              const capacities = Object.fromEntries(
+                detected
+                  .filter((item) => item.capacity !== null)
+                  .map((item) => [item.resourceType, item.capacity]),
+              );
               setResources((current) => ({
                 gold: values.gold ?? current.gold,
                 elixir: values.elixir ?? current.elixir,
                 darkElixir: values.dark_elixir ?? current.darkElixir,
               }));
+              setStorageCapacities((current) => ({
+                gold: capacities.gold ?? current.gold,
+                elixir: capacities.elixir ?? current.elixir,
+                darkElixir: capacities.dark_elixir ?? current.darkElixir,
+              }));
             }}
+            onMagicItemsImported={(detected) =>
+              importQuantities(
+                detected.flatMap((item) =>
+                  item.quantity === null
+                    ? []
+                    : [{ itemKey: item.itemKey, quantity: item.quantity }],
+                ),
+              )
+            }
             onUpgradeSlotsImported={refreshScreenshotProgress}
+            upgradeSlots={screenshotUpgradeSlots}
             onProgressImported={refreshAccountBuildings}
             wallLevels={screenshotWallLevels}
             onWallLevelsImported={refreshScreenshotProgress}
             onProfileImported={async (detected) => {
               if (!selectedAccount) return;
               await applyPlayerImport(selectedAccount, {
-                playerName: selectedAccount.name,
+                playerName: detected.playerName?.trim() || selectedAccount.name,
                 playerTag: detected.playerTag || undefined,
+                experienceLevel: detected.experienceLevel || undefined,
+                clanName: detected.clanDetected ? detected.clanName?.trim() || null : undefined,
                 townHallFrom: selectedAccount.townHallLevel,
                 townHallTo: detected.townHallLevel || selectedAccount.townHallLevel,
                 changes: [],
               });
+              await refreshAccounts();
             }}
           />
         </CollapsibleSection>

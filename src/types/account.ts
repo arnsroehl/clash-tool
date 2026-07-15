@@ -6,6 +6,9 @@ export type ClashAccount = {
   createdAt: string;
   userId: string;
   playerTag: string | null;
+  experienceLevel: number | null;
+  clanName: string | null;
+  clanStatus: "unknown" | "none" | "member";
   lastSyncedAt: string | null;
 };
 
@@ -23,5 +26,8 @@ export type AccountRow = {
   created_at: string;
   user_id: string;
   player_tag: string | null;
+  experience_level: number | null;
+  clan_name: string | null;
+  clan_status: "unknown" | "none" | "member";
   last_synced_at: string | null;
 };

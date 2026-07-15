@@ -76,6 +76,12 @@ create table if not exists public.account_resource_snapshots (
   shiny_ore bigint check (shiny_ore is null or shiny_ore >= 0),
   glowy_ore bigint check (glowy_ore is null or glowy_ore >= 0),
   starry_ore bigint check (starry_ore is null or starry_ore >= 0),
+  gold_capacity bigint check (gold_capacity is null or gold_capacity >= 0),
+  elixir_capacity bigint check (elixir_capacity is null or elixir_capacity >= 0),
+  dark_elixir_capacity bigint check (dark_elixir_capacity is null or dark_elixir_capacity >= 0),
+  shiny_ore_capacity bigint check (shiny_ore_capacity is null or shiny_ore_capacity >= 0),
+  glowy_ore_capacity bigint check (glowy_ore_capacity is null or glowy_ore_capacity >= 0),
+  starry_ore_capacity bigint check (starry_ore_capacity is null or starry_ore_capacity >= 0),
   source_import_session_id uuid references public.screenshot_import_sessions(id) on delete set null,
   captured_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -126,6 +132,9 @@ create index if not exists screenshot_analysis_jobs_user_idx
   on public.screenshot_analysis_jobs (user_id);
 create index if not exists screenshot_analysis_jobs_queue_idx
   on public.screenshot_analysis_jobs (status, available_at, created_at) where status = 'queued';
+create unique index if not exists screenshot_analysis_jobs_one_active_stage_idx
+  on public.screenshot_analysis_jobs (import_session_id, screenshot_id, job_type)
+  where screenshot_id is not null and status in ('queued', 'running');
 
 alter table public.screenshot_catalog_entities enable row level security;
 alter table public.screenshot_catalog_levels enable row level security;

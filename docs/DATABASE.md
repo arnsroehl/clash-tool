@@ -33,6 +33,8 @@ This document describes database tables referenced by the current code and SQL h
 | `siege_machines` | Siege machine game data | `siegeMachineService`, importer |
 | `siege_machine_levels` | Siege machine level game data | `siegeMachineService`, importer |
 | `account_siege_machines` | Per-account siege machine levels | `siegeMachineService` |
+| `magic_item_catalog` | Stable Magic-Item IDs and planner effects | `magicItemService`, screenshot import |
+| `account_magic_items` | Per-account quantities and queue reservations | `magicItemService`, screenshot import |
 
 ## SQL Files Present in Repository
 
@@ -42,6 +44,14 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/troops.sql` | `troops`, `troop_levels`, `account_troops` |
 | `src/scripts/sql/spells.sql` | `spells`, `spell_levels`, `account_spells` |
 | `src/scripts/sql/siege-machines.sql` | `siege_machines`, `siege_machine_levels`, `account_siege_machines` |
+| `src/scripts/sql/screenshot-import.sql` | Screenshot sessions, files, detections, proposed changes, events and feedback |
+| `src/scripts/sql/screenshot-progress-catalog.sql` | Screenshot catalog, account progress, wall distributions, upgrade slots, resource snapshots and analysis jobs |
+| `src/scripts/sql/screenshot-resource-capacities.sql` | Adds separately persisted resource storage capacities to existing screenshot snapshots |
+| `src/scripts/sql/screenshot-full-account-import.sql` | Allows one guided screenshot session to combine all supported account areas |
+| `src/scripts/sql/screenshot-profile-details.sql` | Adds confirmed experience-level and clan-name fields to accounts |
+| `src/scripts/sql/screenshot-file-metadata.sql` | Adds privacy-minimized source/normalized file metadata and coarse device platform |
+| `src/scripts/sql/screenshot-language-detection.sql` | Stores detected German/English screenshot language and confidence independently from app language |
+| `src/scripts/sql/screenshot-analysis-job-idempotency.sql` | Allows only one queued/running analysis stage per screenshot and job type |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 
@@ -73,9 +83,15 @@ Account services read and write:
 - account name
 - town hall level
 - builder count
+- optional screenshot-confirmed experience level
+- clan status (`unknown`, `none`, or `member`) and optional clan name
 - created timestamp
 
 Progress tables store `current_level` per `account_id` and game-data id.
+
+Screenshot resource snapshots store current resource amounts and their optional
+storage capacities separately. Row-level ownership continues to be derived from
+the linked account; a confirmed import session is retained as the source.
 
 ## Game Data
 

@@ -22,6 +22,7 @@ The repository does not contain complete Clash of Clans game data. Current files
 | File | Domain |
 | --- | --- |
 | `src/data/buildings.json` | Buildings |
+| `src/data/traps.json` | Home Village traps, levels and per-Town-Hall instance counts |
 | `src/data/heroes.json` | Heroes |
 | `src/data/troops.json` | Troops |
 | `src/data/spells.json` | Spells |
@@ -65,6 +66,7 @@ Current domain files contain arrays of items:
 - duplicate level numbers are rejected
 - level, town hall, costs, upgrade time, and hitpoints are valid integers
 - costs, upgrade time, and hitpoints are not negative
+- optional availability rows contain unique Town Hall levels and valid instance counts
 
 ## Import Process
 
@@ -81,11 +83,12 @@ The importer:
 
 1. Loads `.env.local` values into the Node process.
 2. Reads the current hard-coded JSON files.
-3. Validates item and level structure.
+3. Validates item, level and optional availability structure.
 4. Resolves existing rows by name where implemented.
 5. Upserts parent rows.
 6. Upserts level rows.
-7. Logs and skips optional missing laboratory tables with SQL helper pointers.
+7. Upserts Town-Hall-specific building counts when present (currently traps).
+8. Logs and skips optional missing laboratory tables with SQL helper pointers.
 
 ## ID and Naming Conventions
 

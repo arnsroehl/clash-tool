@@ -7,7 +7,7 @@ create table if not exists public.screenshot_import_sessions (
   account_id uuid not null references public.accounts(id) on delete cascade,
   selected_import_type text not null check (selected_import_type in (
     'laboratory', 'heroes', 'pets', 'equipment', 'builders', 'buildings',
-    'walls', 'village', 'resources', 'profile'
+    'walls', 'village', 'resources', 'profile', 'full'
   )),
   status text not null default 'draft' check (status in (
     'draft', 'uploaded', 'preprocessing', 'analyzing', 'validating',
@@ -29,6 +29,15 @@ create table if not exists public.screenshot_import_files (
   user_id uuid not null references auth.users(id) on delete cascade,
   storage_path text not null unique,
   original_filename text not null,
+  original_mime_type text check (original_mime_type is null or original_mime_type ~ '^image/'),
+  original_size_bytes bigint check (original_size_bytes is null or original_size_bytes between 1 and 20971520),
+  normalized_mime_type text check (normalized_mime_type is null or normalized_mime_type = 'image/jpeg'),
+  normalized_size_bytes bigint check (normalized_size_bytes is null or normalized_size_bytes between 1 and 20971520),
+  device_platform text not null default 'unknown' check (device_platform in (
+    'ios', 'android', 'macos', 'windows', 'linux', 'chromeos', 'other', 'unknown'
+  )),
+  detected_language text not null default 'unknown' check (detected_language in ('de', 'en', 'unknown')),
+  language_confidence numeric(5,4) not null default 0 check (language_confidence between 0 and 1),
   content_hash text,
   width integer not null check (width > 0),
   height integer not null check (height > 0),

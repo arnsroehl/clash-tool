@@ -89,6 +89,32 @@ export async function saveMagicInventory(
     );
   if (error) throw new Error(error.message);
 }
+
+export async function saveMagicInventoryQuantities(
+  accountId: string,
+  quantities: Array<{ itemKey: string; quantity: number }>,
+): Promise<void> {
+  const unique = new Map<string, number>();
+  quantities.forEach(({ itemKey, quantity }) => {
+    if (!itemKey || !Number.isInteger(quantity) || quantity < 0 || quantity > 999)
+      throw new Error("Ein erkannter Magic-Item-Bestand ist ungültig.");
+    unique.set(itemKey, quantity);
+  });
+  if (!unique.size) return;
+  const rows = [...unique].map(([itemKey, quantity]) => ({
+    account_id: accountId,
+    item_key: itemKey,
+    quantity,
+    updated_at: new Date().toISOString(),
+  }));
+  const { data, error } = await getSupabaseClient()
+    .from("account_magic_items")
+    .upsert(rows, { onConflict: "account_id,item_key" })
+    .select("item_key,quantity");
+  if (error) throw new Error(error.message);
+  if ((data || []).length !== rows.length)
+    throw new Error("Nicht alle Magic-Item-Bestände konnten bestätigt gespeichert werden.");
+}
 export async function getPlanningEvents(
   accountId: string,
 ): Promise<PlanningEvent[]> {

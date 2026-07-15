@@ -1,0 +1,1192 @@
+[
+  {
+    "id": "0cbe92da-f1b0-4db1-894e-ba57918a1bbe",
+    "sourceId": "air-bomb",
+    "name": "Luftbombe",
+    "category": "Fallen",
+    "unlockTownHall": 5,
+    "sortOrder": 900,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 5,
+        "upgradeTimeHours": 0,
+        "goldCost": 4000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 5,
+        "upgradeTimeHours": 0.5,
+        "goldCost": 20000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 7,
+        "upgradeTimeHours": 1,
+        "goldCost": 75000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 9,
+        "upgradeTimeHours": 4,
+        "goldCost": 300000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 8,
+        "goldCost": 550000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 12,
+        "upgradeTimeHours": 12,
+        "goldCost": 800000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 13,
+        "upgradeTimeHours": 16,
+        "goldCost": 1000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 13,
+        "upgradeTimeHours": 18,
+        "goldCost": 1200000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "upgradeTimeHours": 24,
+        "goldCost": 2000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "upgradeTimeHours": 48,
+        "goldCost": 3000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "upgradeTimeHours": 72,
+        "goldCost": 5000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "upgradeTimeHours": 132,
+        "goldCost": 9500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 13,
+        "townHall": 18,
+        "upgradeTimeHours": 216,
+        "goldCost": 15000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ],
+    "availability": [
+      {
+        "townHallLevel": 5,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 6,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 7,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 8,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 9,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 10,
+        "count": 5,
+        "countAfterMerges": 5
+      },
+      {
+        "townHallLevel": 11,
+        "count": 5,
+        "countAfterMerges": 5
+      },
+      {
+        "townHallLevel": 12,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 13,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 14,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 15,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 16,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 17,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 18,
+        "count": 7,
+        "countAfterMerges": 7
+      }
+    ]
+  },
+  {
+    "id": "f75488d8-f54b-4280-9ca9-3693d714b4d1",
+    "sourceId": "bomb",
+    "name": "Bombe",
+    "category": "Fallen",
+    "unlockTownHall": 3,
+    "sortOrder": 910,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 3,
+        "upgradeTimeHours": 0,
+        "goldCost": 400,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 3,
+        "upgradeTimeHours": 6,
+        "goldCost": 1000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 5,
+        "upgradeTimeHours": 0.3333333333333333,
+        "goldCost": 10000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 7,
+        "upgradeTimeHours": 0.6666666666666666,
+        "goldCost": 40000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 8,
+        "upgradeTimeHours": 1,
+        "goldCost": 100000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 9,
+        "upgradeTimeHours": 3,
+        "goldCost": 230000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 10,
+        "upgradeTimeHours": 5,
+        "goldCost": 330000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 11,
+        "upgradeTimeHours": 6,
+        "goldCost": 500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 9,
+        "townHall": 13,
+        "upgradeTimeHours": 12,
+        "goldCost": 750000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 10,
+        "townHall": 14,
+        "upgradeTimeHours": 24,
+        "goldCost": 1300000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 11,
+        "townHall": 15,
+        "upgradeTimeHours": 48,
+        "goldCost": 2500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 12,
+        "townHall": 16,
+        "upgradeTimeHours": 72,
+        "goldCost": 4000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 13,
+        "townHall": 17,
+        "upgradeTimeHours": 108,
+        "goldCost": 8500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 14,
+        "townHall": 18,
+        "upgradeTimeHours": 192,
+        "goldCost": 14000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ],
+    "availability": [
+      {
+        "townHallLevel": 3,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 4,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 5,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 6,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 7,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 8,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 9,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 10,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 11,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 12,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 13,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 14,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 15,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 16,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 17,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 18,
+        "count": 8,
+        "countAfterMerges": 8
+      }
+    ]
+  },
+  {
+    "id": "4a9eb992-2441-43e9-9521-4a8fd9e501db",
+    "sourceId": "giant-bomb",
+    "name": "Riesenbombe",
+    "category": "Fallen",
+    "unlockTownHall": 6,
+    "sortOrder": 920,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 6,
+        "upgradeTimeHours": 0,
+        "goldCost": 12500,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 6,
+        "upgradeTimeHours": 1,
+        "goldCost": 75000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "upgradeTimeHours": 3,
+        "goldCost": 220000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "upgradeTimeHours": 8,
+        "goldCost": 750000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 11,
+        "upgradeTimeHours": 10,
+        "goldCost": 900000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 13,
+        "upgradeTimeHours": 11,
+        "goldCost": 1300000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 13,
+        "upgradeTimeHours": 12,
+        "goldCost": 1500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 14,
+        "upgradeTimeHours": 24,
+        "goldCost": 2000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 9,
+        "townHall": 15,
+        "upgradeTimeHours": 48,
+        "goldCost": 3200000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 10,
+        "townHall": 16,
+        "upgradeTimeHours": 96,
+        "goldCost": 5500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 11,
+        "townHall": 17,
+        "upgradeTimeHours": 120,
+        "goldCost": 10000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ],
+    "availability": [
+      {
+        "townHallLevel": 6,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 7,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 8,
+        "count": 3,
+        "countAfterMerges": 3
+      },
+      {
+        "townHallLevel": 9,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 10,
+        "count": 5,
+        "countAfterMerges": 5
+      },
+      {
+        "townHallLevel": 11,
+        "count": 5,
+        "countAfterMerges": 5
+      },
+      {
+        "townHallLevel": 12,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 13,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 14,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 15,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 16,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 17,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 18,
+        "count": 8,
+        "countAfterMerges": 8
+      }
+    ]
+  },
+  {
+    "id": "c3e8ba70-e761-44cf-b7ea-3296528ed1af",
+    "sourceId": "giga-bomb",
+    "name": "Gigabombe",
+    "category": "Fallen",
+    "unlockTownHall": 17,
+    "sortOrder": 930,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 17,
+        "upgradeTimeHours": 0,
+        "goldCost": 4500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 17,
+        "upgradeTimeHours": 120,
+        "goldCost": 8500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 17,
+        "upgradeTimeHours": 144,
+        "goldCost": 12500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 18,
+        "upgradeTimeHours": 312,
+        "goldCost": 20000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ],
+    "availability": [
+      {
+        "townHallLevel": 17,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 18,
+        "count": 1,
+        "countAfterMerges": 1
+      }
+    ]
+  },
+  {
+    "id": "af22f406-3568-40f6-9482-5d49774558db",
+    "sourceId": "seeking-air-mine",
+    "name": "Zielsuchende Luftmine",
+    "category": "Fallen",
+    "unlockTownHall": 7,
+    "sortOrder": 940,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 7,
+        "upgradeTimeHours": 0,
+        "goldCost": 12000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 9,
+        "upgradeTimeHours": 12,
+        "goldCost": 600000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 10,
+        "upgradeTimeHours": 24,
+        "goldCost": 1200000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 13,
+        "upgradeTimeHours": 36,
+        "goldCost": 2500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 15,
+        "upgradeTimeHours": 72,
+        "goldCost": 5000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 16,
+        "upgradeTimeHours": 108,
+        "goldCost": 6500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 17,
+        "upgradeTimeHours": 132,
+        "goldCost": 12000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 18,
+        "upgradeTimeHours": 276,
+        "goldCost": 19000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ],
+    "availability": [
+      {
+        "townHallLevel": 7,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 8,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 9,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 10,
+        "count": 5,
+        "countAfterMerges": 5
+      },
+      {
+        "townHallLevel": 11,
+        "count": 5,
+        "countAfterMerges": 5
+      },
+      {
+        "townHallLevel": 12,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 13,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 14,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 15,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 16,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 17,
+        "count": 9,
+        "countAfterMerges": 9
+      },
+      {
+        "townHallLevel": 18,
+        "count": 9,
+        "countAfterMerges": 9
+      }
+    ]
+  },
+  {
+    "id": "eef7fe2e-d707-444e-9d55-30bf25c9c840",
+    "sourceId": "skeleton-trap",
+    "name": "Skelettfalle",
+    "category": "Fallen",
+    "unlockTownHall": 8,
+    "sortOrder": 950,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 8,
+        "upgradeTimeHours": 0,
+        "goldCost": 6000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 8,
+        "upgradeTimeHours": 5,
+        "goldCost": 250000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 9,
+        "upgradeTimeHours": 8,
+        "goldCost": 400000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 10,
+        "upgradeTimeHours": 12,
+        "goldCost": 1000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 18,
+        "upgradeTimeHours": 168,
+        "goldCost": 18000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ],
+    "availability": [
+      {
+        "townHallLevel": 8,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 9,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 10,
+        "count": 3,
+        "countAfterMerges": 3
+      },
+      {
+        "townHallLevel": 11,
+        "count": 3,
+        "countAfterMerges": 3
+      },
+      {
+        "townHallLevel": 12,
+        "count": 3,
+        "countAfterMerges": 3
+      },
+      {
+        "townHallLevel": 13,
+        "count": 3,
+        "countAfterMerges": 3
+      },
+      {
+        "townHallLevel": 14,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 15,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 16,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 17,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 18,
+        "count": 4,
+        "countAfterMerges": 4
+      }
+    ]
+  },
+  {
+    "id": "1dd71ad4-5ac3-4e1b-965a-dda8478f4d00",
+    "sourceId": "spring-trap",
+    "name": "Sprungfalle",
+    "category": "Fallen",
+    "unlockTownHall": 4,
+    "sortOrder": 960,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 4,
+        "upgradeTimeHours": 0,
+        "goldCost": 2000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 7,
+        "upgradeTimeHours": 2,
+        "goldCost": 130000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 8,
+        "upgradeTimeHours": 4,
+        "goldCost": 240000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 4,
+        "townHall": 9,
+        "upgradeTimeHours": 6,
+        "goldCost": 350000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 5,
+        "townHall": 10,
+        "upgradeTimeHours": 8,
+        "goldCost": 800000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 11,
+        "upgradeTimeHours": 12,
+        "goldCost": 1000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 7,
+        "townHall": 12,
+        "upgradeTimeHours": 24,
+        "goldCost": 1700000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 8,
+        "townHall": 13,
+        "upgradeTimeHours": 36,
+        "goldCost": 2000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 9,
+        "townHall": 14,
+        "upgradeTimeHours": 48,
+        "goldCost": 3000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 10,
+        "townHall": 15,
+        "upgradeTimeHours": 60,
+        "goldCost": 4000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 11,
+        "townHall": 16,
+        "upgradeTimeHours": 108,
+        "goldCost": 6000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 12,
+        "townHall": 17,
+        "upgradeTimeHours": 228,
+        "goldCost": 13000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 13,
+        "townHall": 18,
+        "upgradeTimeHours": 264,
+        "goldCost": 16000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ],
+    "availability": [
+      {
+        "townHallLevel": 4,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 5,
+        "count": 2,
+        "countAfterMerges": 2
+      },
+      {
+        "townHallLevel": 6,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 7,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 8,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 9,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 10,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 11,
+        "count": 6,
+        "countAfterMerges": 6
+      },
+      {
+        "townHallLevel": 12,
+        "count": 8,
+        "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 13,
+        "count": 9,
+        "countAfterMerges": 9
+      },
+      {
+        "townHallLevel": 14,
+        "count": 9,
+        "countAfterMerges": 9
+      },
+      {
+        "townHallLevel": 15,
+        "count": 9,
+        "countAfterMerges": 9
+      },
+      {
+        "townHallLevel": 16,
+        "count": 9,
+        "countAfterMerges": 9
+      },
+      {
+        "townHallLevel": 17,
+        "count": 9,
+        "countAfterMerges": 9
+      },
+      {
+        "townHallLevel": 18,
+        "count": 9,
+        "countAfterMerges": 9
+      }
+    ]
+  },
+  {
+    "id": "e7efcb35-e591-482f-a91c-05b7b99eb2b7",
+    "sourceId": "tornado-trap",
+    "name": "Tornadofalle",
+    "category": "Fallen",
+    "unlockTownHall": 11,
+    "sortOrder": 970,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 11,
+        "upgradeTimeHours": 0,
+        "goldCost": 1800000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 2,
+        "townHall": 11,
+        "upgradeTimeHours": 24,
+        "goldCost": 2000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 3,
+        "townHall": 12,
+        "upgradeTimeHours": 48,
+        "goldCost": 2500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      }
+    ],
+    "availability": [
+      {
+        "townHallLevel": 11,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 12,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 13,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 14,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 15,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 16,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 17,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 18,
+        "count": 1,
+        "countAfterMerges": 1
+      }
+    ]
+  }
+]

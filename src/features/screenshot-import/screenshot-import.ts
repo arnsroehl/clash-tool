@@ -61,6 +61,60 @@ export type ScreenshotScreenType =
   | "profile"
   | "unknown";
 
+export type ScreenshotImportType =
+  | Exclude<ScreenshotScreenType, "unknown">
+  | "full";
+
+export function canStartScreenshotAnalysis(sessionStatus: string): boolean {
+  return !["confirmed", "cancelled"].includes(sessionStatus);
+}
+
+export type ScreenshotAnalysisTypeResolution = {
+  screenType: ScreenshotScreenType;
+  analysisType: Exclude<ScreenshotImportType, "full"> | null;
+  requiresManualSelection: boolean;
+  mismatch: boolean;
+};
+
+export function resolveScreenshotAnalysisType(params: {
+  selectedImportType: ScreenshotImportType;
+  classifiedScreenType: ScreenshotScreenType;
+  classificationConfidence: number;
+  manuallySelectedType?: Exclude<ScreenshotImportType, "full">;
+  compatibleClassification?: boolean;
+}): ScreenshotAnalysisTypeResolution {
+  const {
+    selectedImportType,
+    classifiedScreenType,
+    classificationConfidence,
+    manuallySelectedType,
+    compatibleClassification = false,
+  } = params;
+  const screenType: ScreenshotScreenType = manuallySelectedType
+    || (selectedImportType === "full"
+      ? classificationConfidence >= 0.5
+        ? classifiedScreenType
+        : "unknown"
+      : classifiedScreenType === "unknown" || compatibleClassification
+        ? selectedImportType
+        : classifiedScreenType);
+  const requiresManualSelection = selectedImportType === "full" && screenType === "unknown";
+  const mismatch =
+    selectedImportType !== "full" &&
+    classifiedScreenType !== "unknown" &&
+    classifiedScreenType !== selectedImportType &&
+    !compatibleClassification &&
+    classificationConfidence >= 0.72;
+  return {
+    screenType,
+    analysisType: screenType === "unknown"
+      ? null
+      : screenType as Exclude<ScreenshotImportType, "full">,
+    requiresManualSelection,
+    mismatch,
+  };
+}
+
 export type ConfidenceBand =
   | "very_high"
   | "high"
@@ -129,6 +183,21 @@ export type ScreenshotReviewSummary = {
   unusable: number;
 };
 
+export type ScreenshotReviewFilter = "changes" | "all" | "conflicts";
+
+export function filterScreenshotReviewChanges(
+  changes: ScreenshotProposedChange[],
+  filter: ScreenshotReviewFilter,
+): ScreenshotProposedChange[] {
+  if (filter === "all") return changes;
+  if (filter === "conflicts")
+    return changes.filter(
+      (change) =>
+        change.changeType === "conflict" || change.changeType === "level_regression",
+    );
+  return changes.filter((change) => change.changeType !== "unchanged");
+}
+
 export type WallLevelDistribution = {
   id: string;
   level: number;
@@ -163,6 +232,34 @@ export type UpgradeSlotDetection = {
   sourceText: string;
 };
 
+export type UpgradeSlotSnapshot = Omit<UpgradeSlotDetection, "id" | "confidence" | "sourceText">;
+
+export type UpgradeSlotChangeType =
+  | "new_slot"
+  | "unchanged"
+  | "upgrade_started"
+  | "upgrade_completed"
+  | "upgrade_changed"
+  | "remaining_time_changed";
+
+export function compareUpgradeSlotState(
+  detected: UpgradeSlotSnapshot,
+  previous?: UpgradeSlotSnapshot | null,
+): UpgradeSlotChangeType {
+  if (!previous) return "new_slot";
+  if (previous.isAvailable && !detected.isAvailable) return "upgrade_started";
+  if (!previous.isAvailable && detected.isAvailable) return "upgrade_completed";
+  if (previous.isAvailable && detected.isAvailable) return "unchanged";
+  const normalizeName = (value: string | null) => normalizeScreenshotText(value || "");
+  if (
+    normalizeName(previous.entityName) !== normalizeName(detected.entityName) ||
+    previous.targetLevel !== detected.targetLevel
+  ) return "upgrade_changed";
+  if (previous.remainingSeconds !== detected.remainingSeconds)
+    return "remaining_time_changed";
+  return "unchanged";
+}
+
 export type UpgradeSlotParseOptions = {
   fallbackSlotType?: UpgradeSlotType;
   entities?: Array<Pick<ScreenshotEntity, "name" | "aliases">>;
@@ -185,17 +282,262 @@ export type ScreenshotResourceType =
 
 export type ScreenshotResourceDetection = {
   resourceType: ScreenshotResourceType;
-  amount: number;
+  amount: number | null;
+  capacity: number | null;
   confidence: number;
   sourceText: string;
+  reasons: string[];
 };
+
+export type ScreenshotMagicItemDefinition = {
+  itemKey: string;
+  name: string;
+  aliases?: string[];
+  currentQuantity: number;
+};
+
+export type ScreenshotMagicItemDetection = {
+  itemKey: string;
+  name: string;
+  quantity: number | null;
+  previousQuantity: number;
+  confidence: number;
+  sourceText: string;
+  reasons: string[];
+};
+
+const MAGIC_ITEM_SCREENSHOT_ALIASES: Record<string, string[]> = {
+  book_building: ["Buch der Gebäude", "Gebäudebuch"],
+  book_heroes: ["Buch der Helden", "Heldenbuch"],
+  book_fighting: ["Buch des Kampfes", "Kampfbuch"],
+  book_spells: ["Buch der Zauber", "Zauberbuch"],
+  hammer_building: ["Hammer der Gebäude", "Gebäudehammer"],
+  hammer_heroes: ["Hammer der Helden", "Heldenhammer"],
+  hammer_fighting: ["Hammer des Kampfes", "Kampfhammer"],
+  hammer_spells: ["Hammer der Zauber", "Zauberhammer"],
+  builder_potion: ["Bauarbeitertrank", "Bauarbeiter-Trank"],
+  research_potion: ["Forschungstrank", "Forschungs-Trank"],
+  wall_rings: ["Mauerringe", "Mauer-Ringe", "Wall Ring"],
+  rune_gold: ["Goldrune", "Rune des Goldes", "Gold-Rune"],
+  rune_elixir: ["Elixierrune", "Rune des Elixiers", "Elixier-Rune"],
+  rune_dark_elixir: [
+    "Dunkle-Elixier-Rune",
+    "Rune des Dunklen Elixiers",
+    "Dunkles Elixier Rune",
+  ],
+};
+
+export function getMagicItemScreenshotAliases(itemKey: string): string[] {
+  return MAGIC_ITEM_SCREENSHOT_ALIASES[itemKey] || [];
+}
+
+export function mergeScreenshotMagicItemDetections(
+  existing: ScreenshotMagicItemDetection | undefined,
+  next: ScreenshotMagicItemDetection,
+): ScreenshotMagicItemDetection {
+  if (!existing) return next;
+  if (existing.itemKey !== next.itemKey)
+    throw new Error("Nur derselbe magische Gegenstand kann zusammengeführt werden.");
+  const conflict =
+    existing.quantity !== null &&
+    next.quantity !== null &&
+    existing.quantity !== next.quantity;
+  const preferNext = next.confidence > existing.confidence;
+  const reasons = [...(existing.reasons || []), ...(next.reasons || [])];
+  if (conflict)
+    reasons.push(
+      `Mehrere Screenshots zeigen unterschiedliche Mengen (${existing.quantity} und ${next.quantity}).`,
+    );
+  return {
+    itemKey: existing.itemKey,
+    name: existing.name,
+    quantity: conflict
+      ? preferNext ? next.quantity : existing.quantity
+      : next.quantity ?? existing.quantity,
+    previousQuantity: existing.previousQuantity,
+    confidence: conflict
+      ? Math.min(existing.confidence, next.confidence, 0.49)
+      : Math.max(existing.confidence, next.confidence),
+    sourceText: `${existing.sourceText} · ${next.sourceText}`,
+    reasons: [...new Set(reasons)],
+  };
+}
+
+export function mergeScreenshotResourceDetections(
+  existing: ScreenshotResourceDetection | undefined,
+  next: ScreenshotResourceDetection,
+): ScreenshotResourceDetection {
+  if (!existing) return next;
+  if (existing.resourceType !== next.resourceType)
+    throw new Error("Nur Werte derselben Ressourcenart können zusammengeführt werden.");
+  const amountConflict =
+    existing.amount !== null && next.amount !== null && existing.amount !== next.amount;
+  const capacityConflict =
+    existing.capacity !== null &&
+    next.capacity !== null &&
+    existing.capacity !== next.capacity;
+  const preferNext = next.confidence > existing.confidence;
+  const amount = amountConflict
+    ? preferNext ? next.amount : existing.amount
+    : next.amount ?? existing.amount;
+  const capacity = capacityConflict
+    ? preferNext ? next.capacity : existing.capacity
+    : next.capacity ?? existing.capacity;
+  const reasons = [...(existing.reasons || []), ...(next.reasons || [])];
+  if (amountConflict)
+    reasons.push(
+      `Mehrere Screenshots zeigen unterschiedliche Bestände (${existing.amount} und ${next.amount}).`,
+    );
+  if (capacityConflict)
+    reasons.push(
+      `Mehrere Screenshots zeigen unterschiedliche Lagerkapazitäten (${existing.capacity} und ${next.capacity}).`,
+    );
+  return {
+    resourceType: existing.resourceType,
+    amount,
+    capacity,
+    confidence:
+      amountConflict || capacityConflict
+        ? Math.min(existing.confidence, next.confidence, 0.49)
+        : Math.max(existing.confidence, next.confidence),
+    sourceText: `${existing.sourceText} · ${next.sourceText}`,
+    reasons: [...new Set(reasons)],
+  };
+}
 
 export type ScreenshotProfileDetection = {
   playerTag: string | null;
+  alternativePlayerTags?: string[];
+  playerName?: string | null;
+  alternativePlayerNames?: string[];
+  clanName?: string | null;
+  alternativeClanNames?: Array<string | null>;
+  clanDetected?: boolean;
   townHallLevel: number | null;
   experienceLevel: number | null;
   confidence: number;
 };
+
+export type ScreenshotProfileValidationStatus =
+  | "match"
+  | "new_identity"
+  | "unverified"
+  | "mismatch"
+  | "stale";
+
+export type ScreenshotProfileValidation = {
+  status: ScreenshotProfileValidationStatus;
+  canApply: boolean;
+  detectedPlayerTag: string | null;
+  expectedPlayerTag: string | null;
+  reasons: string[];
+};
+
+const PLAYER_TAG_PATTERN = /^#[0289PYLQGRJCUV]{3,15}$/;
+
+export function normalizePlayerTag(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const normalized = `#${value
+    .toUpperCase()
+    .replace(/^#/, "")
+    .replace(/O/g, "0")
+    .replace(/[^A-Z0-9]/g, "")}`;
+  return PLAYER_TAG_PATTERN.test(normalized) ? normalized : null;
+}
+
+export function mergeProfileScreenshotDetections(
+  detections: ScreenshotProfileDetection[],
+): ScreenshotProfileDetection | null {
+  if (!detections.length) return null;
+  const ranked = [...detections].sort((left, right) => right.confidence - left.confidence);
+  const tags = [...new Set(
+    ranked.flatMap((detection) => [
+      detection.playerTag,
+      ...(detection.alternativePlayerTags || []),
+    ]).map(normalizePlayerTag).filter((tag): tag is string => Boolean(tag)),
+  )];
+  const townHallLevel = ranked.find((detection) => detection.townHallLevel !== null)?.townHallLevel ?? null;
+  const experienceLevel = ranked.find((detection) => detection.experienceLevel !== null)?.experienceLevel ?? null;
+  const playerNames = [...new Set(
+    ranked.flatMap((detection) => [
+      detection.playerName,
+      ...(detection.alternativePlayerNames || []),
+    ]).filter((name): name is string => Boolean(name)),
+  )];
+  const clanMap = new Map<string, string | null>();
+  ranked.forEach((detection) => {
+    if (!detection.clanDetected) return;
+    const clan = detection.clanName ?? null;
+    clanMap.set(clan === null ? "none" : `name:${clan}`, clan);
+  });
+  const clans = [...clanMap.values()];
+  const clanConflict = clans.length > 1;
+  const playerNameConflict = playerNames.length > 1;
+  return {
+    playerTag: tags[0] || null,
+    alternativePlayerTags: tags.slice(1),
+    playerName: playerNames[0] || null,
+    alternativePlayerNames: playerNames.slice(1),
+    clanName: clans[0] ?? null,
+    alternativeClanNames: clans.slice(1),
+    clanDetected: clans.length > 0,
+    townHallLevel,
+    experienceLevel,
+    confidence: tags.length > 1 || playerNameConflict || clanConflict
+      ? Math.min(0.49, ranked[0].confidence)
+      : ranked[0].confidence,
+  };
+}
+
+export function validateProfileScreenshot(params: {
+  detection: ScreenshotProfileDetection;
+  expectedPlayerTag?: string | null;
+  currentTownHallLevel: number;
+}): ScreenshotProfileValidation {
+  const expectedPlayerTag = normalizePlayerTag(params.expectedPlayerTag);
+  const observedTags = [...new Set([
+    params.detection.playerTag,
+    ...(params.detection.alternativePlayerTags || []),
+  ].map(normalizePlayerTag).filter((tag): tag is string => Boolean(tag)))];
+  const detectedPlayerTag = observedTags[0] || null;
+  const reasons: string[] = [];
+  let status: ScreenshotProfileValidationStatus;
+  if (observedTags.length > 1) {
+    status = "mismatch";
+    reasons.push(`Mehrere Screenshots zeigen unterschiedliche Spieler-Tags (${observedTags.join(", ")}).`);
+  } else if ((params.detection.alternativePlayerNames || []).length) {
+    status = "mismatch";
+    reasons.push("Mehrere Screenshots zeigen unterschiedliche Spielernamen.");
+  } else if ((params.detection.alternativeClanNames || []).length) {
+    status = "mismatch";
+    reasons.push("Mehrere Screenshots zeigen unterschiedliche Clanzugehörigkeiten.");
+  } else if (!detectedPlayerTag) {
+    status = "unverified";
+    reasons.push("Der Spieler-Tag konnte nicht sicher erkannt werden.");
+  } else if (expectedPlayerTag && detectedPlayerTag !== expectedPlayerTag) {
+    status = "mismatch";
+    reasons.push(`Der Screenshot gehört zu ${detectedPlayerTag}, geöffnet ist aber ${expectedPlayerTag}.`);
+  } else if (
+    params.detection.townHallLevel !== null &&
+    params.detection.townHallLevel < params.currentTownHallLevel
+  ) {
+    status = "stale";
+    reasons.push(
+      `Das erkannte Rathaus ${params.detection.townHallLevel} ist niedriger als der gespeicherte Stand ${params.currentTownHallLevel}.`,
+    );
+  } else {
+    status = expectedPlayerTag ? "match" : "new_identity";
+    if (!expectedPlayerTag)
+      reasons.push("Dieser Spieler-Tag wird nach ausdrücklicher Bestätigung mit dem Account verknüpft.");
+  }
+  return {
+    status,
+    canApply: status === "match" || status === "new_identity",
+    detectedPlayerTag,
+    expectedPlayerTag,
+    reasons,
+  };
+}
 
 export type ScreenshotVisualObjectMatch = {
   sourceId: string;
@@ -227,6 +569,20 @@ export type ImageQualityResult = {
   >;
 };
 
+export type ScreenshotContentQualityIssue =
+  | "foreign_game"
+  | "replay_or_foreign_base"
+  | "obstructing_overlay"
+  | "expected_view_markers_missing"
+  | "content_near_image_edge";
+
+export type ScreenshotContentQualityResult = {
+  score: number;
+  accepted: boolean;
+  issues: ScreenshotContentQualityIssue[];
+  evidence: string[];
+};
+
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 
 export const normalizeScreenshotText = (value: string) =>
@@ -235,6 +591,47 @@ export const normalizeScreenshotText = (value: string) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
+
+export type ScreenshotLanguage = "de" | "en" | "unknown";
+
+const SCREENSHOT_LANGUAGE_MARKERS: Record<Exclude<ScreenshotLanguage, "unknown">, string[]> = {
+  de: [
+    "verbessern", "gesamtdauer", "bauarbeiter", "verfugbar", "forschung",
+    "truppen", "zauber", "helden", "haustiere", "ausrustung", "schmied",
+    "ressourcen", "spielerprofil", "spielertag", "rathaus", "mauern",
+    "verteidigung", "angreifen", "dunkles elixier",
+  ],
+  en: [
+    "upgrade", "total time", "builder", "available", "research", "troops",
+    "spells", "heroes", "pets", "equipment", "blacksmith", "resources",
+    "player profile", "player tag", "town hall", "walls", "defense",
+    "attack", "dark elixir",
+  ],
+};
+
+export function detectScreenshotLanguage(text: string): {
+  language: ScreenshotLanguage;
+  confidence: number;
+  matchedMarkers: string[];
+} {
+  const normalized = normalizeScreenshotText(text);
+  const ranked = (Object.entries(SCREENSHOT_LANGUAGE_MARKERS) as Array<
+    [Exclude<ScreenshotLanguage, "unknown">, string[]]
+  >).map(([language, markers]) => {
+    const matchedMarkers = markers.filter((marker) =>
+      normalized.includes(normalizeScreenshotText(marker)),
+    );
+    return { language, matchedMarkers, score: matchedMarkers.length };
+  }).sort((left, right) => right.score - left.score);
+  const best = ranked[0];
+  const runnerUp = ranked[1];
+  if (!best || best.score === 0 || best.score === runnerUp?.score)
+    return { language: "unknown", confidence: 0, matchedMarkers: [] };
+  const confidence = clamp(
+    0.55 + best.score * 0.07 + (best.score - (runnerUp?.score || 0)) * 0.08,
+  );
+  return { language: best.language, confidence, matchedMarkers: best.matchedMarkers };
+}
 
 const GERMAN_SCREENSHOT_ALIASES: Record<string, string[]> = {
   "apprentice-warden": ["Lehrlingswächter"],
@@ -378,7 +775,18 @@ const SCREEN_HINTS: Record<Exclude<ScreenshotScreenType, "unknown">, string[]> =
   buildings: ["gebaude", "buildings", "verteidigung", "defense", "fallen", "traps"],
   walls: ["mauern", "walls", "mauerlevel", "wall level"],
   village: ["heimatdorf", "home village", "angreifen", "attack", "shop"],
-  resources: ["ressourcen", "resources", "gold", "elixier", "elixir", "dunkles elixier"],
+  resources: [
+    "ressourcen",
+    "resources",
+    "gold",
+    "elixier",
+    "elixir",
+    "dunkles elixier",
+    "magische gegenstande",
+    "magic items",
+    "mauerringe",
+    "wall rings",
+  ],
   profile: ["spielerprofil", "player profile", "spielertag", "player tag", "erfahrungslevel", "experience level"],
 };
 
@@ -405,6 +813,114 @@ export function classifyScreenshotText(text: string): {
   const runnerUp = scores[1]?.score || 0;
   const confidence = clamp(0.55 + best.score * 0.12 + (best.score - runnerUp) * 0.08);
   return { screenType: best.screenType, confidence, matchedHints: best.matchedHints };
+}
+
+const FOREIGN_GAME_MARKERS = [
+  "brawl stars",
+  "clash royale",
+  "hay day",
+  "boom beach",
+  "squad busters",
+] as const;
+
+const OBSTRUCTING_OVERLAY_MARKERS = [
+  "whatsapp",
+  "imessage",
+  "facetime",
+  "notification center",
+  "mitteilungszentrale",
+  "incoming call",
+  "eingehender anruf",
+  "low battery",
+  "batteriestand niedrig",
+  "save to photos",
+  "in fotos sichern",
+  "airdrop",
+] as const;
+
+const REPLAY_OR_FOREIGN_BASE_MARKERS = [
+  "replay",
+  "wiederholung",
+  "spectate",
+  "zuschauen",
+  "return home",
+  "nach hause",
+  "visit village",
+  "dorf besuchen",
+] as const;
+
+const REQUIRED_VIEW_MARKERS: Partial<Record<Exclude<ScreenshotScreenType, "unknown">, string[]>> = {
+  laboratory: ["labor", "laboratory", "forschung", "research", "gesamtdauer", "total time"],
+  heroes: ["helden", "heroes", "barbarenkonig", "barbarian king", "archer queen"],
+  pets: ["haustiere", "pets", "pet house", "tierhaus"],
+  equipment: ["ausrustung", "equipment", "schmied", "blacksmith", "erze", "ore"],
+  builders: ["bauarbeiter", "builders", "verfugbar", "available", "upgrade in progress"],
+  buildings: ["gebaude", "buildings", "verteidigung", "defense", "rathaus", "town hall"],
+  walls: ["mauern", "walls", "mauerlevel", "wall level"],
+  village: ["heimatdorf", "home village", "angreifen", "attack", "shop"],
+  resources: ["ressourcen", "resources", "gold", "elixier", "elixir", "erze", "ore"],
+  profile: ["spielerprofil", "player profile", "spielertag", "player tag", "clan"],
+};
+
+export function assessScreenshotContentQuality(params: {
+  text: string;
+  screenType: ScreenshotScreenType;
+  lines?: Array<{ text: string; boundingBox: BoundingBox }>;
+}): ScreenshotContentQualityResult {
+  const normalized = normalizeScreenshotText(params.text);
+  const evidence: string[] = [];
+  const issues: ScreenshotContentQualityIssue[] = [];
+  const matchMarkers = (markers: readonly string[]) => markers.filter((marker) =>
+    normalized.includes(normalizeScreenshotText(marker)),
+  );
+  const foreignMarkers = matchMarkers(FOREIGN_GAME_MARKERS);
+  if (foreignMarkers.length) {
+    issues.push("foreign_game");
+    evidence.push(...foreignMarkers);
+  }
+  const overlayMarkers = matchMarkers(OBSTRUCTING_OVERLAY_MARKERS);
+  if (overlayMarkers.length) {
+    issues.push("obstructing_overlay");
+    evidence.push(...overlayMarkers);
+  }
+  if (["village", "buildings", "walls", "builders"].includes(params.screenType)) {
+    const replayMarkers = matchMarkers(REPLAY_OR_FOREIGN_BASE_MARKERS);
+    if (replayMarkers.length) {
+      issues.push("replay_or_foreign_base");
+      evidence.push(...replayMarkers);
+    }
+  }
+  const requiredMarkers = params.screenType === "unknown"
+    ? []
+    : REQUIRED_VIEW_MARKERS[params.screenType] || [];
+  if (requiredMarkers.length && matchMarkers(requiredMarkers).length === 0)
+    issues.push("expected_view_markers_missing");
+  const clippedLines = (params.lines || []).filter((line) => {
+    if (line.text.trim().length < 3) return false;
+    const box = line.boundingBox;
+    return box.x <= 0.003 || box.y <= 0.003 ||
+      box.x + box.width >= 0.997 || box.y + box.height >= 0.997;
+  });
+  if (clippedLines.length >= 2) {
+    issues.push("content_near_image_edge");
+    evidence.push(...clippedLines.slice(0, 3).map((line) => line.text.trim()));
+  }
+  const blocking = issues.includes("foreign_game") ||
+    issues.includes("replay_or_foreign_base") ||
+    issues.includes("obstructing_overlay");
+  const penalties: Record<ScreenshotContentQualityIssue, number> = {
+    foreign_game: 0.8,
+    replay_or_foreign_base: 0.8,
+    obstructing_overlay: 0.55,
+    expected_view_markers_missing: 0.2,
+    content_near_image_edge: 0.18,
+  };
+  return {
+    score: Math.round(clamp(1 - issues.reduce((sum, issue) => sum + penalties[issue], 0)) * 100) / 100,
+    accepted: !blocking,
+    issues,
+    evidence: [...new Set(evidence)],
+  };
 }
 
 function bestEntityForLine(line: string, entities: ScreenshotEntity[]) {
@@ -543,6 +1059,14 @@ export function calculateDetectionConfidence(parts: {
   );
 }
 
+export function shouldStoreScreenshotFeedback(
+  improvementConsent: boolean,
+  correctedLevel: number | undefined,
+  proposedLevel: number | null,
+): boolean {
+  return improvementConsent && correctedLevel !== undefined && correctedLevel !== proposedLevel;
+}
+
 export function parseScreenshotDetections(params: {
   text: string;
   entities: ScreenshotEntity[];
@@ -589,7 +1113,11 @@ export function parseScreenshotDetections(params: {
       textMatch.candidates.length > 1 &&
       textMatch.candidates[1]?.matchedName === textBest.matchedName
     ) {
-      const textUseKey = `${textBest.entity.type}:${textBest.matchedName}`;
+      // Building instances share the stable `<building-id>:<index>` identity.
+      // Count all localized aliases against that identity so `Bombe` followed
+      // by `Bomb` advances to the second physical trap instead of reusing #1.
+      const instanceGroupId = textBest.entity.id.replace(/:\d+$/, "");
+      const textUseKey = `${textBest.entity.type}:${instanceGroupId}`;
       const textUseIndex = textInstanceUseCount.get(textUseKey) || 0;
       const sameNameCandidates = textMatch.candidates.filter(
         (candidate) => candidate.matchedName === textBest?.matchedName,
@@ -1118,33 +1646,303 @@ export function parseScreenshotResources(text: string): ScreenshotResourceDetect
   ];
   const result = new Map<ScreenshotResourceType, ScreenshotResourceDetection>();
   text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).forEach((line) => {
+    if (/(?:\bbook\b|\bbuch\b|hammer|potion|trank|rune|rings?|mauerringe?|magic\s+items?|magische\s+gegenst[aä]nde)/i.test(line))
+      return;
     const definition = definitions.find(({ pattern }) => pattern.test(line));
     if (!definition) return;
     const withoutName = line.replace(definition.pattern, " ");
-    const amountMatch = withoutName.match(/(\d[\d.,\s]*\d|\d)(?:\s*(k|m|tsd|mio|thousand|million))?\b/i);
-    if (!amountMatch) return;
-    const amount = parseCompactNumber(amountMatch[1], amountMatch[2]);
-    if (amount === null) return;
-    const confidence = amountMatch[2] ? 0.82 : 0.96;
+    const valuePattern = /(\d[\d.,\s]*\d|\d)(?:\s*(k|m|tsd|mio|thousand|million))?\b/gi;
+    const parseFirstValue = (value: string) => {
+      const match = [...value.matchAll(valuePattern)][0];
+      return match ? parseCompactNumber(match[1], match[2]) : null;
+    };
+    const separator = withoutName.match(/^(.*?)(?:\/|\bvon\b|\bof\b)(.*)$/i);
+    const capacityOnly = /(?:kapazit[aä]t|capacity|lager(?:platz)?|storage|max(?:imum)?)/i.test(
+      withoutName,
+    );
+    const amount = separator
+      ? parseFirstValue(separator[1])
+      : capacityOnly
+        ? null
+        : parseFirstValue(withoutName);
+    const capacity = separator
+      ? parseFirstValue(separator[2])
+      : capacityOnly
+        ? parseFirstValue(withoutName)
+        : null;
+    if (amount === null && capacity === null) return;
+    const previous = result.get(definition.type);
+    const mergedAmount = amount ?? previous?.amount ?? null;
+    const mergedCapacity = capacity ?? previous?.capacity ?? null;
+    const reasons = [...(previous?.reasons || [])];
+    let confidence = Math.min(previous?.confidence ?? 1, /(?:k|m|tsd|mio|thousand|million)\b/i.test(withoutName) ? 0.82 : 0.96);
+    if (
+      mergedAmount !== null &&
+      mergedCapacity !== null &&
+      mergedAmount > mergedCapacity
+    ) {
+      confidence = Math.min(confidence, 0.49);
+      reasons.push("Der erkannte Bestand liegt über der erkannten Lagerkapazität.");
+    }
     result.set(definition.type, {
       resourceType: definition.type,
-      amount,
+      amount: mergedAmount,
+      capacity: mergedCapacity,
       confidence,
-      sourceText: line,
+      sourceText: previous ? `${previous.sourceText} · ${line}` : line,
+      reasons: [...new Set(reasons)],
     });
   });
   return [...result.values()];
 }
 
+export function parseScreenshotMagicItems(
+  text: string,
+  definitions: ScreenshotMagicItemDefinition[],
+): ScreenshotMagicItemDetection[] {
+  const detections = new Map<string, ScreenshotMagicItemDetection>();
+  const searchable = definitions.flatMap((definition) =>
+    [definition.name, ...(definition.aliases || []), ...getMagicItemScreenshotAliases(definition.itemKey)]
+      .map((alias) => ({
+        definition,
+        alias,
+        normalized: normalizeScreenshotText(alias),
+      }))
+      .filter((candidate) => candidate.normalized.length >= 4),
+  );
+  text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .forEach((line) => {
+      const normalizedLine = normalizeScreenshotText(line);
+      const match = searchable
+        .filter((candidate) => normalizedLine.includes(candidate.normalized))
+        .sort((left, right) => right.normalized.length - left.normalized.length)[0];
+      if (!match) return;
+      const explicitMultiplier = line.match(/(?:[x×]\s*(\d{1,3})|(\d{1,3})\s*[x×])\b/i);
+      const fraction = line.match(/\b(\d{1,3})\s*\/\s*\d{1,3}\b/);
+      const plainNumbers = [...line.matchAll(/\b\d{1,3}\b/g)];
+      const quantityRaw = explicitMultiplier?.[1]
+        || explicitMultiplier?.[2]
+        || fraction?.[1]
+        || plainNumbers.at(-1)?.[0]
+        || null;
+      const quantity = quantityRaw === null ? null : Number(quantityRaw);
+      const validQuantity =
+        quantity !== null && Number.isInteger(quantity) && quantity >= 0 && quantity <= 999
+          ? quantity
+          : null;
+      const reasons = validQuantity === null
+        ? ["Die Menge des erkannten magischen Gegenstands fehlt oder ist unplausibel."]
+        : [];
+      const current: ScreenshotMagicItemDetection = {
+        itemKey: match.definition.itemKey,
+        name: match.definition.name,
+        quantity: validQuantity,
+        previousQuantity: match.definition.currentQuantity,
+        confidence: validQuantity === null
+          ? 0.35
+          : explicitMultiplier || fraction
+            ? 0.96
+            : 0.86,
+        sourceText: line,
+        reasons,
+      };
+      detections.set(
+        current.itemKey,
+        mergeScreenshotMagicItemDetections(detections.get(current.itemKey), current),
+      );
+    });
+  return [...detections.values()];
+}
+
 export function parseProfileScreenshot(text: string): ScreenshotProfileDetection {
-  const tagMatch = text.toUpperCase().match(/#[0289PYLQGRJCUV]{3,15}/);
+  const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const tagMatch = text.toUpperCase().match(/#[A-Z0-9]{3,15}/);
+  const playerTag = normalizePlayerTag(tagMatch?.[0]);
   const townHallMatch = text.match(/(?:rathaus|town\s*hall|th)\s*(?:level|lvl|stufe)?\s*[:=]?\s*(\d{1,2})/i);
   const experienceMatch = text.match(/(?:erfahrungslevel|experience\s*level|xp\s*level)\s*[:=]?\s*(\d{1,3})/i);
-  const found = [tagMatch, townHallMatch, experienceMatch].filter(Boolean).length;
+  const cleanValue = (value: string | undefined): string | null => {
+    const cleaned = value?.replace(/^[\s:;=–—-]+/, "").replace(/[\s|]+$/, "").trim() || "";
+    if (!cleaned || cleaned.length > 80 || /^#|^\d+$/.test(cleaned)) return null;
+    return cleaned;
+  };
+  const isProfileMetadata = (value: string): boolean =>
+    /^(?:spielerprofil|player\s*profile|profil|profile|spieler-?tag|player\s*tag|rathaus|town\s*hall|th\b|erfahrungslevel|experience\s*level|xp\s*level|clan(?:name)?\b|clan\s*name|name\b)/i.test(value);
+  const explicitPlayerName = lines
+    .map((line) => line.match(/^(?:spielername|player\s*name|name)\s*[:=–—-]\s*(.+)$/i)?.[1])
+    .map(cleanValue)
+    .find((value): value is string => Boolean(value)) || null;
+  const tagLineIndex = lines.findIndex((line) => /#[A-Z0-9]{3,15}/i.test(line));
+  const anchoredPlayerName = tagLineIndex > 0
+    ? [...lines.slice(Math.max(0, tagLineIndex - 2), tagLineIndex)].reverse()
+        .map(cleanValue)
+        .find((value) => value !== null && !isProfileMetadata(value)) || null
+    : null;
+  const playerName = explicitPlayerName || anchoredPlayerName;
+  const noClanPattern = /(?:kein(?:em|en)?\s+clan|ohne\s+clan|not\s+in\s+(?:a\s+)?clan|no\s+clan)/i;
+  const explicitClan = lines
+    .map((line) => line.match(/^(?:clan(?:name)?|clan\s*name)\s*[:=–—-]\s*(.+)$/i)?.[1])
+    .map(cleanValue)
+    .find((value): value is string => Boolean(value)) || null;
+  const clanLabelIndex = lines.findIndex((line) => /^(?:clan|clanname|clan\s*name)$/i.test(line));
+  const clanCandidate = clanLabelIndex >= 0 ? cleanValue(lines[clanLabelIndex + 1]) : null;
+  const anchoredClan = clanCandidate && !isProfileMetadata(clanCandidate) ? clanCandidate : null;
+  const clanNoneDetected = lines.some((line) => noClanPattern.test(line));
+  const clanName = clanNoneDetected ? null : explicitClan || anchoredClan;
+  const clanDetected = clanNoneDetected || clanName !== null;
+  const found = [playerTag, playerName, townHallMatch, experienceMatch, clanDetected].filter(Boolean).length;
   return {
-    playerTag: tagMatch?.[0] || null,
+    playerTag,
+    alternativePlayerTags: [],
+    playerName,
+    alternativePlayerNames: [],
+    clanName,
+    alternativeClanNames: [],
+    clanDetected,
     townHallLevel: townHallMatch ? Number(townHallMatch[1]) : null,
     experienceLevel: experienceMatch ? Number(experienceMatch[1]) : null,
-    confidence: found >= 2 ? 0.95 : found === 1 ? 0.72 : 0,
+    confidence: found >= 3 ? 0.95 : found === 2 ? 0.88 : found === 1 ? 0.72 : 0,
+  };
+}
+
+export type ScreenshotQualityBreakdown = {
+  label: string;
+  total: number;
+  errors: number;
+  errorRate: number;
+};
+
+export type ScreenshotQualityMetrics = {
+  imports: number;
+  confirmedImports: number;
+  abandonmentRate: number | null;
+  averageProcessingMinutes: number | null;
+  decidedChanges: number;
+  objectAccuracy: number | null;
+  levelAccuracy: number | null;
+  autoConfirmationRate: number | null;
+  correctionRate: number | null;
+  byScreenType: ScreenshotQualityBreakdown[];
+  byDevice: ScreenshotQualityBreakdown[];
+  byLanguage: ScreenshotQualityBreakdown[];
+  byGameVersion: ScreenshotQualityBreakdown[];
+};
+
+type ScreenshotQualitySession = {
+  id: string;
+  status: string;
+  createdAt: string;
+  completedAt: string | null;
+  confirmedAt: string | null;
+  gameVersion: string | null;
+};
+
+type ScreenshotQualityFile = {
+  sessionId: string;
+  screenType: string | null;
+  devicePlatform: string | null;
+  detectedLanguage: string | null;
+  qualityScore: number | null;
+  processingStatus: string;
+};
+
+type ScreenshotQualityChange = {
+  status: string;
+  confidence: number;
+  userCorrectedValue: Record<string, unknown> | null;
+};
+
+function ratio(value: number, total: number): number | null {
+  return total > 0 ? Math.round((value / total) * 10_000) / 10_000 : null;
+}
+
+function qualityBreakdown(
+  rows: Array<{ label: string; error: boolean }>,
+): ScreenshotQualityBreakdown[] {
+  const groups = new Map<string, { total: number; errors: number }>();
+  rows.forEach(({ label, error }) => {
+    const current = groups.get(label) || { total: 0, errors: 0 };
+    current.total += 1;
+    if (error) current.errors += 1;
+    groups.set(label, current);
+  });
+  return [...groups.entries()]
+    .map(([label, values]) => ({
+      label,
+      ...values,
+      errorRate: ratio(values.errors, values.total) || 0,
+    }))
+    .sort((left, right) => right.total - left.total || left.label.localeCompare(right.label));
+}
+
+export function calculateScreenshotQualityMetrics(input: {
+  sessions: ScreenshotQualitySession[];
+  files: ScreenshotQualityFile[];
+  changes: ScreenshotQualityChange[];
+}): ScreenshotQualityMetrics {
+  const terminalSessions = input.sessions.filter((session) =>
+    ["confirmed", "completed", "failed", "cancelled"].includes(session.status),
+  );
+  const confirmedImports = input.sessions.filter((session) => session.status === "confirmed").length;
+  const abandoned = terminalSessions.filter((session) =>
+    ["failed", "cancelled"].includes(session.status),
+  ).length;
+  const durations = input.sessions.flatMap((session) => {
+    const end = session.confirmedAt || session.completedAt;
+    if (!end) return [];
+    const duration = new Date(end).getTime() - new Date(session.createdAt).getTime();
+    return Number.isFinite(duration) && duration >= 0 ? [duration / 60_000] : [];
+  });
+  const decided = input.changes.filter((change) =>
+    ["accepted", "corrected", "rejected"].includes(change.status),
+  );
+  const accepted = decided.filter((change) => change.status === "accepted").length;
+  const corrected = decided.filter((change) => change.status === "corrected").length;
+  const objectAccepted = accepted + corrected;
+  const automaticallyAccepted = decided.filter((change) =>
+    change.status === "accepted"
+      && change.confidence >= 0.8
+      && change.userCorrectedValue === null,
+  ).length;
+  const fileRows = input.files.map((file) => ({
+    ...file,
+    error:
+      file.processingStatus === "failed"
+      || (file.qualityScore !== null && file.qualityScore < 0.5)
+      || file.screenType === "unknown",
+  }));
+  const unknown = "Unbekannt";
+  const sessionRows = input.sessions.map((session) => ({
+    label: session.gameVersion || unknown,
+    error: ["failed", "cancelled"].includes(session.status),
+  }));
+
+  return {
+    imports: input.sessions.length,
+    confirmedImports,
+    abandonmentRate: ratio(abandoned, terminalSessions.length),
+    averageProcessingMinutes: durations.length
+      ? Math.round((durations.reduce((sum, duration) => sum + duration, 0) / durations.length) * 10) / 10
+      : null,
+    decidedChanges: decided.length,
+    objectAccuracy: ratio(objectAccepted, decided.length),
+    levelAccuracy: ratio(accepted, decided.length),
+    autoConfirmationRate: ratio(automaticallyAccepted, decided.length),
+    correctionRate: ratio(corrected, decided.length),
+    byScreenType: qualityBreakdown(fileRows.map((file) => ({
+      label: file.screenType || unknown,
+      error: file.error,
+    }))),
+    byDevice: qualityBreakdown(fileRows.map((file) => ({
+      label: file.devicePlatform || unknown,
+      error: file.error,
+    }))),
+    byLanguage: qualityBreakdown(fileRows.map((file) => ({
+      label: file.detectedLanguage || unknown,
+      error: file.error,
+    }))),
+    byGameVersion: qualityBreakdown(sessionRows),
   };
 }

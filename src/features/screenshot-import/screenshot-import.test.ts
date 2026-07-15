@@ -2,20 +2,36 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   assessImageQuality,
+  assessScreenshotContentQuality,
+  detectScreenshotLanguage,
   classifyScreenshotText,
+  canStartScreenshotAnalysis,
+  calculateScreenshotQualityMetrics,
+  compareUpgradeSlotState,
   mergeScreenshotDetections,
+  mergeProfileScreenshotDetections,
+  mergeScreenshotMagicItemDetections,
+  mergeScreenshotResourceDetections,
+  normalizePlayerTag,
   parseScreenshotDetections,
   parseScreenshotLevels,
+  parseScreenshotMagicItems,
   parseScreenshotResources,
   parseProfileScreenshot,
   parseDurationSeconds,
   parseBuilderAvailability,
   filterBuildingImportEntities,
+  filterScreenshotReviewChanges,
   getBuildingImportSection,
+  getMagicItemScreenshotAliases,
   parseUpgradeSlots,
   parseWallDistributions,
+  resolveScreenshotAnalysisType,
   summarizeScreenshotReview,
+  shouldStoreScreenshotFeedback,
+  validateProfileScreenshot,
   type ScreenshotEntity,
+  type ScreenshotProposedChange,
 } from "./screenshot-import";
 import {
   createDifferenceHash,
@@ -26,7 +42,17 @@ import {
   matchObjectFingerprint,
   selectVillageObjectMatches,
 } from "@/services/screenshotObjectRecognitionService";
-import { createLaboratoryGridCells } from "@/services/screenshotRecognitionService";
+import {
+  createLaboratoryGridCells,
+  detectScreenshotDevicePlatform,
+  enhanceScreenshotPixelsForOcr,
+} from "@/services/screenshotRecognitionService";
+import {
+  isScreenshotImportTypeEnabled,
+  isSupportedGameUiVersion,
+  resolveScreenshotImportConfig,
+} from "@/config/screenshotImport";
+import trapCatalog from "@/data/traps.json";
 
 const entities: ScreenshotEntity[] = [
   {
@@ -65,6 +91,33 @@ test("classifies German and English laboratory screenshots", () => {
     "laboratory",
   );
   assert.equal(classifyScreenshotText("unrelated content").screenType, "unknown");
+});
+
+test("starts analysis only for non-terminal import sessions", () => {
+  ["draft", "uploaded", "preprocessing", "analyzing", "validating", "review_required", "ready", "failed"]
+    .forEach((status) => assert.equal(canStartScreenshotAnalysis(status), true));
+  assert.equal(canStartScreenshotAnalysis("confirmed"), false);
+  assert.equal(canStartScreenshotAnalysis("cancelled"), false);
+});
+
+test("detects screenshot language independently from the app language", () => {
+  const german = detectScreenshotLanguage(
+    "Labor Forschung Truppen Zauber Gesamtdauer Direkt verbessern",
+  );
+  assert.equal(german.language, "de");
+  assert.ok(german.confidence >= 0.8);
+
+  const english = detectScreenshotLanguage(
+    "Laboratory Research Troops Spells Total time Upgrade",
+  );
+  assert.equal(english.language, "en");
+  assert.ok(english.confidence >= 0.8);
+
+  assert.deepEqual(detectScreenshotLanguage("Dragon 12"), {
+    language: "unknown",
+    confidence: 0,
+    matchedMarkers: [],
+  });
 });
 
 test("recovers a German Dragon level from stylized laboratory OCR", () => {
@@ -274,6 +327,100 @@ test("rejects likely rotated game screenshots and warns about heavy crops", () =
   );
 });
 
+test("stores only a coarse screenshot device platform", () => {
+  assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (iPhone)", "iPhone"), "ios");
+  assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (Linux; Android 15)", "Linux"), "android");
+  assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (Macintosh)", "MacIntel"), "macos");
+  assert.equal(detectScreenshotDevicePlatform("Mozilla/5.0 (X11; CrOS x86_64)", "Linux"), "chromeos");
+  assert.equal(detectScreenshotDevicePlatform(undefined, undefined), "unknown");
+});
+
+test("creates a contrast-normalized grayscale OCR variant without changing the source", () => {
+  const source = new Uint8ClampedArray([
+    50, 50, 50, 255,
+    100, 100, 100, 255,
+    200, 200, 200, 255,
+  ]);
+  const enhanced = enhanceScreenshotPixelsForOcr(source, 3, 1);
+  assert.deepEqual([...source], [
+    50, 50, 50, 255,
+    100, 100, 100, 255,
+    200, 200, 200, 255,
+  ]);
+  assert.equal(enhanced[0], enhanced[1]);
+  assert.equal(enhanced[1], enhanced[2]);
+  assert.equal(enhanced[3], 255);
+  assert.ok(enhanced[0] < enhanced[4]);
+  assert.ok(enhanced[4] < enhanced[8]);
+  assert.ok(enhanced[0] < 20);
+  assert.ok(enhanced[8] > 230);
+});
+
+test("blocks screenshots from another game or with a system overlay", () => {
+  const foreignGame = assessScreenshotContentQuality({
+    text: "Brawl Stars Trophy Road",
+    screenType: "unknown",
+  });
+  assert.equal(foreignGame.accepted, false);
+  assert.deepEqual(foreignGame.issues, ["foreign_game"]);
+
+  const overlay = assessScreenshotContentQuality({
+    text: "Labor Forschung\nWhatsApp\nNeue Nachricht",
+    screenType: "laboratory",
+  });
+  assert.equal(overlay.accepted, false);
+  assert.ok(overlay.issues.includes("obstructing_overlay"));
+});
+
+test("blocks replay and visited-base screenshots for account progress imports", () => {
+  const replay = assessScreenshotContentQuality({
+    text: "Wiederholung 1x Nach Hause",
+    screenType: "village",
+  });
+  assert.equal(replay.accepted, false);
+  assert.ok(replay.issues.includes("replay_or_foreign_base"));
+
+  const visitedBase = assessScreenshotContentQuality({
+    text: "Visit Village Return Home",
+    screenType: "buildings",
+  });
+  assert.equal(visitedBase.accepted, false);
+  assert.ok(visitedBase.evidence.includes("visit village"));
+
+  const profileText = assessScreenshotContentQuality({
+    text: "Player Profile Replay Master Clan",
+    screenType: "profile",
+  });
+  assert.equal(profileText.accepted, true);
+  assert.ok(!profileText.issues.includes("replay_or_foreign_base"));
+});
+
+test("warns about missing view markers and text clipped by the image edge", () => {
+  const result = assessScreenshotContentQuality({
+    text: "Level 12\nLevel 13",
+    screenType: "laboratory",
+    lines: [
+      { text: "Level 12", boundingBox: { x: 0, y: 0.2, width: 0.2, height: 0.05 } },
+      { text: "Level 13", boundingBox: { x: 0.8, y: 0.96, width: 0.2, height: 0.04 } },
+    ],
+  });
+  assert.equal(result.accepted, true);
+  assert.ok(result.issues.includes("expected_view_markers_missing"));
+  assert.ok(result.issues.includes("content_near_image_edge"));
+  assert.ok(result.score < 1);
+});
+
+test("accepts a complete unobstructed Clash laboratory view", () => {
+  const result = assessScreenshotContentQuality({
+    text: "Labor Forschung Truppen Zauber Gesamtdauer",
+    screenType: "laboratory",
+    lines: [
+      { text: "Labor", boundingBox: { x: 0.4, y: 0.08, width: 0.2, height: 0.06 } },
+    ],
+  });
+  assert.deepEqual(result, { score: 1, accepted: true, issues: [], evidence: [] });
+});
+
 test("extracts supported entity levels and English aliases", () => {
   const matches = parseScreenshotLevels(
     "Bogenschützenkönigin Level 83\nBarbarian King 94",
@@ -370,6 +517,27 @@ test("summarizes safe, unchanged and conflicting results", () => {
   });
 });
 
+test("filters screenshot review values without hiding regressions from conflicts", () => {
+  const reviewChanges = [
+    { id: "same", changeType: "unchanged" },
+    { id: "up", changeType: "level_increased" },
+    { id: "conflict", changeType: "conflict" },
+    { id: "regression", changeType: "level_regression" },
+  ] as ScreenshotProposedChange[];
+  assert.deepEqual(
+    filterScreenshotReviewChanges(reviewChanges, "all").map((change) => change.id),
+    ["same", "up", "conflict", "regression"],
+  );
+  assert.deepEqual(
+    filterScreenshotReviewChanges(reviewChanges, "changes").map((change) => change.id),
+    ["up", "conflict", "regression"],
+  );
+  assert.deepEqual(
+    filterScreenshotReviewChanges(reviewChanges, "conflicts").map((change) => change.id),
+    ["conflict", "regression"],
+  );
+});
+
 test("assigns OCR levels to exact building instances", () => {
   const matches = parseScreenshotLevels("Kanone 2 = Level 20", [
     { id: "cannon:1", name: "Kanone 1", currentLevel: 19, maxLevel: 21, type: "building" },
@@ -407,6 +575,43 @@ test("filters structured building imports by database category", () => {
   assert.deepEqual(
     filterBuildingImportEntities(buildingEntities, "traps").map((entity) => entity.id),
     ["bomb"],
+  );
+});
+
+test("ships every Home Village trap with TH18 levels and instance counts", () => {
+  assert.deepEqual(
+    trapCatalog.map((trap) => trap.sourceId),
+    [
+      "air-bomb",
+      "bomb",
+      "giant-bomb",
+      "giga-bomb",
+      "seeking-air-mine",
+      "skeleton-trap",
+      "spring-trap",
+      "tornado-trap",
+    ],
+  );
+  assert.deepEqual(
+    trapCatalog.map((trap) => Math.max(...trap.levels.map((level) => level.level))),
+    [13, 14, 11, 4, 8, 5, 13, 3],
+  );
+  assert.deepEqual(
+    trapCatalog.map((trap) =>
+      trap.availability.find((availability) => availability.townHallLevel === 18)?.count,
+    ),
+    [7, 8, 8, 1, 9, 4, 9, 1],
+  );
+});
+
+test("assigns repeated trap cards to separate database instances", () => {
+  const matches = parseScreenshotLevels("Bombe Level 14\nBomb Level 13", [
+    { id: "bomb:1", name: "Bombe 1", aliases: ["Bombe", "Bomb"], currentLevel: 12, maxLevel: 14, type: "building" },
+    { id: "bomb:2", name: "Bombe 2", aliases: ["Bombe", "Bomb"], currentLevel: 12, maxLevel: 14, type: "building" },
+  ]);
+  assert.deepEqual(
+    matches.map((match) => [match.id, match.detectedLevel]),
+    [["bomb:1", 14], ["bomb:2", 13]],
   );
 });
 
@@ -499,6 +704,36 @@ test("parses a builder summary and creates exact occupied and available slots", 
   assert.equal(compactSlot[0].remainingSeconds, 374_400);
 });
 
+test("compares imported upgrade slots with the saved planning state", () => {
+  const available = {
+    slotType: "builder" as const,
+    slotIndex: 1,
+    isAvailable: true,
+    entityName: null,
+    targetLevel: null,
+    remainingSeconds: null,
+  };
+  const occupied = {
+    ...available,
+    isAvailable: false,
+    entityName: "Kanone",
+    targetLevel: 20,
+    remainingSeconds: 86_400,
+  };
+  assert.equal(compareUpgradeSlotState(occupied, available), "upgrade_started");
+  assert.equal(compareUpgradeSlotState(available, occupied), "upgrade_completed");
+  assert.equal(
+    compareUpgradeSlotState({ ...occupied, remainingSeconds: 43_200 }, occupied),
+    "remaining_time_changed",
+  );
+  assert.equal(
+    compareUpgradeSlotState({ ...occupied, entityName: "Magierturm" }, occupied),
+    "upgrade_changed",
+  );
+  assert.equal(compareUpgradeSlotState(available, available), "unchanged");
+  assert.equal(compareUpgradeSlotState(occupied), "new_slot");
+});
+
 test("recognizes multi-line hero and pet upgrades from their selected views", () => {
   const heroSlots = parseUpgradeSlots(
     "Barbarian King\nUpgrade in progress to level 96\nRemaining 2d 3h",
@@ -563,13 +798,220 @@ test("parses only explicitly labelled resource values and compact numbers", () =
   );
 });
 
-test("parses stable profile identifiers without guessing a player name", () => {
+test("does not mistake Magic Item names for resource balances", () => {
+  assert.deepEqual(
+    parseScreenshotResources("Rune of Gold 1/1\nGold 12.500.000").map(
+      ({ resourceType, amount }) => [resourceType, amount],
+    ),
+    [["gold", 12_500_000]],
+  );
+});
+
+test("parses resource amounts and storage capacities from combined or separate lines", () => {
+  const resources = parseScreenshotResources(
+    "Gold 12.500.000 / 22.000.000\nElixier 9,5 Mio von 22 Mio\nDunkles Elixier 245000\nDunkles Elixier Lagerkapazität 360000\nShiny Ore capacity 50K",
+  );
+  assert.deepEqual(
+    resources.map(({ resourceType, amount, capacity }) => [resourceType, amount, capacity]),
+    [
+      ["gold", 12_500_000, 22_000_000],
+      ["elixir", 9_500_000, 22_000_000],
+      ["dark_elixir", 245_000, 360_000],
+      ["shiny_ore", null, 50_000],
+    ],
+  );
+});
+
+test("marks a resource result as uncertain when the amount exceeds capacity", () => {
+  const [gold] = parseScreenshotResources("Gold 23 Mio / 22 Mio");
+  assert.equal(gold.confidence, 0.49);
+  assert.match(gold.reasons[0], /über der erkannten Lagerkapazität/);
+});
+
+test("merges complementary resource screenshots and exposes contradictions", () => {
+  const amountOnly = parseScreenshotResources("Gold 12 Mio")[0];
+  const capacityOnly = parseScreenshotResources("Gold Lagerkapazität 22 Mio")[0];
+  const complete = mergeScreenshotResourceDetections(amountOnly, capacityOnly);
+  assert.deepEqual([complete.amount, complete.capacity], [12_000_000, 22_000_000]);
+  assert.equal(complete.confidence, 0.82);
+
+  const conflict = mergeScreenshotResourceDetections(
+    complete,
+    parseScreenshotResources("Gold 13 Mio / 23 Mio")[0],
+  );
+  assert.equal(conflict.confidence, 0.49);
+  assert.ok(conflict.reasons.some((reason) => /unterschiedliche Bestände/.test(reason)));
+  assert.ok(conflict.reasons.some((reason) => /unterschiedliche Lagerkapazitäten/.test(reason)));
+});
+
+test("parses German and English magic-item quantities from the database catalog", () => {
+  const definitions = [
+    { itemKey: "book_building", name: "Book of Building", currentQuantity: 0 },
+    { itemKey: "builder_potion", name: "Builder Potion", currentQuantity: 2 },
+    { itemKey: "wall_rings", name: "Wall Rings", currentQuantity: 4 },
+    { itemKey: "rune_dark_elixir", name: "Rune of Dark Elixir", currentQuantity: 0 },
+  ];
+  const detections = parseScreenshotMagicItems(
+    "Buch der Gebäude 1/1\nBuilder Potion x3\n5× Mauerringe\nDunkle-Elixier-Rune: 1",
+    definitions,
+  );
+  assert.deepEqual(
+    detections.map(({ itemKey, quantity, previousQuantity }) => [itemKey, quantity, previousQuantity]),
+    [
+      ["book_building", 1, 0],
+      ["builder_potion", 3, 2],
+      ["wall_rings", 5, 4],
+      ["rune_dark_elixir", 1, 0],
+    ],
+  );
+});
+
+test("ships German screenshot aliases for every supported magic-item catalog key", () => {
+  const itemKeys = [
+    "book_building",
+    "book_heroes",
+    "book_fighting",
+    "book_spells",
+    "hammer_building",
+    "hammer_heroes",
+    "hammer_fighting",
+    "hammer_spells",
+    "builder_potion",
+    "research_potion",
+    "wall_rings",
+    "rune_gold",
+    "rune_elixir",
+    "rune_dark_elixir",
+  ];
+  assert.ok(itemKeys.every((itemKey) => getMagicItemScreenshotAliases(itemKey).length > 0));
+});
+
+test("requires a manual magic-item quantity and exposes screenshot conflicts", () => {
+  const definitions = [
+    { itemKey: "book_heroes", name: "Book of Heroes", currentQuantity: 1 },
+  ];
+  const missing = parseScreenshotMagicItems("Buch der Helden", definitions)[0];
+  assert.equal(missing.quantity, null);
+  assert.equal(missing.confidence, 0.35);
+
+  const conflict = mergeScreenshotMagicItemDetections(
+    parseScreenshotMagicItems("Book of Heroes x1", definitions)[0],
+    parseScreenshotMagicItems("Book of Heroes x2", definitions)[0],
+  );
+  assert.equal(conflict.confidence, 0.49);
+  assert.match(conflict.reasons[0], /unterschiedliche Mengen/);
+});
+
+test("parses stable profile identifiers without guessing a profile heading as the player name", () => {
   assert.deepEqual(parseProfileScreenshot("Player Profile\nPlayer Tag #2P0Y8LQ\nTown Hall 17\nExperience Level 241"), {
     playerTag: "#2P0Y8LQ",
+    alternativePlayerTags: [],
+    playerName: null,
+    alternativePlayerNames: [],
+    clanName: null,
+    alternativeClanNames: [],
+    clanDetected: false,
     townHallLevel: 17,
     experienceLevel: 241,
     confidence: 0.95,
   });
+});
+
+test("parses German and English player names and clans from profile screenshots", () => {
+  const german = parseProfileScreenshot(
+    "Spielerprofil\nNik der Große\n#2P0Y8LQ\nClan: Codex Krieger\nRathaus 17\nErfahrungslevel 241",
+  );
+  assert.equal(german.playerName, "Nik der Große");
+  assert.equal(german.clanName, "Codex Krieger");
+  assert.equal(german.clanDetected, true);
+  assert.equal(german.confidence, 0.95);
+
+  const english = parseProfileScreenshot(
+    "Player Profile\nPlayer Name: Archer One\nPlayer Tag #9G8J2\nNot in a Clan\nTown Hall 16\nExperience Level 220",
+  );
+  assert.equal(english.playerName, "Archer One");
+  assert.equal(english.clanName, null);
+  assert.equal(english.clanDetected, true);
+});
+
+test("normalizes OCR player tags and blocks foreign or stale profiles", () => {
+  assert.equal(normalizePlayerTag(" 2pOy8lq "), "#2P0Y8LQ");
+  const matching = validateProfileScreenshot({
+    detection: { playerTag: "#2P0Y8LQ", townHallLevel: 17, experienceLevel: 241, confidence: 0.95 },
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  });
+  assert.equal(matching.status, "match");
+  assert.equal(matching.canApply, true);
+  const foreign = validateProfileScreenshot({
+    detection: { playerTag: "#9G8J2", townHallLevel: 17, experienceLevel: 200, confidence: 0.95 },
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  });
+  assert.equal(foreign.status, "mismatch");
+  assert.equal(foreign.canApply, false);
+  const stale = validateProfileScreenshot({
+    detection: { playerTag: "#2P0Y8LQ", townHallLevel: 16, experienceLevel: 230, confidence: 0.95 },
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  });
+  assert.equal(stale.status, "stale");
+  assert.equal(stale.canApply, false);
+});
+
+test("merges profile screenshots and exposes conflicting account identities", () => {
+  const merged = mergeProfileScreenshotDetections([
+    { playerTag: "#2P0Y8LQ", townHallLevel: 17, experienceLevel: null, confidence: 0.94 },
+    { playerTag: "#9G8J2", townHallLevel: null, experienceLevel: 241, confidence: 0.92 },
+  ]);
+  assert.deepEqual(merged, {
+    playerTag: "#2P0Y8LQ",
+    alternativePlayerTags: ["#9G8J2"],
+    playerName: null,
+    alternativePlayerNames: [],
+    clanName: null,
+    alternativeClanNames: [],
+    clanDetected: false,
+    townHallLevel: 17,
+    experienceLevel: 241,
+    confidence: 0.49,
+  });
+  assert.equal(validateProfileScreenshot({
+    detection: merged!,
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  }).status, "mismatch");
+});
+
+test("requires correction when profile screenshots disagree on name or clan", () => {
+  const merged = mergeProfileScreenshotDetections([
+    {
+      playerTag: "#2P0Y8LQ",
+      playerName: "Main One",
+      clanName: "Codex",
+      clanDetected: true,
+      townHallLevel: 17,
+      experienceLevel: 240,
+      confidence: 0.95,
+    },
+    {
+      playerTag: "#2P0Y8LQ",
+      playerName: "Main Two",
+      clanName: null,
+      clanDetected: true,
+      townHallLevel: 17,
+      experienceLevel: 241,
+      confidence: 0.94,
+    },
+  ]);
+  assert.deepEqual(merged?.alternativePlayerNames, ["Main Two"]);
+  assert.deepEqual(merged?.alternativeClanNames, [null]);
+  assert.equal(merged?.confidence, 0.49);
+  assert.equal(validateProfileScreenshot({
+    detection: merged!,
+    expectedPlayerTag: "#2P0Y8LQ",
+    currentTownHallLevel: 17,
+  }).canApply, false);
 });
 
 test("computes and compares deterministic visual fingerprints", () => {
@@ -703,4 +1145,147 @@ test("keeps supported village proposals and suppresses overlapping detections", 
   assert.equal(matches.length, 1);
   assert.equal(matches[0].sourceId, "cannon");
   assert.equal(matches[0].confidence, 0.95);
+});
+
+test("stores correction feedback only with explicit improvement consent", () => {
+  assert.equal(shouldStoreScreenshotFeedback(false, 12, 11), false);
+  assert.equal(shouldStoreScreenshotFeedback(true, undefined, 11), false);
+  assert.equal(shouldStoreScreenshotFeedback(true, 11, 11), false);
+  assert.equal(shouldStoreScreenshotFeedback(true, 12, 11), true);
+});
+
+test("resolves screenshot rollout flags and rejects unknown UI versions", () => {
+  const config = resolveScreenshotImportConfig({
+    enabled: "true",
+    laboratoryEnabled: "off",
+    villageEnabled: "false",
+    supportedGameUiVersion: "coc-ui-test",
+    modelVersion: "ocr-test",
+    layoutVersion: "layout-test",
+  });
+  assert.equal(isScreenshotImportTypeEnabled("laboratory", config), false);
+  assert.equal(isScreenshotImportTypeEnabled("village", config), false);
+  assert.equal(isScreenshotImportTypeEnabled("heroes", config), true);
+  assert.equal(isSupportedGameUiVersion("coc-ui-test", config), true);
+  assert.equal(isSupportedGameUiVersion("coc-ui-new", config), false);
+  assert.equal(isSupportedGameUiVersion(null, config), false);
+});
+
+test("routes every classified view inside a complete-account import", () => {
+  const laboratory = resolveScreenshotAnalysisType({
+    selectedImportType: "full",
+    classifiedScreenType: "laboratory",
+    classificationConfidence: 0.97,
+  });
+  assert.equal(laboratory.analysisType, "laboratory");
+  assert.equal(laboratory.requiresManualSelection, false);
+  assert.equal(laboratory.mismatch, false);
+
+  const uncertain = resolveScreenshotAnalysisType({
+    selectedImportType: "full",
+    classifiedScreenType: "resources",
+    classificationConfidence: 0.42,
+  });
+  assert.equal(uncertain.analysisType, null);
+  assert.equal(uncertain.requiresManualSelection, true);
+
+  const corrected = resolveScreenshotAnalysisType({
+    selectedImportType: "full",
+    classifiedScreenType: "unknown",
+    classificationConfidence: 0,
+    manuallySelectedType: "equipment",
+  });
+  assert.equal(corrected.analysisType, "equipment");
+  assert.equal(corrected.requiresManualSelection, false);
+});
+
+test("keeps wrong views blocked for targeted imports", () => {
+  const mismatch = resolveScreenshotAnalysisType({
+    selectedImportType: "heroes",
+    classifiedScreenType: "laboratory",
+    classificationConfidence: 0.91,
+  });
+  assert.equal(mismatch.screenType, "laboratory");
+  assert.equal(mismatch.mismatch, true);
+
+  const selectedFallback = resolveScreenshotAnalysisType({
+    selectedImportType: "builders",
+    classifiedScreenType: "unknown",
+    classificationConfidence: 0.2,
+  });
+  assert.equal(selectedFallback.analysisType, "builders");
+  assert.equal(selectedFallback.mismatch, false);
+});
+
+test("global screenshot flag overrides individual import flags", () => {
+  const config = resolveScreenshotImportConfig({
+    enabled: "0",
+    laboratoryEnabled: "true",
+    villageEnabled: "true",
+  });
+  assert.equal(isScreenshotImportTypeEnabled("laboratory", config), false);
+  assert.equal(isScreenshotImportTypeEnabled("buildings", config), false);
+});
+
+test("calculates private confirmation-based screenshot quality metrics", () => {
+  const metrics = calculateScreenshotQualityMetrics({
+    sessions: [
+      {
+        id: "confirmed",
+        status: "confirmed",
+        createdAt: "2026-07-15T10:00:00.000Z",
+        completedAt: null,
+        confirmedAt: "2026-07-15T10:04:00.000Z",
+        gameVersion: "18.0",
+      },
+      {
+        id: "failed",
+        status: "failed",
+        createdAt: "2026-07-15T11:00:00.000Z",
+        completedAt: "2026-07-15T11:02:00.000Z",
+        confirmedAt: null,
+        gameVersion: "18.0",
+      },
+    ],
+    files: [
+      {
+        sessionId: "confirmed",
+        screenType: "laboratory",
+        devicePlatform: "ios",
+        detectedLanguage: "de",
+        qualityScore: 0.9,
+        processingStatus: "completed",
+      },
+      {
+        sessionId: "failed",
+        screenType: "unknown",
+        devicePlatform: "ios",
+        detectedLanguage: "de",
+        qualityScore: 0.3,
+        processingStatus: "failed",
+      },
+    ],
+    changes: [
+      { status: "accepted", confidence: 0.96, userCorrectedValue: null },
+      { status: "corrected", confidence: 0.72, userCorrectedValue: { level: 12 } },
+      { status: "rejected", confidence: 0.4, userCorrectedValue: null },
+      { status: "later", confidence: 0.8, userCorrectedValue: null },
+    ],
+  });
+  assert.equal(metrics.imports, 2);
+  assert.equal(metrics.confirmedImports, 1);
+  assert.equal(metrics.abandonmentRate, 0.5);
+  assert.equal(metrics.averageProcessingMinutes, 3);
+  assert.equal(metrics.decidedChanges, 3);
+  assert.equal(metrics.objectAccuracy, 0.6667);
+  assert.equal(metrics.levelAccuracy, 0.3333);
+  assert.equal(metrics.autoConfirmationRate, 0.3333);
+  assert.equal(metrics.correctionRate, 0.3333);
+  assert.deepEqual(metrics.byScreenType, [
+    { label: "laboratory", total: 1, errors: 0, errorRate: 0 },
+    { label: "unknown", total: 1, errors: 1, errorRate: 1 },
+  ]);
+  assert.deepEqual(metrics.byGameVersion, [
+    { label: "18.0", total: 2, errors: 1, errorRate: 0.5 },
+  ]);
 });

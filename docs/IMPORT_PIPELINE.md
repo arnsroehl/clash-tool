@@ -28,6 +28,7 @@ flowchart LR
 2. Create a Supabase client for the script.
 3. Read the current JSON files:
    - `src/data/buildings.json`
+   - `src/data/traps.json`
    - `src/data/heroes.json`
    - `src/data/troops.json`
    - `src/data/spells.json`
@@ -36,6 +37,7 @@ flowchart LR
 5. Resolve existing IDs by name where implemented.
 6. Upsert parent rows.
 7. Upsert level rows.
+8. Upsert Town-Hall availability and individual-instance counts supplied by the catalog.
 
 ## Validation
 
@@ -48,6 +50,7 @@ The importer validates:
 - `levels` is a non-empty array
 - duplicate level numbers are rejected
 - costs, time, and hitpoints are non-negative integers
+- availability contains unique Town Hall levels, non-negative counts, and never more post-merge instances than buildings
 
 ## Upserts
 
@@ -58,6 +61,8 @@ Parent rows use `onConflict: "id"`. Level rows use compound keys such as:
 - `troop_id,level`
 - `spell_id,level`
 - `siege_machine_id,level`
+
+Building availability uses `building_id,town_hall_level`.
 
 ## Missing Tables
 

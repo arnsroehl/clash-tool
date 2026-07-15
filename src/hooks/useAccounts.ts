@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import {
   createAccount,
   deleteAccount,
@@ -41,6 +41,21 @@ export function useAccounts({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 
+  const refreshAccounts = useCallback(async (preserveSelection = true) => {
+    if (!enabled) {
+      setAccounts([]);
+      setSelectedAccount(null);
+      return;
+    }
+    const loadedAccounts = await fetchAccounts();
+    setAccounts(loadedAccounts);
+    setSelectedAccount((current) =>
+      preserveSelection
+        ? loadedAccounts.find((account) => account.id === current?.id) || loadedAccounts[0] || null
+        : loadedAccounts[0] || null,
+    );
+  }, [enabled]);
+
   useEffect(() => {
     async function loadAccounts() {
       if (!enabled) {
@@ -51,9 +66,7 @@ export function useAccounts({
       }
       setIsLoading(true);
       try {
-        const loadedAccounts = await fetchAccounts();
-        setAccounts(loadedAccounts);
-        setSelectedAccount(loadedAccounts[0] || null);
+        await refreshAccounts(false);
       } catch (error) {
         onError(
           error instanceof Error
@@ -66,7 +79,7 @@ export function useAccounts({
     }
 
     loadAccounts();
-  }, [enabled, onError]);
+  }, [enabled, onError, refreshAccounts]);
 
   async function handleCreateAccount(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -136,5 +149,6 @@ export function useAccounts({
     createAccount: handleCreateAccount,
     deleteAccount: handleDeleteAccount,
     selectAccount: setSelectedAccount,
+    refreshAccounts,
   };
 }

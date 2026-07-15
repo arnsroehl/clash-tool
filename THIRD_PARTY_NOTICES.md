@@ -2,7 +2,7 @@
 
 ## clash-of-clans-data
 
-The Home Village game data in `src/data/buildings.json` is derived from
+The Home Village game data in `src/data/buildings.json` and `src/data/traps.json` is derived from
 [`clash-of-clans-data` 0.16.0](https://www.npmjs.com/package/clash-of-clans-data),
 copyright 2026 Christopher Pezza, licensed under the MIT License.
 

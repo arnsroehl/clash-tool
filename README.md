@@ -88,6 +88,83 @@ NEXT_PUBLIC_CLASH_API_ENABLED=true
 Leave the variable unset or set it to `false` to avoid automatic API requests
 and hide unavailable sync controls.
 
+## Screenshot import rollout
+
+Screenshot recognition stores its game-UI, model, and layout versions with each
+import. Public feature flags allow a changed Clash interface to be disabled on
+Vercel without a code rollback:
+
+```env
+NEXT_PUBLIC_SCREENSHOT_IMPORT_ENABLED=true
+NEXT_PUBLIC_LABORATORY_IMPORT_ENABLED=true
+NEXT_PUBLIC_VILLAGE_DETECTION_ENABLED=true
+NEXT_PUBLIC_SUPPORTED_GAME_UI_VERSION=coc-ui-2026-07
+NEXT_PUBLIC_SCREENSHOT_MODEL_VERSION=local-tesseract-v1
+NEXT_PUBLIC_SCREENSHOT_LAYOUT_VERSION=guided-layout-v1
+```
+
+These values are public compatibility metadata, not secrets. When a game update
+changes the interface, disable the affected importer until its layout is
+verified, then set a new UI/layout version and redeploy. Imports without the
+currently supported UI version are not automatically analyzed.
+
+The guided resource view recognizes current Gold, Elixir, Dark Elixir and ore
+balances. Lines such as `Gold 12.5M / 22M` additionally populate the storage
+capacity. Amounts and capacities remain separately editable in the review and
+are only persisted after confirmation. The same guided area recognizes the 14
+Magic Items from the live Supabase catalog in German and English, compares each
+quantity with the saved inventory and blocks conflicting screenshots until the
+user corrects them. Existing databases can add the capacity columns with
+`src/scripts/sql/screenshot-resource-capacities.sql`.
+
+The `Complete account` option combines all supported guided views in one
+private import session. Screenshots can be added in any order; each image is
+classified and routed to the matching laboratory, hero, pet, equipment,
+builder, building, wall, resource or profile parser. Low-confidence views are
+never guessed: the review asks the user to assign the correct view manually.
+Confirmation remains disabled until every Town-Hall-relevant view is present,
+while the whole session can be saved and resumed later. Existing databases can
+enable this session type with
+`src/scripts/sql/screenshot-full-account-import.sql`.
+
+Profile screenshots recognize the player tag, player name, Town Hall,
+experience level and clan in German and English. Conflicting names, tags or
+clans block confirmation until corrected. Confirmed experience and clan values
+are stored on the linked account using
+`src/scripts/sql/screenshot-profile-details.sql` when the optional official API
+is disabled.
+
+Every accepted screenshot is orientation-corrected, capped at 2400 pixels and
+re-encoded as JPEG before private Storage upload. This removes original EXIF and
+GPS blocks. The import record keeps only the original filename, MIME type and
+byte size, normalized byte size, image dimensions and a coarse device platform
+(`ios`, `android`, `macos`, `windows`, `linux`, `chromeos`, `other` or
+`unknown`). Raw user-agent strings are not stored. Existing databases can add
+these columns with `src/scripts/sql/screenshot-file-metadata.sql`.
+German and English screenshot language is detected per image from OCR markers,
+stored with a confidence value and displayed independently from the app
+language. Ambiguous images keep the combined German/English OCR fallback.
+Existing databases can add these fields with
+`src/scripts/sql/screenshot-language-detection.sql`.
+
+Screenshot OCR starts through the authenticated
+`POST /api/import-sessions/:id/start-analysis` route. The route verifies session
+and file ownership through the caller's Supabase JWT, rejects terminal sessions
+and reuses an already active recognition job. A partial unique index from
+`src/scripts/sql/screenshot-analysis-job-idempotency.sql` closes concurrent
+duplicate-start races while completed and failed jobs remain available as
+history and can be retried.
+
+The import start screen also shows a private, collapsible quality overview for
+the latest 100 sessions. It derives object-assignment, confirmed-level,
+correction, abandonment and processing-time values from the user's own review
+decisions and splits file error rates by screen type, coarse device platform,
+screenshot language and game version. These values are deliberately labelled
+as confirmation-based account metrics rather than a global model benchmark.
+Correction feedback is written only after explicit improvement consent and
+includes the coarse device type, detected screenshot language and crop
+coordinates, but no raw user-agent or automatically retained original image.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP

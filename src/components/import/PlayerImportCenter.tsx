@@ -10,10 +10,12 @@ import {
 import { ScreenshotImportWizard } from "@/components/import/ScreenshotImportWizard";
 import {
   getCurrentScreenshotMaxLevel,
+  getMagicItemScreenshotAliases,
   getScreenshotAliases,
   parseScreenshotLevels,
   type ScreenshotEntity,
   type ScreenshotResourceDetection,
+  type ScreenshotMagicItemDetection,
   type ScreenshotProfileDetection,
 } from "@/features/screenshot-import/screenshot-import";
 import {
@@ -26,7 +28,8 @@ import type { ClashAccount } from "@/types/account";
 import type { Building, BuildingInstanceLevelMap } from "@/types/building";
 import type { Hero } from "@/types/hero";
 import type { SiegeMachine, Spell, Troop } from "@/types/laboratory";
-import type { ScreenshotWallLevel } from "@/types/screenshotProgress";
+import type { ScreenshotUpgradeSlot, ScreenshotWallLevel } from "@/types/screenshotProgress";
+import type { MagicInventoryItem } from "@/types/magicItems";
 
 type Props = {
   officialApiEnabled?: boolean;
@@ -42,10 +45,13 @@ type Props = {
   siegeMachines: SiegeMachine[];
   siegeLevels: Record<string, number>;
   extraScreenshotEntities?: ScreenshotEntity[];
+  magicItems?: MagicInventoryItem[];
   language?: "de" | "en";
   onResourcesImported?: (resources: ScreenshotResourceDetection[]) => void;
+  onMagicItemsImported?: (items: ScreenshotMagicItemDetection[]) => Promise<void>;
   onProfileImported?: (profile: ScreenshotProfileDetection) => Promise<void>;
   onUpgradeSlotsImported?: () => Promise<void> | void;
+  upgradeSlots?: ScreenshotUpgradeSlot[];
   onProgressImported?: () => Promise<void> | void;
   wallLevels?: ScreenshotWallLevel[];
   onWallLevelsImported?: () => Promise<void> | void;
@@ -373,13 +379,22 @@ export function PlayerImportCenter(props: Props) {
         <div className="mt-5">
           <ScreenshotImportWizard
             accountId={props.account.id}
+            expectedPlayerTag={props.account.playerTag}
             entities={entities}
             townHallLevel={props.account.townHallLevel}
             language={en ? "en" : "de"}
+            magicItems={(props.magicItems || []).map((item) => ({
+              itemKey: item.itemKey,
+              name: item.name,
+              aliases: getMagicItemScreenshotAliases(item.itemKey),
+              currentQuantity: item.quantity,
+            }))}
             onConfirm={applyScreenshotChanges}
             onResourcesConfirmed={props.onResourcesImported}
+            onMagicItemsConfirmed={props.onMagicItemsImported}
             onProfileConfirmed={props.onProfileImported}
             onUpgradeSlotsConfirmed={props.onUpgradeSlotsImported}
+            existingUpgradeSlots={props.upgradeSlots}
             existingWallLevels={props.wallLevels || []}
             expectedWallCount={wallBuilding?.buildingCount || 0}
             maxWallLevel={wallBuilding?.maxLevel || 0}
