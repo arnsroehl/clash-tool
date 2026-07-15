@@ -193,6 +193,12 @@ server-only `SCREENSHOT_RETAINED_ORIGINAL_DAYS` and
 keeps the import record and appends an auditable deletion event; users can still
 delete retained originals immediately from their private import history.
 
+Database triggers from `src/scripts/sql/screenshot-import-audit-triggers.sql`
+append ownership-scoped events for import creation, every session-status change,
+each upload and every original-file deletion. They run as `SECURITY INVOKER`,
+cannot be called directly by browser roles and complement the immutable analysis
+job/status records, so UI and API entry points produce the same audit trail.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP
