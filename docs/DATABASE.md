@@ -39,6 +39,7 @@ This document describes database tables referenced by the current code and SQL h
 | `account_health_snapshots` | Daily Account Health, strategy fit, balance and rush-risk history | `accountHealthService` |
 | `account_insight_settings` | Disabled Planner Intelligence categories per account | `plannerInsightService` |
 | `account_insight_actions` | Stable dismiss and snooze state for individual insights | `plannerInsightService` |
+| `planning_scenarios` | Isolated scenario-v2 base states, assumptions, queues, forecasts and results | `planningScenarioService` |
 
 ## SQL Files Present in Repository
 
@@ -60,6 +61,7 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/decision-engine-preferences.sql` | RLS-protected manual Decision Engine priorities and exclusions |
 | `src/scripts/sql/account-health-snapshots.sql` | RLS-protected daily Account Health history |
 | `src/scripts/sql/planner-insight-preferences.sql` | RLS-protected Planner Intelligence category and action controls |
+| `src/scripts/sql/planning-scenarios-v2.sql` | Extends scenarios with isolated state/results and a security-invoker adoption transaction |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 

@@ -26,6 +26,7 @@ import { DataPortability } from "@/components/export/DataPortability";
 import { PlatformInstallCard } from "@/components/platform/PlatformInstallCard";
 import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
 import { PlannerInsights } from "@/components/planning/PlannerInsights";
+import { WhatIfScenarioLab } from "@/components/planning/WhatIfScenarioLab";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
@@ -35,6 +36,10 @@ import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simu
 import { runDecisionEngine } from "@/features/decision-engine/decision-engine.service";
 import { calculateAccountHealth } from "@/features/account-health/account-health";
 import { createPlannerInsights } from "@/features/planner-intelligence/planner-intelligence";
+import {
+  buildPlanningScenarioInput,
+  type ScenarioEvaluationContext,
+} from "@/features/planning-scenarios/planning-scenario.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
 import {
   buildingInstanceId,
@@ -83,7 +88,7 @@ import type { BuilderSimulationResult } from "@/features/builder-simulation/buil
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
 import type { HealthEntity } from "@/features/account-health/account-health.types";
 import type { PlannerInsight } from "@/features/planner-intelligence/planner-intelligence.types";
-import type { PlanningScenario } from "@/types/planningScenario";
+import type { PlanningScenario, ScenarioDraft } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
   SiegeMachine,
@@ -227,10 +232,10 @@ export default function Home() {
     scenarios: planningScenarios,
     isBusy: isScenarioBusy,
     save: saveScenario,
-    activate: activateScenario,
+    apply: applyScenario,
     remove: removeScenario,
   } = usePlanningScenarios(selectedAccount?.id, handleError);
-  const applyPlanningScenario = useCallback((scenario: PlanningScenario) => {
+  const applyScenarioControls = useCallback((scenario: PlanningScenario) => {
     setPlanningStrategy(scenario.strategy);
     setResources(scenario.resources);
     setStorageCapacities(scenario.storageCapacities);
@@ -242,6 +247,7 @@ export default function Home() {
   const activeScenario = planningScenarios.find(
     (scenario) => scenario.isActive,
   );
+  const effectiveBuilderCount = activeScenario?.assumptions.builderCount || selectedAccount?.builderCount || 0;
   useEffect(() => {
     if (!screenshotResourceSnapshot || activeScenario) return;
     const timeout = window.setTimeout(() => {
@@ -261,49 +267,11 @@ export default function Home() {
   useEffect(() => {
     if (!activeScenario) return;
     const timeout = window.setTimeout(
-      () => applyPlanningScenario(activeScenario),
+      () => applyScenarioControls(activeScenario),
       0,
     );
     return () => window.clearTimeout(timeout);
-  }, [activeScenario, applyPlanningScenario]);
-  const loadPlanningScenario = useCallback(
-    (scenario: PlanningScenario) => {
-      applyPlanningScenario(scenario);
-      void activateScenario(scenario.id);
-    },
-    [activateScenario, applyPlanningScenario],
-  );
-  const saveCurrentScenario = useCallback(
-    (name: string, id?: string) => {
-      if (!selectedAccount) return;
-      void saveScenario(
-        {
-          accountId: selectedAccount.id,
-          name,
-          strategy: planningStrategy,
-          horizonDays,
-          goalPercent,
-          resources,
-          storageCapacities,
-          dailyIncome,
-          strategyWeights,
-          isActive: true,
-        },
-        id,
-      );
-    },
-    [
-      dailyIncome,
-      goalPercent,
-      horizonDays,
-      planningStrategy,
-      resources,
-      saveScenario,
-      selectedAccount,
-      storageCapacities,
-      strategyWeights,
-    ],
-  );
+  }, [activeScenario, applyScenarioControls]);
 
   const {
     buildings,
@@ -394,6 +362,7 @@ export default function Home() {
     changeQueueItemStatus,
     reorderQueueItems,
     toggleQueueItemLock,
+    refreshQueue,
   } = useUpgradeQueue({
     selectedAccount,
     onError: handleError,
@@ -562,18 +531,46 @@ export default function Home() {
     removeEvent,
   } = useMagicItems(selectedAccount?.id, handleError);
   const simulationStartsAt = useMemo(() => new Date().toISOString(), []);
+  const effectivePlanningEvents = useMemo(() => {
+    if (!activeScenario) return events;
+    const scenarioEvents = [
+      ...activeScenario.baseState.events.filter(
+        (event) => !activeScenario.assumptions.removedEventIds.includes(event.id),
+      ),
+      ...activeScenario.assumptions.addedEvents,
+    ];
+    if (activeScenario.assumptions.goldPassEnabled) {
+      scenarioEvents.push({
+        id: "active-scenario:gold-pass",
+        accountId: activeScenario.accountId,
+        eventType: "gold_pass",
+        name: "Gold Pass",
+        startsAt: simulationStartsAt,
+        endsAt: null,
+        costDiscountPercent: 20,
+        timeDiscountPercent: 20,
+        resourceGold: 0,
+        resourceElixir: 0,
+        resourceDarkElixir: 0,
+        rewardType: "none",
+        rewardAmount: 0,
+        enabled: true,
+      });
+    }
+    return scenarioEvents;
+  }, [activeScenario, events, simulationStartsAt]);
   const activeEffects = useMemo(
-    () => getActivePlanningEffects(events, new Date(simulationStartsAt)),
-    [events, simulationStartsAt],
+    () => getActivePlanningEffects(effectivePlanningEvents, new Date(simulationStartsAt)),
+    [effectivePlanningEvents, simulationStartsAt],
   );
   const scheduledResourcePayouts = useMemo(
     () =>
       getScheduledResourcePayouts(
-        events,
+        effectivePlanningEvents,
         new Date(simulationStartsAt),
         horizonDays,
       ),
-    [events, horizonDays, simulationStartsAt],
+    [effectivePlanningEvents, horizonDays, simulationStartsAt],
   );
   const scheduledResourceBonus = useMemo<ResourceSnapshot>(
     () =>
@@ -610,7 +607,7 @@ export default function Home() {
     const laboratorySlot = screenshotUpgradeSlots.find((slot) => slot.slotType === "laboratory");
     return {
       builderHours: Array.from(
-        { length: selectedAccount?.builderCount || 0 },
+        { length: effectiveBuilderCount },
         (_, index) => {
           const slot = builderSlots.find((item) => item.slotIndex === index + 1);
           return slot?.isAvailable ? 0 : (slot?.remainingSeconds || 0) / 3_600;
@@ -620,22 +617,29 @@ export default function Home() {
         ? 0
         : (laboratorySlot?.remainingSeconds || 0) / 3_600,
     };
-  }, [screenshotUpgradeSlots, selectedAccount?.builderCount]);
+  }, [effectiveBuilderCount, screenshotUpgradeSlots]);
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
     return simulateBuilderQueue({
-      builderCount: selectedAccount?.builderCount || 0,
+      builderCount: effectiveBuilderCount,
       queueItems,
       simulationStartsAt,
       initialBuilderAvailabilityHours: decisionSlotAvailability.builderHours,
       initialLaboratoryAvailabilityHours: decisionSlotAvailability.laboratoryHours,
-      timeDiscountWindows: events
+      earliestStartHoursByQueueItem: Object.fromEntries(queueItems.flatMap((item) =>
+        item.plannedStartAt
+          ? [[item.id, Math.max(0, (new Date(item.plannedStartAt).getTime() - new Date(simulationStartsAt).getTime()) / 3_600_000)]]
+          : [])),
+      pauseWindows: activeScenario?.assumptions.pauseStartsAt && activeScenario.assumptions.pauseEndsAt
+        ? [{ startsAt: activeScenario.assumptions.pauseStartsAt, endsAt: activeScenario.assumptions.pauseEndsAt }]
+        : [],
+      timeDiscountWindows: effectivePlanningEvents
         .filter((event) => event.enabled && event.timeDiscountPercent > 0)
         .map((event) => ({
           startsAt: event.startsAt,
           endsAt: event.endsAt,
           percent: event.timeDiscountPercent,
         })),
-      costDiscountWindows: events
+      costDiscountWindows: effectivePlanningEvents
         .filter((event) => event.enabled && event.costDiscountPercent > 0)
         .map((event) => ({
           startsAt: event.startsAt,
@@ -643,7 +647,7 @@ export default function Home() {
           percent: event.costDiscountPercent,
         })),
     });
-  }, [decisionSlotAvailability, events, queueItems, selectedAccount, simulationStartsAt]);
+  }, [activeScenario, decisionSlotAvailability, effectiveBuilderCount, effectivePlanningEvents, queueItems, simulationStartsAt]);
 
   const progressForecast = useMemo<ProgressForecastResult>(() => {
     return createProgressForecast({
@@ -657,6 +661,15 @@ export default function Home() {
     handleError,
     currentItemLevels,
   );
+  const effectivePlanningGoals = useMemo(
+    () => activeScenario
+      ? goals.map((goal) => ({
+          ...goal,
+          targetDate: activeScenario.assumptions.goalDateOverrides[goal.id] || goal.targetDate,
+        }))
+      : goals,
+    [activeScenario, goals],
+  );
   const decisionPreferences = useDecisionPreferences(
     selectedAccount?.id,
     handleError,
@@ -666,14 +679,14 @@ export default function Home() {
       plannerInput,
       strategy: planningStrategy,
       strategyWeights,
-      goals,
+      goals: effectivePlanningGoals,
       queue: queueItems,
       schedule: builderSimulation.assignments,
       slotAvailability: decisionSlotAvailability,
       resources: effectivePlanningResources,
       storageCapacities,
       dailyIncome,
-      events,
+      events: effectivePlanningEvents,
       magicItems: inventory,
       manualPreferences: decisionPreferences.preferences,
       generatedAt: simulationStartsAt,
@@ -684,8 +697,8 @@ export default function Home() {
       decisionPreferences.preferences,
       decisionSlotAvailability,
       effectivePlanningResources,
-      events,
-      goals,
+      effectivePlanningEvents,
+      effectivePlanningGoals,
       inventory,
       plannerInput,
       planningStrategy,
@@ -709,8 +722,8 @@ export default function Home() {
       simulation: builderSimulation,
       recommendations: upgradeRecommendations,
       queue: queueItems,
-      goals,
-      events,
+      goals: effectivePlanningGoals,
+      events: effectivePlanningEvents,
       magicItems: inventory,
       resources: effectivePlanningResources,
       storageCapacities,
@@ -723,8 +736,8 @@ export default function Home() {
       currentItemLevels,
       dailyIncome,
       effectivePlanningResources,
-      events,
-      goals,
+      effectivePlanningEvents,
+      effectivePlanningGoals,
       inventory,
       queueItems,
       selectedAccount,
@@ -797,7 +810,7 @@ export default function Home() {
       maxWallLevel: wallBuilding?.maxLevel || null,
       strategy: planningStrategy,
       strategyWeights,
-      goals,
+      goals: effectivePlanningGoals,
       upgradeSlots: screenshotUpgradeSlots,
       builderUsagePercent: plannerResult?.summary.builderUsagePercent ?? null,
       queueItemCount: queueItems.filter((item) => item.status === "planned" || item.status === "active").length,
@@ -809,7 +822,7 @@ export default function Home() {
   }, [
     availableBuildings,
     availableScreenshotEntities,
-    goals,
+    effectivePlanningGoals,
     inventory,
     plannerInput,
     plannerResult?.summary.builderUsagePercent,
@@ -828,6 +841,59 @@ export default function Home() {
     accountHealth,
     handleError,
   );
+  const scenarioContext = useMemo<ScenarioEvaluationContext | null>(() => {
+    if (!selectedAccount || !plannerResult) return null;
+    return {
+      accountId: selectedAccount.id,
+      townHallLevel: selectedAccount.townHallLevel,
+      builderCount: effectiveBuilderCount,
+      plannerResult,
+      health: accountHealth,
+      recommendations: upgradeRecommendations,
+      activeQueue: queueItems,
+      goals: effectivePlanningGoals,
+      events: effectivePlanningEvents,
+      magicItems: inventory,
+      resources,
+      storageCapacities,
+      dailyIncome,
+      strategy: planningStrategy,
+      simulationStartsAt,
+      baseTotalDurationHours: builderSimulation.totalDurationHours,
+      initialBuilderAvailabilityHours: decisionSlotAvailability.builderHours,
+      initialLaboratoryAvailabilityHours: decisionSlotAvailability.laboratoryHours,
+    };
+  }, [
+    accountHealth,
+    builderSimulation.totalDurationHours,
+    dailyIncome,
+    decisionSlotAvailability,
+    effectivePlanningEvents,
+    effectivePlanningGoals,
+    inventory,
+    plannerResult,
+    planningStrategy,
+    queueItems,
+    resources,
+    selectedAccount,
+    effectiveBuilderCount,
+    simulationStartsAt,
+    storageCapacities,
+    upgradeRecommendations,
+  ]);
+  const saveWhatIfScenario = useCallback((draft: ScenarioDraft, id?: string) => {
+    if (!scenarioContext) return;
+    void saveScenario(buildPlanningScenarioInput(draft, scenarioContext, false), id);
+  }, [saveScenario, scenarioContext]);
+  const applyWhatIfScenario = useCallback(async (
+    scenario: PlanningScenario,
+    replaceLocked: boolean,
+  ) => {
+    const applied = await applyScenario(scenario.id, replaceLocked);
+    if (applied === null) return;
+    applyScenarioControls(scenario);
+    await refreshQueue();
+  }, [applyScenario, applyScenarioControls, refreshQueue]);
   const clanDashboard = useClanDashboard(user?.id, handleError);
   const selectedClanForProgress = clanDashboard.selectedClan;
   const syncOwnClanProgress = clanDashboard.syncOwnProgress;
@@ -845,8 +911,8 @@ export default function Home() {
             accountId: selectedAccount.id,
             simulation: builderSimulation,
             recommendations: upgradeRecommendations,
-            goals,
-            events,
+            goals: effectivePlanningGoals,
+            events: effectivePlanningEvents,
             resources: effectivePlanningResources,
             storageCapacities,
             dailyIncome,
@@ -858,8 +924,8 @@ export default function Home() {
         : [],
     [
       builderSimulation,
-      events,
-      goals,
+      effectivePlanningEvents,
+      effectivePlanningGoals,
       dailyIncome,
       currentItemLevels,
       notificationLanguage,
@@ -984,7 +1050,7 @@ export default function Home() {
               simulation: builderSimulation,
               resources: effectivePlanningResources,
               inventory,
-              events,
+              events: effectivePlanningEvents,
               profile,
             }}
             language={language}
@@ -1091,13 +1157,29 @@ export default function Home() {
             onGoalPercentChange={setGoalPercent}
             onDailyIncomeChange={setDailyIncome}
             onStrategyWeightsChange={setStrategyWeights}
-            scenarios={planningScenarios}
-            isScenarioBusy={isScenarioBusy}
-            onLoadScenario={loadPlanningScenario}
-            onSaveScenario={saveCurrentScenario}
-            onDeleteScenario={removeScenario}
           />
         </CollapsibleSection>
+
+        {scenarioContext ? (
+          <CollapsibleSection
+            title={en ? "What-if scenarios" : "Was-wäre-wenn-Szenarien"}
+            defaultOpen={isHardcoreProfile}
+          >
+            <WhatIfScenarioLab
+              key={selectedAccount?.id || "no-account"}
+              context={scenarioContext}
+              scenarios={planningScenarios}
+              horizonDays={horizonDays}
+              goalPercent={goalPercent}
+              strategyWeights={strategyWeights}
+              language={language}
+              isBusy={isScenarioBusy}
+              onSave={saveWhatIfScenario}
+              onApply={(scenario, replaceLocked) => void applyWhatIfScenario(scenario, replaceLocked)}
+              onDelete={removeScenario}
+            />
+          </CollapsibleSection>
+        ) : null}
 
         <CollapsibleSection
           title={en ? "Planner Intelligence" : "Planner Intelligence"}
@@ -1281,8 +1363,8 @@ export default function Home() {
               onOptimizeQueue={optimizeGoalQueue}
               isSaving={isSavingQueueItem}
               accountId={selectedAccount.id}
-              builderCount={selectedAccount.builderCount}
-              goals={goals}
+              builderCount={effectiveBuilderCount}
+              goals={effectivePlanningGoals}
               currentLevels={currentItemLevels}
               onSaveGoal={addGoal}
               onDeleteGoal={removeGoal}
@@ -1324,8 +1406,8 @@ export default function Home() {
               storageCapacities,
               dailyIncome,
               queue: queueItems,
-              goals,
-              events,
+              goals: effectivePlanningGoals,
+              events: effectivePlanningEvents,
               magicItems: inventory,
               planningProfile: profile,
               planningScenarios,

@@ -11,8 +11,6 @@ import type {
   ResourceSnapshot,
   UpgradeRecommendation,
 } from "@/features/planner/planner.types";
-import { PlanningScenarioManager } from "@/components/planning/PlanningScenarioManager";
-import type { PlanningScenario } from "@/types/planningScenario";
 
 type Props = {
   language?: "de" | "en";
@@ -36,11 +34,6 @@ type Props = {
   onGoalPercentChange: (value: number) => void;
   onDailyIncomeChange: (value: ResourceSnapshot) => void;
   onStrategyWeightsChange: (value: StrategyWeights) => void;
-  scenarios: PlanningScenario[];
-  isScenarioBusy: boolean;
-  onLoadScenario: (scenario: PlanningScenario) => void;
-  onSaveScenario: (name: string, id?: string) => void;
-  onDeleteScenario: (id: string) => void;
 };
 
 export function PlanningControlCenter(props: Props) {
@@ -122,18 +115,6 @@ export function PlanningControlCenter(props: Props) {
 
   return (
     <div id="planning-control-center" className="contents">
-      <PlanningScenarioManager
-        key={
-          props.scenarios.find((scenario) => scenario.isActive)?.id ||
-          "no-active-scenario"
-        }
-        language={props.language}
-        scenarios={props.scenarios}
-        isBusy={props.isScenarioBusy}
-        onLoad={props.onLoadScenario}
-        onSave={props.onSaveScenario}
-        onDelete={props.onDeleteScenario}
-      />
       <section className="grid gap-5 lg:grid-cols-2">
         <div className="rounded-3xl border border-white/10 bg-slate-900 p-6">
           <h2 className="text-xl font-bold">

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
-  activatePlanningScenario,
+  applyPlanningScenario,
   deletePlanningScenario,
   getPlanningScenarios,
   savePlanningScenario,
@@ -81,19 +81,21 @@ export function usePlanningScenarios(
     [onError, refresh],
   );
 
-  const activate = useCallback(
-    async (id: string) => {
-      if (!accountId) return;
+  const apply = useCallback(
+    async (id: string, replaceLocked: boolean) => {
+      if (!accountId) return null;
       setIsBusy(true);
       try {
-        await activatePlanningScenario(accountId, id);
+        const inserted = await applyPlanningScenario(id, replaceLocked);
         await refresh();
+        return inserted;
       } catch (error) {
         onError(
           error instanceof Error
             ? error.message
-            : "Szenario konnte nicht aktiviert werden.",
+            : "Szenario konnte nicht als aktiver Plan übernommen werden.",
         );
+        return null;
       } finally {
         setIsBusy(false);
       }
@@ -120,5 +122,5 @@ export function usePlanningScenarios(
     [onError, refresh],
   );
 
-  return { scenarios, isBusy, save, activate, remove };
+  return { scenarios, isBusy, save, apply, remove, refresh };
 }
