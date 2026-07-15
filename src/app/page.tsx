@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccountForm } from "@/components/accounts/AccountForm";
 import { AuthPanel } from "@/components/auth/AuthPanel";
 import { PersonalAssistant } from "@/components/assistant/PersonalAssistant";
@@ -27,6 +27,7 @@ import { PlatformInstallCard } from "@/components/platform/PlatformInstallCard";
 import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
 import { PlannerInsights } from "@/components/planning/PlannerInsights";
 import { WhatIfScenarioLab } from "@/components/planning/WhatIfScenarioLab";
+import { ProgressHistoryDashboard } from "@/components/history/ProgressHistoryDashboard";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
@@ -74,6 +75,7 @@ import { useScreenshotProgress } from "@/hooks/useScreenshotProgress";
 import { useDecisionPreferences } from "@/hooks/useDecisionPreferences";
 import { useAccountHealthHistory } from "@/hooks/useAccountHealthHistory";
 import { usePlannerInsights } from "@/hooks/usePlannerInsights";
+import { useProgressHistory } from "@/hooks/useProgressHistory";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type {
   PlannerItem,
@@ -88,6 +90,7 @@ import type { BuilderSimulationResult } from "@/features/builder-simulation/buil
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
 import type { HealthEntity } from "@/features/account-health/account-health.types";
 import type { PlannerInsight } from "@/features/planner-intelligence/planner-intelligence.types";
+import type { ProgressSnapshotSource } from "@/features/progress-history/progress-history.types";
 import type { PlanningScenario, ScenarioDraft } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
@@ -170,6 +173,16 @@ export default function Home() {
     spell: 50,
     siege_machine: 50,
   });
+  const [pendingProgressSnapshotSource, setPendingProgressSnapshotSource] = useState<ProgressSnapshotSource | null>(null);
+  const observedCompletedGoals = useRef<{ accountId?: string; ids: Set<string> }>({ ids: new Set() });
+  useEffect(() => {
+    const pending = window.sessionStorage.getItem("clash-tool:pending-progress-snapshot");
+    if (pending === "api_sync") {
+      window.sessionStorage.removeItem("clash-tool:pending-progress-snapshot");
+      const timeout = window.setTimeout(() => setPendingProgressSnapshotSource("api_sync"), 0);
+      return () => window.clearTimeout(timeout);
+    }
+  }, []);
   const clearError = useCallback(() => setErrorMessage(null), []);
   const handleError = useCallback((message: string) => {
     setErrorMessage(message);
@@ -841,6 +854,67 @@ export default function Home() {
     accountHealth,
     handleError,
   );
+  const progressSnapshotInput = useMemo(() => {
+    if (!selectedAccount || !plannerResult) return null;
+    const completed = queueItems.filter((item) => item.status === "completed");
+    const withForecast = completed.filter((item) => item.plannedFinishAt);
+    const builderSlots = screenshotUpgradeSlots.filter((slot) => slot.slotType === "builder");
+    const laboratorySlot = screenshotUpgradeSlots.find((slot) => slot.slotType === "laboratory");
+    const laboratoryProgress = Math.round((troopProgress + spellProgress + siegeMachineProgress) / 3 * 10) / 10;
+    return {
+      sourceReference: null,
+      overallProgress: plannerResult.summary.progressPercent,
+      categoryProgress: { buildings: progress, heroes: heroProgress, troops: troopProgress, spells: spellProgress, siegeMachines: siegeMachineProgress, laboratory: laboratoryProgress },
+      healthScore: accountHealth?.score ?? null,
+      townHallLevel: selectedAccount.townHallLevel,
+      heroLevels,
+      laboratoryProgress,
+      wallLevels: screenshotWallLevels.map((wall) => ({ level: wall.level, count: wall.count })),
+      builderUtilization: builderSlots.length ? Math.round(builderSlots.filter((slot) => !slot.isAvailable).length / builderSlots.length * 1000) / 10 : plannerResult.summary.builderUsagePercent,
+      laboratoryUtilization: laboratorySlot ? (laboratorySlot.isAvailable ? 0 : 100) : null,
+      remainingUpgradeHours: plannerResult.summary.remainingBuildTimeHours,
+      remainingCosts: { gold: plannerResult.summary.remainingGoldCost, elixir: plannerResult.summary.remainingElixirCost, darkElixir: plannerResult.summary.remainingDarkElixirCost },
+      goals: effectivePlanningGoals.map((goal) => ({ id: goal.id, name: goal.name, currentLevel: goal.currentLevel, targetLevel: goal.targetLevel, status: goal.status })),
+      strategy: planningStrategy,
+      queueLength: queueItems.filter((item) => item.status === "planned" || item.status === "active").length,
+      completedUpgradeCount: completed.length,
+      completedLevelCount: completed.reduce((sum, item) => sum + Math.max(0, item.toLevel - item.fromLevel), 0),
+      completedUpgradeHours: completed.reduce((sum, item) => sum + item.durationHours, 0),
+      spentResources: { gold: completed.reduce((sum, item) => sum + item.goldCost, 0), elixir: completed.reduce((sum, item) => sum + item.elixirCost, 0), darkElixir: completed.reduce((sum, item) => sum + item.darkElixirCost, 0) },
+      eventSavedHours: 0,
+      eventSavedResources: { gold: 0, elixir: 0, darkElixir: 0 },
+      magicItemSavedHours: 0,
+      magicItemSavedResources: { gold: 0, elixir: 0, darkElixir: 0 },
+      onTimeCompletionCount: withForecast.filter((item) => new Date(item.updatedAt) <= new Date(item.plannedFinishAt as string)).length,
+      forecastedCompletionCount: withForecast.length,
+      forecastAbsoluteErrorHours: withForecast.reduce((sum, item) => sum + Math.abs(new Date(item.updatedAt).getTime() - new Date(item.plannedFinishAt as string).getTime()) / 3_600_000, 0),
+      forecastProgressPercent: progressForecast.projectedProgressPercent,
+    };
+  }, [accountHealth?.score, effectivePlanningGoals, heroLevels, heroProgress, plannerResult, planningStrategy, progress, progressForecast.projectedProgressPercent, queueItems, screenshotUpgradeSlots, screenshotWallLevels, selectedAccount, siegeMachineProgress, spellProgress, troopProgress]);
+  const {
+    snapshots: progressHistorySnapshots,
+    isSaving: isSavingProgressHistory,
+    capture: captureProgressSnapshot,
+  } = useProgressHistory(selectedAccount?.id, progressSnapshotInput, handleError);
+  useEffect(() => {
+    if (!pendingProgressSnapshotSource || !progressSnapshotInput) return;
+    const timeout = window.setTimeout(() => {
+      void captureProgressSnapshot(pendingProgressSnapshotSource);
+      setPendingProgressSnapshotSource(null);
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [captureProgressSnapshot, pendingProgressSnapshotSource, progressSnapshotInput]);
+  useEffect(() => {
+    const accountId = selectedAccount?.id;
+    const completedIds = new Set(goals.filter((goal) => goal.status === "completed").map((goal) => goal.id));
+    if (observedCompletedGoals.current.accountId !== accountId) {
+      observedCompletedGoals.current = { accountId, ids: completedIds };
+      return;
+    }
+    const newlyCompleted = [...completedIds].filter((id) => !observedCompletedGoals.current.ids.has(id));
+    observedCompletedGoals.current.ids = completedIds;
+    newlyCompleted.forEach((id) => void captureProgressSnapshot("goal_completed", id));
+  }, [captureProgressSnapshot, goals, selectedAccount?.id]);
   const scenarioContext = useMemo<ScenarioEvaluationContext | null>(() => {
     if (!selectedAccount || !plannerResult) return null;
     return {
@@ -1112,11 +1186,15 @@ export default function Home() {
             }
             onUpgradeSlotsImported={refreshScreenshotProgress}
             upgradeSlots={screenshotUpgradeSlots}
-            onProgressImported={refreshAccountBuildings}
+            onProgressImported={async () => {
+              await Promise.all([refreshAccountBuildings(), refreshScreenshotProgress()]);
+              setPendingProgressSnapshotSource("screenshot_import");
+            }}
             wallLevels={screenshotWallLevels}
             onWallLevelsImported={refreshScreenshotProgress}
             onProfileImported={async (detected) => {
               if (!selectedAccount) return;
+              const townHallChanged = Boolean(detected.townHallLevel && detected.townHallLevel !== selectedAccount.townHallLevel);
               await applyPlayerImport(selectedAccount, {
                 playerName: detected.playerName?.trim() || selectedAccount.name,
                 playerTag: detected.playerTag || undefined,
@@ -1127,6 +1205,7 @@ export default function Home() {
                 changes: [],
               });
               await refreshAccounts();
+              if (townHallChanged) setPendingProgressSnapshotSource("town_hall_change");
             }}
           />
         </CollapsibleSection>
@@ -1282,6 +1361,20 @@ export default function Home() {
           />
         </CollapsibleSection>
 
+        {selectedAccount ? (
+          <CollapsibleSection
+            title={en ? "History & performance" : "Historie & Leistungsanalyse"}
+            defaultOpen={isHardcoreProfile}
+          >
+            <ProgressHistoryDashboard
+              snapshots={progressHistorySnapshots}
+              language={language}
+              isSaving={isSavingProgressHistory}
+              onCapture={() => void captureProgressSnapshot("manual_refresh")}
+            />
+          </CollapsibleSection>
+        ) : null}
+
         <CollapsibleSection
           title={en ? "Strategy comparison" : "Strategievergleich"}
           defaultOpen={isHardcoreProfile}
@@ -1411,6 +1504,7 @@ export default function Home() {
               magicItems: inventory,
               planningProfile: profile,
               planningScenarios,
+              progressHistory: progressHistorySnapshots,
               clans: clanDashboard.clans,
               selectedClanMembers: clanDashboard.members,
               clanGoals: clanDashboard.goals,
