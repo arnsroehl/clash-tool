@@ -5,6 +5,8 @@ import type { MagicInventoryItem, PlanningEvent } from "@/types/magicItems";
 import type { PlanningGoal } from "@/types/planningProfile";
 import type { UpgradeQueueItem } from "@/types/upgradeQueue";
 
+export const PLANNER_INTELLIGENCE_RULESET_VERSION = "planner-intelligence-v1.0.0" as const;
+
 export type InsightCategory =
   | "builder_idle"
   | "resource_shortfall"
@@ -35,6 +37,7 @@ export type InsightAction = {
 };
 
 export type PlannerInsight = {
+  rulesetVersion?: typeof PLANNER_INTELLIGENCE_RULESET_VERSION;
   key: string;
   reasonCode: InsightReasonCode;
   category: InsightCategory;

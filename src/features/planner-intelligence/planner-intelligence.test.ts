@@ -100,6 +100,7 @@ describe("Planner Intelligence", () => {
     assert.equal(idle?.severity, "critical");
     assert.equal(idle?.action?.type, "add_to_queue");
     assert.ok(idle?.solutionDe);
+    assert.equal(idle?.rulesetVersion, "planner-intelligence-v1.0.0");
   });
 
   it("berechnet Ressourcenengpass und Queue-Konflikt aus simulierten Starts", () => {

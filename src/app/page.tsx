@@ -30,6 +30,7 @@ import { WhatIfScenarioLab } from "@/components/planning/WhatIfScenarioLab";
 import { ProgressHistoryDashboard } from "@/components/history/ProgressHistoryDashboard";
 import { AccountTimeline } from "@/components/timeline/AccountTimeline";
 import { TownHallDecisionCard } from "@/components/town-hall/TownHallDecisionCard";
+import { DeepAccountAnalysis } from "@/components/account-analysis/DeepAccountAnalysis";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
@@ -45,6 +46,8 @@ import {
   type ScenarioEvaluationContext,
 } from "@/features/planning-scenarios/planning-scenario.engine";
 import { buildTimeline } from "@/features/timeline/timeline.engine";
+import { analyzeTownHallDecision } from "@/features/town-hall-decision/town-hall-decision.engine";
+import { analyzeAccountStructure } from "@/features/account-analysis/account-analysis.engine";
 import { planUpgrades } from "@/features/planner/planner.service";
 import {
   buildingInstanceId,
@@ -97,6 +100,7 @@ import type { PlannerInsight } from "@/features/planner-intelligence/planner-int
 import type { ProgressSnapshotSource } from "@/features/progress-history/progress-history.types";
 import type { TimelineEvent } from "@/features/timeline/timeline.types";
 import type { TownHallEntity, TownHallVariant } from "@/features/town-hall-decision/town-hall-decision.types";
+import type { AccountAnalysisAction } from "@/features/account-analysis/account-analysis.types";
 import type { PlanningScenario, ScenarioDraft } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
@@ -990,6 +994,27 @@ export default function Home() {
     });
   }, [plannerInput]);
   const townHallDecisionInput = useMemo(() => scenarioContext ? ({ context: scenarioContext, strategy: planningStrategy, health: accountHealth, entities: townHallEntities }) : null, [accountHealth, planningStrategy, scenarioContext, townHallEntities]);
+  const deepAccountAnalysis = useMemo(() => {
+    if (!townHallDecisionInput || !accountHealth) return null;
+    const scheduledAt = new Date(new Date(simulationStartsAt).getTime() + 14 * 86_400_000).toISOString();
+    return analyzeAccountStructure({
+      health: accountHealth,
+      townHall: analyzeTownHallDecision({ ...townHallDecisionInput, scheduledAt }).decision,
+      recommendations: upgradeRecommendations,
+      insights: plannerInsights.visibleInsights,
+      strategy: planningStrategy,
+    });
+  }, [accountHealth, plannerInsights.visibleInsights, planningStrategy, simulationStartsAt, townHallDecisionInput, upgradeRecommendations]);
+  const applyAccountAnalysisAction = useCallback((action: AccountAnalysisAction) => {
+    const recommendation = action.itemKey ? upgradeRecommendations.find((item) => `${item.itemType}:${item.itemId}` === action.itemKey) : undefined;
+    if (action.type === "add_queue" && recommendation) { void addRecommendationToQueue(recommendation); return; }
+    if (action.type === "create_goal" && recommendation && selectedAccount) {
+      void addGoal({ accountId: selectedAccount.id, itemType: recommendation.itemType, itemId: recommendation.itemId, name: recommendation.name, currentLevel: recommendation.currentLevel, targetLevel: recommendation.nextLevel, targetDate: null, estimatedHours: recommendation.nextLevelTime.hours });
+      return;
+    }
+    if (action.type === "set_strategy" && action.strategy) { setPlanningStrategy(action.strategy); document.getElementById("planning-control-center")?.scrollIntoView({ behavior: "smooth" }); return; }
+    document.getElementById(action.type === "open_magic" ? "magic-items-and-events" : "planning-control-center")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [addGoal, addRecommendationToQueue, selectedAccount, upgradeRecommendations]);
   const createTownHallScenario = useCallback((variant: TownHallVariant, scheduledAt: string | null) => {
     if (!scenarioContext) return;
     const draft = createScenarioDraft(scenarioContext, { horizonDays: 365, goalPercent, strategyWeights });
@@ -1306,6 +1331,12 @@ export default function Home() {
             onStrategyWeightsChange={setStrategyWeights}
           />
         </CollapsibleSection>
+
+        {deepAccountAnalysis ? (
+          <CollapsibleSection title={en ? "Deep account analysis" : "Tiefgehende Accountanalyse"} defaultOpen={!isCasualProfile}>
+            <DeepAccountAnalysis analysis={deepAccountAnalysis} language={language} onApply={applyAccountAnalysisAction} />
+          </CollapsibleSection>
+        ) : null}
 
         {townHallDecisionInput ? (
           <CollapsibleSection title={en ? "Town Hall decision" : "Rathaus-Entscheidung"} defaultOpen={isHardcoreProfile}>

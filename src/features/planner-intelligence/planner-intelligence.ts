@@ -1,4 +1,5 @@
 import { estimateGoalRemainingHours } from "@/features/goal-planning/goal-estimation";
+import { PLANNER_INTELLIGENCE_RULESET_VERSION } from "@/features/planner-intelligence/planner-intelligence.types";
 import type {
   InsightCategory,
   InsightSeverity,
@@ -381,5 +382,7 @@ export function createPlannerInsights(input: PlannerIntelligenceInput): PlannerI
     ...goalRiskInsights(input, now),
     ...eventInsights(input, now),
   ];
-  return deduplicate(insights).filter((insight) => new Date(insight.expiresAt).getTime() > now.getTime());
+  return deduplicate(insights)
+    .filter((insight) => new Date(insight.expiresAt).getTime() > now.getTime())
+    .map((insight) => ({ ...insight, rulesetVersion: PLANNER_INTELLIGENCE_RULESET_VERSION }));
 }
