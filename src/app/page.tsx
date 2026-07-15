@@ -29,6 +29,7 @@ import { PlannerInsights } from "@/components/planning/PlannerInsights";
 import { WhatIfScenarioLab } from "@/components/planning/WhatIfScenarioLab";
 import { ProgressHistoryDashboard } from "@/components/history/ProgressHistoryDashboard";
 import { AccountTimeline } from "@/components/timeline/AccountTimeline";
+import { TownHallDecisionCard } from "@/components/town-hall/TownHallDecisionCard";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
@@ -95,6 +96,7 @@ import type { HealthEntity } from "@/features/account-health/account-health.type
 import type { PlannerInsight } from "@/features/planner-intelligence/planner-intelligence.types";
 import type { ProgressSnapshotSource } from "@/features/progress-history/progress-history.types";
 import type { TimelineEvent } from "@/features/timeline/timeline.types";
+import type { TownHallEntity, TownHallVariant } from "@/features/town-hall-decision/town-hall-decision.types";
 import type { PlanningScenario, ScenarioDraft } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
@@ -972,6 +974,33 @@ export default function Home() {
     applyScenarioControls(scenario);
     await refreshQueue();
   }, [applyScenario, applyScenarioControls, refreshQueue]);
+  const townHallEntities = useMemo<TownHallEntity[]>(() => {
+    if (!plannerInput?.items) return [];
+    return plannerInput.items.map((item) => {
+      const currentLevel = plannerInput.itemLevels?.[item.id] || 0;
+      return {
+        id: item.id,
+        name: item.name,
+        type: item.type,
+        category: item.category,
+        currentLevel,
+        maxLevel: item.maxLevel,
+        remainingHours: (plannerInput.upgradeLevels || []).filter((level) => level.itemId === item.id && level.level > currentLevel && level.level <= item.maxLevel).reduce((sum, level) => sum + level.time.hours, 0),
+      };
+    });
+  }, [plannerInput]);
+  const townHallDecisionInput = useMemo(() => scenarioContext ? ({ context: scenarioContext, strategy: planningStrategy, health: accountHealth, entities: townHallEntities }) : null, [accountHealth, planningStrategy, scenarioContext, townHallEntities]);
+  const createTownHallScenario = useCallback((variant: TownHallVariant, scheduledAt: string | null) => {
+    if (!scenarioContext) return;
+    const draft = createScenarioDraft(scenarioContext, { horizonDays: 365, goalPercent, strategyWeights });
+    draft.name = variant.nameDe;
+    draft.description = `Rathausvergleich · ${variant.id} · ${new Date().toLocaleDateString("de-DE")}`;
+    draft.assumptions.townHallMode = variant.id === "max_current" ? "unchanged" : variant.id === "upgrade_now" ? "immediate" : "scheduled";
+    draft.assumptions.townHallTargetLevel = Math.min(18, scenarioContext.townHallLevel + 1);
+    draft.assumptions.townHallUpgradeAt = scheduledAt;
+    void saveScenario(buildPlanningScenarioInput(draft, scenarioContext, false));
+    document.getElementById("what-if-scenarios")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [goalPercent, saveScenario, scenarioContext, strategyWeights]);
   const clanDashboard = useClanDashboard(user?.id, handleError);
   const selectedClanForProgress = clanDashboard.selectedClan;
   const syncOwnClanProgress = clanDashboard.syncOwnProgress;
@@ -1277,6 +1306,12 @@ export default function Home() {
             onStrategyWeightsChange={setStrategyWeights}
           />
         </CollapsibleSection>
+
+        {townHallDecisionInput ? (
+          <CollapsibleSection title={en ? "Town Hall decision" : "Rathaus-Entscheidung"} defaultOpen={isHardcoreProfile}>
+            <TownHallDecisionCard input={townHallDecisionInput} language={language} onCreateScenario={createTownHallScenario} />
+          </CollapsibleSection>
+        ) : null}
 
         {scenarioContext ? (
           <CollapsibleSection
