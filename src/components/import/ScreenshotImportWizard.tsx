@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  calculateScreenshotEntityCoverage,
   classifyScreenshotText,
   compareUpgradeSlotState,
   assessScreenshotContentQuality,
@@ -243,6 +244,7 @@ export function ScreenshotImportWizard({
   const [restoredChanges, setRestoredChanges] = useState<ScreenshotProposedChange[]>([]);
   const [screenshots, setScreenshots] = useState<ProcessedScreenshot[]>([]);
   const [restoredScreenTypes, setRestoredScreenTypes] = useState<ScreenshotScreenType[]>([]);
+  const [restoredCoveredEntityIds, setRestoredCoveredEntityIds] = useState<string[]>([]);
   const [detections, setDetections] = useState<ScreenshotDetection[]>([]);
   const [wallDistributions, setWallDistributions] = useState<WallLevelDistribution[]>([]);
   const [upgradeSlots, setUpgradeSlots] = useState<UpgradeSlotDetection[]>([]);
@@ -402,13 +404,12 @@ export function ScreenshotImportWizard({
     const expected = importType === "buildings"
       ? filterBuildingImportEntities(entities, buildingSection)
       : entities.filter((entity) => (typesByImport[importType] || []).includes(entity.type));
-    const detected = new Set(detections.map((detection) => detection.id));
-    return {
-      expected: expected.length,
-      detected: expected.filter((entity) => detected.has(entity.id)).length,
-      missing: expected.filter((entity) => !detected.has(entity.id)),
-    };
-  }, [buildingSection, detections, entities, importType]);
+    return calculateScreenshotEntityCoverage(expected, [
+      ...detections.map((detection) => detection.id),
+      ...changes.map((change) => change.entityId),
+      ...restoredCoveredEntityIds,
+    ]);
+  }, [buildingSection, changes, detections, entities, importType, restoredCoveredEntityIds]);
   const fullImportCoverage = useMemo(() => {
     const recognized = new Set([
       ...restoredScreenTypes,
@@ -451,8 +452,8 @@ export function ScreenshotImportWizard({
   const hasUnclassifiedFullScreenshots = importType === "full" && screenshots.some(
     (screenshot) => Boolean(screenshot.manualSelection),
   );
-  const hasIncompleteFullImport = importType === "full" && fullImportCoverage.some(
-    (item) => !item.complete,
+  const hasIncompleteFullImport = importType === "full" && (
+    fullImportCoverage.some((item) => !item.complete) || !coverage.complete
   );
   const selectedType = IMPORT_TYPES.find((item) => item.id === importType) || IMPORT_TYPES[0];
   const selectedTypeEnabled = isScreenshotImportTypeEnabled(importType);
@@ -471,6 +472,7 @@ export function ScreenshotImportWizard({
       });
       setSession(created);
       setRestoredScreenTypes([]);
+      setRestoredCoveredEntityIds([]);
       if (importType === "walls" && existingWallLevels.length) {
         setWallDistributions(existingWallLevels.map((wall) => ({
           id: `wall:${wall.level}`,
@@ -511,9 +513,11 @@ export function ScreenshotImportWizard({
     const namedChanges = resumeCandidate.changes.map((change) => ({
       ...change,
       name: entities.find((entity) => entity.id === change.entityId)?.name || change.name,
+      category: entities.find((entity) => entity.id === change.entityId)?.category,
     }));
     setSession(resumeCandidate.session);
     setRestoredScreenTypes(resumeCandidate.screenTypes);
+    setRestoredCoveredEntityIds(resumeCandidate.coveredEntityIds);
     setImportType(resumeCandidate.session.selectedImportType);
     setRetainOriginals(resumeCandidate.session.retainOriginals);
     setRestoredChanges(namedChanges);
@@ -1288,6 +1292,7 @@ export function ScreenshotImportWizard({
     setSession(null);
     setScreenshots([]);
     setRestoredScreenTypes([]);
+    setRestoredCoveredEntityIds([]);
     setDetections([]);
     setWallDistributions([]);
     setUpgradeSlots([]);
@@ -1804,7 +1809,13 @@ export function ScreenshotImportWizard({
               {coverage.missing.length ? (
                 <span className="mt-1 block text-xs opacity-80">
                   {en ? "Not yet visible" : "Noch nicht sichtbar"}: {coverage.missing.slice(0, 8).map((entity) => entity.name).join(", ")}
-                  {coverage.missing.length > 8 ? ` +${coverage.missing.length - 8}` : ""}. {en ? "Add another screenshot if these entries should be included." : "Füge einen weiteren Screenshot hinzu, wenn diese Einträge enthalten sein sollen."}
+                  {coverage.missing.length > 8 ? ` +${coverage.missing.length - 8}` : ""}. {importType === "full"
+                    ? en
+                      ? "Add the missing screenshots or save for later; a complete-account import cannot be confirmed without them."
+                      : "Füge die fehlenden Screenshots hinzu oder speichere für später; ein Vollimport kann ohne sie nicht bestätigt werden."
+                    : en
+                      ? "Add another screenshot if these entries should be included."
+                      : "Füge einen weiteren Screenshot hinzu, wenn diese Einträge enthalten sein sollen."}
                 </span>
               ) : null}
             </div>
@@ -2319,7 +2330,12 @@ function ChangeReviewCard({
           <input type="checkbox" checked={checked} onChange={(event) => onChecked(event.target.checked)} className="mt-1" />
           <span>
             <b className="block">{change.name}</b>
-            <span className="text-sm text-slate-300">{change.previousLevel} → {correctedLevel ?? change.proposedLevel ?? "?"}</span>
+            {change.category ? <span className="block text-xs text-slate-500">{change.category}</span> : null}
+            <span className="text-sm text-slate-300">
+              {change.previousLevel} → {change.unlockStatus === "locked" && (correctedLevel ?? change.proposedLevel) === 0
+                ? (en ? "locked / not built" : "gesperrt / nicht gebaut")
+                : correctedLevel ?? change.proposedLevel ?? "?"}
+            </span>
           </span>
         </label>
         <span className={`rounded-full px-2 py-1 text-xs font-bold ${requiresManual ? "bg-rose-400/15 text-rose-200" : "bg-emerald-400/15 text-emerald-200"}`}>

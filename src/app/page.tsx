@@ -203,6 +203,7 @@ export default function Home() {
         id: entity.id,
         name: entity.name,
         aliases: [...entity.aliases, entity.sourceId],
+        category: entity.category,
         currentLevel: screenshotEntityLevels[entity.id] || 0,
         maxLevel: entity.maxLevel,
         maxLevelForTownHall: entity.maxLevel,

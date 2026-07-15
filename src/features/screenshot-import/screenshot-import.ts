@@ -20,6 +20,27 @@ export type ScreenshotEntity = {
   type: ScreenshotEntityType;
 };
 
+export type ScreenshotEntityCoverage = {
+  expected: number;
+  detected: number;
+  missing: ScreenshotEntity[];
+  complete: boolean;
+};
+
+export function calculateScreenshotEntityCoverage(
+  expectedEntities: ScreenshotEntity[],
+  detectedEntityIds: Iterable<string>,
+): ScreenshotEntityCoverage {
+  const detected = new Set(detectedEntityIds);
+  const missing = expectedEntities.filter((entity) => !detected.has(entity.id));
+  return {
+    expected: expectedEntities.length,
+    detected: expectedEntities.length - missing.length,
+    missing,
+    complete: expectedEntities.length === 0 || missing.length === 0,
+  };
+}
+
 export type BuildingImportSection =
   | "all"
   | "core"
@@ -148,6 +169,7 @@ export type ScreenshotDetection = ScreenshotEntity & {
   confidenceBand: ConfidenceBand;
   alternatives: Array<{ entityId: string; name: string; confidence: number }>;
   validationMessages: string[];
+  unlockStatus: "locked" | "unlocked" | "unknown";
 };
 
 export type ScreenshotChangeType =
@@ -172,6 +194,8 @@ export type ScreenshotProposedChange = {
   sourceDetectionIds: string[];
   reasons: string[];
   alternatives: ScreenshotDetection["alternatives"];
+  category?: string;
+  unlockStatus: ScreenshotDetection["unlockStatus"];
 };
 
 export type ScreenshotReviewSummary = {
@@ -1149,20 +1173,23 @@ export function parseScreenshotDetections(params: {
       ? textMatch.candidates
       : visualCandidates.map((entity) => ({ entity, matchedName: visualMatch?.sourceId }));
     if (!best) return;
-    if (
-      /(?:gesperrt|locked|noch\s+nicht\s+freigeschaltet|not\s+unlocked|requires?|ben[oö]tigt)\b/i.test(
+    const isLocked =
+      /(?:gesperrt|locked|noch\s+nicht\s+freigeschaltet|not\s+unlocked|not\s+built|nicht\s+gebaut|unbuilt)\b/i.test(
         line,
-      )
-    )
-      return;
+      ) || /(?:requires?|ben[oö]tigt)\s+(?:pet\s*house|haustierhaus|rathaus|town\s*hall|labor(?:atory)?|schmied|blacksmith)\b/i.test(line);
     const entity = best.entity;
     const maxLevel = entity.maxLevelForTownHall ?? entity.maxLevel;
-    const directLevel = extractLevel(line, maxLevel);
-    const adjacentLevel = directLevel === null ? findAdjacentLevel(lines, lineIndex, maxLevel) : null;
-    const detectedLevel = directLevel?.level ?? adjacentLevel?.level ?? null;
+    const directLevel = isLocked ? null : extractLevel(line, maxLevel);
+    const adjacentLevel = isLocked || directLevel !== null
+      ? null
+      : findAdjacentLevel(lines, lineIndex, maxLevel);
+    const detectedLevel = isLocked ? 0 : directLevel?.level ?? adjacentLevel?.level ?? null;
     const validationMessages: string[] = [];
     let validationConfidence = 1;
-    if (directLevel?.normalizedOcr || adjacentLevel?.normalizedOcr) {
+    if (isLocked) {
+      validationMessages.push("Das Objekt wurde ausdrücklich als gesperrt oder noch nicht gebaut erkannt.");
+      validationConfidence = 0.9;
+    } else if (directLevel?.normalizedOcr || adjacentLevel?.normalizedOcr) {
       validationMessages.push("Typische OCR-Ziffernfehler im Level wurden normalisiert.");
       validationConfidence = 0.78;
     }
@@ -1258,6 +1285,7 @@ export function parseScreenshotDetections(params: {
         confidence: clamp(objectConfidence - (index + 1) * 0.12),
       })),
       validationMessages,
+      unlockStatus: isLocked ? "locked" : detectedLevel === null ? "unknown" : "unlocked",
     });
   });
 
@@ -1339,6 +1367,8 @@ export function mergeScreenshotDetections(
       sourceDetectionIds: group.map((item) => item.detectionId),
       reasons,
       alternatives: best.alternatives,
+      category: best.category,
+      unlockStatus: best.unlockStatus,
     };
   });
 }

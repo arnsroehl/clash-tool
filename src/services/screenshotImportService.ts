@@ -68,6 +68,7 @@ export type ResumableScreenshotImport = {
   magicItems: ScreenshotMagicItemDetection[];
   profile: ScreenshotProfileDetection | null;
   screenTypes: ScreenshotScreenType[];
+  coveredEntityIds: string[];
 };
 
 export type ScreenshotImportHistoryEntry = {
@@ -198,8 +199,7 @@ export async function fetchLatestOpenScreenshotImport(
       client
         .from("screenshot_import_changes")
         .select("entity_type, entity_id, change_type, previous_value, proposed_value, user_corrected_value, confidence, status, reasons")
-        .eq("import_session_id", row.id)
-        .in("status", ["pending", "later"]),
+        .eq("import_session_id", row.id),
       client
         .from("screenshot_import_files")
         .select("id, storage_path, original_filename, original_mime_type, original_size_bytes, normalized_size_bytes, device_platform, processing_status, screen_type, detected_language, language_confidence")
@@ -210,7 +210,9 @@ export async function fetchLatestOpenScreenshotImport(
     ]);
   if (changeError || fileError || jobError)
     throw new Error((changeError || fileError || jobError)?.message);
-  const changes = (changeRows || []).map((change) => {
+  const changes = (changeRows || []).filter((change) =>
+    ["pending", "later"].includes(String(change.status)),
+  ).map((change) => {
     const confidence = Number(change.confidence || 0);
     const previous = (change.previous_value || {}) as { level?: number };
     const proposed = (change.proposed_value || {}) as { level?: number | null };
@@ -235,6 +237,9 @@ export async function fetchLatestOpenScreenshotImport(
       sourceDetectionIds: [],
       reasons: Array.isArray(change.reasons) ? change.reasons.map(String) : [],
       alternatives: [],
+      unlockStatus: (corrected.level ?? proposed.level) === 0
+        ? "locked" as const
+        : "unlocked" as const,
     };
   });
   const wallMap = new Map<number, WallLevelDistribution>();
@@ -311,6 +316,9 @@ export async function fetchLatestOpenScreenshotImport(
       (fileRows || [])
         .map((file) => String(file.screen_type) as ScreenshotScreenType)
         .filter((type) => type !== "unknown"),
+    )],
+    coveredEntityIds: [...new Set(
+      (changeRows || []).map((change) => String(change.entity_id)),
     )],
   };
 }
@@ -689,6 +697,8 @@ export async function persistScreenshotReview(params: {
           alternatives: detection.alternatives,
           messages: detection.validationMessages,
           local_detection_id: detection.detectionId,
+          unlock_status: detection.unlockStatus,
+          category: detection.category,
         },
       })),
     );

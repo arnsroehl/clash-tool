@@ -6,6 +6,7 @@ import {
   detectScreenshotLanguage,
   classifyScreenshotText,
   canStartScreenshotAnalysis,
+  calculateScreenshotEntityCoverage,
   calculateScreenshotQualityMetrics,
   compareUpgradeSlotState,
   mergeScreenshotDetections,
@@ -771,7 +772,7 @@ test("recognizes multi-line hero and pet upgrades from their selected views", ()
   assert.equal(petSlots[0].remainingSeconds, 93_600);
 });
 
-test("does not treat a facility requirement on a locked pet as its level", () => {
+test("records locked pets and unbuilt buildings as level zero without using facility levels", () => {
   const detections = parseScreenshotDetections({
     text: "Angry Jelly locked – requires Pet House level 10",
     entities: [{
@@ -784,7 +785,37 @@ test("does not treat a facility requirement on a locked pet as its level", () =>
     }],
     screenType: "pets",
   });
-  assert.equal(detections.length, 0);
+  assert.equal(detections.length, 1);
+  assert.equal(detections[0].detectedLevel, 0);
+  assert.equal(detections[0].unlockStatus, "locked");
+  assert.ok(!detections[0].recognizedText.includes("Level 0"));
+
+  const unbuilt = parseScreenshotDetections({
+    text: "Monolith not built – available at Town Hall 15",
+    entities: [{
+      id: "monolith:1",
+      name: "Monolith",
+      currentLevel: 0,
+      maxLevel: 3,
+      type: "building",
+    }],
+    screenType: "buildings",
+  });
+  assert.equal(unbuilt[0].detectedLevel, 0);
+  assert.equal(mergeScreenshotDetections(unbuilt)[0].unlockStatus, "locked");
+});
+
+test("calculates resumable entity coverage from stable entity ids", () => {
+  const expected: ScreenshotEntity[] = [
+    { id: "one", name: "One", currentLevel: 1, type: "troop" },
+    { id: "two", name: "Two", currentLevel: 0, type: "troop" },
+  ];
+  const partial = calculateScreenshotEntityCoverage(expected, ["one", "unrelated"]);
+  assert.equal(partial.expected, 2);
+  assert.equal(partial.detected, 1);
+  assert.equal(partial.complete, false);
+  assert.deepEqual(partial.missing.map((entity) => entity.id), ["two"]);
+  assert.equal(calculateScreenshotEntityCoverage(expected, ["one", "two"]).complete, true);
 });
 
 test("parses only explicitly labelled resource values and compact numbers", () => {

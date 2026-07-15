@@ -129,7 +129,13 @@ classified and routed to the matching laboratory, hero, pet, equipment,
 builder, building, wall, resource or profile parser. Low-confidence views are
 never guessed: the review asks the user to assign the correct view manually.
 Confirmation remains disabled until every Town-Hall-relevant view is present,
-while the whole session can be saved and resumed later. Existing databases can
+and every expected entity has either a recognized level or an explicit
+`locked / not built` result. Coverage is reconstructed from persisted changes
+when an import is resumed. Locked troops, pets, equipment and not-yet-built
+buildings are stored as level zero without confusing a displayed facility
+requirement with the entity level. Equipment categories come from the live
+game catalog and are shown in the review. The whole session can be saved and
+resumed later. Existing databases can
 enable this session type with
 `src/scripts/sql/screenshot-full-account-import.sql`.
 
