@@ -101,12 +101,18 @@ NEXT_PUBLIC_VILLAGE_DETECTION_ENABLED=true
 NEXT_PUBLIC_SUPPORTED_GAME_UI_VERSION=coc-ui-2026-07
 NEXT_PUBLIC_SCREENSHOT_MODEL_VERSION=local-tesseract-v1
 NEXT_PUBLIC_SCREENSHOT_LAYOUT_VERSION=guided-layout-v1
+NEXT_PUBLIC_SCREENSHOT_SUPPORTED_TYPES=laboratory,heroes,pets,equipment,builders,buildings,walls,village,resources,profile
 ```
 
 These values are public compatibility metadata, not secrets. When a game update
 changes the interface, disable the affected importer until its layout is
 verified, then set a new UI/layout version and redeploy. Imports without the
-currently supported UI version are not automatically analyzed.
+currently supported UI version are not automatically analyzed. The supported
+types list provides a controlled per-view rollout; `full` is available only
+when every required view is active, so it cannot bypass a disabled detector.
+The privacy-safe training manifest, annotation contract, leakage checks and
+game-update release procedure are documented in `training/README.md`. Run
+`npm run validate-screenshot-dataset` before any training or model release.
 
 The guided resource view recognizes current Gold, Elixir, Dark Elixir and ore
 balances. Lines such as `Gold 12.5M / 22M` additionally populate the storage

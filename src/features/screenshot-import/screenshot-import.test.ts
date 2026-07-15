@@ -53,6 +53,10 @@ import {
   resolveScreenshotImportConfig,
 } from "@/config/screenshotImport";
 import trapCatalog from "@/data/traps.json";
+import {
+  validateScreenshotTrainingDataset,
+  type ScreenshotTrainingDataset,
+} from "./screenshot-training-dataset";
 
 const entities: ScreenshotEntity[] = [
   {
@@ -1227,6 +1231,22 @@ test("global screenshot flag overrides individual import flags", () => {
   assert.equal(isScreenshotImportTypeEnabled("buildings", config), false);
 });
 
+test("allows controlled screenshot-type rollout and prevents full-import bypasses", () => {
+  const config = resolveScreenshotImportConfig({
+    enabled: "true",
+    laboratoryEnabled: "true",
+    villageEnabled: "true",
+    supportedTypes: "laboratory, heroes, profile, unknown-value",
+  });
+  assert.equal(isScreenshotImportTypeEnabled("laboratory", config), true);
+  assert.equal(isScreenshotImportTypeEnabled("heroes", config), true);
+  assert.equal(isScreenshotImportTypeEnabled("pets", config), false);
+  assert.equal(isScreenshotImportTypeEnabled("full", config), false);
+
+  const allTypes = resolveScreenshotImportConfig({ enabled: "true" });
+  assert.equal(isScreenshotImportTypeEnabled("full", allTypes), true);
+});
+
 test("calculates private confirmation-based screenshot quality metrics", () => {
   const metrics = calculateScreenshotQualityMetrics({
     sessions: [
@@ -1288,4 +1308,51 @@ test("calculates private confirmation-based screenshot quality metrics", () => {
   assert.deepEqual(metrics.byGameVersion, [
     { label: "18.0", total: 2, errors: 1, errorRate: 0.5 },
   ]);
+});
+
+test("validates consented screenshot annotations without account leakage between splits", () => {
+  const sample = (split: "train" | "validation" | "test", marker: string) => ({
+    id: `${split}-sample`,
+    imagePath: `images/${split}.jpg`,
+    split,
+    accountGroupHash: marker.repeat(64),
+    captureSeriesHash: (marker === "a" ? "d" : marker === "b" ? "e" : "f").repeat(64),
+    improvementConsent: true as const,
+    screenshotType: "laboratory" as const,
+    deviceType: "ios",
+    width: 1170,
+    height: 2532,
+    language: "de" as const,
+    townHallLevel: 18,
+    gameVersion: "coc-ui-2026-07",
+    displayTheme: "dark" as const,
+    hasOverlay: false,
+    scale: 1,
+    compression: "low" as const,
+    cropQuality: "complete" as const,
+    annotations: [{
+      kind: "level_region" as const,
+      boundingBox: { x: 0.1, y: 0.2, width: 0.2, height: 0.1 },
+      value: 12,
+    }],
+  });
+  const dataset: ScreenshotTrainingDataset = {
+    schemaVersion: 1,
+    datasetVersion: "test-v1",
+    createdAt: "2026-07-15T00:00:00.000Z",
+    targetGameVersion: "coc-ui-2026-07",
+    targetModelVersion: "model-v1",
+    targetLayoutVersion: "layout-v1",
+    samples: [sample("train", "a"), sample("validation", "b"), sample("test", "c")],
+  };
+  const valid = validateScreenshotTrainingDataset(dataset);
+  assert.equal(valid.valid, true);
+  assert.equal(valid.counts.test, 1);
+
+  dataset.samples[2].accountGroupHash = dataset.samples[0].accountGroupHash;
+  dataset.samples[2].annotations[0].boundingBox.width = 2;
+  const invalid = validateScreenshotTrainingDataset(dataset);
+  assert.equal(invalid.valid, false);
+  assert.ok(invalid.errors.some((error) => error.includes("same account group")));
+  assert.ok(invalid.errors.some((error) => error.includes("invalid bounding box")));
 });

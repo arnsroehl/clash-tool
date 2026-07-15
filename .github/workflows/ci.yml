@@ -31,5 +31,8 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Validate screenshot training dataset contract
+        run: npm run validate-screenshot-dataset
+
       - name: Build application
         run: npm run build
