@@ -1,5 +1,6 @@
 import { getSupabaseClient } from "@/lib/supabase";
 import {
+  calculateScreenshotQualityMetrics,
   mergeScreenshotMagicItemDetections,
   mergeProfileScreenshotDetections,
   type ConfidenceBand,
@@ -9,6 +10,7 @@ import {
   type ScreenshotResourceDetection,
   type ScreenshotMagicItemDetection,
   type ScreenshotImportType,
+  type ScreenshotQualityMetrics,
   type ScreenshotLanguage,
   type ScreenshotScreenType,
   type UpgradeSlotDetection,
@@ -111,6 +113,60 @@ export async function fetchScreenshotImportHistory(
     gameVersion: session.game_version ? String(session.game_version) : null,
     retainedOriginalCount: retainedCounts.get(String(session.id)) || 0,
   }));
+}
+
+export async function fetchScreenshotQualityMetrics(
+  accountId: string,
+): Promise<ScreenshotQualityMetrics> {
+  const client = getSupabaseClient();
+  const { data: sessions, error } = await client
+    .from("screenshot_import_sessions")
+    .select("id, status, created_at, completed_at, confirmed_at, game_version")
+    .eq("account_id", accountId)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw new Error(error.message);
+  const sessionRows = sessions || [];
+  const sessionIds = sessionRows.map((session) => String(session.id));
+  if (!sessionIds.length) {
+    return calculateScreenshotQualityMetrics({ sessions: [], files: [], changes: [] });
+  }
+  const [{ data: files, error: fileError }, { data: changes, error: changeError }] =
+    await Promise.all([
+      client
+        .from("screenshot_import_files")
+        .select("import_session_id, screen_type, device_platform, detected_language, quality_score, processing_status")
+        .in("import_session_id", sessionIds),
+      client
+        .from("screenshot_import_changes")
+        .select("status, confidence, user_corrected_value")
+        .in("import_session_id", sessionIds),
+    ]);
+  if (fileError) throw new Error(fileError.message);
+  if (changeError) throw new Error(changeError.message);
+  return calculateScreenshotQualityMetrics({
+    sessions: sessionRows.map((session) => ({
+      id: String(session.id),
+      status: String(session.status),
+      createdAt: String(session.created_at),
+      completedAt: session.completed_at ? String(session.completed_at) : null,
+      confirmedAt: session.confirmed_at ? String(session.confirmed_at) : null,
+      gameVersion: session.game_version ? String(session.game_version) : null,
+    })),
+    files: (files || []).map((file) => ({
+      sessionId: String(file.import_session_id),
+      screenType: file.screen_type ? String(file.screen_type) : null,
+      devicePlatform: file.device_platform ? String(file.device_platform) : null,
+      detectedLanguage: file.detected_language ? String(file.detected_language) : null,
+      qualityScore: file.quality_score === null ? null : Number(file.quality_score),
+      processingStatus: String(file.processing_status),
+    })),
+    changes: (changes || []).map((change) => ({
+      status: String(change.status),
+      confidence: Number(change.confidence || 0),
+      userCorrectedValue: change.user_corrected_value as Record<string, unknown> | null,
+    })),
+  });
 }
 
 function confidenceBand(confidence: number): ConfidenceBand {
@@ -708,8 +764,9 @@ export async function recordScreenshotFeedback(params: {
   previousResult: Record<string, unknown>;
   correctedResult: Record<string, unknown>;
   improvementConsent: boolean;
-  language: "de" | "en";
+  language: "de" | "en" | "unknown";
   gameVersion?: string | null;
+  deviceType?: ScreenshotDevicePlatform | null;
 }): Promise<void> {
   const client = getSupabaseClient();
   const {
@@ -725,6 +782,7 @@ export async function recordScreenshotFeedback(params: {
     model_version: SCREENSHOT_IMPORT_CONFIG.modelVersion,
     game_version: params.gameVersion || null,
     language: params.language,
+    device_type: params.deviceType || null,
   });
   if (error) throw new Error(error.message);
 }

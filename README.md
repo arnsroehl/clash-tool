@@ -155,6 +155,16 @@ and reuses an already active recognition job. A partial unique index from
 duplicate-start races while completed and failed jobs remain available as
 history and can be retried.
 
+The import start screen also shows a private, collapsible quality overview for
+the latest 100 sessions. It derives object-assignment, confirmed-level,
+correction, abandonment and processing-time values from the user's own review
+decisions and splits file error rates by screen type, coarse device platform,
+screenshot language and game version. These values are deliberately labelled
+as confirmation-based account metrics rather than a global model benchmark.
+Correction feedback is written only after explicit improvement consent and
+includes the coarse device type, detected screenshot language and crop
+coordinates, but no raw user-agent or automatically retained original image.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP

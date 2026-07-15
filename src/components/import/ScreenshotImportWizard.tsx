@@ -35,6 +35,7 @@ import {
   type ScreenshotMagicItemDetection,
   type ScreenshotImportType,
   type ScreenshotProfileDetection,
+  type ScreenshotQualityMetrics,
   type UpgradeSlotDetection,
   type UpgradeSlotChangeType,
   type WallLevelDistribution,
@@ -48,6 +49,7 @@ import {
   deleteScreenshotOriginals,
   downloadScreenshotFile,
   fetchScreenshotImportHistory,
+  fetchScreenshotQualityMetrics,
   fetchLatestOpenScreenshotImport,
   persistScreenshotReview,
   recordChangeDecisions,
@@ -271,6 +273,7 @@ export function ScreenshotImportWizard({
   const [completionState, setCompletionState] = useState<CompletionState>("confirmed");
   const [reviewFilter, setReviewFilter] = useState<ScreenshotReviewFilter>("changes");
   const [history, setHistory] = useState<ScreenshotImportHistoryEntry[]>([]);
+  const [qualityMetrics, setQualityMetrics] = useState<ScreenshotQualityMetrics | null>(null);
   const [deletingOriginalsFor, setDeletingOriginalsFor] = useState<string | null>(null);
   const previewUrls = useRef(new Set<string>());
 
@@ -283,7 +286,12 @@ export function ScreenshotImportWizard({
   );
 
   const refreshHistory = useCallback(async () => {
-    setHistory(await fetchScreenshotImportHistory(accountId));
+    const [entries, metrics] = await Promise.all([
+      fetchScreenshotImportHistory(accountId),
+      fetchScreenshotQualityMetrics(accountId),
+    ]);
+    setHistory(entries);
+    setQualityMetrics(metrics);
   }, [accountId]);
 
   useEffect(() => {
@@ -293,9 +301,15 @@ export function ScreenshotImportWizard({
         if (!cancelled) setResumeCandidate(candidate);
       })
       .catch(() => undefined);
-    void fetchScreenshotImportHistory(accountId)
-      .then((entries) => {
-        if (!cancelled) setHistory(entries);
+    void Promise.all([
+      fetchScreenshotImportHistory(accountId),
+      fetchScreenshotQualityMetrics(accountId),
+    ])
+      .then(([entries, metrics]) => {
+        if (!cancelled) {
+          setHistory(entries);
+          setQualityMetrics(metrics);
+        }
       })
       .catch(() => undefined);
     return () => {
@@ -1146,6 +1160,12 @@ export function ScreenshotImportWizard({
           correctedLevel,
           change.proposedLevel,
         )) continue;
+        const sourceDetection = detections.find((detection) =>
+          change.sourceDetectionIds.includes(detection.detectionId),
+        );
+        const sourceScreenshot = screenshots.find((screenshot) =>
+          screenshot.id === sourceDetection?.screenshotId,
+        );
         await recordScreenshotFeedback({
           sessionId: session.id,
           previousResult: {
@@ -1153,11 +1173,18 @@ export function ScreenshotImportWizard({
             entityId: change.entityId,
             level: change.proposedLevel,
             confidence: change.confidence,
+            screenshotId: sourceDetection?.screenshotId,
+            boundingBox: sourceDetection?.boundingBox,
           },
-          correctedResult: { level: correctedLevel },
+          correctedResult: {
+            entityType: change.entityType,
+            entityId: change.entityId,
+            level: correctedLevel,
+          },
           improvementConsent,
-          language,
+          language: sourceScreenshot?.detectedLanguage || language,
           gameVersion: session.gameVersion,
+          deviceType: sourceScreenshot?.sourceMetadata?.devicePlatform,
         });
       }
       const hasDeferredChanges = Object.values(deferred).some(Boolean);
@@ -1365,6 +1392,62 @@ export function ScreenshotImportWizard({
                 ? "Screenshot imports are temporarily disabled while recognition is being updated. Your private history remains available."
                 : "Screenshot-Importe sind während einer Erkennungsaktualisierung vorübergehend deaktiviert. Deine private Historie bleibt verfügbar."}
             </p>
+          ) : null}
+          {qualityMetrics && qualityMetrics.imports > 0 ? (
+            <details className="mb-4 rounded-xl border border-sky-300/20 bg-sky-300/5 p-4">
+              <summary className="cursor-pointer text-sm font-bold text-sky-100">
+                {en ? "My import quality" : "Meine Importqualität"} · {qualityMetrics.imports} {en ? "imports" : "Importe"}
+              </summary>
+              <p className="mt-2 text-xs text-slate-400">
+                {en
+                  ? "Calculated only from your own confirmed or cancelled imports. These values are not a global model benchmark."
+                  : "Nur aus deinen eigenen bestätigten oder abgebrochenen Importen berechnet. Diese Werte sind keine globale Modell-Benchmark."}
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+                {[
+                  [en ? "Object assignment" : "Objektzuordnung", qualityMetrics.objectAccuracy],
+                  [en ? "Level confirmed" : "Level bestätigt", qualityMetrics.levelAccuracy],
+                  [en ? "Manual corrections" : "Manuelle Korrekturen", qualityMetrics.correctionRate],
+                  [en ? "Abandoned" : "Abgebrochen", qualityMetrics.abandonmentRate],
+                ].map(([label, value]) => (
+                  <div key={String(label)} className="rounded-lg border border-white/10 bg-slate-950/60 p-3">
+                    <b className="block text-lg text-slate-100">
+                      {typeof value === "number" ? `${Math.round(value * 100)} %` : "–"}
+                    </b>
+                    <span className="text-xs text-slate-400">{label}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-slate-400">
+                {qualityMetrics.decidedChanges} {en ? "reviewed changes" : "geprüfte Änderungen"}
+                {qualityMetrics.averageProcessingMinutes !== null
+                  ? ` · Ø ${qualityMetrics.averageProcessingMinutes} min`
+                  : ""}
+                {qualityMetrics.autoConfirmationRate !== null
+                  ? ` · ${Math.round(qualityMetrics.autoConfirmationRate * 100)} % ${en ? "high-confidence accepted" : "sicher übernommen"}`
+                  : ""}
+              </p>
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                {[
+                  { title: en ? "Screen type" : "Ansicht", rows: qualityMetrics.byScreenType },
+                  { title: en ? "Device" : "Gerät", rows: qualityMetrics.byDevice },
+                  { title: en ? "Language" : "Sprache", rows: qualityMetrics.byLanguage },
+                  { title: en ? "Game version" : "Spielversion", rows: qualityMetrics.byGameVersion },
+                ].map(({ title, rows }) => (
+                  <div key={title} className="rounded-lg border border-white/10 p-3 text-xs">
+                    <b className="text-slate-300">{title}</b>
+                    <div className="mt-2 space-y-1 text-slate-400">
+                      {rows.map((row) => (
+                        <div key={row.label} className="flex justify-between gap-3">
+                          <span>{row.label} ({row.total})</span>
+                          <span>{Math.round(row.errorRate * 100)} % {en ? "errors" : "Fehler"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
           ) : null}
           {history.length ? (
             <details className="mb-4 rounded-xl border border-white/10 bg-slate-950/70 p-4">

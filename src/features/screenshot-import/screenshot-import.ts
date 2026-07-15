@@ -1806,3 +1806,143 @@ export function parseProfileScreenshot(text: string): ScreenshotProfileDetection
     confidence: found >= 3 ? 0.95 : found === 2 ? 0.88 : found === 1 ? 0.72 : 0,
   };
 }
+
+export type ScreenshotQualityBreakdown = {
+  label: string;
+  total: number;
+  errors: number;
+  errorRate: number;
+};
+
+export type ScreenshotQualityMetrics = {
+  imports: number;
+  confirmedImports: number;
+  abandonmentRate: number | null;
+  averageProcessingMinutes: number | null;
+  decidedChanges: number;
+  objectAccuracy: number | null;
+  levelAccuracy: number | null;
+  autoConfirmationRate: number | null;
+  correctionRate: number | null;
+  byScreenType: ScreenshotQualityBreakdown[];
+  byDevice: ScreenshotQualityBreakdown[];
+  byLanguage: ScreenshotQualityBreakdown[];
+  byGameVersion: ScreenshotQualityBreakdown[];
+};
+
+type ScreenshotQualitySession = {
+  id: string;
+  status: string;
+  createdAt: string;
+  completedAt: string | null;
+  confirmedAt: string | null;
+  gameVersion: string | null;
+};
+
+type ScreenshotQualityFile = {
+  sessionId: string;
+  screenType: string | null;
+  devicePlatform: string | null;
+  detectedLanguage: string | null;
+  qualityScore: number | null;
+  processingStatus: string;
+};
+
+type ScreenshotQualityChange = {
+  status: string;
+  confidence: number;
+  userCorrectedValue: Record<string, unknown> | null;
+};
+
+function ratio(value: number, total: number): number | null {
+  return total > 0 ? Math.round((value / total) * 10_000) / 10_000 : null;
+}
+
+function qualityBreakdown(
+  rows: Array<{ label: string; error: boolean }>,
+): ScreenshotQualityBreakdown[] {
+  const groups = new Map<string, { total: number; errors: number }>();
+  rows.forEach(({ label, error }) => {
+    const current = groups.get(label) || { total: 0, errors: 0 };
+    current.total += 1;
+    if (error) current.errors += 1;
+    groups.set(label, current);
+  });
+  return [...groups.entries()]
+    .map(([label, values]) => ({
+      label,
+      ...values,
+      errorRate: ratio(values.errors, values.total) || 0,
+    }))
+    .sort((left, right) => right.total - left.total || left.label.localeCompare(right.label));
+}
+
+export function calculateScreenshotQualityMetrics(input: {
+  sessions: ScreenshotQualitySession[];
+  files: ScreenshotQualityFile[];
+  changes: ScreenshotQualityChange[];
+}): ScreenshotQualityMetrics {
+  const terminalSessions = input.sessions.filter((session) =>
+    ["confirmed", "completed", "failed", "cancelled"].includes(session.status),
+  );
+  const confirmedImports = input.sessions.filter((session) => session.status === "confirmed").length;
+  const abandoned = terminalSessions.filter((session) =>
+    ["failed", "cancelled"].includes(session.status),
+  ).length;
+  const durations = input.sessions.flatMap((session) => {
+    const end = session.confirmedAt || session.completedAt;
+    if (!end) return [];
+    const duration = new Date(end).getTime() - new Date(session.createdAt).getTime();
+    return Number.isFinite(duration) && duration >= 0 ? [duration / 60_000] : [];
+  });
+  const decided = input.changes.filter((change) =>
+    ["accepted", "corrected", "rejected"].includes(change.status),
+  );
+  const accepted = decided.filter((change) => change.status === "accepted").length;
+  const corrected = decided.filter((change) => change.status === "corrected").length;
+  const objectAccepted = accepted + corrected;
+  const automaticallyAccepted = decided.filter((change) =>
+    change.status === "accepted"
+      && change.confidence >= 0.8
+      && change.userCorrectedValue === null,
+  ).length;
+  const fileRows = input.files.map((file) => ({
+    ...file,
+    error:
+      file.processingStatus === "failed"
+      || (file.qualityScore !== null && file.qualityScore < 0.5)
+      || file.screenType === "unknown",
+  }));
+  const unknown = "Unbekannt";
+  const sessionRows = input.sessions.map((session) => ({
+    label: session.gameVersion || unknown,
+    error: ["failed", "cancelled"].includes(session.status),
+  }));
+
+  return {
+    imports: input.sessions.length,
+    confirmedImports,
+    abandonmentRate: ratio(abandoned, terminalSessions.length),
+    averageProcessingMinutes: durations.length
+      ? Math.round((durations.reduce((sum, duration) => sum + duration, 0) / durations.length) * 10) / 10
+      : null,
+    decidedChanges: decided.length,
+    objectAccuracy: ratio(objectAccepted, decided.length),
+    levelAccuracy: ratio(accepted, decided.length),
+    autoConfirmationRate: ratio(automaticallyAccepted, decided.length),
+    correctionRate: ratio(corrected, decided.length),
+    byScreenType: qualityBreakdown(fileRows.map((file) => ({
+      label: file.screenType || unknown,
+      error: file.error,
+    }))),
+    byDevice: qualityBreakdown(fileRows.map((file) => ({
+      label: file.devicePlatform || unknown,
+      error: file.error,
+    }))),
+    byLanguage: qualityBreakdown(fileRows.map((file) => ({
+      label: file.detectedLanguage || unknown,
+      error: file.error,
+    }))),
+    byGameVersion: qualityBreakdown(sessionRows),
+  };
+}

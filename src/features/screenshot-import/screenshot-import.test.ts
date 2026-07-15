@@ -6,6 +6,7 @@ import {
   detectScreenshotLanguage,
   classifyScreenshotText,
   canStartScreenshotAnalysis,
+  calculateScreenshotQualityMetrics,
   compareUpgradeSlotState,
   mergeScreenshotDetections,
   mergeProfileScreenshotDetections,
@@ -1224,4 +1225,67 @@ test("global screenshot flag overrides individual import flags", () => {
   });
   assert.equal(isScreenshotImportTypeEnabled("laboratory", config), false);
   assert.equal(isScreenshotImportTypeEnabled("buildings", config), false);
+});
+
+test("calculates private confirmation-based screenshot quality metrics", () => {
+  const metrics = calculateScreenshotQualityMetrics({
+    sessions: [
+      {
+        id: "confirmed",
+        status: "confirmed",
+        createdAt: "2026-07-15T10:00:00.000Z",
+        completedAt: null,
+        confirmedAt: "2026-07-15T10:04:00.000Z",
+        gameVersion: "18.0",
+      },
+      {
+        id: "failed",
+        status: "failed",
+        createdAt: "2026-07-15T11:00:00.000Z",
+        completedAt: "2026-07-15T11:02:00.000Z",
+        confirmedAt: null,
+        gameVersion: "18.0",
+      },
+    ],
+    files: [
+      {
+        sessionId: "confirmed",
+        screenType: "laboratory",
+        devicePlatform: "ios",
+        detectedLanguage: "de",
+        qualityScore: 0.9,
+        processingStatus: "completed",
+      },
+      {
+        sessionId: "failed",
+        screenType: "unknown",
+        devicePlatform: "ios",
+        detectedLanguage: "de",
+        qualityScore: 0.3,
+        processingStatus: "failed",
+      },
+    ],
+    changes: [
+      { status: "accepted", confidence: 0.96, userCorrectedValue: null },
+      { status: "corrected", confidence: 0.72, userCorrectedValue: { level: 12 } },
+      { status: "rejected", confidence: 0.4, userCorrectedValue: null },
+      { status: "later", confidence: 0.8, userCorrectedValue: null },
+    ],
+  });
+  assert.equal(metrics.imports, 2);
+  assert.equal(metrics.confirmedImports, 1);
+  assert.equal(metrics.abandonmentRate, 0.5);
+  assert.equal(metrics.averageProcessingMinutes, 3);
+  assert.equal(metrics.decidedChanges, 3);
+  assert.equal(metrics.objectAccuracy, 0.6667);
+  assert.equal(metrics.levelAccuracy, 0.3333);
+  assert.equal(metrics.autoConfirmationRate, 0.3333);
+  assert.equal(metrics.correctionRate, 0.3333);
+  assert.deepEqual(metrics.byScreenType, [
+    { label: "laboratory", total: 1, errors: 0, errorRate: 0 },
+    { label: "unknown", total: 1, errors: 1, errorRate: 1 },
+  ]);
+  assert.deepEqual(metrics.byGameVersion, [
+    { label: "18.0", total: 2, errors: 1, errorRate: 0.5 },
+  ]);
 });
