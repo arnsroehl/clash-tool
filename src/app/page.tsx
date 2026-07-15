@@ -25,6 +25,7 @@ import { MagicItemsAndEvents } from "@/components/magic-items/MagicItemsAndEvent
 import { DataPortability } from "@/components/export/DataPortability";
 import { PlatformInstallCard } from "@/components/platform/PlatformInstallCard";
 import { PlanningControlCenter } from "@/components/planning/PlanningControlCenter";
+import { PlannerInsights } from "@/components/planning/PlannerInsights";
 import { StrategyComparison } from "@/components/planning/StrategyComparison";
 import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
@@ -33,6 +34,7 @@ import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { runDecisionEngine } from "@/features/decision-engine/decision-engine.service";
 import { calculateAccountHealth } from "@/features/account-health/account-health";
+import { createPlannerInsights } from "@/features/planner-intelligence/planner-intelligence";
 import { planUpgrades } from "@/features/planner/planner.service";
 import {
   buildingInstanceId,
@@ -66,6 +68,7 @@ import { useUpgradeQueue } from "@/hooks/useUpgradeQueue";
 import { useScreenshotProgress } from "@/hooks/useScreenshotProgress";
 import { useDecisionPreferences } from "@/hooks/useDecisionPreferences";
 import { useAccountHealthHistory } from "@/hooks/useAccountHealthHistory";
+import { usePlannerInsights } from "@/hooks/usePlannerInsights";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type {
   PlannerItem,
@@ -79,6 +82,7 @@ import type {
 import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
 import type { HealthEntity } from "@/features/account-health/account-health.types";
+import type { PlannerInsight } from "@/features/planner-intelligence/planner-intelligence.types";
 import type { PlanningScenario } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
@@ -699,6 +703,59 @@ export default function Home() {
     () => decisionResult?.assessments.filter((recommendation) => !recommendation.eligible) || [],
     [decisionResult],
   );
+  const calculatedPlannerInsights = useMemo(
+    () => selectedAccount ? createPlannerInsights({
+      accountId: selectedAccount.id,
+      simulation: builderSimulation,
+      recommendations: upgradeRecommendations,
+      queue: queueItems,
+      goals,
+      events,
+      magicItems: inventory,
+      resources: effectivePlanningResources,
+      storageCapacities,
+      dailyIncome,
+      currentLevels: currentItemLevels,
+      simulationStartsAt,
+    }) : [],
+    [
+      builderSimulation,
+      currentItemLevels,
+      dailyIncome,
+      effectivePlanningResources,
+      events,
+      goals,
+      inventory,
+      queueItems,
+      selectedAccount,
+      simulationStartsAt,
+      storageCapacities,
+      upgradeRecommendations,
+    ],
+  );
+  const plannerInsights = usePlannerInsights(
+    selectedAccount?.id,
+    calculatedPlannerInsights,
+    handleError,
+  );
+  const applyPlannerInsight = useCallback((insight: PlannerInsight) => {
+    const key = insight.action?.itemKey || insight.alternativeItemKey;
+    const recommendation = key
+      ? upgradeRecommendations.find((item) => `${item.itemType}:${item.itemId}` === key)
+      : undefined;
+    if (insight.action?.type === "add_to_queue" && recommendation) {
+      addRecommendationToQueue(recommendation);
+      return;
+    }
+    const targetId = insight.action?.type === "review_resources"
+      ? "planning-control-center"
+      : insight.action?.type === "review_goal"
+        ? "goal-planner"
+        : insight.action?.type === "review_magic_item"
+          ? "magic-items-and-events"
+          : "upgrade-recommendations";
+    document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [addRecommendationToQueue, upgradeRecommendations]);
   const accountHealth = useMemo(() => {
     if (!selectedAccount || !plannerInput?.items || !plannerInput.itemLevels) return null;
     const upgradeLevels = plannerInput.upgradeLevels || [];
@@ -1039,6 +1096,22 @@ export default function Home() {
             onLoadScenario={loadPlanningScenario}
             onSaveScenario={saveCurrentScenario}
             onDeleteScenario={removeScenario}
+          />
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title={en ? "Planner Intelligence" : "Planner Intelligence"}
+          defaultOpen
+        >
+          <PlannerInsights
+            insights={plannerInsights.visibleInsights}
+            disabledCategories={plannerInsights.disabledCategories}
+            language={language}
+            isSaving={plannerInsights.isSaving}
+            onDismiss={plannerInsights.dismiss}
+            onSnooze={plannerInsights.snooze}
+            onToggleCategory={plannerInsights.toggleCategory}
+            onApply={applyPlannerInsight}
           />
         </CollapsibleSection>
 

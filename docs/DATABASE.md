@@ -37,6 +37,8 @@ This document describes database tables referenced by the current code and SQL h
 | `account_magic_items` | Per-account quantities and queue reservations | `magicItemService`, screenshot import |
 | `account_upgrade_preferences` | Per-account preferred, avoided or excluded Decision Engine candidates | `decisionPreferenceService` |
 | `account_health_snapshots` | Daily Account Health, strategy fit, balance and rush-risk history | `accountHealthService` |
+| `account_insight_settings` | Disabled Planner Intelligence categories per account | `plannerInsightService` |
+| `account_insight_actions` | Stable dismiss and snooze state for individual insights | `plannerInsightService` |
 
 ## SQL Files Present in Repository
 
@@ -57,6 +59,7 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/screenshot-import-audit-triggers.sql` | RLS-preserving lifecycle audit triggers for sessions, uploads and original deletion |
 | `src/scripts/sql/decision-engine-preferences.sql` | RLS-protected manual Decision Engine priorities and exclusions |
 | `src/scripts/sql/account-health-snapshots.sql` | RLS-protected daily Account Health history |
+| `src/scripts/sql/planner-insight-preferences.sql` | RLS-protected Planner Intelligence category and action controls |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 

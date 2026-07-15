@@ -63,7 +63,7 @@ export function UpgradeRecommendations({
   const [visibleCount, setVisibleCount] = useState(4);
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+    <section id="upgrade-recommendations" className="rounded-3xl border border-white/10 bg-white/5 p-8">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">

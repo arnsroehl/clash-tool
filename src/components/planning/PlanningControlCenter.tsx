@@ -121,7 +121,7 @@ export function PlanningControlCenter(props: Props) {
     });
 
   return (
-    <>
+    <div id="planning-control-center" className="contents">
       <PlanningScenarioManager
         key={
           props.scenarios.find((scenario) => scenario.isActive)?.id ||
@@ -427,6 +427,6 @@ export function PlanningControlCenter(props: Props) {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
