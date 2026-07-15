@@ -35,6 +35,7 @@ This document describes database tables referenced by the current code and SQL h
 | `account_siege_machines` | Per-account siege machine levels | `siegeMachineService` |
 | `magic_item_catalog` | Stable Magic-Item IDs and planner effects | `magicItemService`, screenshot import |
 | `account_magic_items` | Per-account quantities and queue reservations | `magicItemService`, screenshot import |
+| `account_upgrade_preferences` | Per-account preferred, avoided or excluded Decision Engine candidates | `decisionPreferenceService` |
 
 ## SQL Files Present in Repository
 
@@ -53,6 +54,7 @@ This document describes database tables referenced by the current code and SQL h
 | `src/scripts/sql/screenshot-language-detection.sql` | Stores detected German/English screenshot language and confidence independently from app language |
 | `src/scripts/sql/screenshot-analysis-job-idempotency.sql` | Allows only one queued/running analysis stage per screenshot and job type |
 | `src/scripts/sql/screenshot-import-audit-triggers.sql` | RLS-preserving lifecycle audit triggers for sessions, uploads and original deletion |
+| `src/scripts/sql/decision-engine-preferences.sql` | RLS-protected manual Decision Engine priorities and exclusions |
 
 No SQL helper file for `accounts`, `buildings`, `building_levels`, or `account_buildings` is currently present in the repository.
 

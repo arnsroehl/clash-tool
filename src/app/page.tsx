@@ -30,13 +30,13 @@ import { ProgressForecastOverview } from "@/components/progress-forecast/Progres
 import { FutureAccountView } from "@/components/progress-forecast/FutureAccountView";
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
+import { runDecisionEngine } from "@/features/decision-engine/decision-engine.service";
 import { planUpgrades } from "@/features/planner/planner.service";
 import {
   buildingInstanceId,
   createBuildingInstancePlannerData,
 } from "@/features/planner/building-instance-planner";
 import {
-  rankRecommendations,
   type PlanningStrategy,
   type StrategyWeights,
 } from "@/features/planning-control/planning-control";
@@ -62,10 +62,12 @@ import { useSpells } from "@/hooks/useSpells";
 import { useTroops } from "@/hooks/useTroops";
 import { useUpgradeQueue } from "@/hooks/useUpgradeQueue";
 import { useScreenshotProgress } from "@/hooks/useScreenshotProgress";
+import { useDecisionPreferences } from "@/hooks/useDecisionPreferences";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type {
   PlannerItem,
   PlannerItemLevels,
+  PlannerInput,
   PlannerResult,
   PlannerUpgradeLevel,
   ResourceSnapshot,
@@ -422,7 +424,7 @@ export default function Home() {
     selectedAccount,
   ]);
 
-  const plannerResult = useMemo<PlannerResult | null>(() => {
+  const plannerInput = useMemo<PlannerInput | null>(() => {
     if (!selectedAccount) {
       return null;
     }
@@ -478,12 +480,12 @@ export default function Home() {
       ),
     ];
 
-    return planUpgrades({
+    return {
       account: selectedAccount,
       items: plannerItems,
       itemLevels: plannerLevels,
       upgradeLevels: plannerUpgradeLevels,
-    });
+    };
   }, [
     availableBuildings,
     availableHeroes,
@@ -502,14 +504,10 @@ export default function Home() {
     troopLevels,
     troopMaxLevels,
   ]);
-
-  const upgradeRecommendations = useMemo(() => {
-    return rankRecommendations(
-      plannerResult?.recommendations || [],
-      planningStrategy,
-      strategyWeights,
-    );
-  }, [plannerResult, planningStrategy, strategyWeights]);
+  const plannerResult = useMemo<PlannerResult | null>(
+    () => plannerInput ? planUpgrades(plannerInput) : null,
+    [plannerInput],
+  );
   const currentItemLevels = useMemo(
     () =>
       Object.fromEntries([
@@ -599,23 +597,29 @@ export default function Home() {
       addRawGoalRecommendationsToQueue(recommendations),
     [addRawGoalRecommendationsToQueue],
   );
-  const builderSimulation = useMemo<BuilderSimulationResult>(() => {
+  const decisionSlotAvailability = useMemo(() => {
     const builderSlots = screenshotUpgradeSlots.filter((slot) => slot.slotType === "builder");
     const laboratorySlot = screenshotUpgradeSlots.find((slot) => slot.slotType === "laboratory");
-    return simulateBuilderQueue({
-      builderCount: selectedAccount?.builderCount || 0,
-      queueItems,
-      simulationStartsAt,
-      initialBuilderAvailabilityHours: Array.from(
+    return {
+      builderHours: Array.from(
         { length: selectedAccount?.builderCount || 0 },
         (_, index) => {
           const slot = builderSlots.find((item) => item.slotIndex === index + 1);
           return slot?.isAvailable ? 0 : (slot?.remainingSeconds || 0) / 3_600;
         },
       ),
-      initialLaboratoryAvailabilityHours: laboratorySlot?.isAvailable
+      laboratoryHours: laboratorySlot?.isAvailable
         ? 0
         : (laboratorySlot?.remainingSeconds || 0) / 3_600,
+    };
+  }, [screenshotUpgradeSlots, selectedAccount?.builderCount]);
+  const builderSimulation = useMemo<BuilderSimulationResult>(() => {
+    return simulateBuilderQueue({
+      builderCount: selectedAccount?.builderCount || 0,
+      queueItems,
+      simulationStartsAt,
+      initialBuilderAvailabilityHours: decisionSlotAvailability.builderHours,
+      initialLaboratoryAvailabilityHours: decisionSlotAvailability.laboratoryHours,
       timeDiscountWindows: events
         .filter((event) => event.enabled && event.timeDiscountPercent > 0)
         .map((event) => ({
@@ -631,7 +635,7 @@ export default function Home() {
           percent: event.costDiscountPercent,
         })),
     });
-  }, [events, queueItems, screenshotUpgradeSlots, selectedAccount, simulationStartsAt]);
+  }, [decisionSlotAvailability, events, queueItems, selectedAccount, simulationStartsAt]);
 
   const progressForecast = useMemo<ProgressForecastResult>(() => {
     return createProgressForecast({
@@ -644,6 +648,52 @@ export default function Home() {
     selectedAccount?.id,
     handleError,
     currentItemLevels,
+  );
+  const decisionPreferences = useDecisionPreferences(
+    selectedAccount?.id,
+    handleError,
+  );
+  const decisionResult = useMemo(
+    () => plannerInput ? runDecisionEngine({
+      plannerInput,
+      strategy: planningStrategy,
+      strategyWeights,
+      goals,
+      queue: queueItems,
+      schedule: builderSimulation.assignments,
+      slotAvailability: decisionSlotAvailability,
+      resources: effectivePlanningResources,
+      storageCapacities,
+      dailyIncome,
+      events,
+      magicItems: inventory,
+      manualPreferences: decisionPreferences.preferences,
+      generatedAt: simulationStartsAt,
+    }) : null,
+    [
+      builderSimulation.assignments,
+      dailyIncome,
+      decisionPreferences.preferences,
+      decisionSlotAvailability,
+      effectivePlanningResources,
+      events,
+      goals,
+      inventory,
+      plannerInput,
+      planningStrategy,
+      queueItems,
+      simulationStartsAt,
+      storageCapacities,
+      strategyWeights,
+    ],
+  );
+  const upgradeRecommendations = useMemo(
+    () => decisionResult?.recommendations || [],
+    [decisionResult],
+  );
+  const excludedRecommendations = useMemo(
+    () => decisionResult?.assessments.filter((recommendation) => !recommendation.eligible) || [],
+    [decisionResult],
   );
   const clanDashboard = useClanDashboard(user?.id, handleError);
   const selectedClanForProgress = clanDashboard.selectedClan;
@@ -934,7 +984,11 @@ export default function Home() {
             <UpgradeRecommendations
               plannerResult={plannerResult}
               recommendations={upgradeRecommendations}
+              excludedRecommendations={excludedRecommendations}
               language={language}
+              onAddRecommendation={addRecommendationToQueue}
+              onPreferenceChange={decisionPreferences.updatePreference}
+              preferenceSaving={decisionPreferences.isSaving}
             />
           </div>
 
