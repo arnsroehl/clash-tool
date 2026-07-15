@@ -1628,7 +1628,9 @@ export function ScreenshotImportWizard({
                 ? "Keep original screenshots in my private import history after confirmation."
                 : "Originalscreenshots nach der Bestätigung in meiner privaten Importhistorie behalten."}
               <small className="mt-1 block text-slate-500">
-                {en ? "Off by default. Images are otherwise deleted immediately." : "Standardmäßig aus. Bilder werden andernfalls sofort gelöscht."}
+                {en
+                  ? "Off by default. Images are otherwise deleted immediately; retained originals are automatically deleted after the defined retention period (30 days by default)."
+                  : "Standardmäßig aus. Bilder werden andernfalls sofort gelöscht; aufbewahrte Originale werden nach der festgelegten Frist automatisch gelöscht (standardmäßig 30 Tage)."}
               </small>
             </span>
           </label>

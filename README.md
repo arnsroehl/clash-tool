@@ -171,6 +171,15 @@ Correction feedback is written only after explicit improvement consent and
 includes the coarse device type, detected screenshot language and crop
 coordinates, but no raw user-agent or automatically retained original image.
 
+Originals not selected for retention are deleted immediately after confirmation
+or discard. A CRON-protected daily cleanup at
+`/api/cron/screenshot-retention` additionally deletes retained originals after
+30 days and inactive unfinished imports after 7 days by default. Configure the
+server-only `SCREENSHOT_RETAINED_ORIGINAL_DAYS` and
+`SCREENSHOT_UNFINISHED_IMPORT_DAYS` values to change those deadlines. Deletion
+keeps the import record and appends an auditable deletion event; users can still
+delete retained originals immediately from their private import history.
+
 ### Clash API Proxy
 
 The official Clash of Clans API restricts every key to configured outbound IP
