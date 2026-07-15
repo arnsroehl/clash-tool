@@ -13,6 +13,7 @@ import { DashboardSummary } from "@/components/dashboard/DashboardSummary";
 import { ProgressOverview } from "@/components/dashboard/ProgressOverview";
 import { ResourceSummary } from "@/components/dashboard/ResourceSummary";
 import { UpgradeRecommendations } from "@/components/dashboard/UpgradeRecommendations";
+import { AccountHealthCard } from "@/components/dashboard/AccountHealthCard";
 import { HeroList } from "@/components/heroes/HeroList";
 import { PlayerImportCenter } from "@/components/import/PlayerImportCenter";
 import { GoalPlanner } from "@/components/goals/GoalPlanner";
@@ -31,6 +32,7 @@ import { FutureAccountView } from "@/components/progress-forecast/FutureAccountV
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { runDecisionEngine } from "@/features/decision-engine/decision-engine.service";
+import { calculateAccountHealth } from "@/features/account-health/account-health";
 import { planUpgrades } from "@/features/planner/planner.service";
 import {
   buildingInstanceId,
@@ -63,6 +65,7 @@ import { useTroops } from "@/hooks/useTroops";
 import { useUpgradeQueue } from "@/hooks/useUpgradeQueue";
 import { useScreenshotProgress } from "@/hooks/useScreenshotProgress";
 import { useDecisionPreferences } from "@/hooks/useDecisionPreferences";
+import { useAccountHealthHistory } from "@/hooks/useAccountHealthHistory";
 import type { StatCard } from "@/components/accounts/StatsCards";
 import type {
   PlannerItem,
@@ -75,6 +78,7 @@ import type {
 } from "@/features/planner/planner.types";
 import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
+import type { HealthEntity } from "@/features/account-health/account-health.types";
 import type { PlanningScenario } from "@/types/planningScenario";
 import type { Hero, HeroLevel } from "@/types/hero";
 import type {
@@ -695,6 +699,78 @@ export default function Home() {
     () => decisionResult?.assessments.filter((recommendation) => !recommendation.eligible) || [],
     [decisionResult],
   );
+  const accountHealth = useMemo(() => {
+    if (!selectedAccount || !plannerInput?.items || !plannerInput.itemLevels) return null;
+    const upgradeLevels = plannerInput.upgradeLevels || [];
+    const plannerHealthEntities: HealthEntity[] = plannerInput.items
+      .filter((item) => !/^(mauer|wall)(\s+\d+)?$/i.test(item.name.trim()))
+      .map((item) => {
+        const matchingLevels = upgradeLevels.filter((level) => level.itemId === item.id);
+        return {
+          id: item.id,
+          type: item.type,
+          name: item.name,
+          category: item.category,
+          currentLevel: plannerInput.itemLevels?.[item.id] || 0,
+          maxLevel: item.maxLevel,
+          instanceGroupId: matchingLevels[0]?.buildingId,
+          upgradeLevels: matchingLevels.map((level) => ({
+            level: level.level,
+            timeHours: level.time.hours,
+          })),
+        };
+      });
+    const screenshotHealthEntities: HealthEntity[] = availableScreenshotEntities.map((entity) => ({
+      id: entity.id,
+      type: entity.type,
+      name: entity.name,
+      category: entity.category,
+      currentLevel: screenshotEntityLevels[entity.id] || 0,
+      maxLevel: entity.maxLevel,
+      upgradeLevels: screenshotCatalogLevels
+        .filter((level) => level.entityId === entity.id)
+        .map((level) => ({ level: level.level, timeHours: level.upgradeTimeHours })),
+    }));
+    const wallBuilding = availableBuildings.find((building) => /^(mauer|wall)$/i.test(building.name.trim()));
+    return calculateAccountHealth({
+      accountId: selectedAccount.id,
+      townHallLevel: selectedAccount.townHallLevel,
+      entities: [...plannerHealthEntities, ...screenshotHealthEntities],
+      walls: screenshotWallLevels,
+      maxWallLevel: wallBuilding?.maxLevel || null,
+      strategy: planningStrategy,
+      strategyWeights,
+      goals,
+      upgradeSlots: screenshotUpgradeSlots,
+      builderUsagePercent: plannerResult?.summary.builderUsagePercent ?? null,
+      queueItemCount: queueItems.filter((item) => item.status === "planned" || item.status === "active").length,
+      unreservedMagicItemCount: inventory
+        .filter((item) => !item.reservedQueueItemId)
+        .reduce((sum, item) => sum + item.quantity, 0),
+      generatedAt: simulationStartsAt,
+    });
+  }, [
+    availableBuildings,
+    availableScreenshotEntities,
+    goals,
+    inventory,
+    plannerInput,
+    plannerResult?.summary.builderUsagePercent,
+    planningStrategy,
+    queueItems,
+    screenshotCatalogLevels,
+    screenshotEntityLevels,
+    screenshotUpgradeSlots,
+    screenshotWallLevels,
+    selectedAccount,
+    simulationStartsAt,
+    strategyWeights,
+  ]);
+  const accountHealthHistory = useAccountHealthHistory(
+    selectedAccount?.id,
+    accountHealth,
+    handleError,
+  );
   const clanDashboard = useClanDashboard(user?.id, handleError);
   const selectedClanForProgress = clanDashboard.selectedClan;
   const syncOwnClanProgress = clanDashboard.syncOwnProgress;
@@ -970,6 +1046,15 @@ export default function Home() {
           title={en ? "Planner & Progress" : "Planer & Fortschritt"}
           defaultOpen={!isCasualProfile}
         >
+          {accountHealth ? (
+            <div className="mb-6">
+              <AccountHealthCard
+                health={accountHealth}
+                history={accountHealthHistory}
+                language={language}
+              />
+            </div>
+          ) : null}
           <DashboardSummary
             language={language}
             selectedAccount={selectedAccount}
