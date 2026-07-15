@@ -28,7 +28,7 @@ import type { ClashAccount } from "@/types/account";
 import type { Building, BuildingInstanceLevelMap } from "@/types/building";
 import type { Hero } from "@/types/hero";
 import type { SiegeMachine, Spell, Troop } from "@/types/laboratory";
-import type { ScreenshotUpgradeSlot, ScreenshotWallLevel } from "@/types/screenshotProgress";
+import type { ScreenshotProgressLevel, ScreenshotUpgradeSlot, ScreenshotWallLevel } from "@/types/screenshotProgress";
 import type { MagicInventoryItem } from "@/types/magicItems";
 
 type Props = {
@@ -45,6 +45,7 @@ type Props = {
   siegeMachines: SiegeMachine[];
   siegeLevels: Record<string, number>;
   extraScreenshotEntities?: ScreenshotEntity[];
+  screenshotProgressLevels?: ScreenshotProgressLevel[];
   magicItems?: MagicInventoryItem[];
   language?: "de" | "en";
   onResourcesImported?: (resources: ScreenshotResourceDetection[]) => void;
@@ -381,6 +382,7 @@ export function PlayerImportCenter(props: Props) {
             accountId={props.account.id}
             expectedPlayerTag={props.account.playerTag}
             entities={entities}
+            equipmentLevelCosts={props.screenshotProgressLevels || []}
             townHallLevel={props.account.townHallLevel}
             language={en ? "en" : "de"}
             magicItems={(props.magicItems || []).map((item) => ({

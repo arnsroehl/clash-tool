@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": "screenshot-dataset-template-v1",
+  "createdAt": "2026-07-15T00:00:00.000Z",
+  "targetGameVersion": "coc-ui-2026-07",
+  "targetModelVersion": "local-tesseract-v1",
+  "targetLayoutVersion": "guided-layout-v1",
+  "samples": []
+}

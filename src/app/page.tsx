@@ -190,6 +190,7 @@ export default function Home() {
   });
   const {
     availableEntities: availableScreenshotEntities,
+    catalogLevels: screenshotCatalogLevels,
     accountLevels: screenshotEntityLevels,
     upgradeSlots: screenshotUpgradeSlots,
     resourceSnapshot: screenshotResourceSnapshot,
@@ -203,6 +204,7 @@ export default function Home() {
         id: entity.id,
         name: entity.name,
         aliases: [...entity.aliases, entity.sourceId],
+        category: entity.category,
         currentLevel: screenshotEntityLevels[entity.id] || 0,
         maxLevel: entity.maxLevel,
         maxLevelForTownHall: entity.maxLevel,
@@ -825,6 +827,7 @@ export default function Home() {
             siegeMachines={availableSiegeMachines}
             siegeLevels={siegeMachineLevels}
             extraScreenshotEntities={screenshotProgressEntities}
+            screenshotProgressLevels={screenshotCatalogLevels}
             magicItems={inventory}
             language={language}
             onResourcesImported={(detected) => {

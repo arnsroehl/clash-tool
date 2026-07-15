@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/push",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/screenshot-retention",
+      "schedule": "30 3 * * *"
     }
   ]
 }

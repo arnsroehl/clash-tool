@@ -6,14 +6,17 @@ import {
   detectScreenshotLanguage,
   classifyScreenshotText,
   canStartScreenshotAnalysis,
+  calculateScreenshotEntityCoverage,
   calculateScreenshotQualityMetrics,
   compareUpgradeSlotState,
   mergeScreenshotDetections,
+  mergeScreenshotEquipmentCostDetections,
   mergeProfileScreenshotDetections,
   mergeScreenshotMagicItemDetections,
   mergeScreenshotResourceDetections,
   normalizePlayerTag,
   parseScreenshotDetections,
+  parseScreenshotEquipmentCosts,
   parseScreenshotLevels,
   parseScreenshotMagicItems,
   parseScreenshotResources,
@@ -53,6 +56,10 @@ import {
   resolveScreenshotImportConfig,
 } from "@/config/screenshotImport";
 import trapCatalog from "@/data/traps.json";
+import {
+  validateScreenshotTrainingDataset,
+  type ScreenshotTrainingDataset,
+} from "./screenshot-training-dataset";
 
 const entities: ScreenshotEntity[] = [
   {
@@ -767,7 +774,7 @@ test("recognizes multi-line hero and pet upgrades from their selected views", ()
   assert.equal(petSlots[0].remainingSeconds, 93_600);
 });
 
-test("does not treat a facility requirement on a locked pet as its level", () => {
+test("records locked pets and unbuilt buildings as level zero without using facility levels", () => {
   const detections = parseScreenshotDetections({
     text: "Angry Jelly locked – requires Pet House level 10",
     entities: [{
@@ -780,7 +787,85 @@ test("does not treat a facility requirement on a locked pet as its level", () =>
     }],
     screenType: "pets",
   });
-  assert.equal(detections.length, 0);
+  assert.equal(detections.length, 1);
+  assert.equal(detections[0].detectedLevel, 0);
+  assert.equal(detections[0].unlockStatus, "locked");
+  assert.ok(!detections[0].recognizedText.includes("Level 0"));
+
+  const unbuilt = parseScreenshotDetections({
+    text: "Monolith not built – available at Town Hall 15",
+    entities: [{
+      id: "monolith:1",
+      name: "Monolith",
+      currentLevel: 0,
+      maxLevel: 3,
+      type: "building",
+    }],
+    screenType: "buildings",
+  });
+  assert.equal(unbuilt[0].detectedLevel, 0);
+  assert.equal(mergeScreenshotDetections(unbuilt)[0].unlockStatus, "locked");
+});
+
+test("calculates resumable entity coverage from stable entity ids", () => {
+  const expected: ScreenshotEntity[] = [
+    { id: "one", name: "One", currentLevel: 1, type: "troop" },
+    { id: "two", name: "Two", currentLevel: 0, type: "troop" },
+  ];
+  const partial = calculateScreenshotEntityCoverage(expected, ["one", "unrelated"]);
+  assert.equal(partial.expected, 2);
+  assert.equal(partial.detected, 1);
+  assert.equal(partial.complete, false);
+  assert.deepEqual(partial.missing.map((entity) => entity.id), ["two"]);
+  assert.equal(calculateScreenshotEntityCoverage(expected, ["one", "two"]).complete, true);
+});
+
+test("parses visible equipment ore costs and validates them against target-level data", () => {
+  const equipment: ScreenshotEntity[] = [{
+    id: "giant-gauntlet",
+    name: "Riesenhandschuh",
+    aliases: ["Giant Gauntlet"],
+    category: "episch",
+    currentLevel: 17,
+    maxLevel: 27,
+    type: "equipment",
+  }];
+  const detected = parseScreenshotEquipmentCosts({
+    text: "Riesenhandschuh\nVerbesserung auf Level 18\nGlänzendes Erz 600\nLeuchtendes Erz 60\nSternenerz 10",
+    entities: equipment,
+    levelCosts: [{
+      entityId: "giant-gauntlet",
+      level: 18,
+      shinyOreCost: 600,
+      glowyOreCost: 60,
+      starryOreCost: 10,
+    }],
+  });
+  assert.equal(detected.length, 1);
+  assert.equal(detected[0].targetLevel, 18);
+  assert.equal(detected[0].confidence, 0.96);
+  assert.deepEqual(
+    [detected[0].shinyOreCost, detected[0].glowyOreCost, detected[0].starryOreCost],
+    [600, 60, 10],
+  );
+
+  const mismatch = parseScreenshotEquipmentCosts({
+    text: "Giant Gauntlet\nUpgrade to Level 18\n599 Shiny Ore",
+    entities: equipment,
+    levelCosts: [{
+      entityId: "giant-gauntlet",
+      level: 18,
+      shinyOreCost: 600,
+      glowyOreCost: 60,
+      starryOreCost: 10,
+    }],
+  })[0];
+  assert.equal(mismatch.confidence, 0.49);
+  assert.ok(mismatch.reasons.some((reason) => reason.includes("599")));
+  assert.equal(
+    mergeScreenshotEquipmentCostDetections(detected[0], mismatch).confidence,
+    0.49,
+  );
 });
 
 test("parses only explicitly labelled resource values and compact numbers", () => {
@@ -1227,6 +1312,22 @@ test("global screenshot flag overrides individual import flags", () => {
   assert.equal(isScreenshotImportTypeEnabled("buildings", config), false);
 });
 
+test("allows controlled screenshot-type rollout and prevents full-import bypasses", () => {
+  const config = resolveScreenshotImportConfig({
+    enabled: "true",
+    laboratoryEnabled: "true",
+    villageEnabled: "true",
+    supportedTypes: "laboratory, heroes, profile, unknown-value",
+  });
+  assert.equal(isScreenshotImportTypeEnabled("laboratory", config), true);
+  assert.equal(isScreenshotImportTypeEnabled("heroes", config), true);
+  assert.equal(isScreenshotImportTypeEnabled("pets", config), false);
+  assert.equal(isScreenshotImportTypeEnabled("full", config), false);
+
+  const allTypes = resolveScreenshotImportConfig({ enabled: "true" });
+  assert.equal(isScreenshotImportTypeEnabled("full", allTypes), true);
+});
+
 test("calculates private confirmation-based screenshot quality metrics", () => {
   const metrics = calculateScreenshotQualityMetrics({
     sessions: [
@@ -1288,4 +1389,51 @@ test("calculates private confirmation-based screenshot quality metrics", () => {
   assert.deepEqual(metrics.byGameVersion, [
     { label: "18.0", total: 2, errors: 1, errorRate: 0.5 },
   ]);
+});
+
+test("validates consented screenshot annotations without account leakage between splits", () => {
+  const sample = (split: "train" | "validation" | "test", marker: string) => ({
+    id: `${split}-sample`,
+    imagePath: `images/${split}.jpg`,
+    split,
+    accountGroupHash: marker.repeat(64),
+    captureSeriesHash: (marker === "a" ? "d" : marker === "b" ? "e" : "f").repeat(64),
+    improvementConsent: true as const,
+    screenshotType: "laboratory" as const,
+    deviceType: "ios",
+    width: 1170,
+    height: 2532,
+    language: "de" as const,
+    townHallLevel: 18,
+    gameVersion: "coc-ui-2026-07",
+    displayTheme: "dark" as const,
+    hasOverlay: false,
+    scale: 1,
+    compression: "low" as const,
+    cropQuality: "complete" as const,
+    annotations: [{
+      kind: "level_region" as const,
+      boundingBox: { x: 0.1, y: 0.2, width: 0.2, height: 0.1 },
+      value: 12,
+    }],
+  });
+  const dataset: ScreenshotTrainingDataset = {
+    schemaVersion: 1,
+    datasetVersion: "test-v1",
+    createdAt: "2026-07-15T00:00:00.000Z",
+    targetGameVersion: "coc-ui-2026-07",
+    targetModelVersion: "model-v1",
+    targetLayoutVersion: "layout-v1",
+    samples: [sample("train", "a"), sample("validation", "b"), sample("test", "c")],
+  };
+  const valid = validateScreenshotTrainingDataset(dataset);
+  assert.equal(valid.valid, true);
+  assert.equal(valid.counts.test, 1);
+
+  dataset.samples[2].accountGroupHash = dataset.samples[0].accountGroupHash;
+  dataset.samples[2].annotations[0].boundingBox.width = 2;
+  const invalid = validateScreenshotTrainingDataset(dataset);
+  assert.equal(invalid.valid, false);
+  assert.ok(invalid.errors.some((error) => error.includes("same account group")));
+  assert.ok(invalid.errors.some((error) => error.includes("invalid bounding box")));
 });

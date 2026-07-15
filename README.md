@@ -101,12 +101,18 @@ NEXT_PUBLIC_VILLAGE_DETECTION_ENABLED=true
 NEXT_PUBLIC_SUPPORTED_GAME_UI_VERSION=coc-ui-2026-07
 NEXT_PUBLIC_SCREENSHOT_MODEL_VERSION=local-tesseract-v1
 NEXT_PUBLIC_SCREENSHOT_LAYOUT_VERSION=guided-layout-v1
+NEXT_PUBLIC_SCREENSHOT_SUPPORTED_TYPES=laboratory,heroes,pets,equipment,builders,buildings,walls,village,resources,profile
 ```
 
 These values are public compatibility metadata, not secrets. When a game update
 changes the interface, disable the affected importer until its layout is
 verified, then set a new UI/layout version and redeploy. Imports without the
-currently supported UI version are not automatically analyzed.
+currently supported UI version are not automatically analyzed. The supported
+types list provides a controlled per-view rollout; `full` is available only
+when every required view is active, so it cannot bypass a disabled detector.
+The privacy-safe training manifest, annotation contract, leakage checks and
+game-update release procedure are documented in `training/README.md`. Run
+`npm run validate-screenshot-dataset` before any training or model release.
 
 The guided resource view recognizes current Gold, Elixir, Dark Elixir and ore
 balances. Lines such as `Gold 12.5M / 22M` additionally populate the storage
@@ -123,9 +129,22 @@ classified and routed to the matching laboratory, hero, pet, equipment,
 builder, building, wall, resource or profile parser. Low-confidence views are
 never guessed: the review asks the user to assign the correct view manually.
 Confirmation remains disabled until every Town-Hall-relevant view is present,
-while the whole session can be saved and resumed later. Existing databases can
+and every expected entity has either a recognized level or an explicit
+`locked / not built` result. Coverage is reconstructed from persisted changes
+when an import is resumed. Locked troops, pets, equipment and not-yet-built
+buildings are stored as level zero without confusing a displayed facility
+requirement with the entity level. Equipment categories come from the live
+game catalog and are shown in the review. The whole session can be saved and
+resumed later. Existing databases can
 enable this session type with
 `src/scripts/sql/screenshot-full-account-import.sql`.
+
+Equipment screenshots treat labelled Shiny, Glowy and Starry Ore numbers as
+visible upgrade costs, not as the account's current resource balance. The
+detected costs and target level are compared with the live
+`screenshot_catalog_levels` data, shown as review evidence and restored when a
+multi-image import is resumed. Mismatches remain visibly uncertain while the
+catalog values stay authoritative.
 
 Profile screenshots recognize the player tag, player name, Town Hall,
 experience level and clan in German and English. Conflicting names, tags or
@@ -164,6 +183,21 @@ as confirmation-based account metrics rather than a global model benchmark.
 Correction feedback is written only after explicit improvement consent and
 includes the coarse device type, detected screenshot language and crop
 coordinates, but no raw user-agent or automatically retained original image.
+
+Originals not selected for retention are deleted immediately after confirmation
+or discard. A CRON-protected daily cleanup at
+`/api/cron/screenshot-retention` additionally deletes retained originals after
+30 days and inactive unfinished imports after 7 days by default. Configure the
+server-only `SCREENSHOT_RETAINED_ORIGINAL_DAYS` and
+`SCREENSHOT_UNFINISHED_IMPORT_DAYS` values to change those deadlines. Deletion
+keeps the import record and appends an auditable deletion event; users can still
+delete retained originals immediately from their private import history.
+
+Database triggers from `src/scripts/sql/screenshot-import-audit-triggers.sql`
+append ownership-scoped events for import creation, every session-status change,
+each upload and every original-file deletion. They run as `SECURITY INVOKER`,
+cannot be called directly by browser roles and complement the immutable analysis
+job/status records, so UI and API entry points produce the same audit trail.
 
 ### Clash API Proxy
 
