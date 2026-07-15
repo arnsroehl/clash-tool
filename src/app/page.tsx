@@ -190,6 +190,7 @@ export default function Home() {
   });
   const {
     availableEntities: availableScreenshotEntities,
+    catalogLevels: screenshotCatalogLevels,
     accountLevels: screenshotEntityLevels,
     upgradeSlots: screenshotUpgradeSlots,
     resourceSnapshot: screenshotResourceSnapshot,
@@ -826,6 +827,7 @@ export default function Home() {
             siegeMachines={availableSiegeMachines}
             siegeLevels={siegeMachineLevels}
             extraScreenshotEntities={screenshotProgressEntities}
+            screenshotProgressLevels={screenshotCatalogLevels}
             magicItems={inventory}
             language={language}
             onResourcesImported={(detected) => {

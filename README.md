@@ -139,6 +139,13 @@ resumed later. Existing databases can
 enable this session type with
 `src/scripts/sql/screenshot-full-account-import.sql`.
 
+Equipment screenshots treat labelled Shiny, Glowy and Starry Ore numbers as
+visible upgrade costs, not as the account's current resource balance. The
+detected costs and target level are compared with the live
+`screenshot_catalog_levels` data, shown as review evidence and restored when a
+multi-image import is resumed. Mismatches remain visibly uncertain while the
+catalog values stay authoritative.
+
 Profile screenshots recognize the player tag, player name, Town Hall,
 experience level and clan in German and English. Conflicting names, tags or
 clans block confirmation until corrected. Confirmed experience and clan values

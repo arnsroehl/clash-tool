@@ -2,9 +2,11 @@ import { getSupabaseClient } from "@/lib/supabase";
 import {
   calculateScreenshotQualityMetrics,
   mergeScreenshotMagicItemDetections,
+  mergeScreenshotEquipmentCostDetections,
   mergeProfileScreenshotDetections,
   type ConfidenceBand,
   type ScreenshotDetection,
+  type ScreenshotEquipmentCostDetection,
   type ScreenshotProposedChange,
   type ScreenshotProfileDetection,
   type ScreenshotResourceDetection,
@@ -65,6 +67,7 @@ export type ResumableScreenshotImport = {
   wallDistributions: WallLevelDistribution[];
   upgradeSlots: UpgradeSlotDetection[];
   resources: ScreenshotResourceDetection[];
+  equipmentCosts: ScreenshotEquipmentCostDetection[];
   magicItems: ScreenshotMagicItemDetection[];
   profile: ScreenshotProfileDetection | null;
   screenTypes: ScreenshotScreenType[];
@@ -245,6 +248,7 @@ export async function fetchLatestOpenScreenshotImport(
   const wallMap = new Map<number, WallLevelDistribution>();
   const slotMap = new Map<string, UpgradeSlotDetection>();
   const resourceMap = new Map<string, ScreenshotResourceDetection>();
+  const equipmentCostMap = new Map<string, ScreenshotEquipmentCostDetection>();
   const magicItemMap = new Map<string, ScreenshotMagicItemDetection>();
   const profileDetections: ScreenshotProfileDetection[] = [];
   (jobRows || []).forEach((job) => {
@@ -252,6 +256,7 @@ export async function fetchLatestOpenScreenshotImport(
       wallDistributions?: WallLevelDistribution[];
       upgradeSlotDetections?: UpgradeSlotDetection[];
       resourceDetections?: ScreenshotResourceDetection[];
+      equipmentCostDetections?: ScreenshotEquipmentCostDetection[];
       magicItemDetections?: ScreenshotMagicItemDetection[];
       profileDetection?: ScreenshotProfileDetection | null;
     };
@@ -266,6 +271,12 @@ export async function fetchLatestOpenScreenshotImport(
         capacity: item.capacity ?? null,
         reasons: item.reasons || [],
       }),
+    );
+    (result.equipmentCostDetections || []).forEach((item) =>
+      equipmentCostMap.set(
+        item.id,
+        mergeScreenshotEquipmentCostDetections(equipmentCostMap.get(item.id), item),
+      ),
     );
     if (result.profileDetection) profileDetections.push(result.profileDetection);
     (result.magicItemDetections || []).forEach((item) =>
@@ -310,6 +321,7 @@ export async function fetchLatestOpenScreenshotImport(
     wallDistributions: [...wallMap.values()],
     upgradeSlots: [...slotMap.values()],
     resources: [...resourceMap.values()],
+    equipmentCosts: [...equipmentCostMap.values()],
     magicItems: [...magicItemMap.values()],
     profile,
     screenTypes: [...new Set(

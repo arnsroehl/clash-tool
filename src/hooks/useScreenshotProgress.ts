@@ -102,6 +102,7 @@ export function useScreenshotProgress(
 
   return {
     availableEntities,
+    catalogLevels: levels,
     accountLevels: selectedAccount ? accountLevels : {},
     upgradeSlots: selectedAccount ? upgradeSlots : [],
     resourceSnapshot: selectedAccount ? resourceSnapshot : null,

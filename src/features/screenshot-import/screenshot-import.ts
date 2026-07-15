@@ -304,6 +304,30 @@ export type ScreenshotResourceType =
   | "glowy_ore"
   | "starry_ore";
 
+export type ScreenshotEquipmentLevelCost = {
+  entityId: string;
+  level: number;
+  shinyOreCost: number;
+  glowyOreCost: number;
+  starryOreCost: number;
+};
+
+export type ScreenshotEquipmentCostDetection = {
+  id: string;
+  entityId: string;
+  name: string;
+  targetLevel: number;
+  shinyOreCost: number | null;
+  glowyOreCost: number | null;
+  starryOreCost: number | null;
+  expectedShinyOreCost: number | null;
+  expectedGlowyOreCost: number | null;
+  expectedStarryOreCost: number | null;
+  confidence: number;
+  sourceText: string;
+  reasons: string[];
+};
+
 export type ScreenshotResourceDetection = {
   resourceType: ScreenshotResourceType;
   amount: number | null;
@@ -1663,6 +1687,120 @@ function parseCompactNumber(raw: string, suffix?: string): number | null {
   const value = Number(normalized);
   if (!Number.isFinite(value) || value < 0) return null;
   return Math.round(value * multiplier);
+}
+
+function parseLabelledOreCost(text: string, label: RegExp): number | null {
+  const number = String.raw`(\d[\d.,\s]*\d|\d)(?:\s*(k|m|tsd|mio|thousand|million))?`;
+  const after = text.match(new RegExp(`${label.source}\\s*[:=x]?\\s*${number}`, "i"));
+  if (after) return parseCompactNumber(after[1], after[2]);
+  const before = text.match(new RegExp(`${number}\\s*(?:${label.source})`, "i"));
+  return before ? parseCompactNumber(before[1], before[2]) : null;
+}
+
+export function mergeScreenshotEquipmentCostDetections(
+  previous: ScreenshotEquipmentCostDetection | undefined,
+  next: ScreenshotEquipmentCostDetection,
+): ScreenshotEquipmentCostDetection {
+  if (!previous) return next;
+  const fields = ["shinyOreCost", "glowyOreCost", "starryOreCost"] as const;
+  const conflict = fields.some((field) =>
+    previous[field] !== null && next[field] !== null && previous[field] !== next[field],
+  );
+  if (!conflict) {
+    const preferred = previous.confidence >= next.confidence ? previous : next;
+    const other = preferred === previous ? next : previous;
+    return {
+      ...preferred,
+      shinyOreCost: preferred.shinyOreCost ?? other.shinyOreCost,
+      glowyOreCost: preferred.glowyOreCost ?? other.glowyOreCost,
+      starryOreCost: preferred.starryOreCost ?? other.starryOreCost,
+      sourceText: `${previous.sourceText}\n${next.sourceText}`,
+      reasons: [...new Set([...previous.reasons, ...next.reasons])],
+    };
+  }
+  return {
+    ...next,
+    confidence: Math.min(previous.confidence, next.confidence, 0.49),
+    sourceText: `${previous.sourceText}\n${next.sourceText}`,
+    reasons: [...new Set([
+      ...previous.reasons,
+      ...next.reasons,
+      "Mehrere Screenshots zeigen unterschiedliche Erzkosten.",
+    ])],
+  };
+}
+
+export function parseScreenshotEquipmentCosts(params: {
+  text: string;
+  entities: ScreenshotEntity[];
+  levelCosts: ScreenshotEquipmentLevelCost[];
+}): ScreenshotEquipmentCostDetection[] {
+  const lines = params.text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const equipment = params.entities.filter((entity) => entity.type === "equipment");
+  const oreLabels = {
+    shinyOreCost: /(?:gl[aä]nz(?:endes)?\s+erz|shiny\s+ore)/,
+    glowyOreCost: /(?:leucht(?:endes)?\s+erz|glowy\s+ore)/,
+    starryOreCost: /(?:stern(?:en)?erz|starry\s+ore)/,
+  } as const;
+  return equipment.flatMap((entity) => {
+    const names = [entity.name, ...(entity.aliases || [])].map(normalizeScreenshotText).filter(Boolean);
+    const lineIndex = lines.findIndex((line) => {
+      const normalized = normalizeScreenshotText(line);
+      return names.some((name) => normalized.includes(name));
+    });
+    if (lineIndex < 0) return [];
+    const nextEntityIndex = lines.findIndex((line, index) => {
+      if (index <= lineIndex) return false;
+      const normalized = normalizeScreenshotText(line);
+      return equipment.some((candidate) =>
+        candidate.id !== entity.id
+        && [candidate.name, ...(candidate.aliases || [])]
+          .map(normalizeScreenshotText)
+          .some((name) => name && normalized.includes(name)),
+      );
+    });
+    const blockEnd = nextEntityIndex < 0
+      ? lineIndex + 6
+      : Math.min(lineIndex + 6, nextEntityIndex);
+    const block = lines.slice(lineIndex, blockEnd).join("\n");
+    const shinyOreCost = parseLabelledOreCost(block, oreLabels.shinyOreCost);
+    const glowyOreCost = parseLabelledOreCost(block, oreLabels.glowyOreCost);
+    const starryOreCost = parseLabelledOreCost(block, oreLabels.starryOreCost);
+    if ([shinyOreCost, glowyOreCost, starryOreCost].every((value) => value === null)) return [];
+    const explicitTarget = block.match(
+      /(?:upgrade|verbesser(?:n|ung)|auf|to|ziel)\D{0,20}(?:level|lvl|stufe)\s*(\d{1,2})/i,
+    );
+    const targetLevel = explicitTarget ? Number(explicitTarget[1]) : entity.currentLevel + 1;
+    const expected = params.levelCosts.find((cost) =>
+      cost.entityId === entity.id && cost.level === targetLevel,
+    );
+    const reasons: string[] = [];
+    if (!expected) reasons.push(`Für Ziellevel ${targetLevel} fehlen Vergleichskosten im Spielkatalog.`);
+    const comparisons = [
+      ["Glänzendes Erz", shinyOreCost, expected?.shinyOreCost],
+      ["Leuchtendes Erz", glowyOreCost, expected?.glowyOreCost],
+      ["Sternenerz", starryOreCost, expected?.starryOreCost],
+    ] as const;
+    comparisons.forEach(([name, detected, expectedValue]) => {
+      if (detected !== null && expectedValue !== undefined && detected !== expectedValue)
+        reasons.push(`${name}: erkannt ${detected}, im Katalog ${expectedValue}.`);
+    });
+    return [{
+      id: `equipment-cost:${entity.id}:${targetLevel}`,
+      entityId: entity.id,
+      name: entity.name,
+      targetLevel,
+      shinyOreCost,
+      glowyOreCost,
+      starryOreCost,
+      expectedShinyOreCost: expected?.shinyOreCost ?? null,
+      expectedGlowyOreCost: expected?.glowyOreCost ?? null,
+      expectedStarryOreCost: expected?.starryOreCost ?? null,
+      confidence: reasons.length ? 0.49 : 0.96,
+      sourceText: block,
+      reasons,
+    }];
+  });
 }
 
 export function parseScreenshotResources(text: string): ScreenshotResourceDetection[] {

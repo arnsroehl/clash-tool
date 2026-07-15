@@ -10,11 +10,13 @@ import {
   calculateScreenshotQualityMetrics,
   compareUpgradeSlotState,
   mergeScreenshotDetections,
+  mergeScreenshotEquipmentCostDetections,
   mergeProfileScreenshotDetections,
   mergeScreenshotMagicItemDetections,
   mergeScreenshotResourceDetections,
   normalizePlayerTag,
   parseScreenshotDetections,
+  parseScreenshotEquipmentCosts,
   parseScreenshotLevels,
   parseScreenshotMagicItems,
   parseScreenshotResources,
@@ -816,6 +818,54 @@ test("calculates resumable entity coverage from stable entity ids", () => {
   assert.equal(partial.complete, false);
   assert.deepEqual(partial.missing.map((entity) => entity.id), ["two"]);
   assert.equal(calculateScreenshotEntityCoverage(expected, ["one", "two"]).complete, true);
+});
+
+test("parses visible equipment ore costs and validates them against target-level data", () => {
+  const equipment: ScreenshotEntity[] = [{
+    id: "giant-gauntlet",
+    name: "Riesenhandschuh",
+    aliases: ["Giant Gauntlet"],
+    category: "episch",
+    currentLevel: 17,
+    maxLevel: 27,
+    type: "equipment",
+  }];
+  const detected = parseScreenshotEquipmentCosts({
+    text: "Riesenhandschuh\nVerbesserung auf Level 18\nGlänzendes Erz 600\nLeuchtendes Erz 60\nSternenerz 10",
+    entities: equipment,
+    levelCosts: [{
+      entityId: "giant-gauntlet",
+      level: 18,
+      shinyOreCost: 600,
+      glowyOreCost: 60,
+      starryOreCost: 10,
+    }],
+  });
+  assert.equal(detected.length, 1);
+  assert.equal(detected[0].targetLevel, 18);
+  assert.equal(detected[0].confidence, 0.96);
+  assert.deepEqual(
+    [detected[0].shinyOreCost, detected[0].glowyOreCost, detected[0].starryOreCost],
+    [600, 60, 10],
+  );
+
+  const mismatch = parseScreenshotEquipmentCosts({
+    text: "Giant Gauntlet\nUpgrade to Level 18\n599 Shiny Ore",
+    entities: equipment,
+    levelCosts: [{
+      entityId: "giant-gauntlet",
+      level: 18,
+      shinyOreCost: 600,
+      glowyOreCost: 60,
+      starryOreCost: 10,
+    }],
+  })[0];
+  assert.equal(mismatch.confidence, 0.49);
+  assert.ok(mismatch.reasons.some((reason) => reason.includes("599")));
+  assert.equal(
+    mergeScreenshotEquipmentCostDetections(detected[0], mismatch).confidence,
+    0.49,
+  );
 });
 
 test("parses only explicitly labelled resource values and compact numbers", () => {

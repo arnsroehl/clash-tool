@@ -13,11 +13,13 @@ import {
   getBuildingImportSection,
   mergeProfileScreenshotDetections,
   mergeScreenshotMagicItemDetections,
+  mergeScreenshotEquipmentCostDetections,
   mergeScreenshotResourceDetections,
   mergeScreenshotDetections,
   parseUpgradeSlots,
   parseWallDistributions,
   parseScreenshotDetections,
+  parseScreenshotEquipmentCosts,
   parseScreenshotMagicItems,
   parseScreenshotResources,
   parseProfileScreenshot,
@@ -26,6 +28,8 @@ import {
   shouldStoreScreenshotFeedback,
   validateProfileScreenshot,
   type ScreenshotDetection,
+  type ScreenshotEquipmentCostDetection,
+  type ScreenshotEquipmentLevelCost,
   type BuildingImportSection,
   type ScreenshotEntity,
   type ScreenshotProposedChange,
@@ -89,6 +93,7 @@ type CompletionState = "confirmed" | "partially_confirmed" | "saved_for_later" |
 type Props = {
   accountId: string;
   entities: ScreenshotEntity[];
+  equipmentLevelCosts?: ScreenshotEquipmentLevelCost[];
   townHallLevel: number;
   expectedPlayerTag?: string | null;
   language: "de" | "en";
@@ -218,6 +223,7 @@ function formatScreenshotBytes(bytes: number, language: "de" | "en"): string {
 export function ScreenshotImportWizard({
   accountId,
   entities,
+  equipmentLevelCosts = [],
   townHallLevel,
   expectedPlayerTag = null,
   language,
@@ -249,6 +255,7 @@ export function ScreenshotImportWizard({
   const [wallDistributions, setWallDistributions] = useState<WallLevelDistribution[]>([]);
   const [upgradeSlots, setUpgradeSlots] = useState<UpgradeSlotDetection[]>([]);
   const [resourceDetections, setResourceDetections] = useState<ScreenshotResourceDetection[]>([]);
+  const [equipmentCostDetections, setEquipmentCostDetections] = useState<ScreenshotEquipmentCostDetection[]>([]);
   const [magicItemDetections, setMagicItemDetections] = useState<ScreenshotMagicItemDetection[]>([]);
   const [profileDetection, setProfileDetection] = useState<ScreenshotProfileDetection | null>(null);
   const [accepted, setAccepted] = useState<Record<string, boolean>>({});
@@ -524,6 +531,7 @@ export function ScreenshotImportWizard({
     setWallDistributions(resumeCandidate.wallDistributions);
     setUpgradeSlots(resumeCandidate.upgradeSlots);
     setResourceDetections(resumeCandidate.resources);
+    setEquipmentCostDetections(resumeCandidate.equipmentCosts);
     setMagicItemDetections(resumeCandidate.magicItems);
     setProfileDetection(resumeCandidate.profile);
     setPendingResumeFiles(resumeCandidate.pendingFiles);
@@ -533,6 +541,7 @@ export function ScreenshotImportWizard({
         resumeCandidate.wallDistributions.length ||
         resumeCandidate.upgradeSlots.length ||
         resumeCandidate.resources.length ||
+        resumeCandidate.equipmentCosts.length ||
         resumeCandidate.magicItems.length ||
         resumeCandidate.profile
         ? "review"
@@ -571,6 +580,7 @@ export function ScreenshotImportWizard({
     const combinedWalls = new Map(wallDistributions.map((item) => [item.level, item]));
     const combinedSlots = new Map(upgradeSlots.map((item) => [`${item.slotType}:${item.slotIndex}`, item]));
     const combinedResources = new Map(resourceDetections.map((item) => [item.resourceType, item]));
+    const combinedEquipmentCosts = new Map(equipmentCostDetections.map((item) => [item.id, item]));
     const combinedMagicItems = new Map(magicItemDetections.map((item) => [item.itemKey, item]));
     let combinedProfile = profileDetection;
     const nextScreenshots: ProcessedScreenshot[] = [];
@@ -890,10 +900,16 @@ export function ScreenshotImportWizard({
                     .map(({ name, aliases }) => ({ name, aliases })),
                 })
               : [];
-          const currentResources =
-            analysisImportType === "resources" || analysisImportType === "equipment"
-              ? parseScreenshotResources(recognition.text)
-              : [];
+          const currentResources = analysisImportType === "resources"
+            ? parseScreenshotResources(recognition.text)
+            : [];
+          const currentEquipmentCosts = analysisImportType === "equipment"
+            ? parseScreenshotEquipmentCosts({
+                text: recognition.text,
+                entities,
+                levelCosts: equipmentLevelCosts,
+              })
+            : [];
           const currentMagicItems = analysisImportType === "resources"
             ? parseScreenshotMagicItems(recognition.text, magicItems)
             : [];
@@ -916,6 +932,15 @@ export function ScreenshotImportWizard({
                 item.resourceType,
                 mergeScreenshotResourceDetections(
                   combinedResources.get(item.resourceType),
+                  item,
+                ),
+              ),
+            );
+            currentEquipmentCosts.forEach((item) =>
+              combinedEquipmentCosts.set(
+                item.id,
+                mergeScreenshotEquipmentCostDetections(
+                  combinedEquipmentCosts.get(item.id),
                   item,
                 ),
               ),
@@ -953,6 +978,7 @@ export function ScreenshotImportWizard({
               wallDistributions: mismatch ? [] : currentWalls,
               upgradeSlotDetections: mismatch ? [] : currentSlots,
               resourceDetections: mismatch ? [] : currentResources,
+              equipmentCostDetections: mismatch ? [] : currentEquipmentCosts,
               magicItemDetections: mismatch ? [] : currentMagicItems,
               profileDetection: mismatch ? null : currentProfile,
               mismatch,
@@ -1008,6 +1034,7 @@ export function ScreenshotImportWizard({
       setWallDistributions([...combinedWalls.values()].sort((a, b) => a.level - b.level));
       setUpgradeSlots([...combinedSlots.values()]);
       setResourceDetections([...combinedResources.values()]);
+      setEquipmentCostDetections([...combinedEquipmentCosts.values()]);
       setMagicItemDetections([...combinedMagicItems.values()]);
       setProfileDetection(combinedProfile);
       setScreenshots((current) => {
@@ -1027,7 +1054,7 @@ export function ScreenshotImportWizard({
         ),
         ...current,
       }));
-      if (merged.length || combinedWalls.size || combinedSlots.size || combinedResources.size || combinedMagicItems.size || combinedProfile) setStep("review");
+      if (merged.length || combinedWalls.size || combinedSlots.size || combinedResources.size || combinedEquipmentCosts.size || combinedMagicItems.size || combinedProfile) setStep("review");
       setProgress(100);
     } finally {
       setBusy(false);
@@ -1297,6 +1324,7 @@ export function ScreenshotImportWizard({
     setWallDistributions([]);
     setUpgradeSlots([]);
     setResourceDetections([]);
+    setEquipmentCostDetections([]);
     setMagicItemDetections([]);
     setProfileDetection(null);
     setAccepted({});
@@ -2039,6 +2067,46 @@ export function ScreenshotImportWizard({
                       <p className="mt-2 text-xs text-amber-200">
                         {en ? "Remaining time was not recognized. Enter it before confirming for an exact simulation." : "Restzeit wurde nicht erkannt. Für eine genaue Simulation bitte vor dem Bestätigen eintragen."}
                       </p>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {equipmentCostDetections.length ? (
+            <div className="mt-5">
+              <h4 className="font-bold">{en ? "Visible equipment upgrade costs" : "Sichtbare Ausrüstungs-Upgrade-Kosten"}</h4>
+              <p className="mt-1 text-xs text-slate-400">
+                {en
+                  ? "Detected ore costs are compared with the target-level game catalog. They are evidence only and never overwrite your current ore balance."
+                  : "Erkannte Erzkosten werden mit dem Spielkatalog des Ziellevels verglichen. Sie dienen nur als Prüfhinweis und überschreiben niemals deinen aktuellen Erzbestand."}
+              </p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {equipmentCostDetections.map((cost) => (
+                  <article key={cost.id} className={`rounded-xl border p-3 text-sm ${cost.confidence < 0.5 ? "border-amber-400/30 bg-amber-400/5" : "border-white/10 bg-slate-950"}`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <span>
+                        <b className="block">{cost.name}</b>
+                        <span className="text-xs text-slate-400">{en ? "Target level" : "Ziellevel"} {cost.targetLevel}</span>
+                      </span>
+                      <span className={cost.confidence < 0.5 ? "text-amber-200" : "text-emerald-200"}>{Math.round(cost.confidence * 100)}%</span>
+                    </div>
+                    <div className="mt-3 space-y-1 text-xs text-slate-300">
+                      {[
+                        [en ? "Shiny Ore" : "Glänzendes Erz", cost.shinyOreCost, cost.expectedShinyOreCost],
+                        [en ? "Glowy Ore" : "Leuchtendes Erz", cost.glowyOreCost, cost.expectedGlowyOreCost],
+                        [en ? "Starry Ore" : "Sternenerz", cost.starryOreCost, cost.expectedStarryOreCost],
+                      ].filter(([, detected]) => detected !== null).map(([label, detected, expected]) => (
+                        <div key={String(label)} className="flex justify-between gap-3">
+                          <span>{label}</span>
+                          <span>{String(detected)} {expected !== null ? `· ${en ? "catalog" : "Katalog"} ${String(expected)}` : ""}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {cost.reasons.length ? (
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-amber-200">
+                        {cost.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                      </ul>
                     ) : null}
                   </article>
                 ))}
