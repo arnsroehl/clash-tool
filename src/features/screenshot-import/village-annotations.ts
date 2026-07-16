@@ -1,5 +1,6 @@
 import type {
   BoundingBox,
+  ScreenshotEntity,
   ScreenshotEntityType,
 } from "@/features/screenshot-import/screenshot-import";
 import type {
@@ -39,6 +40,47 @@ export type VillageTrainingExportInput = {
   townHallLevel: number;
   annotations: VillageScreenshotAnnotation[];
 };
+
+export function getVillageAnnotationEntities(
+  entities: ScreenshotEntity[],
+  townHallLevel: number,
+  language: "de" | "en",
+): ScreenshotEntity[] {
+  const unique = new Map<string, ScreenshotEntity>();
+  entities
+    .filter((entity) =>
+      (entity.type === "building" || entity.type === "wall")
+      && (entity.unlockTownHallLevel === undefined || entity.unlockTownHallLevel <= townHallLevel),
+    )
+    .forEach((entity) => {
+      const sourceId = entity.aliases?.[0] || entity.id.split(":")[0];
+      if (unique.has(sourceId)) return;
+      unique.set(sourceId, {
+        ...entity,
+        id: sourceId,
+        name: entity.name.replace(/\s+\d+$/, ""),
+      });
+    });
+  return [...unique.values()].sort((left, right) => left.name.localeCompare(right.name, language));
+}
+
+export function createFullImageVillageAnnotation(params: {
+  screenshotId: string;
+  entityId: string;
+  entityType: VillageAnnotationEntityType;
+  level: number;
+  improvementConsent: boolean;
+}): VillageScreenshotAnnotation {
+  return {
+    id: crypto.randomUUID(),
+    screenshotId: params.screenshotId,
+    entityId: params.entityId,
+    entityType: params.entityType,
+    level: params.level,
+    boundingBox: { x: 0, y: 0, width: 1, height: 1 },
+    improvementConsent: params.improvementConsent,
+  };
+}
 
 export function isValidNormalizedBoundingBox(box: BoundingBox): boolean {
   return [box.x, box.y, box.width, box.height].every(Number.isFinite)

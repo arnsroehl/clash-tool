@@ -7,6 +7,7 @@ import type {
 } from "@/features/screenshot-import/screenshot-import";
 import {
   buildVillageTrainingDataset,
+  getVillageAnnotationEntities,
   normalizeDrawnBoundingBox,
   type VillageScreenshotAnnotation,
 } from "@/features/screenshot-import/village-annotations";
@@ -69,24 +70,7 @@ export function VillageAnnotationEditor({
   const [message, setMessage] = useState<string | null>(null);
   const loaded = useRef(false);
   const availableEntities = useMemo(
-    () => {
-      const unique = new Map<string, ScreenshotEntity>();
-      entities
-        .filter((entity) =>
-          (entity.type === "building" || entity.type === "wall")
-          && (entity.unlockTownHallLevel === undefined || entity.unlockTownHallLevel <= townHallLevel),
-        )
-        .forEach((entity) => {
-          const sourceId = entity.aliases?.[0] || entity.id.split(":")[0];
-          if (unique.has(sourceId)) return;
-          unique.set(sourceId, {
-            ...entity,
-            id: sourceId,
-            name: entity.name.replace(/\s+\d+$/, ""),
-          });
-        });
-      return [...unique.values()].sort((left, right) => left.name.localeCompare(right.name, language));
-    },
+    () => getVillageAnnotationEntities(entities, townHallLevel, language),
     [entities, language, townHallLevel],
   );
   const selectedEntity = availableEntities.find((entity) => entity.id === selectedEntityId);
