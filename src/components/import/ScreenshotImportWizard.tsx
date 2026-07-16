@@ -86,6 +86,7 @@ import {
   SCREENSHOT_IMPORT_CONFIG,
 } from "@/config/screenshotImport";
 import { VillageAnnotationEditor } from "@/components/import/VillageAnnotationEditor";
+import { VillageTrainingBulkUpload } from "@/components/import/VillageTrainingBulkUpload";
 
 type ImportType = ScreenshotImportType;
 type ConcreteImportType = Exclude<ScreenshotImportType, "full">;
@@ -505,6 +506,35 @@ export function ScreenshotImportWizard({
             ? "The import session could not be created."
             : "Die Importsitzung konnte nicht erstellt werden.",
       );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const startTrainingImageSession = async () => {
+    if (!isScreenshotImportTypeEnabled("village") || !gameUiVersionKnown) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      const created = await createScreenshotImportSession({
+        accountId,
+        importType: "village",
+        language,
+        retainOriginals: true,
+        gameVersion: SCREENSHOT_IMPORT_CONFIG.supportedGameUiVersion,
+      });
+      setImportType("village");
+      setRetainOriginals(true);
+      setSession(created);
+      setRestoredScreenTypes([]);
+      setRestoredCoveredEntityIds([]);
+      setResumeCandidate(null);
+      setRestoredChanges([]);
+      setStep("upload");
+    } catch (error) {
+      setMessage(error instanceof Error
+        ? error.message
+        : en ? "The training upload could not be prepared." : "Der Trainingsupload konnte nicht vorbereitet werden.");
     } finally {
       setBusy(false);
     }
@@ -1555,6 +1585,26 @@ export function ScreenshotImportWizard({
               );
             })}
           </div>
+          <div className="mt-4 rounded-xl border border-violet-400/30 bg-violet-400/10 p-4">
+            <b className="text-violet-100">
+              {en ? "Already have individual building images?" : "Du hast schon einzelne Gebäudebilder?"}
+            </b>
+            <p className="mt-1 text-xs text-slate-300">
+              {en
+                ? "Upload several pre-cropped images instead of drawing a box in a whole-village screenshot. Building and level are applied to every selected image."
+                : "Lade mehrere zugeschnittene Bilder hoch, statt Rahmen in einem Gesamtdorf-Bild zu zeichnen. Gebäude und Level werden für alle ausgewählten Bilder übernommen."}
+            </p>
+            <button
+              type="button"
+              disabled={busy || !isScreenshotImportTypeEnabled("village") || !gameUiVersionKnown}
+              onClick={() => void startTrainingImageSession()}
+              className="mt-3 rounded-lg bg-violet-300 px-4 py-2 text-sm font-bold text-slate-950 disabled:opacity-40"
+            >
+              {busy
+                ? (en ? "Preparing…" : "Wird vorbereitet…")
+                : (en ? "Start cropped-image upload" : "Upload für Bildausschnitte starten")}
+            </button>
+          </div>
           {importType === "buildings" ? (
             <fieldset className="mt-4">
               <legend className="text-sm font-bold text-slate-200">
@@ -1691,6 +1741,16 @@ export function ScreenshotImportWizard({
 
       {step === "upload" || step === "review" ? (
         <div className="mt-5">
+          {session && importType === "village" && session.retainOriginals ? (
+            <VillageTrainingBulkUpload
+              session={session}
+              entities={entities}
+              townHallLevel={townHallLevel}
+              language={language}
+              improvementConsent={improvementConsent}
+              onImprovementConsentChange={setImprovementConsent}
+            />
+          ) : null}
           {importType === "full" ? (
             <div className="mb-4 rounded-xl border border-sky-400/20 bg-sky-400/5 p-4">
               <div className="flex items-center justify-between gap-3 text-sm">
