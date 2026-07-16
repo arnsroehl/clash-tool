@@ -219,7 +219,11 @@ export async function fetchLatestOpenScreenshotImport(
     const confidence = Number(change.confidence || 0);
     const previous = (change.previous_value || {}) as { level?: number };
     const proposed = (change.proposed_value || {}) as { level?: number | null };
-    const corrected = (change.user_corrected_value || {}) as { level?: number | null };
+    const corrected = (change.user_corrected_value || {}) as {
+      level?: number | null;
+      entityId?: string;
+      entityType?: ScreenshotProposedChange["entityType"];
+    };
     const status = String(change.status);
     return {
       id: `change:${change.entity_id}`,
@@ -243,6 +247,8 @@ export async function fetchLatestOpenScreenshotImport(
       unlockStatus: (corrected.level ?? proposed.level) === 0
         ? "locked" as const
         : "unlocked" as const,
+      correctedEntityId: corrected.entityId,
+      correctedEntityType: corrected.entityType,
     };
   });
   const wallMap = new Map<number, WallLevelDistribution>();
@@ -761,6 +767,8 @@ export async function recordChangeDecisions(
     entityId: string;
     status: "accepted" | "rejected" | "corrected" | "later";
     correctedLevel?: number;
+    correctedEntityId?: string;
+    correctedEntityType?: string;
   }>,
 ): Promise<void> {
   const client = getSupabaseClient();
@@ -770,7 +778,17 @@ export async function recordChangeDecisions(
       .update({
         status: decision.status,
         user_corrected_value:
-          decision.correctedLevel === undefined ? null : { level: decision.correctedLevel },
+          decision.correctedLevel === undefined && decision.correctedEntityId === undefined
+            ? null
+            : {
+                ...(decision.correctedLevel === undefined ? {} : { level: decision.correctedLevel }),
+                ...(decision.correctedEntityId === undefined
+                  ? {}
+                  : {
+                      entityId: decision.correctedEntityId,
+                      entityType: decision.correctedEntityType || decision.entityType,
+                    }),
+              },
         confirmed_at: decision.status === "later" ? null : new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })

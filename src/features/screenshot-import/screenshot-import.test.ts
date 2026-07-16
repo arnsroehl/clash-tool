@@ -30,6 +30,7 @@ import {
   parseUpgradeSlots,
   parseWallDistributions,
   resolveScreenshotAnalysisType,
+  resolveScreenshotCorrectionEntity,
   summarizeScreenshotReview,
   shouldStoreScreenshotFeedback,
   validateProfileScreenshot,
@@ -105,6 +106,38 @@ test("starts analysis only for non-terminal import sessions", () => {
     .forEach((status) => assert.equal(canStartScreenshotAnalysis(status), true));
   assert.equal(canStartScreenshotAnalysis("confirmed"), false);
   assert.equal(canStartScreenshotAnalysis("cancelled"), false);
+});
+
+test("resolves a manually corrected building without allowing a type change", () => {
+  const change: ScreenshotProposedChange = {
+    id: "change:cannon:1",
+    entityId: "cannon:1",
+    entityType: "building",
+    name: "Kanone 1",
+    previousLevel: 20,
+    proposedLevel: 21,
+    changeType: "level_increased",
+    confidence: 0.6,
+    confidenceBand: "uncertain",
+    status: "review_required",
+    sourceDetectionIds: [],
+    reasons: [],
+    alternatives: [],
+    unlockStatus: "unlocked",
+  };
+  const candidates: ScreenshotEntity[] = [
+    { id: "cannon:1", name: "Kanone 1", currentLevel: 20, type: "building" },
+    { id: "archer-tower:1", name: "Bogenschützenturm 1", currentLevel: 19, type: "building" },
+    { id: "king", name: "Barbarenkönig", currentLevel: 90, type: "hero" },
+  ];
+  assert.equal(
+    resolveScreenshotCorrectionEntity(change, "archer-tower:1", candidates)?.id,
+    "archer-tower:1",
+  );
+  assert.equal(
+    resolveScreenshotCorrectionEntity(change, "king", candidates)?.id,
+    "cannon:1",
+  );
 });
 
 test("detects screenshot language independently from the app language", () => {

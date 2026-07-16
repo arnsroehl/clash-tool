@@ -24,6 +24,7 @@ import {
   parseScreenshotResources,
   parseProfileScreenshot,
   resolveScreenshotAnalysisType,
+  resolveScreenshotCorrectionEntity,
   summarizeScreenshotReview,
   shouldStoreScreenshotFeedback,
   validateProfileScreenshot,
@@ -90,7 +91,8 @@ import { VillageTrainingBulkUpload } from "@/components/import/VillageTrainingBu
 
 type ImportType = ScreenshotImportType;
 type ConcreteImportType = Exclude<ScreenshotImportType, "full">;
-type CompletionState = "confirmed" | "partially_confirmed" | "saved_for_later" | "discarded";
+type CompletionState = "confirmed" | "partially_confirmed" | "saved_for_later" | "discarded" | "training_saved";
+type UploadMode = "normal" | "training";
 
 type Props = {
   accountId: string;
@@ -265,6 +267,10 @@ export function ScreenshotImportWizard({
   const [accepted, setAccepted] = useState<Record<string, boolean>>({});
   const [deferred, setDeferred] = useState<Record<string, boolean>>({});
   const [correctedLevels, setCorrectedLevels] = useState<Record<string, number>>({});
+  const [correctedEntityIds, setCorrectedEntityIds] = useState<Record<string, string>>({});
+  const [uploadMode, setUploadMode] = useState<UploadMode>("normal");
+  const [trainingUploadBusy, setTrainingUploadBusy] = useState(false);
+  const [trainingSavedCount, setTrainingSavedCount] = useState(0);
   const [retainOriginals, setRetainOriginals] = useState(false);
   const [improvementConsent, setImprovementConsent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -289,6 +295,16 @@ export function ScreenshotImportWizard({
   const [qualityMetrics, setQualityMetrics] = useState<ScreenshotQualityMetrics | null>(null);
   const [deletingOriginalsFor, setDeletingOriginalsFor] = useState<string | null>(null);
   const previewUrls = useRef(new Set<string>());
+  const buildingCorrectionOptions = useMemo(() => {
+    const unique = new Map<string, ScreenshotEntity>();
+    entities
+      .filter((entity) =>
+        entity.type === "building"
+        && (entity.unlockTownHallLevel === undefined || entity.unlockTownHallLevel <= townHallLevel),
+      )
+      .forEach((entity) => unique.set(entity.id, entity));
+    return [...unique.values()].sort((left, right) => left.name.localeCompare(right.name, language));
+  }, [entities, language, townHallLevel]);
 
   useEffect(
     () => () => {
@@ -482,6 +498,7 @@ export function ScreenshotImportWizard({
         gameVersion: SCREENSHOT_IMPORT_CONFIG.supportedGameUiVersion,
       });
       setSession(created);
+      setUploadMode("normal");
       setRestoredScreenTypes([]);
       setRestoredCoveredEntityIds([]);
       if (importType === "walls" && existingWallLevels.length) {
@@ -524,6 +541,8 @@ export function ScreenshotImportWizard({
         gameVersion: SCREENSHOT_IMPORT_CONFIG.supportedGameUiVersion,
       });
       setImportType("village");
+      setUploadMode("training");
+      setTrainingSavedCount(0);
       setRetainOriginals(true);
       setSession(created);
       setRestoredScreenTypes([]);
@@ -556,6 +575,9 @@ export function ScreenshotImportWizard({
       category: entities.find((entity) => entity.id === change.entityId)?.category,
     }));
     setSession(resumeCandidate.session);
+    setUploadMode("normal");
+    setTrainingUploadBusy(false);
+    setTrainingSavedCount(0);
     setRestoredScreenTypes(resumeCandidate.screenTypes);
     setRestoredCoveredEntityIds(resumeCandidate.coveredEntityIds);
     setImportType(resumeCandidate.session.selectedImportType);
@@ -569,6 +591,11 @@ export function ScreenshotImportWizard({
     setProfileDetection(resumeCandidate.profile);
     setPendingResumeFiles(resumeCandidate.pendingFiles);
     setAccepted(Object.fromEntries(namedChanges.map((change) => [change.id, change.status === "preselected"])));
+    setCorrectedEntityIds(Object.fromEntries(
+      namedChanges
+        .filter((change) => Boolean(change.correctedEntityId))
+        .map((change) => [change.id, change.correctedEntityId as string]),
+    ));
     setStep(
       namedChanges.length ||
         resumeCandidate.wallDistributions.length ||
@@ -1176,6 +1203,39 @@ export function ScreenshotImportWizard({
       );
       return;
     }
+    const selectedTargets = changes
+      .filter((change) => accepted[change.id])
+      .map((change) => {
+        const target = resolveScreenshotCorrectionEntity(
+          change,
+          correctedEntityIds[change.id],
+          entities,
+        );
+        return {
+          change,
+          target,
+          level: correctedLevels[change.id] ?? change.proposedLevel,
+        };
+      });
+    const invalidTarget = selectedTargets.find(({ target, level }) => {
+      const maximum = target?.maxLevelForTownHall || target?.maxLevel;
+      return level !== null && maximum !== undefined && level > maximum;
+    });
+    if (invalidTarget) {
+      setMessage(en
+        ? `Level ${invalidTarget.level} is not valid for ${invalidTarget.target?.name || invalidTarget.change.name} at this Town Hall.`
+        : `Level ${invalidTarget.level} ist für ${invalidTarget.target?.name || invalidTarget.change.name} auf diesem Rathaus nicht gültig.`);
+      return;
+    }
+    const targetIds = selectedTargets.map(({ target, change }) => target?.id || change.entityId);
+    const duplicateTargetId = targetIds.find((id, index) => targetIds.indexOf(id) !== index);
+    if (duplicateTargetId) {
+      const duplicateTarget = entities.find((entity) => entity.id === duplicateTargetId);
+      setMessage(en
+        ? `Two selected changes target ${duplicateTarget?.name || duplicateTargetId}. Keep only one or choose another building instance.`
+        : `Zwei ausgewählte Änderungen betreffen ${duplicateTarget?.name || duplicateTargetId}. Behalte nur eine oder wähle eine andere Gebäudeinstanz.`);
+      return;
+    }
     setBusy(true);
     setMessage(null);
     try {
@@ -1183,11 +1243,16 @@ export function ScreenshotImportWizard({
         if (!accepted[change.id]) return [];
         const level = correctedLevels[change.id] ?? change.proposedLevel;
         if (level === null || level < 0) return [];
+        const target = resolveScreenshotCorrectionEntity(
+          change,
+          correctedEntityIds[change.id],
+          entities,
+        );
         return [{
-          type: change.entityType as ImportChange["type"],
-          itemId: change.entityId,
-          name: change.name,
-          fromLevel: change.previousLevel,
+          type: (target?.type || change.entityType) as ImportChange["type"],
+          itemId: target?.id || change.entityId,
+          name: target?.name || change.name,
+          fromLevel: target?.currentLevel ?? change.previousLevel,
           toLevel: level,
         }];
       });
@@ -1218,20 +1283,27 @@ export function ScreenshotImportWizard({
           status: deferred[change.id]
             ? "later"
             : accepted[change.id]
-            ? correctedLevels[change.id] === undefined
+            ? correctedLevels[change.id] === undefined && !correctedEntityIds[change.id]
               ? "accepted"
               : "corrected"
             : "rejected",
           correctedLevel: correctedLevels[change.id],
+          correctedEntityId: correctedEntityIds[change.id],
+          correctedEntityType: correctedEntityIds[change.id] ? change.entityType : undefined,
         })),
       );
       for (const change of changes) {
         const correctedLevel = correctedLevels[change.id];
-        if (!shouldStoreScreenshotFeedback(
+        const correctedEntityId = correctedEntityIds[change.id];
+        const entityWasCorrected = Boolean(
+          correctedEntityId && correctedEntityId !== change.entityId,
+        );
+        if (!entityWasCorrected && !shouldStoreScreenshotFeedback(
           improvementConsent,
           correctedLevel,
           change.proposedLevel,
         )) continue;
+        if (!improvementConsent) continue;
         const sourceDetection = detections.find((detection) =>
           change.sourceDetectionIds.includes(detection.detectionId),
         );
@@ -1250,8 +1322,8 @@ export function ScreenshotImportWizard({
           },
           correctedResult: {
             entityType: change.entityType,
-            entityId: change.entityId,
-            level: correctedLevel,
+            entityId: correctedEntityId || change.entityId,
+            level: correctedLevel ?? change.proposedLevel,
           },
           improvementConsent,
           language: sourceScreenshot?.detectedLanguage || language,
@@ -1284,6 +1356,8 @@ export function ScreenshotImportWizard({
           entityId: change.entityId,
           status: "later",
           correctedLevel: correctedLevels[change.id],
+          correctedEntityId: correctedEntityIds[change.id],
+          correctedEntityType: correctedEntityIds[change.id] ? change.entityType : undefined,
         })),
       );
       await saveScreenshotImportForLater(session.id);
@@ -1291,6 +1365,24 @@ export function ScreenshotImportWizard({
       setStep("done");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Import konnte nicht gespeichert werden.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const finishTrainingUpload = async () => {
+    if (!session || trainingUploadBusy || trainingSavedCount < 1) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      await confirmScreenshotImport(session);
+      await refreshHistory().catch(() => undefined);
+      setCompletionState("training_saved");
+      setStep("done");
+    } catch (error) {
+      setMessage(error instanceof Error
+        ? error.message
+        : en ? "The training upload could not be completed." : "Der Trainingsupload konnte nicht abgeschlossen werden.");
     } finally {
       setBusy(false);
     }
@@ -1371,6 +1463,10 @@ export function ScreenshotImportWizard({
     setAccepted({});
     setDeferred({});
     setCorrectedLevels({});
+    setCorrectedEntityIds({});
+    setUploadMode("normal");
+    setTrainingUploadBusy(false);
+    setTrainingSavedCount(0);
     setImprovementConsent(false);
     setRestoredChanges([]);
     setResumeCandidate(null);
@@ -1391,14 +1487,20 @@ export function ScreenshotImportWizard({
     return (
       <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-5">
         <h3 className="font-bold text-emerald-200">
-          {completionState === "saved_for_later" || completionState === "partially_confirmed"
+          {completionState === "training_saved"
+            ? (en ? "Training images saved" : "Trainingsbilder gespeichert")
+            : completionState === "saved_for_later" || completionState === "partially_confirmed"
             ? (en ? "Import saved" : "Import gespeichert")
             : completionState === "discarded"
               ? (en ? "Changes discarded" : "Änderungen verworfen")
               : (en ? "Import completed" : "Import abgeschlossen")}
         </h3>
         <p className="mt-2 text-sm text-slate-300">
-          {completionState === "partially_confirmed"
+          {completionState === "training_saved"
+            ? en
+              ? "The labeled image crops were saved privately. No account levels were changed."
+              : "Die beschrifteten Bildausschnitte wurden privat gespeichert. Es wurden keine Account-Level geändert."
+            : completionState === "partially_confirmed"
             ? en
               ? "Confirmed values were applied. Deferred changes remain private and can be continued later."
               : "Bestätigte Werte wurden übernommen. Zurückgestellte Änderungen bleiben privat gespeichert und können später fortgesetzt werden."
@@ -1433,7 +1535,11 @@ export function ScreenshotImportWizard({
           </p>
           <h3 className="mt-1 text-lg font-bold">
             {step === "select" ? (en ? "1. Select area" : "1. Bereich wählen") :
-              step === "upload" ? (en ? "2. Add screenshots" : "2. Screenshots hinzufügen") :
+              step === "upload"
+                ? uploadMode === "training"
+                  ? (en ? "2. Add training images" : "2. Trainingsbilder hinzufügen")
+                  : (en ? "2. Add screenshots" : "2. Screenshots hinzufügen")
+                :
                 (en ? "3. Review changes" : "3. Änderungen prüfen")}
           </h3>
         </div>
@@ -1741,16 +1847,43 @@ export function ScreenshotImportWizard({
 
       {step === "upload" || step === "review" ? (
         <div className="mt-5">
-          {session && importType === "village" && session.retainOriginals ? (
-            <VillageTrainingBulkUpload
-              session={session}
-              entities={entities}
-              townHallLevel={townHallLevel}
-              language={language}
-              improvementConsent={improvementConsent}
-              onImprovementConsentChange={setImprovementConsent}
-            />
-          ) : null}
+          {session && uploadMode === "training" ? (
+            <>
+              <VillageTrainingBulkUpload
+                session={session}
+                entities={entities}
+                townHallLevel={townHallLevel}
+                language={language}
+                improvementConsent={improvementConsent}
+                onImprovementConsentChange={setImprovementConsent}
+                onBusyChange={setTrainingUploadBusy}
+                onSaved={(count) => setTrainingSavedCount((current) => current + count)}
+              />
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={busy || trainingUploadBusy || trainingSavedCount < 1}
+                  onClick={() => void finishTrainingUpload()}
+                  className="rounded-xl bg-violet-300 px-5 py-3 font-bold text-slate-950 disabled:opacity-40"
+                >
+                  {busy
+                    ? (en ? "Finishing…" : "Wird abgeschlossen…")
+                    : trainingSavedCount
+                      ? (en ? `Finish training upload (${trainingSavedCount})` : `Trainingsupload abschließen (${trainingSavedCount})`)
+                      : (en ? "Upload at least one image" : "Mindestens ein Bild hochladen")}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy || trainingUploadBusy}
+                  onClick={() => void cancel()}
+                  className="rounded-xl border border-rose-400/30 px-5 py-3 font-bold text-rose-200 disabled:opacity-40"
+                >
+                  {en ? "Cancel and delete" : "Abbrechen und löschen"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
           {importType === "full" ? (
             <div className="mb-4 rounded-xl border border-sky-400/20 bg-sky-400/5 p-4">
               <div className="flex items-center justify-between gap-3 text-sm">
@@ -1923,6 +2056,8 @@ export function ScreenshotImportWizard({
               </span>
             </label>
           ) : null}
+            </>
+          )}
         </div>
       ) : null}
 
@@ -2002,6 +2137,8 @@ export function ScreenshotImportWizard({
                       checked={accepted[change.id] || false}
                       deferred={deferred[change.id] || false}
                       correctedLevel={correctedLevels[change.id]}
+                      correctedEntityId={correctedEntityIds[change.id]}
+                      entityOptions={change.entityType === "building" ? buildingCorrectionOptions : []}
                       language={language}
                       crop={(() => {
                         const detection = detections.find((item) => change.sourceDetectionIds.includes(item.detectionId));
@@ -2021,6 +2158,16 @@ export function ScreenshotImportWizard({
                       onLevel={(level) => {
                         setCorrectedLevels((current) => ({ ...current, [change.id]: level }));
                         setAccepted((current) => ({ ...current, [change.id]: true }));
+                      }}
+                      onEntity={(entityId) => {
+                        setCorrectedEntityIds((current) => {
+                          const next = { ...current };
+                          if (entityId === change.entityId) delete next[change.id];
+                          else next[change.id] = entityId;
+                          return next;
+                        });
+                        setAccepted((current) => ({ ...current, [change.id]: true }));
+                        setDeferred((current) => ({ ...current, [change.id]: false }));
                       }}
                       onSuggestedLevel={() => {
                         if (change.suggestedLevel === null || change.suggestedLevel === undefined) return;
@@ -2471,10 +2618,13 @@ function ChangeReviewCard({
   checked,
   deferred,
   correctedLevel,
+  correctedEntityId,
+  entityOptions,
   language,
   onChecked,
   onLater,
   onLevel,
+  onEntity,
   onSuggestedLevel,
   crop,
 }: {
@@ -2482,15 +2632,22 @@ function ChangeReviewCard({
   checked: boolean;
   deferred: boolean;
   correctedLevel?: number;
+  correctedEntityId?: string;
+  entityOptions: ScreenshotEntity[];
   language: "de" | "en";
   onChecked: (checked: boolean) => void;
   onLater: () => void;
   onLevel: (level: number) => void;
+  onEntity: (entityId: string) => void;
   onSuggestedLevel: () => void;
   crop?: { url: string; box: { x: number; y: number; width: number; height: number } };
 }) {
   const en = language === "en";
   const requiresManual = change.status === "manual_required";
+  const selectedEntity = entityOptions.find(
+    (entity) => entity.id === (correctedEntityId || change.entityId),
+  );
+  const previousLevel = selectedEntity?.currentLevel ?? change.previousLevel;
   return (
     <article className={`rounded-xl border p-4 ${requiresManual ? "border-rose-400/30 bg-rose-400/5" : "border-white/10 bg-slate-950"}`}>
       {crop ? (
@@ -2508,10 +2665,12 @@ function ChangeReviewCard({
         <label className="flex min-w-0 flex-1 items-start gap-3">
           <input type="checkbox" checked={checked} onChange={(event) => onChecked(event.target.checked)} className="mt-1" />
           <span>
-            <b className="block">{change.name}</b>
-            {change.category ? <span className="block text-xs text-slate-500">{change.category}</span> : null}
+            <b className="block">{selectedEntity?.name || change.name}</b>
+            {selectedEntity?.category || change.category ? (
+              <span className="block text-xs text-slate-500">{selectedEntity?.category || change.category}</span>
+            ) : null}
             <span className="text-sm text-slate-300">
-              {change.previousLevel} → {change.unlockStatus === "locked" && (correctedLevel ?? change.proposedLevel) === 0
+              {previousLevel} → {change.unlockStatus === "locked" && (correctedLevel ?? change.proposedLevel) === 0
                 ? (en ? "locked / not built" : "gesperrt / nicht gebaut")
                 : correctedLevel ?? change.proposedLevel ?? "?"}
             </span>
@@ -2558,12 +2717,33 @@ function ChangeReviewCard({
           </button>
         </div>
       ) : null}
+      {change.entityType === "building" && entityOptions.length ? (
+        <label className="mt-3 block text-xs text-slate-400">
+          {en ? "Correct building" : "Gebäudeart korrigieren"}
+          <select
+            value={correctedEntityId || change.entityId}
+            onChange={(event) => onEntity(event.target.value)}
+            className="mt-1 block w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"
+          >
+            {entityOptions.map((entity) => (
+              <option key={entity.id} value={entity.id}>
+                {entity.name} · {en ? "saved level" : "gespeichertes Level"} {entity.currentLevel}
+              </option>
+            ))}
+          </select>
+          {correctedEntityId && correctedEntityId !== change.entityId ? (
+            <span className="mt-1 block text-emerald-200">
+              {en ? "The corrected building will be applied on confirmation." : "Das korrigierte Gebäude wird bei der Bestätigung übernommen."}
+            </span>
+          ) : null}
+        </label>
+      ) : null}
       <label className="mt-3 flex items-center gap-2 text-xs text-slate-400">
         {en ? "Correct level" : "Level korrigieren"}
         <input
           type="number"
           min={0}
-          max={200}
+          max={selectedEntity?.maxLevelForTownHall || selectedEntity?.maxLevel || 200}
           value={correctedLevel ?? change.proposedLevel ?? ""}
           onChange={(event) => onLevel(Number(event.target.value))}
           className="w-20 rounded-lg border border-white/10 bg-slate-900 px-2 py-1 text-white"
