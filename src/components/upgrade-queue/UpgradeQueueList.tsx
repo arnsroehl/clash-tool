@@ -70,8 +70,11 @@ export function UpgradeQueueList({
       gold: total.gold + item.goldCost,
       elixir: total.elixir + item.elixirCost,
       darkElixir: total.darkElixir + item.darkElixirCost,
+      shinyOre: total.shinyOre + (item.shinyOreCost || 0),
+      glowyOre: total.glowyOre + (item.glowyOreCost || 0),
+      starryOre: total.starryOre + (item.starryOreCost || 0),
     }),
-    { gold: 0, elixir: 0, darkElixir: 0 },
+    { gold: 0, elixir: 0, darkElixir: 0, shinyOre: 0, glowyOre: 0, starryOre: 0 },
   );
   const format = (value: number) =>
     new Intl.NumberFormat(en ? "en-US" : "de-DE").format(value);
@@ -226,6 +229,11 @@ export function UpgradeQueueList({
             </p>
           </div>
         </div>
+      ) : null}
+      {selectedAccount && (resourceTotals.shinyOre > 0 || resourceTotals.glowyOre > 0 || resourceTotals.starryOre > 0) ? (
+        <p className="mt-3 rounded-xl border border-cyan-300/20 bg-cyan-300/5 p-3 text-sm text-cyan-100">
+          {en ? "Ores for open queue" : "Erze für offene Queue"}: {format(resourceTotals.shinyOre)} / {format(resourceTotals.glowyOre)} / {format(resourceTotals.starryOre)}
+        </p>
       ) : null}
 
       {selectedAccount && queueItems.length > 0 ? (

@@ -18,6 +18,9 @@ describe("Upgrade Queue Service", () => {
       gold_cost: 0,
       elixir_cost: 50000,
       dark_elixir_cost: 0,
+      shiny_ore_cost: 120,
+      glowy_ore_cost: 20,
+      starry_ore_cost: 2,
       duration_hours: 5,
       priority_score: 90,
       queue_order: 1,
@@ -38,5 +41,6 @@ describe("Upgrade Queue Service", () => {
     assert.equal(item.elixirCost, row.elixir_cost);
     assert.equal(item.queueOrder, row.queue_order);
     assert.equal(item.isLocked, false);
+    assert.equal(item.shinyOreCost, 120);
   });
 });

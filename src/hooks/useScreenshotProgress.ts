@@ -7,6 +7,9 @@ import {
   fetchAccountResourceSnapshot,
   fetchAccountWallLevels,
   fetchScreenshotProgressCatalog,
+  updateAccountScreenshotEntityLevel,
+  saveAccountUpgradeSlot,
+  deleteAccountUpgradeSlot,
 } from "@/services/screenshotProgressService";
 import type { ClashAccount } from "@/types/account";
 import type {
@@ -16,6 +19,7 @@ import type {
   ScreenshotUpgradeSlot,
   ScreenshotResourceSnapshot,
   ScreenshotWallLevel,
+  SaveUpgradeSlotInput,
 } from "@/types/screenshotProgress";
 
 export function useScreenshotProgress(
@@ -29,6 +33,8 @@ export function useScreenshotProgress(
   const [upgradeSlots, setUpgradeSlots] = useState<ScreenshotUpgradeSlot[]>([]);
   const [resourceSnapshot, setResourceSnapshot] = useState<ScreenshotResourceSnapshot | null>(null);
   const [wallLevels, setWallLevels] = useState<ScreenshotWallLevel[]>([]);
+  const [savingEntityId, setSavingEntityId] = useState<string | null>(null);
+  const [isSavingSlot, setIsSavingSlot] = useState(false);
 
   const refreshAccountProgress = useCallback(async () => {
     if (!enabled || !selectedAccount) return;
@@ -100,6 +106,45 @@ export function useScreenshotProgress(
       }));
   }, [entities, levels, selectedAccount]);
 
+  const updateEntityLevel = useCallback(async (entityId: string, level: number) => {
+    if (!selectedAccount) return;
+    setSavingEntityId(entityId);
+    try {
+      await updateAccountScreenshotEntityLevel({ accountId: selectedAccount.id, entityId, currentLevel: level });
+      setAccountLevels((current) => ({ ...current, [entityId]: level }));
+    } catch (error) {
+      onError(error instanceof Error ? error.message : "Level konnte nicht gespeichert werden.");
+    } finally {
+      setSavingEntityId(null);
+    }
+  }, [onError, selectedAccount]);
+
+  const saveUpgradeSlot = useCallback(async (input: Omit<SaveUpgradeSlotInput, "accountId">) => {
+    if (!selectedAccount) return;
+    setIsSavingSlot(true);
+    try {
+      await saveAccountUpgradeSlot({ ...input, accountId: selectedAccount.id });
+      await refreshAccountProgress();
+    } catch (error) {
+      onError(error instanceof Error ? error.message : "Upgrade-Slot konnte nicht gespeichert werden.");
+    } finally {
+      setIsSavingSlot(false);
+    }
+  }, [onError, refreshAccountProgress, selectedAccount]);
+
+  const removeUpgradeSlot = useCallback(async (slotType: SaveUpgradeSlotInput["slotType"], slotIndex: number) => {
+    if (!selectedAccount) return;
+    setIsSavingSlot(true);
+    try {
+      await deleteAccountUpgradeSlot({ accountId: selectedAccount.id, slotType, slotIndex });
+      await refreshAccountProgress();
+    } catch (error) {
+      onError(error instanceof Error ? error.message : "Upgrade-Slot konnte nicht entfernt werden.");
+    } finally {
+      setIsSavingSlot(false);
+    }
+  }, [onError, refreshAccountProgress, selectedAccount]);
+
   return {
     availableEntities,
     catalogLevels: levels,
@@ -108,5 +153,10 @@ export function useScreenshotProgress(
     resourceSnapshot: selectedAccount ? resourceSnapshot : null,
     wallLevels: selectedAccount ? wallLevels : [],
     refreshAccountProgress,
+    updateEntityLevel,
+    savingEntityId,
+    saveUpgradeSlot,
+    removeUpgradeSlot,
+    isSavingSlot,
   };
 }

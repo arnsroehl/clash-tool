@@ -12,7 +12,13 @@ export type PlannerBuilding = Building;
 export type PlannerBuildingLevels = BuildingLevelMap;
 
 export type PlannerItemType =
-  "building" | "hero" | "troop" | "spell" | "siege_machine";
+  | "building"
+  | "hero"
+  | "troop"
+  | "spell"
+  | "siege_machine"
+  | "pet"
+  | "equipment";
 
 export type PlannerItem = {
   id: string;
@@ -26,7 +32,13 @@ export type PlannerItem = {
 
 export type PlannerItemLevels = Record<string, number>;
 
-export type ResourceType = "gold" | "elixir" | "darkElixir";
+export type ResourceType =
+  | "gold"
+  | "elixir"
+  | "darkElixir"
+  | "shinyOre"
+  | "glowyOre"
+  | "starryOre";
 
 export type PlannerRuleId =
   | "town-hall"
@@ -51,6 +63,9 @@ export type UpgradeCosts = {
   gold: number;
   elixir: number;
   darkElixir: number;
+  shinyOre?: number;
+  glowyOre?: number;
+  starryOre?: number;
 };
 
 export type UpgradeTime = {
@@ -61,6 +76,9 @@ export type ResourceSnapshot = {
   gold: number;
   elixir: number;
   darkElixir: number;
+  shinyOre?: number;
+  glowyOre?: number;
+  starryOre?: number;
 };
 
 export type BuilderAvailability = {
@@ -175,6 +193,9 @@ export type PlannerSummary = {
   remainingGoldCost: number;
   remainingElixirCost: number;
   remainingDarkElixirCost: number;
+  remainingShinyOreCost?: number;
+  remainingGlowyOreCost?: number;
+  remainingStarryOreCost?: number;
   remainingBuildTimeHours: number;
   builderUsagePercent: number;
 };

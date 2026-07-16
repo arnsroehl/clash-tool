@@ -239,6 +239,7 @@ export type WallDistributionParseOptions = {
 
 export type UpgradeSlotType =
   | "builder"
+  | "goblin_builder"
   | "laboratory"
   | "pet_house"
   | "blacksmith"

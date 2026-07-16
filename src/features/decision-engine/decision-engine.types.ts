@@ -5,6 +5,7 @@ import type {
   ResourceSnapshot,
   UpgradeRecommendation,
 } from "@/features/planner/planner.types";
+import type { UpgradeSlotType } from "@/types/upgradeQueue";
 import type {
   PlanningStrategy,
   StrategyWeights,
@@ -55,7 +56,7 @@ export type RecommendationReason = {
   polarity: RecommendationReasonPolarity;
   impact: number;
   value?: number;
-  unit?: "hours" | "percent" | "gold" | "elixir" | "dark_elixir" | "score";
+  unit?: "hours" | "percent" | "gold" | "elixir" | "dark_elixir" | "shiny_ore" | "glowy_ore" | "starry_ore" | "score";
   metadata?: Record<string, string | number | boolean | null>;
 };
 
@@ -126,11 +127,14 @@ export type DecisionQueueEntry = {
   goldCost: number;
   elixirCost: number;
   darkElixirCost: number;
+  shinyOreCost?: number;
+  glowyOreCost?: number;
+  starryOreCost?: number;
 };
 
 export type DecisionScheduleAssignment = {
   itemType: string;
-  slotType: "builder" | "laboratory";
+  slotType: UpgradeSlotType;
   slotLabel: string;
   startHour: number;
   endHour: number;
@@ -181,6 +185,7 @@ export type DecisionContext = {
   slotAvailability?: {
     builderHours: number[];
     laboratoryHours: number;
+    slotHours?: Partial<Record<UpgradeSlotType, number[]>>;
   };
   resources?: ResourceSnapshot;
   storageCapacities?: ResourceSnapshot;

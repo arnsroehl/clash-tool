@@ -10,7 +10,7 @@ export type PlanningStrategy =
   | "town_hall_push"
   | "custom";
 
-export type StrategyWeights = Record<UpgradeRecommendation["itemType"], number>;
+export type StrategyWeights = Partial<Record<UpgradeRecommendation["itemType"], number>>;
 
 export const strategyLabels: Record<PlanningStrategy, string> = {
   balanced: "Ausgewogen",
@@ -48,6 +48,8 @@ function strategyBonus(
       return weights?.[item.itemType] ?? 0;
     case "offense":
       return item.itemType === "hero" ||
+        item.itemType === "pet" ||
+        item.itemType === "equipment" ||
         item.itemType === "troop" ||
         item.itemType === "spell" ||
         item.itemType === "siege_machine"
@@ -58,6 +60,8 @@ function strategyBonus(
     case "war":
       return item.itemType === "hero"
         ? 55
+        : item.itemType === "pet" || item.itemType === "equipment"
+          ? 45
         : item.itemType !== "building"
           ? 35
           : includes("clanburg", "adler", "inferno", "monolith")

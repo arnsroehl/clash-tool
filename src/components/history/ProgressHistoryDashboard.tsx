@@ -6,7 +6,7 @@ import type { HistoryPeriod, ProgressCategory, ProgressHistorySnapshot } from "@
 
 type Props = { snapshots: ProgressHistorySnapshot[]; language: "de" | "en"; isSaving: boolean; onCapture: () => void };
 const labels: Record<ProgressCategory, { de: string; en: string }> = {
-  buildings: { de: "Gebäude", en: "Buildings" }, heroes: { de: "Helden", en: "Heroes" }, troops: { de: "Truppen", en: "Troops" }, spells: { de: "Zauber", en: "Spells" }, siegeMachines: { de: "Belagerung", en: "Siege" }, laboratory: { de: "Labor gesamt", en: "Laboratory" },
+  buildings: { de: "Gebäude", en: "Buildings" }, heroes: { de: "Helden", en: "Heroes" }, troops: { de: "Truppen", en: "Troops" }, spells: { de: "Zauber", en: "Spells" }, siegeMachines: { de: "Belagerung", en: "Siege" }, laboratory: { de: "Labor gesamt", en: "Laboratory" }, pets: { de: "Pets", en: "Pets" }, equipment: { de: "Ausrüstung", en: "Equipment" },
 };
 const sourceLabels: Record<ProgressHistorySnapshot["source"], { de: string; en: string }> = {
   daily: { de: "Tagessnapshot", en: "Daily snapshot" }, screenshot_import: { de: "Screenshot-Import", en: "Screenshot import" }, api_sync: { de: "API-Abgleich", en: "API sync" }, town_hall_change: { de: "Rathauswechsel", en: "Town Hall change" }, goal_completed: { de: "Zielabschluss", en: "Goal completed" }, manual_refresh: { de: "Manuell", en: "Manual" },

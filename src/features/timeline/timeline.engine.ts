@@ -4,28 +4,28 @@ const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 const atHour = (iso: string, hours: number) => new Date(new Date(iso).getTime() + hours * HOUR).toISOString();
 const event = (value: TimelineEvent) => value;
-const resourceNames = ["gold", "elixir", "darkElixir"] as const;
+const resourceNames = ["gold", "elixir", "darkElixir", "shinyOre", "glowyOre", "starryOre"] as const;
 
 export function buildTimeline(input: TimelineInput): TimelineEvent[] {
   const queue = new Map(input.queue.map((item) => [item.id, item]));
   const assignments = new Map(input.assignments.map((item) => [item.queueItemId, item]));
   const result: TimelineEvent[] = [];
   input.assignments.forEach((assignment) => {
-    const item = queue.get(assignment.queueItemId);
     const startsAt = atHour(input.now, assignment.startHour); const endsAt = atHour(input.now, assignment.endHour);
     const isLaboratory = assignment.slotType === "laboratory";
-    const isPet = /pet|haustier|l.a.s.s.i|eule|owl|yak|unicorn|phoenix|frosty|diggy|spirit fox|angry jelly/i.test(`${item?.itemId || ""} ${assignment.name}`);
-    const isForge = /forge|schmiede/i.test(`${item?.itemId || ""} ${assignment.name}`);
-    result.push(event({ id: `start:${assignment.queueItemId}`, type: "UPGRADE_STARTED", sourceType: "QUEUE_ENTRY", sourceId: assignment.queueItemId, startsAt, endsAt, accountId: input.accountId, lane: isLaboratory ? "laboratory" : "builder", title: `${assignment.name} ${assignment.fromLevel} → ${assignment.toLevel}`, description: `${assignment.slotLabel} · ${assignment.durationHours} h`, isEstimate: true, metadata: { queueItemId: assignment.queueItemId, targetLevel: assignment.toLevel, slotLabel: assignment.slotLabel } }));
+    const isPet = assignment.itemType === "pet";
+    const isForge = assignment.itemType === "equipment";
+    const lane = isLaboratory ? "laboratory" : isPet ? "pets" : isForge ? "equipment" : "builder";
+    result.push(event({ id: `start:${assignment.queueItemId}`, type: "UPGRADE_STARTED", sourceType: "QUEUE_ENTRY", sourceId: assignment.queueItemId, startsAt, endsAt, accountId: input.accountId, lane, title: `${assignment.name} ${assignment.fromLevel} → ${assignment.toLevel}`, description: `${assignment.slotLabel} · ${assignment.durationHours} h`, isEstimate: true, metadata: { queueItemId: assignment.queueItemId, targetLevel: assignment.toLevel, slotLabel: assignment.slotLabel } }));
     const completedType = isForge ? "FORGE_COMPLETED" : isPet ? "PET_UPGRADE_COMPLETED" : isLaboratory ? "LAB_RESEARCH_COMPLETED" : "UPGRADE_COMPLETED";
-    result.push(event({ id: `finish:${assignment.queueItemId}`, type: completedType, sourceType: "SIMULATION", sourceId: assignment.queueItemId, startsAt: endsAt, endsAt: null, accountId: input.accountId, lane: isLaboratory ? "laboratory" : "builder", title: `${assignment.name} Level ${assignment.toLevel}`, description: `${assignment.slotLabel} wird frei.`, isEstimate: true, metadata: { queueItemId: assignment.queueItemId, targetLevel: assignment.toLevel, slotLabel: assignment.slotLabel } }));
-    if (!isLaboratory) result.push(event({ id: `free:${assignment.queueItemId}`, type: "BUILDER_FREE", sourceType: "SIMULATION", sourceId: assignment.queueItemId, startsAt: endsAt, endsAt: null, accountId: input.accountId, lane: "builder", title: `${assignment.slotLabel} wird frei`, description: `Nach ${assignment.name} Level ${assignment.toLevel}.`, isEstimate: true, metadata: { queueItemId: assignment.queueItemId, builderIndex: assignment.builderIndex } }));
-    const daysUntilAffordable = Math.max(...resourceNames.map((key) => Math.max(0, assignment.effectiveCosts[key] - input.resources[key]) / Math.max(0.0001, input.dailyIncome[key])));
+    result.push(event({ id: `finish:${assignment.queueItemId}`, type: completedType, sourceType: "SIMULATION", sourceId: assignment.queueItemId, startsAt: endsAt, endsAt: null, accountId: input.accountId, lane, title: `${assignment.name} Level ${assignment.toLevel}`, description: `${assignment.slotLabel} wird frei.`, isEstimate: true, metadata: { queueItemId: assignment.queueItemId, targetLevel: assignment.toLevel, slotLabel: assignment.slotLabel } }));
+    if (assignment.slotType === "builder" || assignment.slotType === "goblin_builder") result.push(event({ id: `free:${assignment.queueItemId}`, type: "BUILDER_FREE", sourceType: "SIMULATION", sourceId: assignment.queueItemId, startsAt: endsAt, endsAt: null, accountId: input.accountId, lane: "builder", title: `${assignment.slotLabel} wird frei`, description: `Nach ${assignment.name} Level ${assignment.toLevel}.`, isEstimate: true, metadata: { queueItemId: assignment.queueItemId, builderIndex: assignment.builderIndex } }));
+    const daysUntilAffordable = Math.max(...resourceNames.map((key) => Math.max(0, (assignment.effectiveCosts[key] || 0) - (input.resources[key] || 0)) / Math.max(0.0001, input.dailyIncome[key] || 0)));
     if (Number.isFinite(daysUntilAffordable) && daysUntilAffordable > 0 && daysUntilAffordable * 24 <= assignment.startHour) result.push(event({ id: `affordable:${assignment.queueItemId}`, type: "RESOURCE_AFFORDABLE", sourceType: "RESOURCE_FORECAST", sourceId: assignment.queueItemId, startsAt: atHour(input.now, daysUntilAffordable * 24), endsAt: null, accountId: input.accountId, lane: "resources", title: `${assignment.name} voraussichtlich finanzierbar`, description: "Aus aktuellem Bestand und täglichem Farming geschätzt.", isEstimate: true, metadata: { queueItemId: assignment.queueItemId } }));
   });
   resourceNames.forEach((key) => {
-    const hours = (input.capacities[key] - input.resources[key]) / Math.max(0.0001, input.dailyIncome[key]) * 24;
-    if (input.capacities[key] > 0 && input.dailyIncome[key] > 0 && hours >= 0) result.push(event({ id: `storage:${key}`, type: "STORAGE_FULL", sourceType: "RESOURCE_FORECAST", sourceId: key, startsAt: atHour(input.now, hours), endsAt: null, accountId: input.accountId, lane: "resources", title: `${key} Lager voraussichtlich voll`, description: "Ohne vorherige Ausgabe oder Kapazitätsänderung.", isEstimate: true, metadata: { resource: key } }));
+    const hours = ((input.capacities[key] || 0) - (input.resources[key] || 0)) / Math.max(0.0001, input.dailyIncome[key] || 0) * 24;
+    if ((input.capacities[key] || 0) > 0 && (input.dailyIncome[key] || 0) > 0 && hours >= 0) result.push(event({ id: `storage:${key}`, type: "STORAGE_FULL", sourceType: "RESOURCE_FORECAST", sourceId: key, startsAt: atHour(input.now, hours), endsAt: null, accountId: input.accountId, lane: "resources", title: `${key} Lager voraussichtlich voll`, description: "Ohne vorherige Ausgabe oder Kapazitätsänderung.", isEstimate: true, metadata: { resource: key } }));
   });
   input.events.filter((item) => item.enabled).forEach((item) => {
     if (item.startsAt) result.push(event({ id: `event-start:${item.id}`, type: "EVENT_STARTED", sourceType: "EVENT", sourceId: item.id, startsAt: item.startsAt, endsAt: item.endsAt, accountId: input.accountId, lane: "events", title: `${item.name} beginnt`, description: `Kosten ${item.costDiscountPercent}% · Zeit ${item.timeDiscountPercent}%`, isEstimate: false, metadata: { eventType: item.eventType } }));

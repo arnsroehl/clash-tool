@@ -59,14 +59,32 @@ export type AccountScreenshotProgressRow = {
   current_level: number;
 };
 
+import type { UpgradeSlotType } from "@/types/upgradeQueue";
+import type { UpgradeItemType } from "@/types/upgradeQueue";
+
 export type ScreenshotUpgradeSlot = {
-  slotType: "builder" | "laboratory" | "pet_house" | "blacksmith" | "helper";
+  slotType: UpgradeSlotType;
   slotIndex: number;
   isAvailable: boolean;
   entityName: string | null;
   targetLevel: number | null;
   remainingSeconds: number | null;
   finishesAt: string | null;
+  enabled?: boolean;
+  label?: string | null;
+  allowedItemTypes?: UpgradeItemType[];
+  durationMultiplier?: number;
+};
+
+export type SaveUpgradeSlotInput = {
+  accountId: string;
+  slotType: UpgradeSlotType;
+  slotIndex: number;
+  enabled: boolean;
+  isAvailable?: boolean;
+  label?: string | null;
+  allowedItemTypes?: UpgradeItemType[];
+  durationMultiplier?: number;
 };
 
 export type ScreenshotResourceSnapshot = {

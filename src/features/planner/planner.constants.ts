@@ -19,12 +19,18 @@ export const NO_COST: UpgradeCosts = {
   gold: 0,
   elixir: 0,
   darkElixir: 0,
+  shinyOre: 0,
+  glowyOre: 0,
+  starryOre: 0,
 };
 
 export const RESOURCE_TYPES: readonly ResourceType[] = [
   "gold",
   "elixir",
   "darkElixir",
+  "shinyOre",
+  "glowyOre",
+  "starryOre",
 ];
 
 export const RULE_NAMES: Record<PlannerRuleId, string> = {
@@ -54,6 +60,9 @@ export const DEFAULT_RESOURCE_SNAPSHOT: ResourceSnapshot = {
   gold: 0,
   elixir: 0,
   darkElixir: 0,
+  shinyOre: 0,
+  glowyOre: 0,
+  starryOre: 0,
 };
 
 export const DEFAULT_UPGRADE_QUEUE: UpgradeQueue = {

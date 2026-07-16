@@ -12,7 +12,13 @@ const RESOURCE_LABELS = {
   gold: { de: "Gold", en: "Gold" },
   elixir: { de: "Elixier", en: "Elixir" },
   darkElixir: { de: "Dunkles Elixier", en: "Dark elixir" },
+  shinyOre: { de: "Glänzendes Erz", en: "Shiny ore" },
+  glowyOre: { de: "Leuchtendes Erz", en: "Glowy ore" },
+  starryOre: { de: "Sternenerz", en: "Starry ore" },
 } as const;
+
+const RESOURCE_KEYS = Object.keys(RESOURCE_LABELS) as Array<keyof typeof RESOURCE_LABELS>;
+const resourceValue = (snapshot: ResourceSnapshot, resource: keyof typeof RESOURCE_LABELS) => snapshot[resource] || 0;
 
 const severityWeight: Record<InsightSeverity, number> = {
   information: 0,
@@ -47,7 +53,7 @@ function costs(item: PlannerIntelligenceInput["recommendations"][number]): Resou
 
 function assignmentResource(assignment: PlannerIntelligenceInput["simulation"]["assignments"][number]): keyof ResourceSnapshot | null {
   const values = assignment.effectiveCosts;
-  return (Object.keys(values) as Array<keyof ResourceSnapshot>).sort((a, b) => values[b] - values[a])[0] || null;
+  return RESOURCE_KEYS.sort((a, b) => resourceValue(values, b) - resourceValue(values, a))[0] || null;
 }
 
 function categoryExpiry(category: InsightCategory, start: Date, hours: number): string {
@@ -69,6 +75,9 @@ function projectResources(input: PlannerIntelligenceInput, hours: number): Resou
     gold: input.resources.gold + input.dailyIncome.gold * hours / 24,
     elixir: input.resources.elixir + input.dailyIncome.elixir * hours / 24,
     darkElixir: input.resources.darkElixir + input.dailyIncome.darkElixir * hours / 24,
+    shinyOre: resourceValue(input.resources, "shinyOre") + resourceValue(input.dailyIncome, "shinyOre") * hours / 24,
+    glowyOre: resourceValue(input.resources, "glowyOre") + resourceValue(input.dailyIncome, "glowyOre") * hours / 24,
+    starryOre: resourceValue(input.resources, "starryOre") + resourceValue(input.dailyIncome, "starryOre") * hours / 24,
   };
 }
 
@@ -136,13 +145,15 @@ function resourceAndConflictInsights(input: PlannerIntelligenceInput, now: Date)
   const byDayResource = new Map<string, { count: number; total: number; available: number; hour: number; resource: keyof ResourceSnapshot }>();
   for (const assignment of assignments) {
     const hoursPassed = Math.max(0, assignment.startHour - previousHour);
-    (Object.keys(projected) as Array<keyof ResourceSnapshot>).forEach((resource) => {
-      projected[resource] += input.dailyIncome[resource] * hoursPassed / 24;
+    RESOURCE_KEYS.forEach((resource) => {
+      projected[resource] = resourceValue(projected, resource) + resourceValue(input.dailyIncome, resource) * hoursPassed / 24;
     });
     previousHour = assignment.startHour;
     const required = assignment.effectiveCosts;
-    for (const resource of Object.keys(projected) as Array<keyof ResourceSnapshot>) {
-      const shortage = Math.max(0, required[resource] - projected[resource]);
+    for (const resource of RESOURCE_KEYS) {
+      const requiredAmount = resourceValue(required, resource);
+      const projectedAmount = resourceValue(projected, resource);
+      const shortage = Math.max(0, requiredAmount - projectedAmount);
       if (shortage > 0) {
         const labels = RESOURCE_LABELS[resource];
         const severity: InsightSeverity = assignment.startHour <= 24 ? "critical" : "important";
@@ -150,7 +161,7 @@ function resourceAndConflictInsights(input: PlannerIntelligenceInput, now: Date)
           key: `resource_shortfall:${assignment.queueItemId}:${resource}`,
           reasonCode: "RESOURCE_SHORTFALL", category: "resource_shortfall", severity,
           urgency: round(clamp(100 - assignment.startHour)), financialImpact: round(shortage), resourceType: resource,
-          timeImpactHours: input.dailyIncome[resource] > 0 ? round(shortage / input.dailyIncome[resource] * 24) : 168,
+          timeImpactHours: resourceValue(input.dailyIncome, resource) > 0 ? round(shortage / resourceValue(input.dailyIncome, resource) * 24) : 168,
           goalId: null,
           titleDe: `${labels.de} fehlt für ${assignment.name}`, titleEn: `${labels.en} shortfall for ${assignment.name}`,
           messageDe: `Zum geplanten Start fehlen voraussichtlich ${compactNumber(shortage)} ${labels.de}.`,
@@ -161,16 +172,16 @@ function resourceAndConflictInsights(input: PlannerIntelligenceInput, now: Date)
           solutionEn: `Increase ${labels.en} farming, delay the upgrade or adjust the queue.`,
           createdAt: now.toISOString(), expiresAt: categoryExpiry("resource_shortfall", now, assignment.startHour || 24),
           action: { type: "review_resources", labelDe: "Ressourcen anpassen", labelEn: "Adjust resources" },
-          alternativeItemKey: input.recommendations.find((item) => costs(item)[resource] < required[resource]) ? itemKey(input.recommendations.find((item) => costs(item)[resource] < required[resource])!.itemType, input.recommendations.find((item) => costs(item)[resource] < required[resource])!.itemId) : null,
+          alternativeItemKey: input.recommendations.find((item) => resourceValue(costs(item), resource) < requiredAmount) ? itemKey(input.recommendations.find((item) => resourceValue(costs(item), resource) < requiredAmount)!.itemType, input.recommendations.find((item) => resourceValue(costs(item), resource) < requiredAmount)!.itemId) : null,
           metadata: { assignmentId: assignment.queueItemId, startHour: round(assignment.startHour), shortage: round(shortage) },
         });
       }
-      projected[resource] -= required[resource];
+      projected[resource] = projectedAmount - requiredAmount;
       const day = Math.floor(assignment.startHour / 24);
       const key = `${day}:${resource}`;
-      const existing = byDayResource.get(key) || { count: 0, total: 0, available: projected[resource] + required[resource], hour: assignment.startHour, resource };
-      existing.count += required[resource] > 0 ? 1 : 0;
-      existing.total += required[resource];
+      const existing = byDayResource.get(key) || { count: 0, total: 0, available: resourceValue(projected, resource) + requiredAmount, hour: assignment.startHour, resource };
+      existing.count += requiredAmount > 0 ? 1 : 0;
+      existing.total += requiredAmount;
       byDayResource.set(key, existing);
     }
   }
@@ -198,14 +209,15 @@ function resourceAndConflictInsights(input: PlannerIntelligenceInput, now: Date)
 }
 
 function overflowInsights(input: PlannerIntelligenceInput, now: Date): PlannerInsight[] {
-  return (Object.keys(input.resources) as Array<keyof ResourceSnapshot>).flatMap((resource) => {
-    const capacity = input.storageCapacities[resource];
-    const income = input.dailyIncome[resource];
-    if (capacity <= 0 || income <= 0 || input.resources[resource] >= capacity) return [];
-    const hours = (capacity - input.resources[resource]) / income * 24;
+  return RESOURCE_KEYS.flatMap((resource) => {
+    const capacity = resourceValue(input.storageCapacities, resource);
+    const income = resourceValue(input.dailyIncome, resource);
+    const current = resourceValue(input.resources, resource);
+    if (capacity <= 0 || income <= 0 || current >= capacity) return [];
+    const hours = (capacity - current) / income * 24;
     if (hours > 72) return [];
     const labels = RESOURCE_LABELS[resource];
-    const affordable = input.recommendations.find((item) => costs(item)[resource] > 0 && costs(item)[resource] <= input.resources[resource]);
+    const affordable = input.recommendations.find((item) => resourceValue(costs(item), resource) > 0 && resourceValue(costs(item), resource) <= current);
     return [{
       key: `resource_overflow:${resource}`, reasonCode: "RESOURCE_OVERFLOW_RISK" as const,
       category: "resource_overflow" as const, severity: hours <= 12 ? "important" as const : "recommendation" as const,
@@ -220,7 +232,7 @@ function overflowInsights(input: PlannerIntelligenceInput, now: Date): PlannerIn
       solutionEn: affordable ? `Start ${affordable.name}, for example, before production is lost.` : "Plan spending or reduce resource income.",
       createdAt: now.toISOString(), expiresAt: categoryExpiry("resource_overflow", now, hours),
       action: affordable ? { type: "add_to_queue" as const, itemKey: itemKey(affordable.itemType, affordable.itemId), labelDe: "Upgrade einplanen", labelEn: "Schedule upgrade" } : { type: "review_resources" as const, labelDe: "Ressourcen prüfen", labelEn: "Review resources" },
-      alternativeItemKey: null, metadata: { fullInHours: round(hours), capacity, current: input.resources[resource] },
+      alternativeItemKey: null, metadata: { fullInHours: round(hours), capacity, current },
     }];
   });
 }

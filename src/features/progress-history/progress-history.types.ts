@@ -9,7 +9,7 @@ export type ProgressSnapshotSource =
   | "goal_completed"
   | "manual_refresh";
 
-export type ProgressCategory = "buildings" | "heroes" | "troops" | "spells" | "siegeMachines" | "laboratory";
+export type ProgressCategory = "buildings" | "heroes" | "troops" | "spells" | "siegeMachines" | "laboratory" | "pets" | "equipment";
 
 export type ProgressHistorySnapshot = {
   id: string;
@@ -18,7 +18,7 @@ export type ProgressHistorySnapshot = {
   capturedOn: string;
   source: ProgressSnapshotSource;
   overallProgress: number;
-  categoryProgress: Record<ProgressCategory, number>;
+  categoryProgress: Record<Exclude<ProgressCategory, "pets" | "equipment">, number> & Partial<Record<"pets" | "equipment", number>>;
   healthScore: number | null;
   townHallLevel: number;
   heroLevels: Record<string, number>;

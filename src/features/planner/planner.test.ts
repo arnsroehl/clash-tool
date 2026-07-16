@@ -253,6 +253,26 @@ describe("Planner Engine", () => {
     assert.equal(result.summary.remainingDarkElixirCost, 200);
   });
 
+  it("behandelt Pets und Heldenausrüstung samt Erz als Plannerobjekte", () => {
+    const result = planUpgrades({
+      account,
+      items: [
+        { id: "pet-1", type: "pet", name: "Einhorn", category: "Pet", unlockTownHallLevel: 9, maxLevel: 2, sortOrder: 1 },
+        { id: "equipment-1", type: "equipment", name: "Riesiger Handschuh", category: "Episch", unlockTownHallLevel: 8, maxLevel: 2, sortOrder: 2 },
+      ],
+      itemLevels: { "pet-1": 1, "equipment-1": 1 },
+      upgradeLevels: [
+        { itemId: "pet-1", itemType: "pet", level: 2, townHallLevel: 9, costs: { gold: 0, elixir: 0, darkElixir: 10_000 }, time: { hours: 24 } },
+        { itemId: "equipment-1", itemType: "equipment", level: 2, townHallLevel: 8, costs: { gold: 0, elixir: 0, darkElixir: 0, shinyOre: 120, glowyOre: 20, starryOre: 2 }, time: { hours: 1 } },
+      ],
+    });
+    assert.deepEqual(result.recommendations.map((item) => item.itemType).sort(), ["equipment", "pet"]);
+    assert.equal(result.summary.remainingDarkElixirCost, 10_000);
+    assert.equal(result.summary.remainingShinyOreCost, 120);
+    assert.equal(result.summary.remainingGlowyOreCost, 20);
+    assert.equal(result.summary.remainingStarryOreCost, 2);
+  });
+
   it("begrenzt Upgradepfad und Restzeit auf das Rathaus-Maximum", () => {
     const result = planUpgrades({
       account,

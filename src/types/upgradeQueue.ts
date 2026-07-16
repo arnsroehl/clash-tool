@@ -2,7 +2,21 @@ export type UpgradeQueueItemStatus =
   "planned" | "active" | "completed" | "skipped";
 
 export type UpgradeItemType =
-  "building" | "hero" | "troop" | "spell" | "siege_machine";
+  | "building"
+  | "hero"
+  | "troop"
+  | "spell"
+  | "siege_machine"
+  | "pet"
+  | "equipment";
+
+export type UpgradeSlotType =
+  | "builder"
+  | "goblin_builder"
+  | "laboratory"
+  | "pet_house"
+  | "blacksmith"
+  | "helper";
 
 export type UpgradeQueueItemRow = {
   id: string;
@@ -17,12 +31,15 @@ export type UpgradeQueueItemRow = {
   gold_cost: number;
   elixir_cost: number;
   dark_elixir_cost: number;
+  shiny_ore_cost?: number;
+  glowy_ore_cost?: number;
+  starry_ore_cost?: number;
   duration_hours: number;
   priority_score: number;
   queue_order: number;
   status: UpgradeQueueItemStatus;
   is_locked: boolean;
-  slot_type: string | null;
+  slot_type: UpgradeSlotType | null;
   planned_start_at: string | null;
   planned_finish_at: string | null;
 };
@@ -40,12 +57,15 @@ export type UpgradeQueueItem = {
   goldCost: number;
   elixirCost: number;
   darkElixirCost: number;
+  shinyOreCost?: number;
+  glowyOreCost?: number;
+  starryOreCost?: number;
   durationHours: number;
   priorityScore: number;
   queueOrder: number;
   status: UpgradeQueueItemStatus;
   isLocked: boolean;
-  slotType: string | null;
+  slotType: UpgradeSlotType | null;
   plannedStartAt: string | null;
   plannedFinishAt: string | null;
 };
@@ -60,6 +80,9 @@ export type CreateUpgradeQueueItemInput = {
   goldCost?: number;
   elixirCost?: number;
   darkElixirCost?: number;
+  shinyOreCost?: number;
+  glowyOreCost?: number;
+  starryOreCost?: number;
   durationHours?: number;
   priorityScore?: number;
   queueOrder: number;

@@ -7,7 +7,7 @@ import type {
 } from "@/types/upgradeQueue";
 
 const UPGRADE_QUEUE_SELECT_FIELDS =
-  "id, created_at, updated_at, account_id, item_type, item_id, name, from_level, to_level, gold_cost, elixir_cost, dark_elixir_cost, duration_hours, priority_score, queue_order, status, is_locked, slot_type, planned_start_at, planned_finish_at";
+  "id, created_at, updated_at, account_id, item_type, item_id, name, from_level, to_level, gold_cost, elixir_cost, dark_elixir_cost, shiny_ore_cost, glowy_ore_cost, starry_ore_cost, duration_hours, priority_score, queue_order, status, is_locked, slot_type, planned_start_at, planned_finish_at";
 
 function isMissingTableMessage(message: string): boolean {
   return (
@@ -42,6 +42,9 @@ export function mapUpgradeQueueItem(
     goldCost: row.gold_cost,
     elixirCost: row.elixir_cost,
     darkElixirCost: row.dark_elixir_cost,
+    shinyOreCost: row.shiny_ore_cost || 0,
+    glowyOreCost: row.glowy_ore_cost || 0,
+    starryOreCost: row.starry_ore_cost || 0,
     durationHours: row.duration_hours,
     priorityScore: row.priority_score,
     queueOrder: row.queue_order,
@@ -87,6 +90,9 @@ export async function createUpgradeQueueItem(
       gold_cost: input.goldCost ?? 0,
       elixir_cost: input.elixirCost ?? 0,
       dark_elixir_cost: input.darkElixirCost ?? 0,
+      shiny_ore_cost: input.shinyOreCost ?? 0,
+      glowy_ore_cost: input.glowyOreCost ?? 0,
+      starry_ore_cost: input.starryOreCost ?? 0,
       duration_hours: input.durationHours ?? 0,
       priority_score: input.priorityScore ?? 0,
       queue_order: input.queueOrder,

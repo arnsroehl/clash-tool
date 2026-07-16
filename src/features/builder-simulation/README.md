@@ -1,20 +1,18 @@
 # Builder Simulation
 
-Builder Simulation V1 distributes existing upgrade queue items across the active account builders.
+The builder simulation distributes queue items across every compatible upgrade slot.
 
-## V1 Logic
+## Slot logic
 
 - Input is `UpgradeQueueItem[]`.
-- `builderCount` comes from the active account.
-- The next queue item is always assigned to the builder with the earliest free hour.
+- Legacy callers can still provide `builderCount`; modern callers provide typed slots.
+- Buildings and heroes use Builders or Goblin Builders.
+- Troops, spells and siege machines use the Laboratory.
+- Pets use the Pet House and hero equipment uses the Blacksmith.
+- Helpers declare the item types they support, so future helpers need no scheduler rewrite.
+- The next queue item is assigned to the earliest compatible, enabled slot.
+- Screenshot-detected remaining times and manually configured availability delay only that slot.
 - Times are relative hours from start `0`.
 - Queue order is respected.
 
-## Excluded From V1
-
-- Resource logic.
-- Real calendar dates.
-- Magic items.
-- Pauses.
-- Priority recalculation.
-- Supabase persistence for simulation output.
+Cost and time discounts, pause windows, ore costs and per-item earliest starts are applied before an assignment is finalized. Simulation output stays deterministic and is derived from the persisted queue and slot configuration rather than being stored separately.
