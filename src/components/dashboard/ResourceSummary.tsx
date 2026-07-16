@@ -43,6 +43,9 @@ export function ResourceSummary({
       label: en ? "Remaining dark elixir cost" : "Restkosten Dunkles Elixier",
       value: formatNumber(summary?.remainingDarkElixirCost || 0, language),
     },
+    { label: en ? "Remaining shiny ore" : "Restkosten Glänzendes Erz", value: formatNumber(summary?.remainingShinyOreCost || 0, language) },
+    { label: en ? "Remaining glowy ore" : "Restkosten Leuchtendes Erz", value: formatNumber(summary?.remainingGlowyOreCost || 0, language) },
+    { label: en ? "Remaining starry ore" : "Restkosten Sternenerz", value: formatNumber(summary?.remainingStarryOreCost || 0, language) },
   ];
 
   return (

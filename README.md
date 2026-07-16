@@ -74,6 +74,13 @@ src/scripts/sql/
 
 These SQL files are setup helpers and are not executed automatically by the app.
 
+Pets and hero equipment are first-class planner and queue objects. Their Dark
+Elixir and Shiny/Glowy/Starry Ore costs are stored with queue entries, while
+Pet House, Blacksmith, Goblin Builder and configurable helpers run as parallel
+upgrade slots. Existing databases can enable these fields with
+`src/scripts/sql/planner-special-upgrades.sql`; fresh setups receive the same
+schema through the queue and screenshot catalog helpers.
+
 ## Optional Clash API integration
 
 The app runs in manual mode by default. Level entry, screenshot recognition,

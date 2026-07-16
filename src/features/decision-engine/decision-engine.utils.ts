@@ -11,6 +11,7 @@ import {
   type StrategySelection,
 } from "@/features/decision-engine/decision-engine.types";
 import type { UpgradeRecommendation } from "@/features/planner/planner.types";
+import type { ResourceType } from "@/features/planner/planner.types";
 import type { PlanningStrategy } from "@/features/planning-control/planning-control";
 
 export const DEFAULT_DECISION_WEIGHTS: DecisionScoringWeights = {
@@ -135,12 +136,15 @@ function timeContribution(item: UpgradeRecommendation): number {
 
 function primaryResource(
   item: UpgradeRecommendation,
-): "gold" | "elixir" | "darkElixir" | null {
+): ResourceType | null {
   const costs = item.nextLevelCosts;
   const entries = [
     ["gold", costs.gold],
     ["elixir", costs.elixir],
     ["darkElixir", costs.darkElixir],
+    ["shinyOre", costs.shinyOre || 0],
+    ["glowyOre", costs.glowyOre || 0],
+    ["starryOre", costs.starryOre || 0],
   ] as const;
   return [...entries].sort((left, right) => right[1] - left[1])[0]?.[1] > 0
     ? [...entries].sort((left, right) => right[1] - left[1])[0][0]
@@ -151,7 +155,13 @@ function expectedSlot(item: UpgradeRecommendation, context: DecisionContext): {
   label: string;
   startHour: number;
 } {
-  const slotType = LAB_ITEM_TYPES.has(item.itemType) ? "laboratory" : "builder";
+  const slotType = item.itemType === "pet"
+    ? "pet_house"
+    : item.itemType === "equipment"
+      ? "blacksmith"
+      : LAB_ITEM_TYPES.has(item.itemType)
+        ? "laboratory"
+        : "builder";
   const matching = (context.schedule || []).filter((entry) => entry.slotType === slotType);
   if (slotType === "laboratory") {
     const endHour = Math.max(
@@ -159,6 +169,11 @@ function expectedSlot(item: UpgradeRecommendation, context: DecisionContext): {
       ...matching.map((entry) => entry.endHour),
     );
     return { label: "Labor", startHour: endHour };
+  }
+  if (slotType === "pet_house" || slotType === "blacksmith") {
+    const label = slotType === "pet_house" ? "Pet House" : "Schmied";
+    const initial = context.slotAvailability?.slotHours?.[slotType]?.[0] || 0;
+    return { label, startHour: Math.max(initial, ...matching.map((entry) => entry.endHour)) };
   }
   const builderHours = context.slotAvailability?.builderHours
     || Array.from({ length: context.plannerInput.account.builderCount }, () => 0);
@@ -248,7 +263,7 @@ export function scoreRecommendation(
       scope === "all"
       || scope === item.itemType
       || (scope === "laboratory" && LAB_ITEM_TYPES.has(item.itemType))
-      || (scope === "builder" && !LAB_ITEM_TYPES.has(item.itemType)),
+      || (scope === "builder" && (item.itemType === "building" || item.itemType === "hero")),
     ));
   if (applicableMagicItem && item.nextLevelTime.hours >= 24) {
     const magicItemValue = clamp(item.nextLevelTime.hours / 48, 2, 8);
@@ -259,20 +274,20 @@ export function scoreRecommendation(
   let costBenefit = 0;
   let resourceImpact = 0;
   if (resource && context.resources && context.storageCapacities) {
-    const cost = item.nextLevelCosts[resource];
-    const capacity = Math.max(1, context.storageCapacities[resource]);
+    const cost = item.nextLevelCosts[resource] || 0;
+    const capacity = Math.max(1, context.storageCapacities[resource] || 0);
     costBenefit = clamp(10 * (1 - cost / capacity), -8, 10);
     factors.push(reason("COST_EFFICIENT", costBenefit >= 0 ? "positive" : "negative", costBenefit, Math.round(cost / capacity * 100), "percent", { resource }));
-    const available = context.resources[resource];
+    const available = context.resources[resource] || 0;
     if (available >= cost) {
       resourceImpact = 12;
-      factors.push(reason("RESOURCE_AVAILABLE", "positive", resourceImpact, cost, resource === "darkElixir" ? "dark_elixir" : resource));
+      factors.push(reason("RESOURCE_AVAILABLE", "positive", resourceImpact, cost, resource === "darkElixir" ? "dark_elixir" : resource === "shinyOre" ? "shiny_ore" : resource === "glowyOre" ? "glowy_ore" : resource === "starryOre" ? "starry_ore" : resource));
       if (available / capacity >= 0.9)
         factors.push(reason("RESOURCE_OVERFLOW_PREVENTION", "positive", 6, Math.round(available / capacity * 100), "percent", { resource }));
     } else {
       const missing = cost - available;
       resourceImpact = -clamp(4 + missing / capacity * 10, 4, 14);
-      factors.push(reason("RESOURCE_SHORTFALL", "negative", resourceImpact, missing, resource === "darkElixir" ? "dark_elixir" : resource));
+      factors.push(reason("RESOURCE_SHORTFALL", "negative", resourceImpact, missing, resource === "darkElixir" ? "dark_elixir" : resource === "shinyOre" ? "shiny_ore" : resource === "glowyOre" ? "glowy_ore" : resource === "starryOre" ? "starry_ore" : resource));
     }
   } else if (resource) {
     factors.push(reason("MISSING_RESOURCE_DATA", "neutral", 0, undefined, undefined, { resource }));

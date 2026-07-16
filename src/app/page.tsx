@@ -36,6 +36,8 @@ import { CollapsibleSection } from "@/components/layout/CollapsibleSection";
 import { ProgressForecastOverview } from "@/components/progress-forecast/ProgressForecastOverview";
 import { FutureAccountView } from "@/components/progress-forecast/FutureAccountView";
 import { UpgradeQueueList } from "@/components/upgrade-queue/UpgradeQueueList";
+import { SpecialUpgradeProgress } from "@/components/special-upgrades/SpecialUpgradeProgress";
+import { UpgradeSlotManager } from "@/components/special-upgrades/UpgradeSlotManager";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { runDecisionEngine } from "@/features/decision-engine/decision-engine.service";
 import { calculateAccountHealth } from "@/features/account-health/account-health";
@@ -93,7 +95,7 @@ import type {
   ResourceSnapshot,
   UpgradeRecommendation,
 } from "@/features/planner/planner.types";
-import type { BuilderSimulationResult } from "@/features/builder-simulation/builder-simulation.types";
+import type { BuilderSimulationResult, UpgradeSimulationSlot } from "@/features/builder-simulation/builder-simulation.types";
 import type { ProgressForecastResult } from "@/features/progress-forecast/progress-forecast.types";
 import type { HealthEntity } from "@/features/account-health/account-health.types";
 import type { PlannerInsight } from "@/features/planner-intelligence/planner-intelligence.types";
@@ -133,6 +135,9 @@ function toPlannerUpgradeLevel(params: {
   goldCost: number;
   elixirCost: number;
   darkElixirCost: number;
+  shinyOreCost?: number;
+  glowyOreCost?: number;
+  starryOreCost?: number;
 }): PlannerUpgradeLevel {
   return {
     itemId: params.itemId,
@@ -144,6 +149,9 @@ function toPlannerUpgradeLevel(params: {
       gold: params.goldCost,
       elixir: params.elixirCost,
       darkElixir: params.darkElixirCost,
+      shinyOre: params.shinyOreCost || 0,
+      glowyOre: params.glowyOreCost || 0,
+      starryOre: params.starryOreCost || 0,
     },
     time: {
       hours: params.upgradeTimeHours,
@@ -163,11 +171,17 @@ export default function Home() {
     gold: 0,
     elixir: 0,
     darkElixir: 0,
+    shinyOre: 0,
+    glowyOre: 0,
+    starryOre: 0,
   });
   const [storageCapacities, setStorageCapacities] = useState<ResourceSnapshot>({
     gold: 0,
     elixir: 0,
     darkElixir: 0,
+    shinyOre: 0,
+    glowyOre: 0,
+    starryOre: 0,
   });
   const [horizonDays, setHorizonDays] = useState(30);
   const [goalPercent, setGoalPercent] = useState(75);
@@ -175,6 +189,9 @@ export default function Home() {
     gold: 0,
     elixir: 0,
     darkElixir: 0,
+    shinyOre: 0,
+    glowyOre: 0,
+    starryOre: 0,
   });
   const [strategyWeights, setStrategyWeights] = useState<StrategyWeights>({
     building: 50,
@@ -182,6 +199,8 @@ export default function Home() {
     troop: 50,
     spell: 50,
     siege_machine: 50,
+    pet: 50,
+    equipment: 50,
   });
   const [pendingProgressSnapshotSource, setPendingProgressSnapshotSource] = useState<ProgressSnapshotSource | null>(null);
   const observedCompletedGoals = useRef<{ accountId?: string; ids: Set<string> }>({ ids: new Set() });
@@ -234,6 +253,11 @@ export default function Home() {
     resourceSnapshot: screenshotResourceSnapshot,
     wallLevels: screenshotWallLevels,
     refreshAccountProgress: refreshScreenshotProgress,
+    updateEntityLevel: updateScreenshotEntityLevel,
+    savingEntityId: savingScreenshotEntityId,
+    saveUpgradeSlot,
+    removeUpgradeSlot,
+    isSavingSlot,
   } =
     useScreenshotProgress(selectedAccount, handleError, Boolean(user));
   const screenshotProgressEntities = useMemo(
@@ -278,11 +302,17 @@ export default function Home() {
         gold: screenshotResourceSnapshot.gold ?? current.gold,
         elixir: screenshotResourceSnapshot.elixir ?? current.elixir,
         darkElixir: screenshotResourceSnapshot.darkElixir ?? current.darkElixir,
+        shinyOre: screenshotResourceSnapshot.shinyOre ?? current.shinyOre,
+        glowyOre: screenshotResourceSnapshot.glowyOre ?? current.glowyOre,
+        starryOre: screenshotResourceSnapshot.starryOre ?? current.starryOre,
       }));
       setStorageCapacities((current) => ({
         gold: screenshotResourceSnapshot.goldCapacity ?? current.gold,
         elixir: screenshotResourceSnapshot.elixirCapacity ?? current.elixir,
         darkElixir: screenshotResourceSnapshot.darkElixirCapacity ?? current.darkElixir,
+        shinyOre: screenshotResourceSnapshot.shinyOreCapacity ?? current.shinyOre,
+        glowyOre: screenshotResourceSnapshot.glowyOreCapacity ?? current.glowyOre,
+        starryOre: screenshotResourceSnapshot.starryOreCapacity ?? current.starryOre,
       }));
     }, 0);
     return () => window.clearTimeout(timeout);
@@ -440,6 +470,15 @@ export default function Home() {
       ...toPlannerItems<Troop>(availableTroops, "troop"),
       ...toPlannerItems<Spell>(availableSpells, "spell"),
       ...toPlannerItems<SiegeMachine>(availableSiegeMachines, "siege_machine"),
+      ...availableScreenshotEntities.map((entity) => ({
+        id: entity.id,
+        type: entity.type,
+        name: entity.name,
+        category: entity.category,
+        unlockTownHallLevel: entity.unlockTownHallLevel,
+        maxLevel: entity.maxLevel,
+        sortOrder: entity.sortOrder,
+      })),
     ];
     const plannerLevels = mergeLevelMaps(
       buildingPlanner.itemLevels,
@@ -447,6 +486,7 @@ export default function Home() {
       troopLevels,
       spellLevels,
       siegeMachineLevels,
+      screenshotEntityLevels,
     );
     const plannerUpgradeLevels: PlannerUpgradeLevel[] = [
       ...buildingPlanner.upgradeLevels,
@@ -478,6 +518,22 @@ export default function Home() {
           ...level,
         }),
       ),
+      ...screenshotCatalogLevels.map((level) => {
+        const entity = availableScreenshotEntities.find((item) => item.id === level.entityId);
+        return toPlannerUpgradeLevel({
+          itemId: level.entityId,
+          itemType: entity?.type || "pet",
+          level: level.level,
+          townHallLevel: level.townHallLevel,
+          upgradeTimeHours: level.upgradeTimeHours,
+          goldCost: 0,
+          elixirCost: 0,
+          darkElixirCost: level.darkElixirCost,
+          shinyOreCost: level.shinyOreCost,
+          glowyOreCost: level.glowyOreCost,
+          starryOreCost: level.starryOreCost,
+        });
+      }).filter((level) => level.townHallLevel <= selectedAccount.townHallLevel),
     ];
 
     return {
@@ -492,12 +548,15 @@ export default function Home() {
     availableSiegeMachines,
     availableSpells,
     availableTroops,
+    availableScreenshotEntities,
     buildingInstanceLevels,
     buildingMaxLevels,
     heroLevels,
     heroMaxLevels,
     siegeMachineLevels,
     siegeMachineMaxLevels,
+    screenshotCatalogLevels,
+    screenshotEntityLevels,
     selectedAccount,
     spellLevels,
     spellMaxLevels,
@@ -533,6 +592,9 @@ export default function Home() {
         ...Object.entries(siegeMachineLevels).map(
           ([id, level]) => [`siege_machine:${id}`, level] as const,
         ),
+        ...availableScreenshotEntities.map((entity) =>
+          [`${entity.type}:${entity.id}`, screenshotEntityLevels[entity.id] || 0] as const,
+        ),
       ]),
     [
       availableBuildings,
@@ -541,6 +603,8 @@ export default function Home() {
       siegeMachineLevels,
       spellLevels,
       troopLevels,
+      availableScreenshotEntities,
+      screenshotEntityLevels,
     ],
   );
 
@@ -602,8 +666,11 @@ export default function Home() {
           gold: total.gold + payout.resources.gold,
           elixir: total.elixir + payout.resources.elixir,
           darkElixir: total.darkElixir + payout.resources.darkElixir,
+          shinyOre: (total.shinyOre || 0) + (payout.resources.shinyOre || 0),
+          glowyOre: (total.glowyOre || 0) + (payout.resources.glowyOre || 0),
+          starryOre: (total.starryOre || 0) + (payout.resources.starryOre || 0),
         }),
-        { gold: 0, elixir: 0, darkElixir: 0 },
+        { gold: 0, elixir: 0, darkElixir: 0, shinyOre: 0, glowyOre: 0, starryOre: 0 },
       ),
     [scheduledResourcePayouts],
   );
@@ -612,6 +679,9 @@ export default function Home() {
       gold: resources.gold + activeEffects.resourceBonus.gold,
       elixir: resources.elixir + activeEffects.resourceBonus.elixir,
       darkElixir: resources.darkElixir + activeEffects.resourceBonus.darkElixir,
+      shinyOre: (resources.shinyOre || 0) + (activeEffects.resourceBonus.shinyOre || 0),
+      glowyOre: (resources.glowyOre || 0) + (activeEffects.resourceBonus.glowyOre || 0),
+      starryOre: (resources.starryOre || 0) + (activeEffects.resourceBonus.starryOre || 0),
     }),
     [activeEffects.resourceBonus, resources],
   );
@@ -639,8 +709,57 @@ export default function Home() {
       laboratoryHours: laboratorySlot?.isAvailable
         ? 0
         : (laboratorySlot?.remainingSeconds || 0) / 3_600,
+      slotHours: Object.fromEntries(
+        (["builder", "goblin_builder", "laboratory", "pet_house", "blacksmith", "helper"] as const).map((type) => [
+          type,
+          screenshotUpgradeSlots.filter((slot) => slot.slotType === type).map((slot) => slot.isAvailable ? 0 : (slot.remainingSeconds || 0) / 3_600),
+        ]),
+      ),
     };
   }, [effectiveBuilderCount, screenshotUpgradeSlots]);
+  const simulationSlots = useMemo<UpgradeSimulationSlot[]>(() => {
+    const find = (type: UpgradeSimulationSlot["type"], index: number) =>
+      screenshotUpgradeSlots.find((slot) => slot.slotType === type && slot.slotIndex === index);
+    const fromSnapshot = (type: UpgradeSimulationSlot["type"], index: number, fallbackLabel: string): UpgradeSimulationSlot => {
+      const slot = find(type, index);
+      return {
+        id: `${type}:${index}`,
+        type,
+        index,
+        label: slot?.label || fallbackLabel,
+        enabled: slot?.enabled !== false,
+        availableAtHours: slot?.isAvailable === false ? (slot.remainingSeconds || 0) / 3_600 : 0,
+        allowedItemTypes: slot?.allowedItemTypes,
+        durationMultiplier: slot?.durationMultiplier || 1,
+      };
+    };
+    const core: UpgradeSimulationSlot[] = [
+      ...Array.from({ length: effectiveBuilderCount }, (_, index) => fromSnapshot("builder", index + 1, `Builder ${index + 1}`)),
+      fromSnapshot("laboratory", 1, "Labor"),
+    ];
+    if ((selectedAccount?.townHallLevel || 0) >= 14) core.push(fromSnapshot("pet_house", 1, "Pet House"));
+    if ((selectedAccount?.townHallLevel || 0) >= 8) core.push(fromSnapshot("blacksmith", 1, "Schmied"));
+    const optional = screenshotUpgradeSlots
+      .filter((slot) => slot.slotType === "goblin_builder" || slot.slotType === "helper")
+      .map((slot) => fromSnapshot(slot.slotType, slot.slotIndex, `${slot.slotType} ${slot.slotIndex}`));
+    return [...core, ...optional];
+  }, [effectiveBuilderCount, screenshotUpgradeSlots, selectedAccount?.townHallLevel]);
+  const displayedUpgradeSlots = useMemo(() => simulationSlots.map((slot) => {
+    const saved = screenshotUpgradeSlots.find((item) => item.slotType === slot.type && item.slotIndex === slot.index);
+    return saved || {
+      slotType: slot.type,
+      slotIndex: slot.index,
+      isAvailable: (slot.availableAtHours || 0) <= 0,
+      entityName: null,
+      targetLevel: null,
+      remainingSeconds: (slot.availableAtHours || 0) * 3_600,
+      finishesAt: null,
+      enabled: slot.enabled !== false,
+      label: slot.label || null,
+      allowedItemTypes: slot.allowedItemTypes || [],
+      durationMultiplier: slot.durationMultiplier || 1,
+    };
+  }), [screenshotUpgradeSlots, simulationSlots]);
   const builderSimulation = useMemo<BuilderSimulationResult>(() => {
     return simulateBuilderQueue({
       builderCount: effectiveBuilderCount,
@@ -648,6 +767,7 @@ export default function Home() {
       simulationStartsAt,
       initialBuilderAvailabilityHours: decisionSlotAvailability.builderHours,
       initialLaboratoryAvailabilityHours: decisionSlotAvailability.laboratoryHours,
+      slots: simulationSlots,
       earliestStartHoursByQueueItem: Object.fromEntries(queueItems.flatMap((item) =>
         item.plannedStartAt
           ? [[item.id, Math.max(0, (new Date(item.plannedStartAt).getTime() - new Date(simulationStartsAt).getTime()) / 3_600_000)]]
@@ -670,7 +790,7 @@ export default function Home() {
           percent: event.costDiscountPercent,
         })),
     });
-  }, [activeScenario, decisionSlotAvailability, effectiveBuilderCount, effectivePlanningEvents, queueItems, simulationStartsAt]);
+  }, [activeScenario, decisionSlotAvailability, effectiveBuilderCount, effectivePlanningEvents, queueItems, simulationSlots, simulationStartsAt]);
 
   const progressForecast = useMemo<ProgressForecastResult>(() => {
     return createProgressForecast({
@@ -813,22 +933,11 @@ export default function Home() {
           })),
         };
       });
-    const screenshotHealthEntities: HealthEntity[] = availableScreenshotEntities.map((entity) => ({
-      id: entity.id,
-      type: entity.type,
-      name: entity.name,
-      category: entity.category,
-      currentLevel: screenshotEntityLevels[entity.id] || 0,
-      maxLevel: entity.maxLevel,
-      upgradeLevels: screenshotCatalogLevels
-        .filter((level) => level.entityId === entity.id)
-        .map((level) => ({ level: level.level, timeHours: level.upgradeTimeHours })),
-    }));
     const wallBuilding = availableBuildings.find((building) => /^(mauer|wall)$/i.test(building.name.trim()));
     return calculateAccountHealth({
       accountId: selectedAccount.id,
       townHallLevel: selectedAccount.townHallLevel,
-      entities: [...plannerHealthEntities, ...screenshotHealthEntities],
+      entities: plannerHealthEntities,
       walls: screenshotWallLevels,
       maxWallLevel: wallBuilding?.maxLevel || null,
       strategy: planningStrategy,
@@ -844,15 +953,12 @@ export default function Home() {
     });
   }, [
     availableBuildings,
-    availableScreenshotEntities,
     effectivePlanningGoals,
     inventory,
     plannerInput,
     plannerResult?.summary.builderUsagePercent,
     planningStrategy,
     queueItems,
-    screenshotCatalogLevels,
-    screenshotEntityLevels,
     screenshotUpgradeSlots,
     screenshotWallLevels,
     selectedAccount,
@@ -871,10 +977,16 @@ export default function Home() {
     const builderSlots = screenshotUpgradeSlots.filter((slot) => slot.slotType === "builder");
     const laboratorySlot = screenshotUpgradeSlots.find((slot) => slot.slotType === "laboratory");
     const laboratoryProgress = Math.round((troopProgress + spellProgress + siegeMachineProgress) / 3 * 10) / 10;
+    const specialProgress = (type: "pet" | "equipment") => {
+      const entities = availableScreenshotEntities.filter((entity) => entity.type === type);
+      const maximum = entities.reduce((sum, entity) => sum + entity.maxLevel, 0);
+      const current = entities.reduce((sum, entity) => sum + Math.min(entity.maxLevel, screenshotEntityLevels[entity.id] || 0), 0);
+      return maximum ? Math.round(current / maximum * 1_000) / 10 : 0;
+    };
     return {
       sourceReference: null,
       overallProgress: plannerResult.summary.progressPercent,
-      categoryProgress: { buildings: progress, heroes: heroProgress, troops: troopProgress, spells: spellProgress, siegeMachines: siegeMachineProgress, laboratory: laboratoryProgress },
+      categoryProgress: { buildings: progress, heroes: heroProgress, troops: troopProgress, spells: spellProgress, siegeMachines: siegeMachineProgress, laboratory: laboratoryProgress, pets: specialProgress("pet"), equipment: specialProgress("equipment") },
       healthScore: accountHealth?.score ?? null,
       townHallLevel: selectedAccount.townHallLevel,
       heroLevels,
@@ -883,14 +995,14 @@ export default function Home() {
       builderUtilization: builderSlots.length ? Math.round(builderSlots.filter((slot) => !slot.isAvailable).length / builderSlots.length * 1000) / 10 : plannerResult.summary.builderUsagePercent,
       laboratoryUtilization: laboratorySlot ? (laboratorySlot.isAvailable ? 0 : 100) : null,
       remainingUpgradeHours: plannerResult.summary.remainingBuildTimeHours,
-      remainingCosts: { gold: plannerResult.summary.remainingGoldCost, elixir: plannerResult.summary.remainingElixirCost, darkElixir: plannerResult.summary.remainingDarkElixirCost },
+      remainingCosts: { gold: plannerResult.summary.remainingGoldCost, elixir: plannerResult.summary.remainingElixirCost, darkElixir: plannerResult.summary.remainingDarkElixirCost, shinyOre: plannerResult.summary.remainingShinyOreCost || 0, glowyOre: plannerResult.summary.remainingGlowyOreCost || 0, starryOre: plannerResult.summary.remainingStarryOreCost || 0 },
       goals: effectivePlanningGoals.map((goal) => ({ id: goal.id, name: goal.name, currentLevel: goal.currentLevel, targetLevel: goal.targetLevel, status: goal.status })),
       strategy: planningStrategy,
       queueLength: queueItems.filter((item) => item.status === "planned" || item.status === "active").length,
       completedUpgradeCount: completed.length,
       completedLevelCount: completed.reduce((sum, item) => sum + Math.max(0, item.toLevel - item.fromLevel), 0),
       completedUpgradeHours: completed.reduce((sum, item) => sum + item.durationHours, 0),
-      spentResources: { gold: completed.reduce((sum, item) => sum + item.goldCost, 0), elixir: completed.reduce((sum, item) => sum + item.elixirCost, 0), darkElixir: completed.reduce((sum, item) => sum + item.darkElixirCost, 0) },
+      spentResources: { gold: completed.reduce((sum, item) => sum + item.goldCost, 0), elixir: completed.reduce((sum, item) => sum + item.elixirCost, 0), darkElixir: completed.reduce((sum, item) => sum + item.darkElixirCost, 0), shinyOre: completed.reduce((sum, item) => sum + (item.shinyOreCost || 0), 0), glowyOre: completed.reduce((sum, item) => sum + (item.glowyOreCost || 0), 0), starryOre: completed.reduce((sum, item) => sum + (item.starryOreCost || 0), 0) },
       eventSavedHours: 0,
       eventSavedResources: { gold: 0, elixir: 0, darkElixir: 0 },
       magicItemSavedHours: 0,
@@ -900,7 +1012,7 @@ export default function Home() {
       forecastAbsoluteErrorHours: withForecast.reduce((sum, item) => sum + Math.abs(new Date(item.updatedAt).getTime() - new Date(item.plannedFinishAt as string).getTime()) / 3_600_000, 0),
       forecastProgressPercent: progressForecast.projectedProgressPercent,
     };
-  }, [accountHealth?.score, effectivePlanningGoals, heroLevels, heroProgress, plannerResult, planningStrategy, progress, progressForecast.projectedProgressPercent, queueItems, screenshotUpgradeSlots, screenshotWallLevels, selectedAccount, siegeMachineProgress, spellProgress, troopProgress]);
+  }, [accountHealth?.score, availableScreenshotEntities, effectivePlanningGoals, heroLevels, heroProgress, plannerResult, planningStrategy, progress, progressForecast.projectedProgressPercent, queueItems, screenshotEntityLevels, screenshotUpgradeSlots, screenshotWallLevels, selectedAccount, siegeMachineProgress, spellProgress, troopProgress]);
   const {
     snapshots: progressHistorySnapshots,
     isSaving: isSavingProgressHistory,
@@ -1684,6 +1796,27 @@ export default function Home() {
             selectedAccount={selectedAccount}
             onUpdateHeroLevel={updateHeroLevel}
           />
+        </CollapsibleSection>
+
+        <CollapsibleSection title={en ? "Pets, equipment & upgrade slots" : "Pets, Ausrüstung & Upgrade-Slots"}>
+          {selectedAccount ? (
+            <div className="space-y-5">
+              <SpecialUpgradeProgress
+                language={language}
+                entities={availableScreenshotEntities}
+                levels={screenshotEntityLevels}
+                savingEntityId={savingScreenshotEntityId}
+                onLevelChange={updateScreenshotEntityLevel}
+              />
+              <UpgradeSlotManager
+                language={language}
+                slots={displayedUpgradeSlots}
+                isSaving={isSavingSlot}
+                onSave={saveUpgradeSlot}
+                onRemove={removeUpgradeSlot}
+              />
+            </div>
+          ) : <p className="p-5 text-slate-400">{en ? "Select an account first." : "Wähle zuerst einen Account aus."}</p>}
         </CollapsibleSection>
 
         <CollapsibleSection

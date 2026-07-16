@@ -2,7 +2,7 @@
 create table if not exists public.account_upgrade_preferences (
   id uuid primary key default gen_random_uuid(),
   account_id uuid not null references public.accounts(id) on delete cascade,
-  item_type text not null check (item_type in ('building', 'hero', 'troop', 'spell', 'siege_machine')),
+  item_type text not null check (item_type in ('building', 'hero', 'troop', 'spell', 'siege_machine', 'pet', 'equipment')),
   item_id text not null check (char_length(item_id) between 1 and 160),
   preference text not null default 'normal'
     check (preference in ('normal', 'prefer', 'strongly_prefer', 'avoid', 'exclude')),

@@ -1,4 +1,8 @@
-import type { UpgradeItemType, UpgradeQueueItem } from "@/types/upgradeQueue";
+import type {
+  UpgradeItemType,
+  UpgradeQueueItem,
+  UpgradeSlotType,
+} from "@/types/upgradeQueue";
 import type { ResourceSnapshot } from "@/features/planner/planner.types";
 
 export type SimulationDiscountWindow = {
@@ -24,9 +28,21 @@ export type BuilderSimulationInput = {
   initialLaboratoryAvailabilityHours?: number;
   earliestStartHoursByQueueItem?: Record<string, number>;
   pauseWindows?: SimulationPauseWindow[];
+  slots?: UpgradeSimulationSlot[];
 };
 
-export type UpgradeSlotType = "builder" | "laboratory";
+export type UpgradeSimulationSlot = {
+  id: string;
+  type: UpgradeSlotType;
+  index: number;
+  label?: string;
+  availableAtHours?: number;
+  enabled?: boolean;
+  allowedItemTypes?: UpgradeItemType[];
+  durationMultiplier?: number;
+};
+
+export type { UpgradeSlotType } from "@/types/upgradeQueue";
 
 export type BuilderAssignment = {
   builderIndex: number;
@@ -44,6 +60,7 @@ export type BuilderAssignment = {
   originalCosts: ResourceSnapshot;
   effectiveCosts: ResourceSnapshot;
   slotType: UpgradeSlotType;
+  slotId?: string;
   slotLabel: string;
 };
 
@@ -55,4 +72,7 @@ export type BuilderSimulationResult = {
   idleTimeHours: number;
   builderAssignmentCount: number;
   laboratoryAssignmentCount: number;
+  slotCounts?: Partial<Record<UpgradeSlotType, number>>;
+  assignmentCounts?: Partial<Record<UpgradeSlotType, number>>;
+  totalSlotIdleTimeHours?: number;
 };

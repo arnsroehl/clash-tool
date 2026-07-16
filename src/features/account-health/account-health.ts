@@ -201,6 +201,8 @@ function strategyFit(input: AccountHealthInput, areas: HealthArea[]): number {
   const customTypeWeights: Partial<Record<HealthAreaId, number>> = input.strategy === "custom" ? {
     defense: input.strategyWeights?.building || 0,
     heroes: input.strategyWeights?.hero || 0,
+    pets: input.strategyWeights?.pet || 0,
+    equipment: input.strategyWeights?.equipment || 0,
     laboratory: ((input.strategyWeights?.troop || 0) + (input.strategyWeights?.spell || 0) + (input.strategyWeights?.siege_machine || 0)) / 3,
     offense: ((input.strategyWeights?.hero || 0) + (input.strategyWeights?.troop || 0)) / 2,
   } : {};

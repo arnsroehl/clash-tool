@@ -15,6 +15,7 @@ import {
   calculateRemainingElixir,
   calculateRemainingGold,
   calculateRemainingLevels,
+  calculateRemainingOre,
   calculateRemainingLevelsForBuilding,
   calculateRemainingTime,
   getCurrentBuildingLevel,
@@ -216,6 +217,9 @@ export function createPlannerResult(input: PlannerInput): PlannerResult {
       remainingDarkElixirCost: calculateRemainingDarkElixir(
         sortedPossibleUpgrades,
       ),
+      remainingShinyOreCost: calculateRemainingOre(sortedPossibleUpgrades, "shinyOre"),
+      remainingGlowyOreCost: calculateRemainingOre(sortedPossibleUpgrades, "glowyOre"),
+      remainingStarryOreCost: calculateRemainingOre(sortedPossibleUpgrades, "starryOre"),
       remainingBuildTimeHours: remainingTime.hours,
       builderUsagePercent: calculateBuilderUsage(builderAvailability),
     },

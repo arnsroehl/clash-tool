@@ -141,6 +141,9 @@ export function sumUpgradeCosts(levels: PlannerUpgradeLevel[]): UpgradeCosts {
       gold: costs.gold + level.costs.gold,
       elixir: costs.elixir + level.costs.elixir,
       darkElixir: costs.darkElixir + level.costs.darkElixir,
+      shinyOre: (costs.shinyOre || 0) + (level.costs.shinyOre || 0),
+      glowyOre: (costs.glowyOre || 0) + (level.costs.glowyOre || 0),
+      starryOre: (costs.starryOre || 0) + (level.costs.starryOre || 0),
     }),
     { ...NO_COST },
   );
@@ -175,6 +178,16 @@ export function calculateRemainingDarkElixir(
 ): number {
   return upgrades.reduce(
     (sum, upgrade) => sum + upgrade.remainingCosts.darkElixir,
+    0,
+  );
+}
+
+export function calculateRemainingOre(
+  upgrades: UpgradeCandidate[],
+  resource: "shinyOre" | "glowyOre" | "starryOre",
+): number {
+  return upgrades.reduce(
+    (sum, upgrade) => sum + (upgrade.remainingCosts[resource] || 0),
     0,
   );
 }
@@ -223,7 +236,8 @@ export function calculatePriorityScore(params: {
     itemType === "troop" || itemType === "spell" || itemType === "siege_machine"
       ? 35
       : 0;
-  const heroBonus = itemType === "hero" ? 35 : 0;
+  const heroBonus = itemType === "hero" || itemType === "pet" ? 35 : 0;
+  const equipmentBonus = itemType === "equipment" ? 30 : 0;
   const keyBuildingBonus =
     normalizedName.includes("rathaus") ||
     normalizedName.includes("town hall") ||
@@ -239,6 +253,7 @@ export function calculatePriorityScore(params: {
     params.currentLevel * PRIORITY_WEIGHTS.lowCurrentLevel +
     typeBonus +
     heroBonus +
+    equipmentBonus +
     keyBuildingBonus +
     defenseBonus +
     resourcePenalty;

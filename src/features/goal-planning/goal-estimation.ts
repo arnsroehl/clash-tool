@@ -31,11 +31,19 @@ export function estimateMilestoneElapsedHours(
       ["troop", "spell", "siege_machine"].includes(item.itemType),
     )
     .reduce((sum, item) => sum + item.remainingTime.hours, 0);
+  const petHouseHours = recommendations
+    .filter((item) => item.itemType === "pet")
+    .reduce((sum, item) => sum + item.remainingTime.hours, 0);
+  const blacksmithHours = recommendations
+    .filter((item) => item.itemType === "equipment")
+    .reduce((sum, item) => sum + item.remainingTime.hours, 0);
 
   return Math.ceil(
     Math.max(
       assignJobsToEarliestSlot(builderPaths, builderCount),
       laboratoryHours,
+      petHouseHours,
+      blacksmithHours,
     ),
   );
 }

@@ -1,6 +1,9 @@
 export type PlannerNotificationType =
   | "builder_free"
   | "laboratory_free"
+  | "pet_house_free"
+  | "blacksmith_free"
+  | "helper_free"
   | "upgrade_ready"
   | "storage_full"
   | "recommendation"

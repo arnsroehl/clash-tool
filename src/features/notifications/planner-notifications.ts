@@ -28,7 +28,7 @@ type Input = {
   now?: Date;
 };
 
-const emptyResources: ResourceSnapshot = { gold: 0, elixir: 0, darkElixir: 0 };
+const emptyResources: ResourceSnapshot = { gold: 0, elixir: 0, darkElixir: 0, shinyOre: 0, glowyOre: 0, starryOre: 0 };
 
 export function createPlannerNotifications({
   accountId,
@@ -61,7 +61,10 @@ export function createPlannerNotifications({
     const affordableNow =
       spendableResources.gold >= costs.gold &&
       spendableResources.elixir >= costs.elixir &&
-      spendableResources.darkElixir >= costs.darkElixir;
+      spendableResources.darkElixir >= costs.darkElixir &&
+      (spendableResources.shinyOre || 0) >= (costs.shinyOre || 0) &&
+      (spendableResources.glowyOre || 0) >= (costs.glowyOre || 0) &&
+      (spendableResources.starryOre || 0) >= (costs.starryOre || 0);
     if (assignment.startHour > 0 || affordableNow) {
       drafts.push({
         accountId,
@@ -76,6 +79,9 @@ export function createPlannerNotifications({
         spendableResources.gold -= costs.gold;
         spendableResources.elixir -= costs.elixir;
         spendableResources.darkElixir -= costs.darkElixir;
+        spendableResources.shinyOre = (spendableResources.shinyOre || 0) - (costs.shinyOre || 0);
+        spendableResources.glowyOre = (spendableResources.glowyOre || 0) - (costs.glowyOre || 0);
+        spendableResources.starryOre = (spendableResources.starryOre || 0) - (costs.starryOre || 0);
       }
     }
   }
@@ -86,7 +92,13 @@ export function createPlannerNotifications({
       type:
         assignment.slotType === "laboratory"
           ? "laboratory_free"
-          : "builder_free",
+          : assignment.slotType === "pet_house"
+            ? "pet_house_free"
+            : assignment.slotType === "blacksmith"
+              ? "blacksmith_free"
+              : assignment.slotType === "helper"
+                ? "helper_free"
+                : "builder_free",
       notifyAt: atHour(assignment.endHour),
       title: en
         ? `${assignment.slotLabel} becomes free`

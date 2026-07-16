@@ -41,8 +41,8 @@ export function NotificationCenter({
           </h2>
           <p className="mt-1 text-sm text-slate-400">
             {en
-              ? "Builders, laboratory, queue, goals and events are derived from your current plan."
-              : "Builder, Labor, Queue, Ziele und Events werden aus deiner aktuellen Planung abgeleitet."}
+              ? "Builders, laboratory, Pet House, Blacksmith, queue, goals and events are derived from your current plan."
+              : "Builder, Labor, Pet House, Schmied, Queue, Ziele und Events werden aus deiner aktuellen Planung abgeleitet."}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

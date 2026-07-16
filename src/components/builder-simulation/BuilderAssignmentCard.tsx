@@ -14,6 +14,8 @@ function formatType(type: string, language: "de" | "en"): string {
           troop: "Troop",
           spell: "Spell",
           siege_machine: "Siege machine",
+          pet: "Pet",
+          equipment: "Hero equipment",
         }
       : {
           building: "Gebäude",
@@ -21,6 +23,8 @@ function formatType(type: string, language: "de" | "en"): string {
           troop: "Truppe",
           spell: "Zauber",
           siege_machine: "Belagerung",
+          pet: "Pet",
+          equipment: "Heldenausrüstung",
         };
 
   return labels[type] || type;
@@ -45,11 +49,14 @@ export function BuilderAssignmentCard({
     .filter(([, value]) => value > 0)
     .map(([resource, value]) => {
       const labels = en
-        ? { gold: "Gold", elixir: "Elixir", darkElixir: "Dark Elixir" }
+        ? { gold: "Gold", elixir: "Elixir", darkElixir: "Dark Elixir", shinyOre: "Shiny ore", glowyOre: "Glowy ore", starryOre: "Starry ore" }
         : {
             gold: "Gold",
             elixir: "Elixier",
             darkElixir: "Dunkles Elixier",
+            shinyOre: "Glänzendes Erz",
+            glowyOre: "Leuchtendes Erz",
+            starryOre: "Sternenerz",
           };
       return `${labels[resource as keyof typeof labels]} ${new Intl.NumberFormat(
         en ? "en-US" : "de-DE",

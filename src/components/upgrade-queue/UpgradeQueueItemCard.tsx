@@ -31,6 +31,8 @@ function formatType(type: string, language: "de" | "en"): string {
           troop: "Troop",
           spell: "Spell",
           siege_machine: "Siege machine",
+          pet: "Pet",
+          equipment: "Hero equipment",
         }
       : {
           building: "Gebäude",
@@ -38,6 +40,8 @@ function formatType(type: string, language: "de" | "en"): string {
           troop: "Truppe",
           spell: "Zauber",
           siege_machine: "Belagerung",
+          pet: "Pet",
+          equipment: "Heldenausrüstung",
         };
 
   return labels[type] || type;
@@ -73,6 +77,7 @@ export function UpgradeQueueItemCard({
             {en ? "Elixir" : "Elixier"}{" "}
             {formatNumber(item.elixirCost, language)} · DE{" "}
             {formatNumber(item.darkElixirCost, language)}
+            {(item.shinyOreCost || item.glowyOreCost || item.starryOreCost) ? ` · Erz ${formatNumber(item.shinyOreCost || 0, language)}/${formatNumber(item.glowyOreCost || 0, language)}/${formatNumber(item.starryOreCost || 0, language)}` : ""}
           </p>
           <select
             aria-label={`${en ? "Status of" : "Status von"} ${item.name}`}

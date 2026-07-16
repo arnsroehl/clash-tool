@@ -78,6 +78,9 @@ function recommendationQueueItem(
     goldCost: recommendation.nextLevelCosts.gold,
     elixirCost: recommendation.nextLevelCosts.elixir,
     darkElixirCost: recommendation.nextLevelCosts.darkElixir,
+    shinyOreCost: recommendation.nextLevelCosts.shinyOre || 0,
+    glowyOreCost: recommendation.nextLevelCosts.glowyOre || 0,
+    starryOreCost: recommendation.nextLevelCosts.starryOre || 0,
     durationHours: recommendation.nextLevelTime.hours,
     priorityScore: recommendation.score,
     queueOrder: order,
@@ -225,6 +228,9 @@ function applyMagicItems(
     let goldCost = item.goldCost;
     let elixirCost = item.elixirCost;
     let darkElixirCost = item.darkElixirCost;
+    let shinyOreCost = item.shinyOreCost || 0;
+    let glowyOreCost = item.glowyOreCost || 0;
+    let starryOreCost = item.starryOreCost || 0;
     for (const use of uses) {
       const inventory = base.magicItems.find((magic) => magic.itemKey === use.itemKey);
       if (!inventory || use.quantity <= 0) continue;
@@ -237,9 +243,12 @@ function applyMagicItems(
         goldCost = 0;
         elixirCost = 0;
         darkElixirCost = 0;
+        shinyOreCost = 0;
+        glowyOreCost = 0;
+        starryOreCost = 0;
       }
     }
-    return { ...item, durationHours, goldCost, elixirCost, darkElixirCost };
+    return { ...item, durationHours, goldCost, elixirCost, darkElixirCost, shinyOreCost, glowyOreCost, starryOreCost };
   });
 }
 
@@ -251,7 +260,10 @@ function sumResources(
     gold: total.gold + assignment[effective].gold,
     elixir: total.elixir + assignment[effective].elixir,
     darkElixir: total.darkElixir + assignment[effective].darkElixir,
-  }), { gold: 0, elixir: 0, darkElixir: 0 });
+    shinyOre: (total.shinyOre || 0) + (assignment[effective].shinyOre || 0),
+    glowyOre: (total.glowyOre || 0) + (assignment[effective].glowyOre || 0),
+    starryOre: (total.starryOre || 0) + (assignment[effective].starryOre || 0),
+  }), { gold: 0, elixir: 0, darkElixir: 0, shinyOre: 0, glowyOre: 0, starryOre: 0 });
 }
 
 export function evaluatePlanningScenario(
@@ -281,6 +293,12 @@ export function evaluatePlanningScenario(
     pauseWindows,
     initialBuilderAvailabilityHours: context.initialBuilderAvailabilityHours,
     initialLaboratoryAvailabilityHours: context.initialLaboratoryAvailabilityHours,
+    slots: [
+      ...Array.from({ length: Math.max(1, draft.assumptions.builderCount) }, (_, index) => ({ id: `builder:${index + 1}`, type: "builder" as const, index: index + 1, availableAtHours: context.initialBuilderAvailabilityHours?.[index] || 0 })),
+      { id: "laboratory:1", type: "laboratory" as const, index: 1, availableAtHours: context.initialLaboratoryAvailabilityHours || 0 },
+      ...(context.townHallLevel >= 14 ? [{ id: "pet_house:1", type: "pet_house" as const, index: 1 }] : []),
+      ...(context.townHallLevel >= 8 ? [{ id: "blacksmith:1", type: "blacksmith" as const, index: 1 }] : []),
+    ],
     timeDiscountWindows: events.map((event) => ({ startsAt: event.startsAt, endsAt: event.endsAt, percent: Math.max(goldPassPercent, event.timeDiscountPercent) })),
     costDiscountWindows: events.map((event) => ({ startsAt: event.startsAt, endsAt: event.endsAt, percent: Math.max(goldPassPercent, event.costDiscountPercent) })),
   });
@@ -292,11 +310,17 @@ export function evaluatePlanningScenario(
     gold: Math.max(0, draft.resources.gold + draft.dailyIncome.gold * draft.horizonDays - resourcesRequired.gold),
     elixir: Math.max(0, draft.resources.elixir + draft.dailyIncome.elixir * draft.horizonDays - resourcesRequired.elixir),
     darkElixir: Math.max(0, draft.resources.darkElixir + draft.dailyIncome.darkElixir * draft.horizonDays - resourcesRequired.darkElixir),
+    shinyOre: Math.max(0, (draft.resources.shinyOre || 0) + (draft.dailyIncome.shinyOre || 0) * draft.horizonDays - (resourcesRequired.shinyOre || 0)),
+    glowyOre: Math.max(0, (draft.resources.glowyOre || 0) + (draft.dailyIncome.glowyOre || 0) * draft.horizonDays - (resourcesRequired.glowyOre || 0)),
+    starryOre: Math.max(0, (draft.resources.starryOre || 0) + (draft.dailyIncome.starryOre || 0) * draft.horizonDays - (resourcesRequired.starryOre || 0)),
   };
   const farmingRequiredPerDay: ResourceSnapshot = {
     gold: round(Math.max(0, resourcesRequired.gold - draft.resources.gold) / draft.horizonDays),
     elixir: round(Math.max(0, resourcesRequired.elixir - draft.resources.elixir) / draft.horizonDays),
     darkElixir: round(Math.max(0, resourcesRequired.darkElixir - draft.resources.darkElixir) / draft.horizonDays),
+    shinyOre: round(Math.max(0, (resourcesRequired.shinyOre || 0) - (draft.resources.shinyOre || 0)) / draft.horizonDays),
+    glowyOre: round(Math.max(0, (resourcesRequired.glowyOre || 0) - (draft.resources.glowyOre || 0)) / draft.horizonDays),
+    starryOre: round(Math.max(0, (resourcesRequired.starryOre || 0) - (draft.resources.starryOre || 0)) / draft.horizonDays),
   };
   const goalResults = baseState.goals.filter((goal) => goal.status === "active").map((goal) => {
     const targetDate = draft.assumptions.goalDateOverrides[goal.id] || goal.targetDate;

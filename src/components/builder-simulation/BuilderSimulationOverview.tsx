@@ -32,16 +32,29 @@ export function BuilderSimulationOverview({
         total.darkElixir +
         assignment.originalCosts.darkElixir -
         assignment.effectiveCosts.darkElixir,
+      shinyOre: total.shinyOre + (assignment.originalCosts.shinyOre || 0) - (assignment.effectiveCosts.shinyOre || 0),
+      glowyOre: total.glowyOre + (assignment.originalCosts.glowyOre || 0) - (assignment.effectiveCosts.glowyOre || 0),
+      starryOre: total.starryOre + (assignment.originalCosts.starryOre || 0) - (assignment.effectiveCosts.starryOre || 0),
     }),
-    { gold: 0, elixir: 0, darkElixir: 0 },
+    { gold: 0, elixir: 0, darkElixir: 0, shinyOre: 0, glowyOre: 0, starryOre: 0 },
   );
   const formattedSavings = [
     [en ? "gold" : "Gold", eventSavings.gold],
     [en ? "elixir" : "Elixier", eventSavings.elixir],
     [en ? "dark elixir" : "Dunkles Elixier", eventSavings.darkElixir],
+    [en ? "shiny ore" : "Glänzendes Erz", eventSavings.shinyOre],
+    [en ? "glowy ore" : "Leuchtendes Erz", eventSavings.glowyOre],
+    [en ? "starry ore" : "Sternenerz", eventSavings.starryOre],
   ]
     .filter(([, value]) => Number(value) > 0)
     .map(([label, value]) => `${formatNumber(Number(value), language)} ${label}`);
+  const assignmentCounts = simulation.assignmentCounts || {
+    builder: simulation.builderAssignmentCount,
+    laboratory: simulation.laboratoryAssignmentCount,
+  };
+  const slotLabels: Record<string, string> = en
+    ? { builder: "Builder", goblin_builder: "Goblin Builder", laboratory: "Laboratory", pet_house: "Pet House", blacksmith: "Blacksmith", helper: "Helper" }
+    : { builder: "Builder", goblin_builder: "Goblin Builder", laboratory: "Labor", pet_house: "Pet House", blacksmith: "Schmied", helper: "Helfer" };
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
@@ -61,23 +74,13 @@ export function BuilderSimulationOverview({
         </span>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl bg-white/5 p-4">
-          <p className="text-xs text-slate-400">
-            {en ? "Builder upgrades" : "Bauarbeiter-Upgrades"}
-          </p>
-          <p className="mt-1 text-2xl font-bold">
-            {simulation.builderAssignmentCount}
-          </p>
-        </div>
-        <div className="rounded-2xl bg-white/5 p-4">
-          <p className="text-xs text-slate-400">
-            {en ? "Laboratory upgrades" : "Labor-Upgrades"}
-          </p>
-          <p className="mt-1 text-2xl font-bold">
-            {simulation.laboratoryAssignmentCount}
-          </p>
-        </div>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {Object.entries(assignmentCounts).filter(([, count]) => (count || 0) > 0).map(([type, count]) => (
+          <div key={type} className="rounded-2xl bg-white/5 p-4">
+            <p className="text-xs text-slate-400">{slotLabels[type] || type}</p>
+            <p className="mt-1 text-2xl font-bold">{count}</p>
+          </div>
+        ))}
       </div>
 
       {formattedSavings.length > 0 ? (

@@ -49,6 +49,9 @@ export function PlanningControlCenter(props: Props) {
     gold: props.resources.gold + props.resourceBonus.gold,
     elixir: props.resources.elixir + props.resourceBonus.elixir,
     darkElixir: props.resources.darkElixir + props.resourceBonus.darkElixir,
+    shinyOre: (props.resources.shinyOre || 0) + (props.resourceBonus.shinyOre || 0),
+    glowyOre: (props.resources.glowyOre || 0) + (props.resourceBonus.glowyOre || 0),
+    starryOre: (props.resources.starryOre || 0) + (props.resourceBonus.starryOre || 0),
   };
   const hasResourceBonus = Object.values(props.resourceBonus).some(
     (value) => value > 0,
@@ -63,7 +66,10 @@ export function PlanningControlCenter(props: Props) {
     ? effectiveResources.gold >= effectiveCost(top.nextLevelCosts.gold) &&
       effectiveResources.elixir >= effectiveCost(top.nextLevelCosts.elixir) &&
       effectiveResources.darkElixir >=
-        effectiveCost(top.nextLevelCosts.darkElixir)
+        effectiveCost(top.nextLevelCosts.darkElixir) &&
+      (effectiveResources.shinyOre || 0) >= effectiveCost(top.nextLevelCosts.shinyOre || 0) &&
+      (effectiveResources.glowyOre || 0) >= effectiveCost(top.nextLevelCosts.glowyOre || 0) &&
+      (effectiveResources.starryOre || 0) >= effectiveCost(top.nextLevelCosts.starryOre || 0)
     : false;
   const affordableAlternative = props.recommendations
     .slice(1)
@@ -73,11 +79,22 @@ export function PlanningControlCenter(props: Props) {
         effectiveResources.elixir >=
           effectiveCost(item.nextLevelCosts.elixir) &&
         effectiveResources.darkElixir >=
-          effectiveCost(item.nextLevelCosts.darkElixir),
+          effectiveCost(item.nextLevelCosts.darkElixir) &&
+        (effectiveResources.shinyOre || 0) >= effectiveCost(item.nextLevelCosts.shinyOre || 0) &&
+        (effectiveResources.glowyOre || 0) >= effectiveCost(item.nextLevelCosts.glowyOre || 0) &&
+        (effectiveResources.starryOre || 0) >= effectiveCost(item.nextLevelCosts.starryOre || 0),
     );
   const currentProgress = props.plannerResult?.summary.progressPercent ?? 0;
   const goalReached = currentProgress >= props.goalPercent;
-  const resourceKeys = ["gold", "elixir", "darkElixir"] as const;
+  const resourceKeys = ["gold", "elixir", "darkElixir", "shinyOre", "glowyOre", "starryOre"] as const;
+  const resourceLabel = (key: typeof resourceKeys[number]) => ({
+    gold: "Gold",
+    elixir: en ? "Elixir" : "Elixier",
+    darkElixir: en ? "Dark elixir" : "Dunkles Elixier",
+    shinyOre: en ? "Shiny ore" : "Glänzendes Erz",
+    glowyOre: en ? "Glowy ore" : "Leuchtendes Erz",
+    starryOre: en ? "Starry ore" : "Sternenerz",
+  })[key];
   const waitDays = top
     ? Math.ceil(
         Math.max(
@@ -85,12 +102,12 @@ export function PlanningControlCenter(props: Props) {
           ...resourceKeys.map((key) => {
             const deficit = Math.max(
               0,
-              effectiveCost(top.nextLevelCosts[key]) - effectiveResources[key],
+              effectiveCost(top.nextLevelCosts[key] || 0) - (effectiveResources[key] || 0),
             );
             return deficit === 0
               ? 0
-              : props.dailyIncome[key] > 0
-                ? deficit / props.dailyIncome[key]
+              : (props.dailyIncome[key] || 0) > 0
+                ? deficit / (props.dailyIncome[key] || 1)
                 : Number.POSITIVE_INFINITY;
           }),
         ),
@@ -175,7 +192,7 @@ export function PlanningControlCenter(props: Props) {
                 {en ? "Custom weighting" : "Eigene Gewichtung"}
               </h3>
               {(
-                ["building", "hero", "troop", "spell", "siege_machine"] as const
+                ["building", "hero", "troop", "spell", "siege_machine", "pet", "equipment"] as const
               ).map((type) => {
                 const typeLabels = en
                   ? {
@@ -184,6 +201,8 @@ export function PlanningControlCenter(props: Props) {
                       troop: "Troops",
                       spell: "Spells",
                       siege_machine: "Siege",
+                      pet: "Pets",
+                      equipment: "Equipment",
                     }
                   : {
                       building: "Gebäude",
@@ -191,6 +210,8 @@ export function PlanningControlCenter(props: Props) {
                       troop: "Truppen",
                       spell: "Zauber",
                       siege_machine: "Belagerung",
+                      pet: "Pets",
+                      equipment: "Ausrüstung",
                     };
                 return (
                   <label
@@ -202,7 +223,7 @@ export function PlanningControlCenter(props: Props) {
                       type="range"
                       min="0"
                       max="100"
-                      value={props.strategyWeights[type]}
+                      value={props.strategyWeights[type] ?? 50}
                       onChange={(event) =>
                         props.onStrategyWeightsChange({
                           ...props.strategyWeights,
@@ -211,29 +232,21 @@ export function PlanningControlCenter(props: Props) {
                       }
                       className="accent-amber-400"
                     />
-                    <span>{props.strategyWeights[type]}</span>
+                    <span>{props.strategyWeights[type] ?? 50}</span>
                   </label>
                 );
               })}
             </div>
           ) : null}
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {(["gold", "elixir", "darkElixir"] as const).map((key) => (
+            {resourceKeys.map((key) => (
               <label key={key} className="text-xs font-semibold text-slate-400">
-                {key === "darkElixir"
-                  ? en
-                    ? "Dark elixir"
-                    : "Dunkles Elixier"
-                  : key === "elixir"
-                    ? en
-                      ? "Elixir"
-                      : "Elixier"
-                    : "Gold"}
+                {resourceLabel(key)}
                 <input
                   type="number"
                   min="0"
                   className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 p-3 text-white"
-                  value={props.resources[key]}
+                  value={props.resources[key] ?? 0}
                   onChange={(event) => updateResource(key, event.target.value)}
                 />
               </label>
@@ -245,20 +258,12 @@ export function PlanningControlCenter(props: Props) {
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             {resourceKeys.map((key) => (
               <label key={key} className="text-xs font-semibold text-slate-400">
-                {key === "darkElixir"
-                  ? en
-                    ? "Dark elixir"
-                    : "Dunkles Elixier"
-                  : key === "elixir"
-                    ? en
-                      ? "Elixir"
-                      : "Elixier"
-                    : "Gold"}
+                {resourceLabel(key)}
                 <input
                   type="number"
                   min="0"
                   className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 p-3 text-white"
-                  value={props.storageCapacities[key]}
+                  value={props.storageCapacities[key] ?? 0}
                   onChange={(event) => updateCapacity(key, event.target.value)}
                 />
               </label>
@@ -272,20 +277,12 @@ export function PlanningControlCenter(props: Props) {
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             {resourceKeys.map((key) => (
               <label key={key} className="text-xs font-semibold text-slate-400">
-                {key === "darkElixir"
-                  ? en
-                    ? "Dark elixir"
-                    : "Dunkles Elixier"
-                  : key === "elixir"
-                    ? en
-                      ? "Elixir"
-                      : "Elixier"
-                    : "Gold"}
+                {resourceLabel(key)}
                 <input
                   type="number"
                   min="0"
                   className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950 p-3 text-white"
-                  value={props.dailyIncome[key]}
+                  value={props.dailyIncome[key] ?? 0}
                   onChange={(event) => updateIncome(key, event.target.value)}
                 />
               </label>
@@ -334,7 +331,7 @@ export function PlanningControlCenter(props: Props) {
                   7 {en ? "days" : "Tage"}
                 </span>
                 <span className="font-bold">
-                  {numberFormat.format(props.dailyIncome[key] * 7)}
+                  {numberFormat.format((props.dailyIncome[key] || 0) * 7)}
                 </span>
               </div>
             ))}

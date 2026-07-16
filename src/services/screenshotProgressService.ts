@@ -9,7 +9,57 @@ import type {
   ScreenshotUpgradeSlot,
   ScreenshotResourceSnapshot,
   ScreenshotWallLevel,
+  SaveUpgradeSlotInput,
 } from "@/types/screenshotProgress";
+
+export async function updateAccountScreenshotEntityLevel(input: {
+  accountId: string;
+  entityId: string;
+  currentLevel: number;
+}): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from("account_screenshot_entities")
+    .upsert({
+      account_id: input.accountId,
+      entity_id: input.entityId,
+      current_level: Math.max(0, Math.floor(input.currentLevel)),
+      is_unlocked: input.currentLevel > 0,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "account_id,entity_id" });
+  if (error) throw new Error(error.message);
+}
+
+export async function saveAccountUpgradeSlot(input: SaveUpgradeSlotInput): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from("account_upgrade_slots")
+    .upsert({
+      account_id: input.accountId,
+      slot_type: input.slotType,
+      slot_index: input.slotIndex,
+      enabled: input.enabled,
+      is_available: input.isAvailable ?? true,
+      label: input.label || null,
+      allowed_item_types: input.allowedItemTypes || [],
+      duration_multiplier: input.durationMultiplier ?? 1,
+      source_import_session_id: null,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "account_id,slot_type,slot_index" });
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteAccountUpgradeSlot(input: {
+  accountId: string;
+  slotType: SaveUpgradeSlotInput["slotType"];
+  slotIndex: number;
+}): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from("account_upgrade_slots")
+    .delete()
+    .eq("account_id", input.accountId)
+    .eq("slot_type", input.slotType)
+    .eq("slot_index", input.slotIndex);
+  if (error) throw new Error(error.message);
+}
 
 export async function fetchAccountWallLevels(
   accountId: string,
@@ -98,7 +148,7 @@ export async function fetchAccountUpgradeSlots(
 ): Promise<ScreenshotUpgradeSlot[]> {
   const { data, error } = await getSupabaseClient()
     .from("account_upgrade_slots")
-    .select("slot_type, slot_index, is_available, entity_name, target_level, remaining_seconds, finishes_at")
+    .select("slot_type, slot_index, is_available, entity_name, target_level, remaining_seconds, finishes_at, enabled, label, allowed_item_types, duration_multiplier")
     .eq("account_id", accountId)
     .order("slot_type")
     .order("slot_index");
@@ -111,6 +161,10 @@ export async function fetchAccountUpgradeSlots(
     targetLevel: row.target_level as number | null,
     remainingSeconds: row.remaining_seconds === null ? null : Number(row.remaining_seconds),
     finishesAt: row.finishes_at as string | null,
+    enabled: row.enabled === undefined ? true : Boolean(row.enabled),
+    label: row.label as string | null,
+    allowedItemTypes: (row.allowed_item_types || []) as ScreenshotUpgradeSlot["allowedItemTypes"],
+    durationMultiplier: Number(row.duration_multiplier || 1),
   }));
 }
 

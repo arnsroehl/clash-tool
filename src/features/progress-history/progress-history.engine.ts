@@ -1,7 +1,7 @@
 import type { HistoryPeriod, ProgressHistorySnapshot, ProgressHistoryStatistics } from "@/features/progress-history/progress-history.types";
 
 const DAY = 86_400_000;
-const categories = ["buildings", "heroes", "troops", "spells", "siegeMachines", "laboratory"] as const;
+const categories = ["buildings", "heroes", "troops", "spells", "siegeMachines", "laboratory", "pets", "equipment"] as const;
 const round = (value: number, digits = 1) => Number(value.toFixed(digits));
 const average = (values: Array<number | null>) => {
   const known = values.filter((value): value is number => value !== null && Number.isFinite(value));
@@ -33,7 +33,7 @@ export function analyzeProgressHistory(snapshots: ProgressHistorySnapshot[]): Pr
   }
   const days = Math.max(1, (new Date(last.capturedAt).getTime() - new Date(first.capturedAt).getTime()) / DAY);
   const progressGain = round(last.overallProgress - first.overallProgress);
-  const categoryGains = categories.map((category) => ({ category, gain: last.categoryProgress[category] - first.categoryProgress[category] }));
+  const categoryGains = categories.map((category) => ({ category, gain: (last.categoryProgress[category] || 0) - (first.categoryProgress[category] || 0) }));
   const activeCategoryGains = categoryGains.filter((entry) => Math.abs(entry.gain) > 0.001);
   let greatestProgressPhase: ProgressHistoryStatistics["greatestProgressPhase"] = null;
   let longestInactiveDays = 0;
@@ -56,7 +56,7 @@ export function analyzeProgressHistory(snapshots: ProgressHistorySnapshot[]): Pr
     completedUpgradeCount: difference(last.completedUpgradeCount, first.completedUpgradeCount),
     completedLevelCount: difference(last.completedLevelCount, first.completedLevelCount),
     completedUpgradeHours: round(difference(last.completedUpgradeHours, first.completedUpgradeHours)),
-    spentResources: { gold: difference(last.spentResources.gold, first.spentResources.gold), elixir: difference(last.spentResources.elixir, first.spentResources.elixir), darkElixir: difference(last.spentResources.darkElixir, first.spentResources.darkElixir) },
+    spentResources: { gold: difference(last.spentResources.gold, first.spentResources.gold), elixir: difference(last.spentResources.elixir, first.spentResources.elixir), darkElixir: difference(last.spentResources.darkElixir, first.spentResources.darkElixir), shinyOre: difference(last.spentResources.shinyOre || 0, first.spentResources.shinyOre || 0), glowyOre: difference(last.spentResources.glowyOre || 0, first.spentResources.glowyOre || 0), starryOre: difference(last.spentResources.starryOre || 0, first.spentResources.starryOre || 0) },
     eventSavedHours: round(difference(last.eventSavedHours, first.eventSavedHours)),
     eventSavedResources: { gold: difference(last.eventSavedResources.gold, first.eventSavedResources.gold), elixir: difference(last.eventSavedResources.elixir, first.eventSavedResources.elixir), darkElixir: difference(last.eventSavedResources.darkElixir, first.eventSavedResources.darkElixir) },
     magicItemSavedHours: round(difference(last.magicItemSavedHours, first.magicItemSavedHours)),

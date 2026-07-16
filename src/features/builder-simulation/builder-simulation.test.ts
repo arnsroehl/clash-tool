@@ -136,6 +136,44 @@ describe("Builder Simulation", () => {
     assert.equal(result.laboratoryAssignmentCount, 2);
   });
 
+  it("plant Pets und Ausrüstung parallel in Pet House und Schmied", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      queueItems: [
+        createQueueItem({ id: "building", queueOrder: 1, durationHours: 12 }),
+        createQueueItem({ id: "pet", queueOrder: 2, durationHours: 8, itemType: "pet" }),
+        createQueueItem({ id: "equipment", queueOrder: 3, durationHours: 6, itemType: "equipment" }),
+      ],
+      slots: [
+        { id: "builder:1", type: "builder", index: 1 },
+        { id: "pet_house:1", type: "pet_house", index: 1 },
+        { id: "blacksmith:1", type: "blacksmith", index: 1 },
+      ],
+    });
+    assert.deepEqual(result.assignments.map((item) => item.slotType), ["builder", "pet_house", "blacksmith"]);
+    assert.ok(result.assignments.every((item) => item.startHour === 0));
+    assert.equal(result.assignmentCounts?.pet_house, 1);
+    assert.equal(result.assignmentCounts?.blacksmith, 1);
+  });
+
+  it("nutzt Goblin Builder und konfigurierte Helfer als echte parallele Slots", () => {
+    const result = simulateBuilderQueue({
+      builderCount: 1,
+      queueItems: [
+        createQueueItem({ id: "a", queueOrder: 1, durationHours: 10 }),
+        createQueueItem({ id: "b", queueOrder: 2, durationHours: 8 }),
+        createQueueItem({ id: "pet", queueOrder: 3, durationHours: 6, itemType: "pet" }),
+      ],
+      slots: [
+        { id: "builder:1", type: "builder", index: 1 },
+        { id: "goblin_builder:1", type: "goblin_builder", index: 1 },
+        { id: "helper:1", type: "helper", index: 1, allowedItemTypes: ["pet"] },
+      ],
+    });
+    assert.deepEqual(result.assignments.map((item) => item.slotType), ["builder", "goblin_builder", "helper"]);
+    assert.ok(result.assignments.every((item) => item.startHour === 0));
+  });
+
   it("berücksichtigt per Screenshot erkannte belegte Slots", () => {
     const result = simulateBuilderQueue({
       builderCount: 2,
