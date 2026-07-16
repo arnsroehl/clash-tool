@@ -85,6 +85,7 @@ import {
   isSupportedGameUiVersion,
   SCREENSHOT_IMPORT_CONFIG,
 } from "@/config/screenshotImport";
+import { VillageAnnotationEditor } from "@/components/import/VillageAnnotationEditor";
 
 type ImportType = ScreenshotImportType;
 type ConcreteImportType = Exclude<ScreenshotImportType, "full">;
@@ -124,6 +125,8 @@ type ProcessedScreenshot = {
   warnings?: string[];
   sourceMetadata?: ScreenshotSourceMetadata & {
     normalizedSizeBytes: number;
+    width: number;
+    height: number;
   };
   manualSelection?: {
     file: File;
@@ -616,6 +619,8 @@ export function ScreenshotImportWizard({
                 originalSizeBytes: normalized.originalSizeBytes,
                 devicePlatform: normalized.devicePlatform,
                 normalizedSizeBytes: normalized.normalizedSizeBytes,
+                width: normalized.width,
+                height: normalized.height,
               },
               error: normalized.quality.issues
                 .map((issue) => qualityIssueText[issue]?.[language] || issue)
@@ -779,6 +784,8 @@ export function ScreenshotImportWizard({
                 originalSizeBytes: normalized.originalSizeBytes,
                 devicePlatform: normalized.devicePlatform,
                 normalizedSizeBytes: normalized.normalizedSizeBytes,
+                width: normalized.width,
+                height: normalized.height,
               },
               error: contentIssueMessages.join(". "),
             });
@@ -808,6 +815,8 @@ export function ScreenshotImportWizard({
                 originalSizeBytes: normalized.originalSizeBytes,
                 devicePlatform: normalized.devicePlatform,
                 normalizedSizeBytes: normalized.normalizedSizeBytes,
+                width: normalized.width,
+                height: normalized.height,
               },
               error: en
                 ? "The view could not be classified safely. Select the matching area."
@@ -1001,6 +1010,8 @@ export function ScreenshotImportWizard({
               originalSizeBytes: normalized.originalSizeBytes,
               devicePlatform: normalized.devicePlatform,
               normalizedSizeBytes: normalized.normalizedSizeBytes,
+              width: normalized.width,
+              height: normalized.height,
             },
             error: mismatch
               ? en
@@ -1811,6 +1822,46 @@ export function ScreenshotImportWizard({
                 </article>
               ))}
             </div>
+          ) : null}
+          {session ? screenshots
+            .filter((screenshot) =>
+              screenshot.screenType === "village"
+              && Boolean(screenshot.previewUrl)
+              && Boolean(screenshot.sourceMetadata),
+            )
+            .map((screenshot) => (
+              <VillageAnnotationEditor
+                key={`annotation-${screenshot.id}`}
+                accountId={accountId}
+                sessionId={session.id}
+                screenshot={{
+                  id: screenshot.id,
+                  name: screenshot.name,
+                  previewUrl: screenshot.previewUrl,
+                  width: screenshot.sourceMetadata?.width || 1,
+                  height: screenshot.sourceMetadata?.height || 1,
+                  deviceType: screenshot.sourceMetadata?.devicePlatform || "unknown",
+                }}
+                entities={entities}
+                townHallLevel={townHallLevel}
+                language={language}
+                improvementConsent={improvementConsent}
+              />
+            )) : null}
+          {step === "upload" && screenshots.some((screenshot) => screenshot.screenType === "village") ? (
+            <label className="mt-4 flex items-start gap-3 rounded-xl border border-white/10 bg-slate-950/60 p-3 text-xs text-slate-400">
+              <input
+                type="checkbox"
+                checked={improvementConsent}
+                onChange={(event) => setImprovementConsent(event.target.checked)}
+                className="mt-0.5"
+              />
+              <span>
+                {en
+                  ? "Allow my manually marked buildings to be used for recognition training. Optional and off by default."
+                  : "Meine manuell markierten Gebäude dürfen für das Training der Erkennung verwendet werden. Optional und standardmäßig aus."}
+              </span>
+            </label>
           ) : null}
         </div>
       ) : null}
