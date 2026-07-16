@@ -196,7 +196,20 @@ export type ScreenshotProposedChange = {
   alternatives: ScreenshotDetection["alternatives"];
   category?: string;
   unlockStatus: ScreenshotDetection["unlockStatus"];
+  correctedEntityId?: string;
+  correctedEntityType?: ScreenshotEntityType;
 };
+
+export function resolveScreenshotCorrectionEntity(
+  change: ScreenshotProposedChange,
+  correctedEntityId: string | undefined,
+  entities: ScreenshotEntity[],
+): ScreenshotEntity | undefined {
+  const corrected = correctedEntityId
+    ? entities.find((entity) => entity.id === correctedEntityId && entity.type === change.entityType)
+    : undefined;
+  return corrected || entities.find((entity) => entity.id === change.entityId);
+}
 
 export type ScreenshotReviewSummary = {
   detected: number;

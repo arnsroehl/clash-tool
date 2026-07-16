@@ -6,7 +6,7 @@ type ChangeRow = {
   entity_type: string;
   entity_id: string;
   proposed_value: { level?: number } | null;
-  user_corrected_value: { level?: number } | null;
+  user_corrected_value: { level?: number; entityId?: string; entityType?: string } | null;
   status: string;
 };
 
@@ -33,7 +33,12 @@ export async function POST(request: NextRequest, context: Context) {
   const accepted = changes.flatMap((change) => {
     if (change.status !== "accepted" && change.status !== "corrected") return [];
     const level = change.user_corrected_value?.level ?? change.proposed_value?.level;
-    return typeof level === "number" && level >= 0 ? [{ ...change, level }] : [];
+    return typeof level === "number" && level >= 0 ? [{
+      ...change,
+      entity_id: change.user_corrected_value?.entityId || change.entity_id,
+      entity_type: change.entity_type,
+      level,
+    }] : [];
   });
   const tableMap: Record<string, { table: string; idColumn: string }> = {
     hero: { table: "account_heroes", idColumn: "hero_id" },

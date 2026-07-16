@@ -22,6 +22,8 @@ type Props = {
   language: "de" | "en";
   improvementConsent: boolean;
   onImprovementConsentChange: (enabled: boolean) => void;
+  onBusyChange?: (busy: boolean) => void;
+  onSaved?: (count: number) => void;
 };
 
 type UploadResult = {
@@ -38,6 +40,8 @@ export function VillageTrainingBulkUpload({
   language,
   improvementConsent,
   onImprovementConsentChange,
+  onBusyChange,
+  onSaved,
 }: Props) {
   const en = language === "en";
   const [open, setOpen] = useState(true);
@@ -64,6 +68,7 @@ export function VillageTrainingBulkUpload({
     input.value = "";
     if (!files.length || !selectedEntity || !levelIsValid || !improvementConsent) return;
     setBusy(true);
+    onBusyChange?.(true);
     setMessage(null);
     setProgress(0);
     const nextResults: UploadResult[] = [];
@@ -115,6 +120,7 @@ export function VillageTrainingBulkUpload({
     const successCount = nextResults.filter((result) => !result.error).length;
     try {
       if (successCount) await saveScreenshotImportForLater(session.id);
+      if (successCount) onSaved?.(successCount);
       setMessage(en
         ? `${successCount} of ${files.length} training images saved.`
         : `${successCount} von ${files.length} Trainingsbildern gespeichert.`);
@@ -122,6 +128,7 @@ export function VillageTrainingBulkUpload({
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
       setBusy(false);
+      onBusyChange?.(false);
     }
   };
 
