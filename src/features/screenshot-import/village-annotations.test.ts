@@ -6,6 +6,7 @@ import {
   getVillageAnnotationEntities,
   normalizeDrawnBoundingBox,
 } from "./village-annotations";
+import { resolveTrainingBulkImportPath } from "./training-bulk-import";
 
 test("normalizes village annotation boxes drawn in either direction", () => {
   assert.deepEqual(
@@ -108,4 +109,49 @@ test("creates a full-image annotation for a pre-cropped training image", () => {
   assert.equal(annotation.level, 21);
   assert.equal(annotation.improvementConsent, true);
   assert.deepEqual(annotation.boundingBox, { x: 0, y: 0, width: 1, height: 1 });
+});
+
+const trainingEntities = [
+  {
+    id: "town-hall",
+    name: "Rathaus",
+    aliases: ["town hall"],
+    type: "building" as const,
+    currentLevel: 18,
+    maxLevelForTownHall: 18,
+  },
+  {
+    id: "cannon",
+    name: "Kanone",
+    type: "building" as const,
+    currentLevel: 21,
+    maxLevelForTownHall: 21,
+  },
+];
+
+test("resolves training labels from nested dataset folders", () => {
+  const result = resolveTrainingBulkImportPath(
+    "mein-datensatz/town-hall/level-18/bild-01.png",
+    trainingEntities,
+  );
+  assert.equal(result.entity?.id, "town-hall");
+  assert.equal(result.level, 18);
+  assert.equal(result.error, undefined);
+});
+
+test("resolves localized entity names from bulk filenames", () => {
+  const result = resolveTrainingBulkImportPath("Kanone__21__003.webp", trainingEntities);
+  assert.equal(result.entity?.id, "cannon");
+  assert.equal(result.level, 21);
+});
+
+test("rejects unknown entities and levels above the town hall limit", () => {
+  assert.equal(
+    resolveTrainingBulkImportPath("unbekannt/1/bild.png", trainingEntities).error,
+    "unknown_entity",
+  );
+  assert.equal(
+    resolveTrainingBulkImportPath("town-hall/19/bild.png", trainingEntities).error,
+    "level_too_high",
+  );
 });

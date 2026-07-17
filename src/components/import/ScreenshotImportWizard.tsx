@@ -1697,8 +1697,8 @@ export function ScreenshotImportWizard({
             </b>
             <p className="mt-1 text-xs text-slate-300">
               {en
-                ? "Upload several pre-cropped images instead of drawing a box in a whole-village screenshot. Building and level are applied to every selected image."
-                : "Lade mehrere zugeschnittene Bilder hoch, statt Rahmen in einem Gesamtdorf-Bild zu zeichnen. Gebäude und Level werden für alle ausgewählten Bilder übernommen."}
+                ? "Import a labeled dataset folder or ZIP automatically. You can still upload several images with one manually selected building and level."
+                : "Importiere einen beschrifteten Dataset-Ordner oder ein ZIP automatisch. Alternativ kannst du weiterhin mehrere Bilder mit einem manuell gewählten Gebäude und Level hochladen."}
             </p>
             <button
               type="button"
