@@ -1,7 +1,12 @@
 "use client";
 
 import { ChangeEvent, useMemo, useRef, useState } from "react";
-import { unzip } from "fflate";
+import {
+  extractTrainingArchive,
+  isTrainingImagePath,
+  MAX_ARCHIVE_BYTES,
+  validateTrainingImageSizes,
+} from "@/features/screenshot-import/training-archive";
 import type { ScreenshotEntity } from "@/features/screenshot-import/screenshot-import";
 import {
   resolveTrainingBulkImportPath,
@@ -46,42 +51,38 @@ type TrainingUploadEntry = {
   error?: TrainingBulkImportError;
 };
 
-const MAX_AUTOMATIC_FILES = 500;
-const MAX_ARCHIVE_BYTES = 100 * 1024 * 1024;
-const MAX_EXTRACTED_BYTES = 250 * 1024 * 1024;
-const IMAGE_EXTENSION = /\.(?:jpe?g|png|webp)$/i;
-
 function imageMimeType(path: string): string {
   if (/\.png$/i.test(path)) return "image/png";
   if (/\.webp$/i.test(path)) return "image/webp";
   return "image/jpeg";
 }
 
-async function extractZipImages(archive: File, en: boolean): Promise<Array<{ file: File; relativePath: string }>> {
+async function extractZipImages(archive: File): Promise<Array<{ file: File; relativePath: string }>> {
   if (archive.size > MAX_ARCHIVE_BYTES)
-    throw new Error(en ? "ZIP archives may be at most 100 MB." : "ZIP-Dateien dürfen höchstens 100 MB groß sein.");
+    throw new Error("archive_too_large");
   const source = new Uint8Array(await archive.arrayBuffer());
-  const entries = await new Promise<Record<string, Uint8Array>>((resolve, reject) => {
-    unzip(source, (error, result) => error ? reject(error) : resolve(result));
-  });
-  const imageEntries = Object.entries(entries).filter(([path]) =>
-    IMAGE_EXTENSION.test(path) && !path.includes("/__MACOSX/") && !path.startsWith("__MACOSX/"),
-  );
-  if (imageEntries.length > MAX_AUTOMATIC_FILES)
-    throw new Error(en
-      ? `One import may contain at most ${MAX_AUTOMATIC_FILES} images.`
-      : `Ein Import darf höchstens ${MAX_AUTOMATIC_FILES} Bilder enthalten.`);
-  const extractedBytes = imageEntries.reduce((sum, [, bytes]) => sum + bytes.byteLength, 0);
-  if (extractedBytes > MAX_EXTRACTED_BYTES)
-    throw new Error(en
-      ? "Extracted images may be at most 250 MB in total."
-      : "Die entpackten Bilder dürfen zusammen höchstens 250 MB groß sein.");
+  const entries = await extractTrainingArchive(source);
+  const imageEntries = Object.entries(entries);
   return imageEntries.map(([relativePath, bytes]) => ({
     relativePath,
     file: new File([bytes.slice().buffer], relativePath.split("/").at(-1) || "training-image.jpg", {
       type: imageMimeType(relativePath),
     }),
   }));
+}
+
+function archiveErrorLabel(error: unknown, en: boolean): string {
+  const code = error instanceof Error ? error.message : String(error);
+  if (code === "too_many_images") return en
+    ? "One import may contain at most 500 images."
+    : "Ein Import darf höchstens 500 Bilder enthalten.";
+  if (code === "images_too_large") return en
+    ? "Images may be at most 250 MB in total."
+    : "Die Bilder dürfen zusammen höchstens 250 MB groß sein.";
+  if (code === "archive_too_large") return en
+    ? "ZIP archives may be at most 100 MB."
+    : "ZIP-Dateien dürfen höchstens 100 MB groß sein.";
+  return en ? "The ZIP archive could not be read." : "Das ZIP-Archiv konnte nicht gelesen werden.";
 }
 
 function errorLabel(error: TrainingBulkImportError, en: boolean): string {
@@ -123,7 +124,7 @@ export function VillageTrainingBulkUpload({
   const level = Number(selectedLevel);
   const levelIsValid = Number.isInteger(level)
     && level >= 1
-    && level <= (selectedEntity?.maxLevelForTownHall || selectedEntity?.maxLevel || 100);
+    && level <= (selectedEntity?.maxLevelForTownHall ?? selectedEntity?.maxLevel ?? 100);
   const canUpload = Boolean(selectedEntity) && levelIsValid && improvementConsent && !busy;
   const automaticErrors = automaticFiles.filter((entry) => entry.error);
   const automaticValid = automaticFiles.filter((entry) => entry.entity && entry.level && !entry.error);
@@ -145,12 +146,12 @@ export function VillageTrainingBulkUpload({
   }, [automaticFiles, language]);
 
   const prepareAutomaticFiles = (files: Array<{ file: File; relativePath: string }>) => {
-    const images = files.filter(({ relativePath }) => IMAGE_EXTENSION.test(relativePath));
-    if (images.length > MAX_AUTOMATIC_FILES) {
+    const images = files.filter(({ relativePath }) => isTrainingImagePath(relativePath));
+    try {
+      validateTrainingImageSizes(images.map(({ file }) => file.size));
+    } catch (error) {
       setAutomaticFiles([]);
-      setAutomaticMessage(en
-        ? `One import may contain at most ${MAX_AUTOMATIC_FILES} images.`
-        : `Ein Import darf höchstens ${MAX_AUTOMATIC_FILES} Bilder enthalten.`);
+      setAutomaticMessage(archiveErrorLabel(error, en));
       return;
     }
     const prepared = images.map(({ file, relativePath }) => ({
@@ -263,10 +264,10 @@ export function VillageTrainingBulkUpload({
     if (!archive) return;
     setAutomaticMessage(en ? "Reading ZIP archive…" : "ZIP-Archiv wird gelesen…");
     try {
-      prepareAutomaticFiles(await extractZipImages(archive, en));
+      prepareAutomaticFiles(await extractZipImages(archive));
     } catch (error) {
       setAutomaticFiles([]);
-      setAutomaticMessage(error instanceof Error ? error.message : String(error));
+      setAutomaticMessage(archiveErrorLabel(error, en));
     }
   };
 
@@ -432,7 +433,7 @@ export function VillageTrainingBulkUpload({
                   <input
                     type="number"
                     min={1}
-                    max={selectedEntity?.maxLevelForTownHall || selectedEntity?.maxLevel || 100}
+                    max={selectedEntity?.maxLevelForTownHall ?? selectedEntity?.maxLevel ?? 100}
                     value={selectedLevel}
                     onChange={(event) => setSelectedLevel(event.target.value)}
                     disabled={busy || !selectedEntity}

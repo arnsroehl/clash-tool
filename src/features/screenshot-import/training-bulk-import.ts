@@ -94,7 +94,7 @@ export function resolveTrainingBulkImportPath(
   if (!Number.isInteger(level) || level < 1) {
     return { relativePath, ...labels, entity, error: "invalid_level" };
   }
-  const maximum = entity.maxLevelForTownHall || entity.maxLevel || 100;
+  const maximum = entity.maxLevelForTownHall ?? entity.maxLevel ?? 100;
   if (level > maximum) {
     return { relativePath, ...labels, entity, level, error: "level_too_high" };
   }
