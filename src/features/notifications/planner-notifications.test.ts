@@ -23,6 +23,9 @@ test("creates builder, laboratory and queue reminders from deterministic inputs"
           durationHours: 4,
           slotType: "builder",
           slotLabel: "Builder 1",
+          costDiscountPercent: 0,
+          originalCosts: { gold: 0, elixir: 0, darkElixir: 0 },
+          effectiveCosts: { gold: 0, elixir: 0, darkElixir: 0 },
         },
       ],
       totalDurationHours: 4,
@@ -72,6 +75,9 @@ test("creates a daily summary with the next three recommendations", () => {
     (name, index) => ({
       itemId: String(index),
       buildingId: String(index),
+      buildingName: name,
+      sortOrder: index,
+      blockingReasons: [],
       itemType: "building" as const,
       name,
       category: "defense",
@@ -153,6 +159,7 @@ test("omits the daily summary when the profile preference is disabled", () => {
       {
         itemId: "cannon:1",
         buildingId: "cannon:1",
+        buildingName: "Kanone 1",
         itemType: "building",
         name: "Kanone 1",
         category: "defense",
@@ -195,6 +202,11 @@ test("schedules an upgrade reminder when an event payout makes it affordable", (
     recommendations: [
       {
         itemId: "cannon",
+        recommendationReason: "test",
+        buildingId: "cannon",
+        buildingName: "Kanone",
+        sortOrder: 1,
+        blockingReasons: [],
         itemType: "building",
         name: "Kanone",
         category: "defense",

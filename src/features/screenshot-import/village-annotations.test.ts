@@ -87,10 +87,10 @@ test("blocks exports without improvement consent", () => {
 
 test("deduplicates building instances for annotation selection", () => {
   const entities = getVillageAnnotationEntities([
-    { id: "cannon:1", name: "Kanone 1", type: "building", aliases: ["cannon"], unlockTownHallLevel: 1 },
-    { id: "cannon:2", name: "Kanone 2", type: "building", aliases: ["cannon"], unlockTownHallLevel: 1 },
-    { id: "wall:1", name: "Mauer 1", type: "wall", unlockTownHallLevel: 2 },
-    { id: "locked", name: "Gesperrt", type: "building", unlockTownHallLevel: 18 },
+    { id: "cannon:1", name: "Kanone 1", type: "building", aliases: ["cannon"], unlockTownHallLevel: 1, currentLevel: 1 },
+    { id: "cannon:2", name: "Kanone 2", type: "building", aliases: ["cannon"], unlockTownHallLevel: 1, currentLevel: 1 },
+    { id: "wall:1", name: "Mauer 1", type: "wall", unlockTownHallLevel: 2, currentLevel: 1 },
+    { id: "locked", name: "Gesperrt", type: "building", unlockTownHallLevel: 18, currentLevel: 0 },
   ], 17, "de");
   assert.deepEqual(entities.map(({ id, name }) => ({ id, name })), [
     { id: "cannon", name: "Kanone" },

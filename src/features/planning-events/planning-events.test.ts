@@ -58,6 +58,7 @@ test("applies an event cost discount to queue-ready recommendation data", () => 
     {
       itemId: "cannon:1",
       buildingId: "cannon:1",
+      buildingName: "Kanone 1",
       itemType: "building",
       name: "Kanone 1",
       category: "Verteidigung",
