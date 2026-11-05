@@ -78,3 +78,34 @@ are checked before image decompression; unrelated files, hidden files and
 Unknown buildings and levels above the account's Town Hall limit block upload.
 Use correctly labeled crops from multiple buildings and levels before assessing
 recognition quality; a batch containing only Town Hall 18 is not a general test.
+
+## Recognition diagnostics on private saved images
+
+Open **Private import history → View images → Check recognition against labels**.
+This runs the current browser recognizer locally; the image and evaluation do
+not get uploaded and account progress and annotations are not changed.
+
+Two separate measurements are shown:
+
+- Free image search: a match requires the same building ID and box IoU >= 0.5.
+  One-to-one assignment prevents repeated predictions from inflating coverage.
+  Proposals without a matching annotation are reported separately, since a
+  partly labeled image cannot establish a false-positive rate.
+- Known-position diagnosis: compare the best fingerprint match inside each
+  saved annotation box, including uncertain guesses. This isolates type matching
+  from localization, and is not automatic detection accuracy or level accuracy.
+
+Images labeled as one full-image building crop do not evaluate free village
+search. Empty annotations have no accuracy percentage. Stored labels are the
+comparison reference, not independently verified ground truth; screenshots from
+the same capture or duplicate image must not be used across train/test splits.
+
+## Targeted building-level supplement (2026-11-05)
+
+`src/data/building-level-supplement.json` records the pinned data-package version,
+package integrity and official release notes for Builder's Hut 8, Monolith 5 and
+X-Bow 13. Their missing base levels are appended to `buildings.json`; existing
+levels remain unchanged. The matching SQL appends missing runtime rows and
+raises catalog maxima without editing account progress or training labels.
+This is a scoped supplement to the existing dataset, not a complete game-data
+refresh. Supercharge records are not treated as additional base levels.

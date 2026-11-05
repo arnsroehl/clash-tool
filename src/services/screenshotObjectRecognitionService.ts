@@ -216,7 +216,7 @@ export function selectVillageObjectMatches(
   return selected;
 }
 
-function hashRegion(
+export function hashScreenshotRegion(
   bitmap: ImageBitmap,
   context: CanvasRenderingContext2D,
   box: BoundingBox,
@@ -269,7 +269,7 @@ export async function recognizeScreenshotObjects(params: {
   params.lines.forEach((line, lineIndex) => {
     let best: ScreenshotObjectMatch | null = null;
     candidateBoxes(line.boundingBox).forEach((box) => {
-      const match = matchObjectFingerprint(hashRegion(bitmap, context, box), catalog);
+      const match = matchObjectFingerprint(hashScreenshotRegion(bitmap, context, box), catalog);
       if (!match || match.confidence < 0.78) return;
       const candidate = { ...match, lineIndex, boundingBox: box };
       if (!best || candidate.confidence > best.confidence) best = candidate;
@@ -281,7 +281,7 @@ export async function recognizeScreenshotObjects(params: {
     params.laboratoryGridCells?.length === LABORATORY_START_GRID.length
   ) {
     const gridHashes = params.laboratoryGridCells.map((cell) =>
-      hashRegion(bitmap, context, cell.cardBox),
+      hashScreenshotRegion(bitmap, context, cell.cardBox),
     );
     const visualVerificationPassed = laboratoryStartGridIsVerified({
       hashes: gridHashes,
@@ -313,7 +313,7 @@ export async function recognizeScreenshotObjects(params: {
   }
   if (params.screenType === "village") {
     const proposals = villageProposalBoxes().flatMap((box) => {
-      const match = matchObjectFingerprint(hashRegion(bitmap, context, box), catalog);
+      const match = matchObjectFingerprint(hashScreenshotRegion(bitmap, context, box), catalog);
       return match && match.confidence >= 0.92
         ? [{ ...match, lineIndex: -1, boundingBox: box }]
         : [];

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ScreenshotRecognitionCheck } from "@/components/import/ScreenshotRecognitionCheck";
 import { useEffect, useState } from "react";
 import type { ScreenshotEntity } from "@/features/screenshot-import/screenshot-import";
 import type { VillageScreenshotAnnotation } from "@/features/screenshot-import/village-annotations";
@@ -12,7 +13,7 @@ export function ScreenshotHistoryViewer({ sessionId, entities, language }: Props
   const en = language === "en";
   const [files, setFiles] = useState<RetainedScreenshot[]>([]);
   const [selected, setSelected] = useState("");
-  const [preview, setPreview] = useState<{ id: string; url: string; annotations: VillageScreenshotAnnotation[] } | null>(null);
+  const [preview, setPreview] = useState<{ id: string; url: string; blob: Blob; annotations: VillageScreenshotAnnotation[] } | null>(null);
   const [listLoaded, setListLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -32,7 +33,7 @@ export function ScreenshotHistoryViewer({ sessionId, entities, language }: Props
     void loadRetainedScreenshot(sessionId, file).then((result) => {
       if (cancelled) return;
       url = URL.createObjectURL(result.blob);
-      setPreview({ id: file.id, url, annotations: result.annotations });
+      setPreview({ id: file.id, url, blob: result.blob, annotations: result.annotations });
       setError(null);
     }).catch((cause: unknown) => {
       if (!cancelled) setError(cause instanceof Error ? cause.message : String(cause));
@@ -59,6 +60,7 @@ export function ScreenshotHistoryViewer({ sessionId, entities, language }: Props
           <Image src={visible.url} alt={file.name} fill unoptimized sizes="100vw" className="object-contain" />
           {visible.annotations.map((annotation, index) => <div key={annotation.id} title={`${entityName(annotation.entityId)} · ${annotation.level ?? "?"}`} className="pointer-events-none absolute border-2 border-amber-300" style={{ left: `${annotation.boundingBox.x * 100}%`, top: `${annotation.boundingBox.y * 100}%`, width: `${annotation.boundingBox.width * 100}%`, height: `${annotation.boundingBox.height * 100}%` }}><span className="bg-amber-300 px-1 text-xs font-bold text-black">{index + 1}</span></div>)}
         </div>
+        <ScreenshotRecognitionCheck key={file.id} blob={visible.blob} annotations={visible.annotations} language={language} />
         <ol className="grid list-inside list-decimal gap-1 sm:grid-cols-2">{visible.annotations.map((annotation) => <li key={annotation.id}>{entityName(annotation.entityId)} · Level {annotation.level ?? "?"}</li>)}</ol>
         <p className="text-slate-400">{en ? "Private preview. Labels are shown as saved; no account values are changed." : "Private Vorschau. Beschriftungen werden wie gespeichert angezeigt; Accountwerte werden nicht verändert."}</p>
       </> : null}
