@@ -1,0 +1,44 @@
+{
+  "source": "clash-of-clans-data@0.19.1",
+  "checkedAt": "2026-11-05",
+  "releaseNotes": [
+    "https://supercell.com/en/games/clashofclans/blog/release-notes/the-sound-of-clash-update/",
+    "https://supercell.com/en/games/clashofclans/blog/release-notes/the-anime-fury-update-is-here/"
+  ],
+  "levels": [
+    {
+      "sourceId": "builders-hut",
+      "buildingId": "6483ee2b-8cc0-4f7c-860b-6c39f748da42",
+      "level": 8,
+      "townHall": 18,
+      "upgradeTimeHours": 312.0,
+      "goldCost": 24000000,
+      "elixirCost": 0,
+      "darkElixirCost": 0,
+      "hitpoints": 2100
+    },
+    {
+      "sourceId": "monolith",
+      "buildingId": "a179d882-8a76-4283-b836-be2f323c66ba",
+      "level": 5,
+      "townHall": 18,
+      "upgradeTimeHours": 360.0,
+      "goldCost": 0,
+      "elixirCost": 0,
+      "darkElixirCost": 470000,
+      "hitpoints": 5959
+    },
+    {
+      "sourceId": "x-bow",
+      "buildingId": "58889b4b-474f-4162-8143-0a9ba6ff4330",
+      "level": 13,
+      "townHall": 18,
+      "upgradeTimeHours": 324.0,
+      "goldCost": 26000000,
+      "elixirCost": 0,
+      "darkElixirCost": 0,
+      "hitpoints": 5000
+    }
+  ],
+  "integrity": "sha512-STHiiofY0UIQwI31RZwx/6jzXTrnMF09CRoVkex+QDdrlE4agcmlSG6Zhaf+/Eul9kv9VYwquTWs7ZzCnfRExw=="
+}

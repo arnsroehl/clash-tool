@@ -3,5 +3,12 @@
   "dataVersion": "clash-of-clans-data-0.16.0",
   "schemaVersion": 2,
   "generatedAt": "2026-07-12",
-  "description": "Home Village game data synchronized from clash-of-clans-data 0.16.0."
+  "description": "Home Village game data synchronized from clash-of-clans-data 0.16.0.",
+  "supplements": [
+    {
+      "file": "building-level-supplement.json",
+      "source": "clash-of-clans-data@0.19.1",
+      "checkedAt": "2026-11-05"
+    }
+  ]
 }
