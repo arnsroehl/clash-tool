@@ -1137,7 +1137,7 @@ export function ScreenshotImportWizard({
     await processFiles(files.map((file) => ({ file })));
   };
 
-  const classifyFullImportScreenshot = async (
+  const classifyImportScreenshot = async (
     screenshot: ProcessedScreenshot,
     forcedType: ConcreteImportType,
   ) => {
@@ -2005,7 +2005,7 @@ export function ScreenshotImportWizard({
                           disabled={busy}
                           onChange={(event) => {
                             if (!event.target.value) return;
-                            void classifyFullImportScreenshot(
+                            void classifyImportScreenshot(
                               screenshot,
                               event.target.value as ConcreteImportType,
                             );
@@ -2013,7 +2013,7 @@ export function ScreenshotImportWizard({
                           className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-2 text-white"
                         >
                           <option value="">{en ? "Choose…" : "Auswählen…"}</option>
-                          {IMPORT_TYPES.filter((item): item is typeof item & { id: ConcreteImportType } => item.id !== "full").map((item) => (
+                          {IMPORT_TYPES.filter((item): item is typeof item & { id: ConcreteImportType } => item.id !== "full" && (importType === "full" || item.id === importType)).map((item) => (
                             <option key={item.id} value={item.id}>{en ? item.en : item.de}</option>
                           ))}
                         </select>

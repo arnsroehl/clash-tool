@@ -1470,3 +1470,24 @@ test("validates consented screenshot annotations without account leakage between
   assert.ok(invalid.errors.some((error) => error.includes("same account group")));
   assert.ok(invalid.errors.some((error) => error.includes("invalid bounding box")));
 });
+
+
+test("lets a user correct a misclassified village screenshot without bypassing review", () => {
+  const mistaken = resolveScreenshotAnalysisType({
+    selectedImportType: "village", classifiedScreenType: "equipment", classificationConfidence: 0.75,
+  });
+  assert.equal(mistaken.mismatch, true);
+  assert.equal(mistaken.requiresManualSelection, true);
+  const corrected = resolveScreenshotAnalysisType({
+    selectedImportType: "village", classifiedScreenType: "equipment", classificationConfidence: 0.75,
+    manuallySelectedType: "village",
+  });
+  assert.equal(corrected.analysisType, "village");
+  assert.equal(corrected.mismatch, false);
+  assert.equal(corrected.requiresManualSelection, false);
+  const unrelated = resolveScreenshotAnalysisType({
+    selectedImportType: "village", classifiedScreenType: "equipment", classificationConfidence: 0.75,
+    manuallySelectedType: "heroes",
+  });
+  assert.equal(unrelated.mismatch, true);
+});
