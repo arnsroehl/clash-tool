@@ -86,6 +86,7 @@ import {
   isSupportedGameUiVersion,
   SCREENSHOT_IMPORT_CONFIG,
 } from "@/config/screenshotImport";
+import { ScreenshotHistoryViewer } from "@/components/import/ScreenshotHistoryViewer";
 import { VillageAnnotationEditor } from "@/components/import/VillageAnnotationEditor";
 import { VillageTrainingBulkUpload } from "@/components/import/VillageTrainingBulkUpload";
 
@@ -291,6 +292,7 @@ export function ScreenshotImportWizard({
   );
   const [completionState, setCompletionState] = useState<CompletionState>("confirmed");
   const [reviewFilter, setReviewFilter] = useState<ScreenshotReviewFilter>("changes");
+  const [previewHistoryId, setPreviewHistoryId] = useState<string | null>(null);
   const [history, setHistory] = useState<ScreenshotImportHistoryEntry[]>([]);
   const [qualityMetrics, setQualityMetrics] = useState<ScreenshotQualityMetrics | null>(null);
   const [deletingOriginalsFor, setDeletingOriginalsFor] = useState<string | null>(null);
@@ -1647,6 +1649,12 @@ export function ScreenshotImportWizard({
                           {` · ${entry.retainedOriginalCount} ${en ? "retained originals" : "aufbewahrte Originale"}`}
                         </span>
                       </span>
+                      {entry.retainedOriginalCount > 0 ? (
+                        <button type="button" onClick={() => setPreviewHistoryId((current) => current === entry.id ? null : entry.id)} aria-expanded={previewHistoryId === entry.id} className="rounded-lg border border-sky-400/30 px-3 py-2 font-bold text-sky-100">
+                          {previewHistoryId === entry.id ? (en ? "Close images" : "Bilder schließen") : (en ? "View images" : "Bilder ansehen")}
+                        </button>
+                      ) : null}
+                      {previewHistoryId === entry.id && entry.retainedOriginalCount > 0 ? <ScreenshotHistoryViewer key={`${accountId}:${entry.id}`} sessionId={entry.id} entities={entities} language={language} /> : null}
                       {entry.retainedOriginalCount > 0 ? (
                         <button
                           type="button"
