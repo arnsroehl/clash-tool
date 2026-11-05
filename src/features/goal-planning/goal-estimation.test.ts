@@ -14,6 +14,11 @@ function recommendation(
 ): UpgradeRecommendation {
   return {
     itemId: id,
+    recommendationReason: "test",
+    buildingId: id,
+    buildingName: id,
+    sortOrder: 1,
+    blockingReasons: [],
     itemType,
     name: id,
     category: itemType,

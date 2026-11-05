@@ -11,6 +11,12 @@ import type {
 const account: PlannerAccount = {
   id: "account-1",
   name: "Main",
+  userId: "user-1",
+  playerTag: null,
+  experienceLevel: null,
+  clanName: null,
+  clanStatus: "unknown",
+  lastSyncedAt: null,
   townHallLevel: 9,
   builderCount: 5,
   createdAt: "2026-07-07T00:00:00.000Z",
