@@ -61,3 +61,20 @@ non-zero and must block training or release.
 The application rejects sessions with a different game UI version. The
 complete-account import is enabled only when every required screenshot type is
 active, so it cannot bypass a partial rollout.
+
+## Importing labeled building crops
+
+In the dedicated training-image import, select a folder or ZIP using either
+`town-hall/18/image.png`, `town-hall/level-18/image.png`, or
+`town-hall__18__001.png`. A surrounding dataset folder is allowed. Building IDs,
+localized names and known aliases are accepted. Check the group preview before
+uploading and explicitly enable improvement consent. Labels come from paths;
+the importer does not verify what a picture actually depicts.
+
+Each automatic import allows up to 500 JPEG, PNG or WebP images totaling
+250 MB. ZIP files must be at most 100 MB. ZIP image counts and declared sizes
+are checked before image decompression; unrelated files, hidden files and
+`__MACOSX` metadata are skipped. Folder imports use the same image limits.
+Unknown buildings and levels above the account's Town Hall limit block upload.
+Use correctly labeled crops from multiple buildings and levels before assessing
+recognition quality; a batch containing only Town Hall 18 is not a general test.

@@ -1,3 +1,5 @@
+import { zipSync } from "fflate";
+import { extractTrainingArchive, MAX_EXTRACTED_BYTES, validateTrainingImageSizes } from "./training-archive";
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
@@ -154,4 +156,46 @@ test("rejects unknown entities and levels above the town hall limit", () => {
     resolveTrainingBulkImportPath("town-hall/19/bild.png", trainingEntities).error,
     "level_too_high",
   );
+});
+
+test("keeps an explicit zero town hall level limit", () => {
+  const entities = [{ ...trainingEntities[0], maxLevelForTownHall: 0, maxLevel: 18 }];
+  assert.equal(resolveTrainingBulkImportPath("town-hall/1/image.png", entities).error, "level_too_high");
+});
+
+test("extracts training images and ignores hidden images and unrelated ZIP entries", async () => {
+  const source = zipSync({
+    "town-hall/18/image.png": new Uint8Array([1, 2, 3]),
+    "__MACOSX/town-hall/18/._image.png": new Uint8Array([4]),
+    "town-hall/18/._image.png": new Uint8Array([4]),
+    "notes.txt": new Uint8Array([5]),
+  });
+  const result = await extractTrainingArchive(source);
+  assert.deepEqual(Object.keys(result), ["town-hall/18/image.png"]);
+  assert.deepEqual([...result["town-hall/18/image.png"]], [1, 2, 3]);
+});
+
+test("rejects oversized ZIP declarations before trying to decompress image data", async () => {
+  const source = zipSync({ "town-hall/18/image.png": new Uint8Array([1]) });
+  const view = new DataView(source.buffer, source.byteOffset, source.byteLength);
+  for (let offset = 0; offset <= source.length - 46; offset += 1) {
+    if (view.getUint32(offset, true) === 0x02014b50) {
+      view.setUint32(offset + 24, MAX_EXTRACTED_BYTES + 1, true);
+      break;
+    }
+  }
+  await assert.rejects(extractTrainingArchive(source), /images_too_large/);
+});
+
+test("rejects too many ZIP images before decompression", async () => {
+  const files = Object.fromEntries(Array.from({ length: 501 }, (_, index) =>
+    [`cannon/21/${index}.png`, new Uint8Array([index % 256])],
+  ));
+  await assert.rejects(extractTrainingArchive(zipSync(files)), /too_many_images/);
+});
+
+test("applies the same total size limits to selected folders", () => {
+  assert.doesNotThrow(() => validateTrainingImageSizes([MAX_EXTRACTED_BYTES]));
+  assert.throws(() => validateTrainingImageSizes([MAX_EXTRACTED_BYTES, 1]), /images_too_large/);
+  assert.throws(() => validateTrainingImageSizes(Array(501).fill(1)), /too_many_images/);
 });
