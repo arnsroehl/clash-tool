@@ -119,13 +119,14 @@ export function resolveScreenshotAnalysisType(params: {
       : classifiedScreenType === "unknown" || compatibleClassification
         ? selectedImportType
         : classifiedScreenType);
-  const requiresManualSelection = selectedImportType === "full" && screenType === "unknown";
   const mismatch =
     selectedImportType !== "full" &&
+    manuallySelectedType !== selectedImportType &&
     classifiedScreenType !== "unknown" &&
     classifiedScreenType !== selectedImportType &&
     !compatibleClassification &&
     classificationConfidence >= 0.72;
+  const requiresManualSelection = mismatch || (selectedImportType === "full" && screenType === "unknown");
   return {
     screenType,
     analysisType: screenType === "unknown"
