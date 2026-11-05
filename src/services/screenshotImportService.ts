@@ -91,9 +91,9 @@ export async function fetchScreenshotImportHistory(
     .from("screenshot_import_sessions")
     .select("id, selected_import_type, created_at, confirmed_at, game_version")
     .eq("account_id", accountId)
-    .eq("status", "confirmed")
+    .in("status", ["confirmed", "draft", "uploaded", "analyzing", "review_required", "ready", "failed"])
     .order("created_at", { ascending: false })
-    .limit(10);
+    .limit(50);
   if (error) throw new Error(error.message);
   if (!sessions?.length) return [];
   const sessionIds = sessions.map((session) => String(session.id));
