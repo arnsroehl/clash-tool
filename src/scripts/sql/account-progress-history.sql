@@ -9,7 +9,7 @@ create table if not exists public.account_progress_snapshots (
   overall_progress numeric(6,2) not null check (overall_progress between 0 and 100),
   category_progress jsonb not null check (jsonb_typeof(category_progress) = 'object'),
   health_score numeric(5,1) check (health_score between 0 and 100),
-  town_hall_level integer not null check (town_hall_level between 1 and 18),
+  town_hall_level integer not null check (town_hall_level between 1 and 19),
   hero_levels jsonb not null default '{}'::jsonb check (jsonb_typeof(hero_levels) = 'object'),
   laboratory_progress numeric(6,2) not null check (laboratory_progress between 0 and 100),
   wall_levels jsonb not null default '[]'::jsonb check (jsonb_typeof(wall_levels) = 'array'),

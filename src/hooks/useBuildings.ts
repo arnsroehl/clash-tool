@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { TH19_MAX_WALL_UPGRADES, TH19_WALL_LEVEL } from "@/config/gameLimits";
+import { buildingInstanceCaps } from "@/features/planner/building-instance-planner";
 import {
   fetchAccountBuildingLevels,
   fetchBuildingAvailability,
@@ -34,7 +36,7 @@ function calculateProgress(
   const completedBuildingLevels = availableBuildings.reduce((sum, building) => {
     return (
       sum +
-      (instanceLevels[building.id] || []).reduce(
+      (instanceLevels[building.id] || []).slice(0, building.countAfterMerges || 1).reduce(
         (levelSum, level) => levelSum + level,
         0,
       )
@@ -42,7 +44,8 @@ function calculateProgress(
   }, 0);
 
   const maxBuildingLevels = availableBuildings.reduce((sum, building) => {
-    return sum + building.maxLevel * (building.countAfterMerges || 1);
+    return buildingInstanceCaps(building, instanceLevels[building.id] || [])
+      .reduce((total, cap) => total + cap, sum);
   }, 0);
 
   return maxBuildingLevels > 0
@@ -161,26 +164,30 @@ export function useBuildings({
         .map((row) => [row.buildingId, row]),
     );
 
+    const firecrackerTower = buildings.find((building) => building.sourceId === "firecracker-tower");
+    const allowedMerges = firecrackerTower
+      ? availabilityByBuilding.get(firecrackerTower.id)?.countAfterMerges ?? 0
+      : 0;
+    const completedMerges = firecrackerTower
+      ? (buildingInstanceLevels[firecrackerTower.id] || []).slice(0, allowedMerges)
+          .filter((level) => level > 0).length
+      : 0;
     return buildings
-      .filter((building) => {
+      .filter((building) => building.unlockTownHallLevel <= selectedAccount.townHallLevel)
+      .flatMap((building) => {
         const availability = availabilityByBuilding.get(building.id);
-        return availability
-          ? availability.countAfterMerges > 0
-          : building.unlockTownHallLevel <= selectedAccount.townHallLevel;
-      })
-      .map((building) => ({
-        ...building,
-        buildingCount:
-          availabilityByBuilding.get(building.id)?.buildingCount ?? 1,
-        countAfterMerges:
-          availabilityByBuilding.get(building.id)?.countAfterMerges ?? 1,
-        maxLevel: calculateAvailableMaxLevel(
-          building,
-          buildingMaxLevels,
-          selectedAccount.townHallLevel,
-        ),
-      }));
-  }, [buildingAvailability, buildingMaxLevels, buildings, selectedAccount]);
+        const needsFirecrackerMerge = building.sourceId === "archer-tower" || building.sourceId === "scattershot";
+        const countAfterMerges = (availability?.countAfterMerges ?? 1)
+          + (availability && needsFirecrackerMerge ? allowedMerges - completedMerges : 0);
+        if (countAfterMerges === 0) return [];
+        return [{
+          ...building,
+          buildingCount: availability?.buildingCount ?? 1,
+          countAfterMerges,
+          maxLevel: calculateAvailableMaxLevel(building, buildingMaxLevels, selectedAccount.townHallLevel),
+        }];
+      });
+  }, [buildingAvailability, buildingInstanceLevels, buildingMaxLevels, buildings, selectedAccount]);
 
   const effectiveBuildingInstanceLevels = useMemo(() => {
     if (!selectedAccount) return buildingInstanceLevels;
@@ -220,6 +227,13 @@ export function useBuildings({
     }
 
     const safeLevel = clampBuildingLevel(building, nextLevel);
+    const existing = buildingInstanceLevels[building.id] || [];
+    if (building.sourceId === "wall" && safeLevel === TH19_WALL_LEVEL
+      && existing[instanceIndex - 1] !== TH19_WALL_LEVEL
+      && existing.filter((level) => level === TH19_WALL_LEVEL).length >= TH19_MAX_WALL_UPGRADES) {
+      onError(`Bis zu ${TH19_MAX_WALL_UPGRADES} Mauern können Level ${TH19_WALL_LEVEL} erreichen.`);
+      return;
+    }
 
     clearError();
     setIsSavingBuildingId(building.id);

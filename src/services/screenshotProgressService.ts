@@ -76,12 +76,29 @@ export async function fetchAccountWallLevels(
   }));
 }
 
+async function fetchCatalogLevelRows(): Promise<ScreenshotProgressLevelRow[]> {
+  const client = getSupabaseClient();
+  const rows: ScreenshotProgressLevelRow[] = [];
+  const pageSize = 500;
+  while (true) {
+    const { data, error } = await client
+      .from("screenshot_catalog_levels")
+      .select("entity_id, level, town_hall_level, required_facility_level, upgrade_time_hours, dark_elixir_cost, shiny_ore_cost, glowy_ore_cost, starry_ore_cost, hitpoints")
+      .order("entity_id")
+      .order("level")
+      .range(rows.length, rows.length + pageSize - 1);
+    if (error) throw new Error(error.message);
+    rows.push(...(data || []) as ScreenshotProgressLevelRow[]);
+    if (!data || data.length < pageSize) return rows;
+  }
+}
+
 export async function fetchScreenshotProgressCatalog(): Promise<{
   entities: ScreenshotProgressEntity[];
   levels: ScreenshotProgressLevel[];
 }> {
   const client = getSupabaseClient();
-  const [{ data: entities, error: entityError }, { data: levels, error: levelError }] =
+  const [{ data: entities, error: entityError }, levels] =
     await Promise.all([
       client
         .from("screenshot_catalog_entities")
@@ -90,14 +107,9 @@ export async function fetchScreenshotProgressCatalog(): Promise<{
         )
         .order("entity_type")
         .order("sort_order"),
-      client
-        .from("screenshot_catalog_levels")
-        .select(
-          "entity_id, level, town_hall_level, required_facility_level, upgrade_time_hours, dark_elixir_cost, shiny_ore_cost, glowy_ore_cost, starry_ore_cost, hitpoints",
-        ),
+      fetchCatalogLevelRows(),
     ]);
   if (entityError) throw new Error(entityError.message);
-  if (levelError) throw new Error(levelError.message);
   return {
     entities: ((entities || []) as ScreenshotProgressEntityRow[]).map((row) => ({
       id: row.id,
@@ -111,7 +123,7 @@ export async function fetchScreenshotProgressCatalog(): Promise<{
       sortOrder: row.sort_order,
       metadata: row.metadata || {},
     })),
-    levels: ((levels || []) as ScreenshotProgressLevelRow[]).map((row) => ({
+    levels: levels.map((row) => ({
       entityId: row.entity_id,
       level: row.level,
       townHallLevel: row.town_hall_level,

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { TH19_MAX_WALL_UPGRADES, TH19_WALL_LEVEL } from "@/config/gameLimits";
 import {
   calculateScreenshotEntityCoverage,
   classifyScreenshotText,
@@ -396,10 +397,12 @@ export function ScreenshotImportWizard({
   );
   const hasInvalidWallDistribution = useMemo(() => {
     const levels = wallDistributions.map((wall) => wall.level);
-    return wallDistributions.some((wall) => wall.level < 1 || wall.count < 0)
+    return wallDistributions.some((wall) => !Number.isInteger(wall.level) || !Number.isInteger(wall.count)
+      || wall.level < 1 || wall.count < 0 || (maxWallLevel > 0 && wall.level > maxWallLevel)
+      || (wall.level === TH19_WALL_LEVEL && wall.count > TH19_MAX_WALL_UPGRADES))
       || new Set(levels).size !== levels.length
       || (expectedWallCount > 0 && wallTotal !== expectedWallCount);
-  }, [expectedWallCount, wallDistributions, wallTotal]);
+  }, [expectedWallCount, maxWallLevel, wallDistributions, wallTotal]);
   const groupedChanges = useMemo(() => {
     const groups = new Map<string, ScreenshotProposedChange[]>();
     filterScreenshotReviewChanges(changes, reviewFilter).forEach((change) => {
@@ -723,6 +726,7 @@ export function ScreenshotImportWizard({
             },
             { width: normalized.width, height: normalized.height },
             initialFocusType,
+            initialFocusType === "buildings" || !initialFocusType ? entities : [],
           );
           let languageDetection = detectScreenshotLanguage(recognition.text);
           let classification = classifyScreenshotText(recognition.text);
@@ -923,16 +927,17 @@ export function ScreenshotImportWizard({
           const analysisEntities = analysisImportType === "buildings" && importType === "buildings"
             ? filterBuildingImportEntities(entities, buildingSection)
             : entities;
+          const buildingMenuLines = analysisImportType === "buildings" ? recognition.buildingMenuLines : null;
           const currentDetections = parseScreenshotDetections({
-            text: recognition.text,
+            text: buildingMenuLines ? "" : recognition.text,
             entities: analysisEntities,
             screenshotId: uploaded.id,
             screenType: effectiveScreenType,
             townHallLevel,
             ocrConfidence: recognition.confidence,
             layoutConfidence: forcedType ? 1 : classification.confidence,
-            ocrLines: recognition.lines,
-            objectMatches,
+            ocrLines: buildingMenuLines ?? recognition.lines,
+            objectMatches: buildingMenuLines ? [] : objectMatches,
           });
           const currentWalls = analysisImportType === "walls"
             ? parseWallDistributions(recognition.text, {
@@ -2198,6 +2203,12 @@ export function ScreenshotImportWizard({
           {wallDistributions.length ? (
             <div className="mt-5">
               <h4 className="font-bold">{en ? "Wall distribution" : "Mauerverteilung"}</h4>
+              {maxWallLevel === TH19_WALL_LEVEL ? (
+                <p className="mt-1 text-xs text-slate-400">
+                  {en ? `Up to ${TH19_MAX_WALL_UPGRADES} walls at level ${TH19_WALL_LEVEL}.`
+                    : `Bis zu ${TH19_MAX_WALL_UPGRADES} Mauern auf Level ${TH19_WALL_LEVEL}.`}
+                </p>
+              ) : null}
               <p className={`mt-2 rounded-lg p-2 text-sm ${hasInvalidWallDistribution ? "bg-amber-400/10 text-amber-100" : "bg-emerald-400/10 text-emerald-100"}`}>
                 {en ? "Total" : "Gesamt"}: <b>{wallTotal}</b>
                 {expectedWallCount > 0 ? ` / ${expectedWallCount}` : ""}

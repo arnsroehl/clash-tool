@@ -1,3 +1,4 @@
+import { MAX_TOWN_HALL_LEVEL } from "@/config/gameLimits";
 import { createScenarioDraft, evaluatePlanningScenario } from "@/features/planning-scenarios/planning-scenario.engine";
 import type { ScenarioTownHallMode } from "@/types/planningScenario";
 import type { TownHallDecisionAnalysis, TownHallDecisionInput, TownHallEntity, TownHallReason, TownHallRecommendation, TownHallVariant } from "@/features/town-hall-decision/town-hall-decision.types";
@@ -27,7 +28,7 @@ function recommendation(score: number, spread: number, strategy: TownHallDecisio
 
 function variant(input: TownHallDecisionInput, mode: ScenarioTownHallMode, id: TownHallVariant["id"]): TownHallVariant {
   const draft = createScenarioDraft(input.context, { horizonDays: 365, goalPercent: 100, strategyWeights: { building: 50, hero: 50, troop: 50, spell: 50, siege_machine: 50 } });
-  draft.strategy = input.strategy; draft.assumptions.townHallMode = mode; draft.assumptions.townHallTargetLevel = Math.min(18, input.context.townHallLevel + 1); draft.assumptions.townHallUpgradeAt = mode === "scheduled" ? input.scheduledAt : null;
+  draft.strategy = input.strategy; draft.assumptions.townHallMode = mode; draft.assumptions.townHallTargetLevel = Math.min(MAX_TOWN_HALL_LEVEL, input.context.townHallLevel + 1); draft.assumptions.townHallUpgradeAt = mode === "scheduled" ? input.scheduledAt : null;
   const result = evaluatePlanningScenario(draft, input.context).results;
   const heroBase = area(input, "heroes") ?? input.health?.generalProgressScore ?? 0; const offenseBase = area(input, "offense") ?? input.health?.generalProgressScore ?? 0;
   const newTierPenalty = mode === "unchanged" ? 0 : 7; const gain = Math.min(12, result.completedUpgradesInHorizon / Math.max(1, result.queueLength) * 12);
@@ -45,7 +46,7 @@ export function analyzeTownHallDecision(input: TownHallDecisionInput): TownHallD
   const remainingAllHours = input.entities.reduce((sum, item) => sum + item.remainingHours, 0);
   const upcomingEvent = input.context.events.some((item) => item.enabled && item.startsAt && new Date(item.startsAt).getTime() > new Date(input.context.simulationStartsAt).getTime() && new Date(item.startsAt).getTime() - new Date(input.context.simulationStartsAt).getTime() <= 14 * 86_400_000);
   const magicCount = input.context.magicItems.reduce((sum, item) => sum + item.quantity, 0);
-  const nextTownHallLevel = input.context.townHallLevel >= 18 ? null : input.context.townHallLevel + 1;
+  const nextTownHallLevel = input.context.townHallLevel >= MAX_TOWN_HALL_LEVEL ? null : input.context.townHallLevel + 1;
   const benefitBonus = nextTownHallLevel ? (["town_hall_push", "fastest", "farming"].includes(input.strategy) ? 7 : 3) : -20;
   const eventBonus = upcomingEvent ? 3 : 0; const magicBonus = Math.min(4, magicCount); const timePenalty = Math.min(12, Math.log10(1 + remainingAllHours / 24) * 4);
   const score = round(clamp(weighted + benefitBonus + eventBonus + magicBonus - timePenalty));

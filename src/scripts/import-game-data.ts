@@ -1,6 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import buildingAvailability from "../data/building-availability.json";
+import gameVersion from "../data/game-version.json";
+import pets from "../data/pets.json";
 
 type GameBuildingLevel = {
   level: number;
@@ -439,7 +442,23 @@ async function readBuildings(): Promise<GameBuilding[]> {
       throw new Error(`Gebäude-Source-ID "${trap.sourceId}" ist doppelt vorhanden.`);
   });
 
-  return [...buildings, ...traps];
+  const items = [...buildings, ...traps];
+  const availabilityBySourceId = new Map<string, GameBuildingAvailability[]>();
+  for (const { sourceId, ...entry } of buildingAvailability) {
+    const entries = availabilityBySourceId.get(sourceId) || [];
+    entries.push(entry);
+    availabilityBySourceId.set(sourceId, entries);
+  }
+  for (const sourceId of availabilityBySourceId.keys()) {
+    if (!items.some((building) => building.sourceId === sourceId))
+      throw new Error(`Unbekannte Verfügbarkeit für "${sourceId}".`);
+  }
+  return items.map((item) => {
+    const entries = availabilityBySourceId.get(item.sourceId);
+    return entries
+      ? { ...item, availability: validateBuildingAvailability(entries, item.sourceId) }
+      : item;
+  });
 }
 
 async function readHeroes(): Promise<GameHero[]> {
@@ -774,6 +793,41 @@ async function importLaboratoryItems(params: {
   }
 }
 
+async function importPets(client: ReturnType<typeof createScriptSupabaseClient>) {
+  const { data: existing, error: lookupError } = await client
+    .from("screenshot_catalog_entities").select("id, source_id").eq("entity_type", "pet");
+  if (lookupError) throw new Error(`Pet-Katalog konnte nicht gelesen werden: ${lookupError.message}`);
+  const ids = new Map((existing || []).map((row) => [row.source_id, row.id]));
+  const entities = pets.map((pet) => ({
+    id: ids.get(pet.sourceId) || pet.id,
+    source_id: pet.sourceId,
+    entity_type: "pet",
+    name: pet.name,
+    aliases: pet.aliases,
+    category: pet.category,
+    unlock_town_hall_level: pet.unlockTownHall,
+    max_level: Math.max(...pet.levels.map((entry) => entry.level)),
+    sort_order: pet.sortOrder,
+    metadata: { petHouseLevelRequired: pet.petHouseLevelRequired },
+    data_version: gameVersion.dataVersion,
+  }));
+  const levels = pets.flatMap((pet) => pet.levels.map((entry) => ({
+    entity_id: ids.get(pet.sourceId) || pet.id,
+    level: entry.level,
+    town_hall_level: entry.townHall,
+    required_facility_level: entry.requiredFacilityLevel,
+    upgrade_time_hours: entry.upgradeTimeHours,
+    dark_elixir_cost: entry.darkElixirCost,
+    hitpoints: entry.hitpoints,
+  })));
+  const { error: entityError } = await client.from("screenshot_catalog_entities")
+    .upsert(entities, { onConflict: "id" });
+  if (entityError) throw new Error(`Pet-Katalogimport fehlgeschlagen: ${entityError.message}`);
+  const { error: levelError } = await client.from("screenshot_catalog_levels")
+    .upsert(levels, { onConflict: "entity_id,level" });
+  if (levelError) throw new Error(`Pet-Levelimport fehlgeschlagen: ${levelError.message}`);
+}
+
 async function runImport() {
   console.log("Lade lokale Supabase-Konfiguration...");
   await loadLocalEnv();
@@ -940,6 +994,7 @@ async function runImport() {
     sqlFile: "src/scripts/sql/siege-machines.sql",
   });
 
+  await importPets(supabase);
   console.log("Game-Data-Import erfolgreich abgeschlossen.");
 }
 

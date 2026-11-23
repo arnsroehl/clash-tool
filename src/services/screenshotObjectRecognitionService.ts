@@ -6,6 +6,7 @@ import type {
 } from "@/features/screenshot-import/screenshot-import";
 import type { ScreenshotRecognitionResult } from "@/services/screenshotRecognitionService";
 import type { LaboratoryGridCellRecognition } from "@/services/screenshotRecognitionService";
+import { searchVillageBitmap } from "@/services/villageObjectSearchService";
 
 export type ScreenshotIconSignature = {
   sourceId: string;
@@ -172,50 +173,6 @@ function candidateBoxes(line: BoundingBox): BoundingBox[] {
   ];
 }
 
-function villageProposalBoxes(): BoundingBox[] {
-  const proposals: BoundingBox[] = [];
-  [0.08, 0.12, 0.17].forEach((size) => {
-    const step = size * 0.72;
-    for (let y = 0.08; y + size <= 0.94; y += step)
-      for (let x = 0.02; x + size <= 0.98; x += step)
-        proposals.push({ x, y, width: size, height: size });
-  });
-  return proposals;
-}
-
-function overlap(left: BoundingBox, right: BoundingBox): number {
-  const x = Math.max(0, Math.min(left.x + left.width, right.x + right.width) - Math.max(left.x, right.x));
-  const y = Math.max(0, Math.min(left.y + left.height, right.y + right.height) - Math.max(left.y, right.y));
-  const intersection = x * y;
-  const union = left.width * left.height + right.width * right.height - intersection;
-  return union > 0 ? intersection / union : 0;
-}
-
-export function selectVillageObjectMatches(
-  candidates: ScreenshotObjectMatch[],
-  limit = 40,
-): ScreenshotObjectMatch[] {
-  const ranked = [...candidates].sort((left, right) => right.confidence - left.confidence);
-  const supported = ranked.filter((candidate) => {
-    const support = ranked.filter(
-      (other) =>
-        other !== candidate &&
-        other.sourceId === candidate.sourceId &&
-        overlap(other.boundingBox, candidate.boundingBox) >= 0.12,
-    ).length;
-    return candidate.confidence >= 0.97 || support > 0;
-  });
-  const selected: ScreenshotObjectMatch[] = [];
-  supported.forEach((candidate) => {
-    if (selected.length >= limit) return;
-    const overlapsSelected = selected.some(
-      (existing) => overlap(existing.boundingBox, candidate.boundingBox) >= 0.3,
-    );
-    if (!overlapsSelected) selected.push(candidate);
-  });
-  return selected;
-}
-
 export function hashScreenshotRegion(
   bitmap: ImageBitmap,
   context: CanvasRenderingContext2D,
@@ -257,6 +214,22 @@ export async function recognizeScreenshotObjects(params: {
   const catalog = signatures.filter((signature) => types.has(signature.entityType));
   if (!catalog.length) return [];
   const bitmap = await createImageBitmap(params.file, { imageOrientation: "from-image" });
+  if (params.screenType === "village") {
+    try {
+      const matches = await searchVillageBitmap(bitmap);
+      return matches.map((match) => ({
+        sourceId: match.sourceId,
+        entityType: "building",
+        visualLevel: match.level,
+        confidence: match.confidence,
+        lineIndex: -1,
+        boundingBox: match.boundingBox,
+        alternatives: [],
+      }));
+    } finally {
+      bitmap.close();
+    }
+  }
   const canvas = document.createElement("canvas");
   canvas.width = 9;
   canvas.height = 8;
@@ -310,15 +283,6 @@ export async function recognizeScreenshotObjects(params: {
         });
       });
     }
-  }
-  if (params.screenType === "village") {
-    const proposals = villageProposalBoxes().flatMap((box) => {
-      const match = matchObjectFingerprint(hashScreenshotRegion(bitmap, context, box), catalog);
-      return match && match.confidence >= 0.92
-        ? [{ ...match, lineIndex: -1, boundingBox: box }]
-        : [];
-    });
-    matches.push(...selectVillageObjectMatches(proposals, Math.max(0, 40 - matches.length)));
   }
   bitmap.close();
   return matches;

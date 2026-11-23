@@ -33,6 +33,12 @@ export function BuildingCard({
             ? ` · ${en ? "before merge" : "vor Merge"} ${building.buildingCount}×`
             : ""}
         </p>
+        {building.sourceId === "firecracker-tower" && (
+          <p className="mt-1 text-xs text-slate-400">
+            {en ? "Each tower requires an Archer Tower at level 21 and a Scattershot at level 7."
+              : "Jeder Turm benötigt einen Bogenschützenturm auf Level 21 und ein Streukatapult auf Level 7."}
+          </p>
+        )}
       </summary>
       <div className="space-y-3 border-t border-white/10 p-5">
         {Array.from({ length: building.countAfterMerges || 1 }, (_, index) => {

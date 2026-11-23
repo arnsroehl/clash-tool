@@ -9,7 +9,6 @@ import {
 } from "react";
 import { ScreenshotImportWizard } from "@/components/import/ScreenshotImportWizard";
 import {
-  getCurrentScreenshotMaxLevel,
   getMagicItemScreenshotAliases,
   getScreenshotAliases,
   parseScreenshotLevels,
@@ -84,7 +83,7 @@ export function PlayerImportCenter(props: Props) {
         Array.from({ length: item.countAfterMerges || 1 }, (_, index) => ({
           id: `${item.id}:${index + 1}`,
           name: `${item.name} ${index + 1}`,
-          aliases: item.sourceId ? [item.sourceId, `${item.sourceId}-${index + 1}`] : [],
+          aliases: screenshotAliases(item.name, item.sourceId, item.sourceId ? `${item.sourceId}-${index + 1}` : null),
           category: item.category,
           type: "building" as const,
           currentLevel: props.buildingInstanceLevels[item.id]?.[index] || 0,
@@ -107,7 +106,7 @@ export function PlayerImportCenter(props: Props) {
         aliases: screenshotAliases(item.apiName, item.sourceId),
         type: "troop" as const,
         currentLevel: props.troopLevels[item.id] || 0,
-        maxLevel: getCurrentScreenshotMaxLevel(item.sourceId, item.maxLevel),
+        maxLevel: item.maxLevel,
         unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...props.spells.map((item) => ({
@@ -116,7 +115,7 @@ export function PlayerImportCenter(props: Props) {
         aliases: screenshotAliases(item.apiName, item.sourceId),
         type: "spell" as const,
         currentLevel: props.spellLevels[item.id] || 0,
-        maxLevel: getCurrentScreenshotMaxLevel(item.sourceId, item.maxLevel),
+        maxLevel: item.maxLevel,
         unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...props.siegeMachines.map((item) => ({
@@ -125,7 +124,7 @@ export function PlayerImportCenter(props: Props) {
         aliases: screenshotAliases(item.apiName, item.sourceId),
         type: "siege_machine" as const,
         currentLevel: props.siegeLevels[item.id] || 0,
-        maxLevel: getCurrentScreenshotMaxLevel(item.sourceId, item.maxLevel),
+        maxLevel: item.maxLevel,
         unlockTownHallLevel: item.unlockTownHallLevel,
       })),
       ...(props.extraScreenshotEntities || []),

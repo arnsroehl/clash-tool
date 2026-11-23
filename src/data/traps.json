@@ -123,6 +123,15 @@
         "elixirCost": 0,
         "darkElixirCost": 0,
         "hitpoints": 0
+      },
+      {
+        "level": 14,
+        "townHall": 19,
+        "upgradeTimeHours": 204.0,
+        "goldCost": 17500000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
       }
     ],
     "availability": [
@@ -193,6 +202,11 @@
       },
       {
         "townHallLevel": 18,
+        "count": 7,
+        "countAfterMerges": 7
+      },
+      {
+        "townHallLevel": 19,
         "count": 7,
         "countAfterMerges": 7
       }
@@ -413,6 +427,11 @@
         "townHallLevel": 18,
         "count": 8,
         "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 19,
+        "count": 8,
+        "countAfterMerges": 8
       }
     ]
   },
@@ -522,6 +541,15 @@
         "elixirCost": 0,
         "darkElixirCost": 0,
         "hitpoints": 0
+      },
+      {
+        "level": 12,
+        "townHall": 18,
+        "upgradeTimeHours": 120.0,
+        "goldCost": 9000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
       }
     ],
     "availability": [
@@ -589,6 +617,11 @@
         "townHallLevel": 18,
         "count": 8,
         "countAfterMerges": 8
+      },
+      {
+        "townHallLevel": 19,
+        "count": 8,
+        "countAfterMerges": 8
       }
     ]
   },
@@ -645,6 +678,11 @@
       },
       {
         "townHallLevel": 18,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 19,
         "count": 1,
         "countAfterMerges": 1
       }
@@ -791,6 +829,11 @@
         "townHallLevel": 18,
         "count": 9,
         "countAfterMerges": 9
+      },
+      {
+        "townHallLevel": 19,
+        "count": 9,
+        "countAfterMerges": 9
       }
     ]
   },
@@ -842,6 +885,15 @@
         "level": 5,
         "townHall": 18,
         "upgradeTimeHours": 168,
+        "goldCost": 18000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
+      },
+      {
+        "level": 6,
+        "townHall": 19,
+        "upgradeTimeHours": 216.0,
         "goldCost": 18000000,
         "elixirCost": 0,
         "darkElixirCost": 0,
@@ -901,6 +953,11 @@
       },
       {
         "townHallLevel": 18,
+        "count": 4,
+        "countAfterMerges": 4
+      },
+      {
+        "townHallLevel": 19,
         "count": 4,
         "countAfterMerges": 4
       }
@@ -1030,6 +1087,15 @@
         "elixirCost": 0,
         "darkElixirCost": 0,
         "hitpoints": 0
+      },
+      {
+        "level": 14,
+        "townHall": 19,
+        "upgradeTimeHours": 192.0,
+        "goldCost": 17000000,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 0
       }
     ],
     "availability": [
@@ -1107,6 +1173,11 @@
         "townHallLevel": 18,
         "count": 9,
         "countAfterMerges": 9
+      },
+      {
+        "townHallLevel": 19,
+        "count": 10,
+        "countAfterMerges": 10
       }
     ]
   },
@@ -1184,6 +1255,11 @@
       },
       {
         "townHallLevel": 18,
+        "count": 1,
+        "countAfterMerges": 1
+      },
+      {
+        "townHallLevel": 19,
         "count": 1,
         "countAfterMerges": 1
       }
