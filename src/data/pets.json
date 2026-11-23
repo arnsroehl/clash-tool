@@ -88,6 +88,46 @@
         "upgradeTimeHours": 192,
         "darkElixirCost": 230000,
         "hitpoints": 2125
+      },
+      {
+        "level": 11,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 180.0,
+        "darkElixirCost": 260000,
+        "hitpoints": 2200
+      },
+      {
+        "level": 12,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192.0,
+        "darkElixirCost": 290000,
+        "hitpoints": 2275
+      },
+      {
+        "level": 13,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192.0,
+        "darkElixirCost": 320000,
+        "hitpoints": 2350
+      },
+      {
+        "level": 14,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192.0,
+        "darkElixirCost": 350000,
+        "hitpoints": 2425
+      },
+      {
+        "level": 15,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192.0,
+        "darkElixirCost": 380000,
+        "hitpoints": 2500
       }
     ]
   },
@@ -180,6 +220,46 @@
         "upgradeTimeHours": 156,
         "darkElixirCost": 180000,
         "hitpoints": 5000
+      },
+      {
+        "level": 11,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 168.0,
+        "darkElixirCost": 220000,
+        "hitpoints": 5150
+      },
+      {
+        "level": 12,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 180.0,
+        "darkElixirCost": 250000,
+        "hitpoints": 5300
+      },
+      {
+        "level": 13,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192.0,
+        "darkElixirCost": 280000,
+        "hitpoints": 5450
+      },
+      {
+        "level": 14,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192.0,
+        "darkElixirCost": 310000,
+        "hitpoints": 5600
+      },
+      {
+        "level": 15,
+        "townHall": 18,
+        "requiredFacilityLevel": 12,
+        "upgradeTimeHours": 192.0,
+        "darkElixirCost": 350000,
+        "hitpoints": 5750
       }
     ]
   },

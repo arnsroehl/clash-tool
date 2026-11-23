@@ -1,3 +1,4 @@
+import { MAX_TOWN_HALL_LEVEL } from "@/config/gameLimits";
 import { simulateBuilderQueue } from "@/features/builder-simulation/builder-simulation.engine";
 import { estimateGoalRemainingHours } from "@/features/goal-planning/goal-estimation";
 import type { AccountHealthResult } from "@/features/account-health/account-health.types";
@@ -101,7 +102,7 @@ export function defaultScenarioAssumptions(
   return {
     simulationStartsAt: null,
     townHallMode: "unchanged",
-    townHallTargetLevel: Math.min(18, townHallLevel + 1),
+    townHallTargetLevel: Math.min(MAX_TOWN_HALL_LEVEL, townHallLevel + 1),
     townHallUpgradeAt: null,
     builderCount,
     pauseStartsAt: null,

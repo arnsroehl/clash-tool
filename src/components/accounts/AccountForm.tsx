@@ -1,3 +1,4 @@
+import { MAX_TOWN_HALL_LEVEL } from "@/config/gameLimits";
 import type { FormEvent } from "react";
 
 type AccountFormProps = {
@@ -45,10 +46,10 @@ export function AccountForm({
           <select
             name="townHallLevel"
             required
-            defaultValue="18"
+            defaultValue={MAX_TOWN_HALL_LEVEL}
             className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none transition focus:border-amber-400"
           >
-            {Array.from({ length: 18 }, (_, index) => index + 1).map(
+            {Array.from({ length: MAX_TOWN_HALL_LEVEL }, (_, index) => index + 1).map(
               (level) => (
                 <option key={level} value={level}>
                   {en ? "Town Hall" : "Rathaus"} {level}

@@ -1,9 +1,12 @@
 import {
   assessImageQuality,
+  hasBuildingsAndHeroesMenu,
   type BoundingBox,
   type ImageQualityResult,
+  type ScreenshotEntity,
   type ScreenshotScreenType,
 } from "@/features/screenshot-import/screenshot-import";
+import { findBuildingMenuRows } from "@/features/screenshot-import/build-menu";
 
 export type ScreenshotDevicePlatform =
   | "ios"
@@ -36,6 +39,7 @@ export type ScreenshotRecognitionResult = {
   text: string;
   confidence: number;
   lines: Array<{ text: string; confidence: number; boundingBox: BoundingBox }>;
+  buildingMenuLines: ScreenshotRecognitionResult["lines"] | null;
   laboratoryGridCells: LaboratoryGridCellRecognition[];
   preprocessingApplied: boolean;
 };
@@ -399,6 +403,7 @@ export async function recognizeScreenshotDetailed(
   onProgress: (percent: number) => void,
   dimensions?: { width: number; height: number },
   focusScreenType?: ScreenshotScreenType,
+  buildingMenuEntities: ScreenshotEntity[] = [],
 ): Promise<ScreenshotRecognitionResult> {
   const { createWorker, PSM } = await import("tesseract.js");
   const useLaboratoryFocus = focusScreenType === "laboratory" && Boolean(dimensions);
@@ -619,14 +624,77 @@ export async function recognizeScreenshotDetailed(
       });
       return { ...cell, lineIndex };
     });
+    const text = [result.data.text, enhancedText, focusedText].filter(Boolean).join("\n");
+    let buildingMenuLines: ScreenshotRecognitionResult["lines"] | null = null;
+    if (buildingMenuEntities.length && hasBuildingsAndHeroesMenu(text) && dimensions) {
+      buildingMenuLines = [];
+      await worker.setParameters({ tessedit_pageseg_mode: PSM.SPARSE_TEXT });
+      const sparse = await worker.recognize(file, {}, { text: true, blocks: true });
+      const sparseLines = (sparse.data.blocks || []).flatMap((block) =>
+        block.paragraphs.flatMap((paragraph) => paragraph.lines.map((line) => ({
+          text: line.text.trim(),
+          confidence: Math.min(1, Math.max(0, line.confidence / 100)),
+          boundingBox: {
+            x: line.bbox.x0 / width,
+            y: line.bbox.y0 / height,
+            width: (line.bbox.x1 - line.bbox.x0) / width,
+            height: (line.bbox.y1 - line.bbox.y0) / height,
+          },
+        }))),
+      );
+      const rows = findBuildingMenuRows(sparseLines, buildingMenuEntities, width / height);
+      const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+      try {
+        await worker.setParameters({
+          tessedit_char_whitelist: "0123456789",
+          tessedit_pageseg_mode: PSM.SINGLE_LINE,
+        });
+        progressStart = 100;
+        progressSpan = 0;
+        for (const row of rows) {
+          const matches = [];
+          for (const threshold of [225, 237]) {
+            const badge = cropToCanvas(bitmap, row.badge, 144, 112);
+            thresholdBadge(badge, threshold);
+            const padded = document.createElement("canvas");
+            padded.width = 116;
+            padded.height = 122;
+            const context = padded.getContext("2d");
+            if (!context) continue;
+            context.fillStyle = "#fff";
+            context.fillRect(0, 0, padded.width, padded.height);
+            context.drawImage(badge, 53, 0, 68, 74, 24, 24, 68, 74);
+            const badgeResult = await worker.recognize(await canvasToPng(padded));
+            const digits = badgeResult.data.text.trim();
+            const level = /^\d{1,3}$/.test(digits) ? Number(digits) : 0;
+            if (level > 0) matches.push({ level, confidence: badgeResult.data.confidence / 100 });
+          }
+          const [first, second] = matches;
+          const agreed = first && second && first.level === second.level;
+          const confident = matches.length === 1 && first.confidence >= 0.84;
+          if (agreed || confident) {
+            for (let index = 0; index < row.count; index++) {
+              buildingMenuLines.push({
+                text: `${row.name} Level ${first.level}`,
+                confidence: agreed ? Math.min(0.91, row.confidence + 0.12) : 0.72,
+                boundingBox: row.boundingBox,
+              });
+            }
+          }
+        }
+      } finally {
+        bitmap.close();
+      }
+    }
     return {
-      text: [result.data.text, enhancedText, focusedText].filter(Boolean).join("\n"),
+      text,
       confidence: Math.max(
         baseConfidence,
         enhancedConfidence,
         focusedConfidence,
       ),
       lines,
+      buildingMenuLines,
       laboratoryGridCells,
       preprocessingApplied,
     };

@@ -739,40 +739,8 @@ const GERMAN_SCREENSHOT_ALIASES: Record<string, string[]> = {
   "wall-wrecker": ["Mauerbrecher"],
 };
 
-const CURRENT_SCREENSHOT_MAX_LEVELS: Record<string, number> = {
-  barbarian: 13,
-  goblin: 10,
-  valkyrie: 12,
-  golem: 15,
-  dragon: 13,
-  balloon: 13,
-  yeti: 8,
-  headhunter: 4,
-  "root-rider": 4,
-  druid: 6,
-  "battle-drill": 6,
-  "siege-barracks": 6,
-  "log-launcher": 6,
-  "battle-blimp": 6,
-  "rage-spell": 7,
-  "freeze-spell": 8,
-  "clone-spell": 9,
-  "recall-spell": 7,
-  "overgrowth-spell": 5,
-  "ice-block-spell": 6,
-};
-
 export function getScreenshotAliases(sourceId?: string | null): string[] {
   return sourceId ? GERMAN_SCREENSHOT_ALIASES[sourceId] || [] : [];
-}
-
-export function getCurrentScreenshotMaxLevel(
-  sourceId: string | null | undefined,
-  fallback: number,
-): number {
-  return sourceId
-    ? Math.max(fallback, CURRENT_SCREENSHOT_MAX_LEVELS[sourceId] || 0)
-    : fallback;
 }
 
 export function getConfidenceBand(confidence: number): ConfidenceBand {
@@ -853,11 +821,18 @@ const SCREEN_HINTS: Record<Exclude<ScreenshotScreenType, "unknown">, string[]> =
   profile: ["spielerprofil", "player profile", "spielertag", "player tag", "erfahrungslevel", "experience level"],
 };
 
+export function hasBuildingsAndHeroesMenu(text: string): boolean {
+  return /(?:buildings(?:and)?heroes|gebaude(?:und)?helden)/.test(normalizeScreenshotText(text));
+}
+
 export function classifyScreenshotText(text: string): {
   screenType: ScreenshotScreenType;
   confidence: number;
   matchedHints: string[];
 } {
+  if (hasBuildingsAndHeroesMenu(text)) {
+    return { screenType: "buildings", confidence: 0.94, matchedHints: ["buildings and heroes"] };
+  }
   const normalized = normalizeScreenshotText(text);
   const scores = Object.entries(SCREEN_HINTS).map(([screenType, hints]) => {
     const matchedHints = hints.filter((hint) =>

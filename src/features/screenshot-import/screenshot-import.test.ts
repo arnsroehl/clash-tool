@@ -1,3 +1,5 @@
+import { findVillageObjects } from "./village-object-search";
+import { findBuildingMenuRows } from "./build-menu";
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
@@ -44,7 +46,6 @@ import {
   laboratoryStartGridIsVerified,
   laboratoryStartGridSourceId,
   matchObjectFingerprint,
-  selectVillageObjectMatches,
 } from "@/services/screenshotObjectRecognitionService";
 import {
   createLaboratoryGridCells,
@@ -633,8 +634,8 @@ test("ships every Home Village trap with TH18 levels and instance counts", () =>
     ],
   );
   assert.deepEqual(
-    trapCatalog.map((trap) => Math.max(...trap.levels.map((level) => level.level))),
-    [13, 14, 11, 4, 8, 5, 13, 3],
+    trapCatalog.map((trap) => Math.max(...trap.levels.filter((level) => level.townHall <= 18).map((level) => level.level))),
+    [13, 14, 12, 4, 8, 5, 13, 3],
   );
   assert.deepEqual(
     trapCatalog.map((trap) =>
@@ -1254,15 +1255,33 @@ test("does not assign more visual village matches than existing instances", () =
   assert.equal(detections[0].id, "cannon:1");
 });
 
-test("keeps supported village proposals and suppresses overlapping detections", () => {
-  const matches = selectVillageObjectMatches([
-    { sourceId: "cannon", entityType: "building", visualLevel: 20, confidence: 0.95, lineIndex: -1, boundingBox: { x: 0.1, y: 0.1, width: 0.15, height: 0.15 }, alternatives: [] },
-    { sourceId: "cannon", entityType: "building", visualLevel: 20, confidence: 0.94, lineIndex: -1, boundingBox: { x: 0.12, y: 0.12, width: 0.15, height: 0.15 }, alternatives: [] },
-    { sourceId: "mortar", entityType: "building", visualLevel: 15, confidence: 0.93, lineIndex: -1, boundingBox: { x: 0.7, y: 0.7, width: 0.12, height: 0.12 }, alternatives: [] },
-  ]);
-  assert.equal(matches.length, 1);
-  assert.equal(matches[0].sourceId, "cannon");
-  assert.equal(matches[0].confidence, 0.95);
+test("finds the same object at two scales and suppresses overlapping crops", () => {
+  const width = 360;
+  const height = 240;
+  const data = new Uint8ClampedArray(width * height * 4).fill(100);
+  const color = (x: number, y: number) => [
+    (x * 73 + y * 41) % 256,
+    (x * 31 + y * 97) % 256,
+    (x * 43 + y * 23) % 256,
+  ];
+  const samples = Array.from({ length: 48 }, (_, i) => {
+    const x = (i * 5 + Math.floor(i / 8)) % 16;
+    const y = (i * 11 + Math.floor(i / 6)) % 16;
+    return [x, y, ...color(x, y)];
+  }).flat();
+  for (const [left, top, size] of [[87, 57, 32], [225, 129, 48]]) {
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const offset = ((top + y) * width + left + x) * 4;
+        data.set([...color(Math.floor(x * 16 / size), Math.floor(y * 16 / size)), 255], offset);
+      }
+    }
+  }
+  const matches = findVillageObjects({ width, height, data }, [{ sourceId: "fixture", level: 3, aspect: 1, samples }]);
+  assert.equal(matches.length, 2);
+  assert.ok(matches.some(({ boundingBox }) => Math.abs(boundingBox.x * width - 87) <= 2));
+  assert.ok(matches.some(({ boundingBox }) => Math.abs(boundingBox.x * width - 225) <= 2));
+  assert.ok(matches.every((match) => match.level === null));
 });
 
 test("stores correction feedback only with explicit improvement consent", () => {
@@ -1490,4 +1509,32 @@ test("lets a user correct a misclassified village screenshot without bypassing r
     manuallySelectedType: "heroes",
   });
   assert.equal(unrelated.mismatch, true);
+});
+
+test("recognizes the new Buildings and Heroes menu and isolates level badges from quantities and prices", () => {
+  const entities: ScreenshotEntity[] = [
+    { id: "spell-tower:1", name: "Zauberturm 1", aliases: ["spell-tower"], type: "building", maxLevel: 4, currentLevel: 0 },
+    { id: "spell-tower:2", name: "Zauberturm 2", aliases: ["spell-tower"], type: "building", maxLevel: 4, currentLevel: 0 },
+    { id: "town-hall:1", name: "Rathaus 1", aliases: ["town-hall"], type: "building", maxLevel: 19, currentLevel: 18 },
+  ];
+  assert.equal(classifyScreenshotText("Buildings & Heroes\nSuggested upgrades").screenType, "buildings");
+  assert.equal(classifyScreenshotText("Gebäude und Helden\nVorgeschlagene Verbesserungen").screenType, "buildings");
+  const rows = findBuildingMenuRows([
+    { text: "Spell Tower x 2 27 000 000", confidence: 0.95, boundingBox: { x: 0.52, y: 0.24, width: 0.2, height: 0.02 } },
+    { text: "Town Hall 12d", confidence: 0.95, boundingBox: { x: 0.52, y: 0.66, width: 0.12, height: 0.02 } },
+    { text: "Town Hall 12d", confidence: 0.85, boundingBox: { x: 0.1, y: 0.66, width: 0.12, height: 0.02 } },
+  ], entities, 1.03);
+  assert.deepEqual(rows.map((row) => [row.name, row.count]), [["spell tower", 2], ["town hall", 1]]);
+  assert.ok(rows[0].badge.x < rows[0].boundingBox.x && rows[0].badge.y > rows[0].boundingBox.y);
+  const levels = [4, 19];
+  const recognized = rows.flatMap((row, index) => Array.from({ length: row.count }, () => ({
+    text: `${row.name} Level ${levels[index]}`,
+    confidence: 0.9,
+    boundingBox: row.boundingBox,
+  })));
+  assert.deepEqual(parseScreenshotDetections({
+    text: "", entities, ocrLines: recognized, screenType: "buildings", townHallLevel: 19,
+  }).map(({ id, detectedLevel }) => [id, detectedLevel]), [
+    ["spell-tower:1", 4], ["spell-tower:2", 4], ["town-hall:1", 19],
+  ]);
 });

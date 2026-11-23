@@ -1,5 +1,6 @@
 "use client";
 
+import { MAX_TOWN_HALL_LEVEL } from "@/config/gameLimits";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccountForm } from "@/components/accounts/AccountForm";
 import { AuthPanel } from "@/components/auth/AuthPanel";
@@ -1133,7 +1134,7 @@ export default function Home() {
     draft.name = variant.nameDe;
     draft.description = `Rathausvergleich · ${variant.id} · ${new Date().toLocaleDateString("de-DE")}`;
     draft.assumptions.townHallMode = variant.id === "max_current" ? "unchanged" : variant.id === "upgrade_now" ? "immediate" : "scheduled";
-    draft.assumptions.townHallTargetLevel = Math.min(18, scenarioContext.townHallLevel + 1);
+    draft.assumptions.townHallTargetLevel = Math.min(MAX_TOWN_HALL_LEVEL, scenarioContext.townHallLevel + 1);
     draft.assumptions.townHallUpgradeAt = scheduledAt;
     void saveScenario(buildPlanningScenarioInput(draft, scenarioContext, false));
     document.getElementById("what-if-scenarios")?.scrollIntoView({ behavior: "smooth", block: "start" });

@@ -3076,5 +3076,335 @@
     "townHallLevel": 18,
     "count": 325,
     "countAfterMerges": 325
+  },
+  {
+    "sourceId": "air-defense",
+    "townHallLevel": 19,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "air-sweeper",
+    "townHallLevel": 19,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "archer-tower",
+    "townHallLevel": 19,
+    "count": 9,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "army-camp",
+    "townHallLevel": 19,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "barracks",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "blacksmith",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "bomb-tower",
+    "townHallLevel": 19,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "builders-hut",
+    "townHallLevel": 19,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "cannon",
+    "townHallLevel": 19,
+    "count": 7,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "clan-castle",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "crafting-station",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-barracks",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-elixir-drill",
+    "townHallLevel": 19,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "dark-elixir-storage",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "dark-spell-factory",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "eagle-artillery",
+    "townHallLevel": 19,
+    "count": 0,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "elixir-collector",
+    "townHallLevel": 19,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "elixir-storage",
+    "townHallLevel": 19,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "firecracker-tower",
+    "townHallLevel": 19,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "firespitter",
+    "townHallLevel": 19,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "gold-mine",
+    "townHallLevel": 19,
+    "count": 7,
+    "countAfterMerges": 7
+  },
+  {
+    "sourceId": "gold-storage",
+    "townHallLevel": 19,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "guardian-shrine",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hero-hall",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "hidden-tesla",
+    "townHallLevel": 19,
+    "count": 5,
+    "countAfterMerges": 5
+  },
+  {
+    "sourceId": "inferno-tower",
+    "townHallLevel": 19,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "laboratory",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "monolith",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "mortar",
+    "townHallLevel": 19,
+    "count": 4,
+    "countAfterMerges": 4
+  },
+  {
+    "sourceId": "multi-archer-tower",
+    "townHallLevel": 19,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "multi-gear-tower",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "pet-house",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "revenge-tower",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "ricochet-cannon",
+    "townHallLevel": 19,
+    "count": 3,
+    "countAfterMerges": 3
+  },
+  {
+    "sourceId": "scattershot",
+    "townHallLevel": 19,
+    "count": 2,
+    "countAfterMerges": 0
+  },
+  {
+    "sourceId": "spell-factory",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "spell-tower",
+    "townHallLevel": 19,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "spiky-tower",
+    "townHallLevel": 19,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 8,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 9,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 10,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 11,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 12,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 13,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 14,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 15,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 16,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 17,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 18,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "squad-barracks",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "super-wizard-tower",
+    "townHallLevel": 19,
+    "count": 2,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "wall",
+    "townHallLevel": 19,
+    "count": 350,
+    "countAfterMerges": 350
+  },
+  {
+    "sourceId": "wizard-tower",
+    "townHallLevel": 19,
+    "count": 6,
+    "countAfterMerges": 2
+  },
+  {
+    "sourceId": "workshop",
+    "townHallLevel": 19,
+    "count": 1,
+    "countAfterMerges": 1
+  },
+  {
+    "sourceId": "x-bow",
+    "townHallLevel": 19,
+    "count": 4,
+    "countAfterMerges": 4
   }
 ]

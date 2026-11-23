@@ -1,3 +1,4 @@
+import { MAX_TOWN_HALL_LEVEL } from "@/config/gameLimits";
 import type {
   BoundingBox,
   ScreenshotScreenType,
@@ -140,8 +141,8 @@ export function validateScreenshotTrainingDataset(
       errors.push(`${name}: invalid crop quality.`);
     if (!Number.isInteger(sample.width) || sample.width < 1 || !Number.isInteger(sample.height) || sample.height < 1)
       errors.push(`${name}: image dimensions must be positive integers.`);
-    if (!Number.isInteger(sample.townHallLevel) || sample.townHallLevel < 1 || sample.townHallLevel > 18)
-      errors.push(`${name}: Town Hall level must be between 1 and 18.`);
+    if (!Number.isInteger(sample.townHallLevel) || sample.townHallLevel < 1 || sample.townHallLevel > MAX_TOWN_HALL_LEVEL)
+      errors.push(`${name}: Town Hall level must be between 1 and ${MAX_TOWN_HALL_LEVEL}.`);
     if (!Number.isFinite(sample.scale) || sample.scale <= 0)
       errors.push(`${name}: scale must be positive.`);
     if (!sample.imagePath.trim() || sample.imagePath.startsWith("/") || sample.imagePath.includes(".."))

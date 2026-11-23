@@ -51,6 +51,15 @@
         "elixirCost": 10000000,
         "darkElixirCost": 0,
         "hitpoints": 5000
+      },
+      {
+        "level": 6,
+        "townHall": 18,
+        "upgradeTimeHours": 252.0,
+        "goldCost": 0,
+        "elixirCost": 18500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5500
       }
     ]
   },
@@ -106,6 +115,15 @@
         "elixirCost": 17000000,
         "darkElixirCost": 0,
         "hitpoints": 6300
+      },
+      {
+        "level": 6,
+        "townHall": 18,
+        "upgradeTimeHours": 312.0,
+        "goldCost": 0,
+        "elixirCost": 24500000,
+        "darkElixirCost": 0,
+        "hitpoints": 6900
       }
     ]
   },
@@ -161,6 +179,15 @@
         "elixirCost": 18000000,
         "darkElixirCost": 0,
         "hitpoints": 2100
+      },
+      {
+        "level": 6,
+        "townHall": 19,
+        "upgradeTimeHours": 360.0,
+        "goldCost": 0,
+        "elixirCost": 31000000,
+        "darkElixirCost": 0,
+        "hitpoints": 2200
       }
     ]
   },
@@ -216,6 +243,15 @@
         "elixirCost": 18000000,
         "darkElixirCost": 0,
         "hitpoints": 5500
+      },
+      {
+        "level": 6,
+        "townHall": 18,
+        "upgradeTimeHours": 288.0,
+        "goldCost": 0,
+        "elixirCost": 21500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5800
       }
     ]
   },
@@ -271,6 +307,15 @@
         "elixirCost": 18000000,
         "darkElixirCost": 0,
         "hitpoints": 4800
+      },
+      {
+        "level": 6,
+        "townHall": 18,
+        "upgradeTimeHours": 276.0,
+        "goldCost": 0,
+        "elixirCost": 20500000,
+        "darkElixirCost": 0,
+        "hitpoints": 5100
       }
     ]
   },

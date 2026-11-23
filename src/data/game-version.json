@@ -1,14 +1,21 @@
 {
   "game": "Clash of Clans",
-  "dataVersion": "clash-of-clans-data-0.16.0",
+  "dataVersion": "clash-of-clans-data-0.16.0+clashy-26.11.1",
   "schemaVersion": 2,
-  "generatedAt": "2026-07-12",
-  "description": "Home Village game data synchronized from clash-of-clans-data 0.16.0.",
+  "generatedAt": "2026-11-23",
+  "description": "Home Village game data with the November 2026 Town Hall 19 progression.",
   "supplements": [
     {
       "file": "building-level-supplement.json",
       "source": "clash-of-clans-data@0.19.1",
       "checkedAt": "2026-11-05"
+    },
+    {
+      "source": "ClashKingInc/clashy.py@d3eb8d9fb4522c0d63f8d213bf2c5e3063699ab9",
+      "url": "https://github.com/ClashKingInc/clashy.py/blob/d3eb8d9fb4522c0d63f8d213bf2c5e3063699ab9/coc/static/static_data.json",
+      "sha256": "46c99983b795f99a53039dd5b6469aee445e0438fb893e5af12004247644b5a1",
+      "releaseNotes": "https://supercell.com/en/games/clashofclans/blog/release-notes/the-clash-of-titans-update-is-rolling-out/",
+      "checkedAt": "2026-11-23"
     }
   ]
 }

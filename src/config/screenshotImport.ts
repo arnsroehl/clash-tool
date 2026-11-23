@@ -1,5 +1,8 @@
 import type { ScreenshotImportType } from "@/features/screenshot-import/screenshot-import";
 
+const CURRENT_GAME_UI_VERSION = "coc-ui-2026-11";
+const PREVIOUS_GAME_UI_VERSION = "coc-ui-2026-07";
+
 export type ScreenshotImportPublicEnvironment = {
   enabled?: string;
   laboratoryEnabled?: string;
@@ -54,9 +57,9 @@ export function resolveScreenshotImportConfig(
     laboratoryEnabled: publicFlag(environment.laboratoryEnabled, true),
     villageEnabled: publicFlag(environment.villageEnabled, true),
     supportedGameUiVersion:
-      environment.supportedGameUiVersion?.trim() || "coc-ui-2026-07",
-    modelVersion: environment.modelVersion?.trim() || "local-tesseract-v1",
-    layoutVersion: environment.layoutVersion?.trim() || "guided-layout-v1",
+      environment.supportedGameUiVersion?.trim() || CURRENT_GAME_UI_VERSION,
+    modelVersion: environment.modelVersion?.trim() || "local-tesseract-v2",
+    layoutVersion: environment.layoutVersion?.trim() || "guided-layout-v2",
     activeImportTypes: supportedImportTypes(environment.supportedTypes),
   };
 }
@@ -90,5 +93,6 @@ export function isSupportedGameUiVersion(
   version: string | null | undefined,
   config: ScreenshotImportConfig = SCREENSHOT_IMPORT_CONFIG,
 ): boolean {
-  return version === config.supportedGameUiVersion;
+  return version === config.supportedGameUiVersion
+    || (config.supportedGameUiVersion === CURRENT_GAME_UI_VERSION && version === PREVIOUS_GAME_UI_VERSION);
 }
