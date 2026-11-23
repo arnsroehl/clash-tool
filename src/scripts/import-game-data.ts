@@ -36,6 +36,7 @@ type GameHero = {
   id: string;
   sourceId: string;
   name: string;
+  apiName?: string;
   category: string;
   unlockTownHall: number;
   sortOrder: number;
@@ -74,6 +75,7 @@ type HeroUpsertRow = {
   id: string;
   source_id: string;
   name: string;
+  api_name: string;
   category: string;
   unlock_town_hall_level: number;
   max_level: number;
@@ -90,8 +92,6 @@ type HeroLevelUpsertRow = {
   dark_elixir_cost: number;
   hitpoints: number;
 };
-
-type LaboratoryUpsertRow = HeroUpsertRow;
 
 type LaboratoryLevelUpsertRow = {
   troop_id?: string;
@@ -115,6 +115,7 @@ type ExistingBuildingRow = {
 type ExistingHeroRow = {
   id: string;
   name: string;
+  api_name: string | null;
   source_id: string | null;
 };
 
@@ -357,14 +358,15 @@ function validateHero(value: unknown): GameHero {
     throw new Error("Ein Helden-Eintrag ist kein Objekt.");
   }
 
-  const { id, sourceId, name, category, unlockTownHall, sortOrder, levels } =
+  const { id, sourceId, name, apiName, category, unlockTownHall, sortOrder, levels } =
     value;
 
   if (
     !isUuid(id) ||
     !isString(sourceId) ||
     !isString(name) ||
-    !isString(category)
+    !isString(category) ||
+    (apiName !== undefined && !isString(apiName))
   ) {
     throw new Error(
       "Game Items brauchen gültige Felder id, sourceId, name und category. id muss eine UUID sein.",
@@ -396,6 +398,7 @@ function validateHero(value: unknown): GameHero {
     id,
     sourceId,
     name,
+    apiName,
     category,
     unlockTownHall,
     sortOrder,
@@ -523,47 +526,8 @@ function resolveBuildingId(
   );
 }
 
-async function resolveHeroIds(
-  supabase: ReturnType<typeof createScriptSupabaseClient>,
-): Promise<Map<string, string> | null> {
-  const { data, error } = await supabase
-    .from("heroes")
-    .select("id, name, source_id");
-
-  if (error) {
-    if (isMissingTableErrorMessage(error.message)) {
-      console.log(
-        "Überspringe heroes: Tabelle fehlt. SQL-Datei: src/scripts/sql/heroes.sql",
-      );
-      return null;
-    }
-
-    throw new Error(
-      `Bestehende Helden konnten nicht gelesen werden: ${error.message}`,
-    );
-  }
-
-  return ((data || []) as ExistingHeroRow[]).reduce<Map<string, string>>(
-    (heroIds, row) => {
-      heroIds.set(row.name, row.id);
-      if (row.source_id) {
-        heroIds.set(row.source_id, row.id);
-      }
-      return heroIds;
-    },
-    new Map<string, string>(),
-  );
-}
-
-function resolveHeroId(
-  hero: GameHero,
-  existingHeroIds: Map<string, string>,
-): string {
-  return (
-    existingHeroIds.get(hero.sourceId) ||
-    existingHeroIds.get(hero.name) ||
-    hero.id
-  );
+function findExistingItem(item: GameHero, existing: Map<string, ExistingHeroRow>) {
+  return existing.get(item.sourceId) || existing.get(item.name);
 }
 
 function toBuildingRows(
@@ -614,27 +578,31 @@ function toBuildingAvailabilityRows(
 }
 
 function toHeroRows(
-  heroes: GameHero[],
-  existingHeroIds: Map<string, string>,
+  items: GameHero[],
+  existingItems: Map<string, ExistingHeroRow>,
 ): HeroUpsertRow[] {
-  return heroes.map((hero) => ({
-    id: resolveHeroId(hero, existingHeroIds),
-    source_id: hero.sourceId,
-    name: hero.name,
-    category: hero.category,
-    unlock_town_hall_level: hero.unlockTownHall,
-    max_level: Math.max(...hero.levels.map((level) => level.level)),
-    sort_order: hero.sortOrder,
-  }));
+  return items.map((item) => {
+    const existing = findExistingItem(item, existingItems);
+    return {
+      id: existing?.id || item.id,
+      source_id: item.sourceId,
+      name: item.name,
+      api_name: existing?.api_name || item.apiName || item.name,
+      category: item.category,
+      unlock_town_hall_level: item.unlockTownHall,
+      max_level: Math.max(...item.levels.map((level) => level.level)),
+      sort_order: item.sortOrder,
+    };
+  });
 }
 
 function toHeroLevelRows(
   heroes: GameHero[],
-  existingHeroIds: Map<string, string>,
+  existingHeroIds: Map<string, ExistingHeroRow>,
 ): HeroLevelUpsertRow[] {
   return heroes.flatMap((hero) =>
     hero.levels.map((level) => ({
-      hero_id: resolveHeroId(hero, existingHeroIds),
+      hero_id: findExistingItem(hero, existingHeroIds)?.id || hero.id,
       level: level.level,
       town_hall_level: level.townHall,
       upgrade_time_hours: level.upgradeTimeHours,
@@ -644,31 +612,16 @@ function toHeroLevelRows(
       hitpoints: level.hitpoints,
     })),
   );
-}
-
-function toLaboratoryRows(
-  items: GameHero[],
-  existingItemIds: Map<string, string>,
-): LaboratoryUpsertRow[] {
-  return items.map((item) => ({
-    id: resolveHeroId(item, existingItemIds),
-    source_id: item.sourceId,
-    name: item.name,
-    category: item.category,
-    unlock_town_hall_level: item.unlockTownHall,
-    max_level: Math.max(...item.levels.map((level) => level.level)),
-    sort_order: item.sortOrder,
-  }));
 }
 
 function toLaboratoryLevelRows(params: {
   items: GameHero[];
-  existingItemIds: Map<string, string>;
+  existingItemIds: Map<string, ExistingHeroRow>;
   foreignKey: "troop_id" | "spell_id" | "siege_machine_id";
 }): LaboratoryLevelUpsertRow[] {
   return params.items.flatMap((item) =>
     item.levels.map((level) => ({
-      [params.foreignKey]: resolveHeroId(item, params.existingItemIds),
+      [params.foreignKey]: findExistingItem(item, params.existingItemIds)?.id || item.id,
       level: level.level,
       town_hall_level: level.townHall,
       upgrade_time_hours: level.upgradeTimeHours,
@@ -680,15 +633,14 @@ function toLaboratoryLevelRows(params: {
   );
 }
 
-async function resolveGenericItemIds(params: {
+async function readExistingItems(params: {
   supabase: ReturnType<typeof createScriptSupabaseClient>;
   tableName: string;
-  items: GameHero[];
   sqlFile: string;
-}): Promise<Map<string, string> | null> {
+}): Promise<Map<string, ExistingHeroRow> | null> {
   const { data, error } = await params.supabase
     .from(params.tableName)
-    .select("id, name, source_id");
+    .select("id, name, source_id, api_name");
 
   if (error) {
     if (isMissingTableErrorMessage(error.message)) {
@@ -703,15 +655,15 @@ async function resolveGenericItemIds(params: {
     );
   }
 
-  return ((data || []) as ExistingHeroRow[]).reduce<Map<string, string>>(
+  return ((data || []) as ExistingHeroRow[]).reduce<Map<string, ExistingHeroRow>>(
     (itemIds, row) => {
-      itemIds.set(row.name, row.id);
+      itemIds.set(row.name, row);
       if (row.source_id) {
-        itemIds.set(row.source_id, row.id);
+        itemIds.set(row.source_id, row);
       }
       return itemIds;
     },
-    new Map<string, string>(),
+    new Map<string, ExistingHeroRow>(),
   );
 }
 
@@ -738,10 +690,9 @@ async function importLaboratoryItems(params: {
     `Validierung erfolgreich: ${items.length} ${params.label}, ${totalLevelCount} Level.`,
   );
 
-  const existingItemIds = await resolveGenericItemIds({
+  const existingItemIds = await readExistingItems({
     supabase: params.supabase,
     tableName: params.tableName,
-    items,
     sqlFile: params.sqlFile,
   });
 
@@ -749,7 +700,7 @@ async function importLaboratoryItems(params: {
     return;
   }
 
-  const itemRows = toLaboratoryRows(items, existingItemIds);
+  const itemRows = toHeroRows(items, existingItemIds);
   const levelRows = toLaboratoryLevelRows({
     items,
     existingItemIds,
@@ -917,7 +868,11 @@ async function runImport() {
   );
 
   console.log("Prüfe bestehende Helden...");
-  const existingHeroIds = await resolveHeroIds(supabase);
+  const existingHeroIds = await readExistingItems({
+    supabase,
+    tableName: "heroes",
+    sqlFile: "src/scripts/sql/heroes.sql",
+  });
   if (!existingHeroIds) {
     console.log("Hero-Import übersprungen.");
   } else {

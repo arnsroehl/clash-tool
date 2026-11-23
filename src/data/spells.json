@@ -1419,6 +1419,7 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Heroic Spell"
   }
 ]
