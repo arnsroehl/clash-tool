@@ -5,6 +5,7 @@ export type VillageTemplate = {
   level: number | null;
   aspect: number;
   samples: readonly number[];
+  stationaryBaseOnly?: boolean;
 };
 
 export type VillageObjectCandidate = {
@@ -23,7 +24,10 @@ export type VillagePixels = {
 const GRID = 16;
 const COARSE_ERROR_LIMIT = 35;
 const STRUCTURE_ERROR_LIMIT = 0.66;
-const MAX_FRAME_SIDE = 720;
+const PARTIAL_STRUCTURE_ERROR_LIMIT = 0.5;
+const DEFAULT_FRAME_LONG_EDGE = 720;
+const TARGET_FRAME_SHORT_EDGE = 500;
+const MAX_FRAME_LONG_EDGE = 1080;
 const SEARCH_FRACTIONS = [0.072, 0.088, 0.108, 0.132, 0.162, 0.198, 0.242, 0.296];
 
 type Hit = {
@@ -108,6 +112,7 @@ function searchTemplate(image: VillagePixels, template: VillageTemplate, scale: 
 
 function refineHit(image: VillagePixels, initial: Hit, step: number): Hit[] {
   const { template } = initial;
+  const errorLimit = template.stationaryBaseOnly ? PARTIAL_STRUCTURE_ERROR_LIMIT : STRUCTURE_ERROR_LIMIT;
   let best: Hit | undefined;
   const radius = Math.max(2, Math.round(initial.width * 0.11));
   for (let width = initial.width - radius; width <= initial.width + radius; width += 2) {
@@ -138,7 +143,7 @@ function refineHit(image: VillagePixels, initial: Hit, step: number): Hit[] {
         const drift = total / count;
         const error = Math.sqrt(Math.max(0, squares / count - drift * drift)) / deviation
           + absolute / (count * 200);
-        if (error <= STRUCTURE_ERROR_LIMIT && (!best || error < best.error))
+        if (error <= errorLimit && (!best || error < best.error))
           best = { template, x, y, width, height, error };
       }
     }
@@ -147,7 +152,14 @@ function refineHit(image: VillagePixels, initial: Hit, step: number): Hit[] {
 }
 
 export function villageFrameSize(width: number, height: number) {
-  const fraction = Math.min(1, MAX_FRAME_SIDE / Math.max(width, height));
+  const longEdge = Math.max(width, height);
+  const shortEdge = Math.min(width, height);
+  // Keep more building detail in wide phone screenshots while bounding the search cost.
+  const targetLongEdge = Math.min(
+    MAX_FRAME_LONG_EDGE,
+    Math.max(DEFAULT_FRAME_LONG_EDGE, TARGET_FRAME_SHORT_EDGE * longEdge / shortEdge),
+  );
+  const fraction = Math.min(1, targetLongEdge / longEdge);
   return { width: Math.max(1, Math.round(width * fraction)), height: Math.max(1, Math.round(height * fraction)) };
 }
 
@@ -172,7 +184,8 @@ export function findVillageObjects(
       && other.template.level !== hit.template.level);
     results.push({
       sourceId: hit.template.sourceId,
-      level: hit.error <= 0.4 && competingLevel && competingLevel.error - hit.error >= 0.13
+      level: !hit.template.stationaryBaseOnly && hit.error <= 0.4
+        && competingLevel && competingLevel.error - hit.error >= 0.13
         ? hit.template.level
         : null,
       confidence: Math.min(0.98, 1 - hit.error / 4),

@@ -7,7 +7,7 @@ const categories = ["town-hall", "defenses", "army-buildings", "resource-buildin
 const grid = 16;
 const templates = [];
 
-async function makeTemplate(file, sourceId, level) {
+async function makeTemplate(file, sourceId, level, stationaryBaseOnly = false) {
   const { data, info } = await sharp(file).trim().png().toBuffer({ resolveWithObject: true });
   const pixels = await sharp(data).resize(grid, grid, { fit: "fill" }).ensureAlpha().raw().toBuffer();
   const groups = Array.from({ length: 16 }, () => []);
@@ -29,8 +29,36 @@ async function makeTemplate(file, sourceId, level) {
     .sort((a, b) => b[0].saturation - a[0].saturation)
     .slice(0, 16);
   if (ranked.length < 5) return;
-  const samples = [0, 1, 2].flatMap((index) => ranked.flatMap((group) => group[index]?.sample || []));
-  templates.push({ sourceId, level, aspect: Number((info.height / info.width).toFixed(3)), samples });
+  const samples = [0, 1, 2].flatMap((index) => ranked.flatMap((group) => {
+    const sample = group[index]?.sample;
+    return sample && (!stationaryBaseOnly || sample[1] >= 7) ? sample : [];
+  }));
+  if (stationaryBaseOnly && samples.length < 14 * 5) return;
+  const template = {
+    sourceId,
+    level,
+    aspect: Number((info.height / info.width).toFixed(3)),
+    samples,
+    ...(stationaryBaseOnly ? { stationaryBaseOnly: true } : {}),
+  };
+  templates.push(template);
+  if (stationaryBaseOnly) {
+    templates.push({
+      ...template,
+      samples: samples.map((value, index) => index % 5 === 0 ? grid - 1 - value : value),
+    });
+  }
+}
+
+async function addLevels(directory, sourceId, stationaryBaseOnly = false) {
+  const names = await readdir(directory).catch((error) => {
+    if (error.code === "ENOENT" || error.code === "ENOTDIR") return [];
+    throw error;
+  });
+  for (const name of names.sort((a, b) => a.localeCompare(b, "en", { numeric: true }))) {
+    const level = name.match(/^level-(\d+)\.png$/)?.[1];
+    if (level) await makeTemplate(path.join(directory, name), sourceId, Number(level), stationaryBaseOnly);
+  }
 }
 
 for (const category of categories) {
@@ -38,14 +66,12 @@ for (const category of categories) {
   const entries = category === "town-hall" ? ["town-hall"] : (await readdir(folder)).sort();
   for (const sourceId of entries) {
     if (sourceId === "wall") continue;
-    const directory = path.join(folder, ...(category === "town-hall" ? [] : [sourceId]), "normal");
-    const names = await readdir(directory).catch((error) => {
-      if (error.code === "ENOENT" || error.code === "ENOTDIR") return [];
-      throw error;
-    });
-    for (const name of names.sort((a,b) => a.localeCompare(b, "en", { numeric: true }))) {
-      const level = name.match(/^level-(\d+)\.png$/)?.[1];
-      if (level) await makeTemplate(path.join(directory, name), sourceId, Number(level));
+    const directory = path.join(folder, ...(category === "town-hall" ? [] : [sourceId]));
+    await addLevels(path.join(directory, "normal"), sourceId);
+    if (sourceId === "x-bow") {
+      // The rotating bow can face a different direction from its reference image.
+      for (const variant of ["normal", "air-and-ground", "ground-depleted", "air-and-ground-depleted"])
+        await addLevels(path.join(directory, variant), sourceId, true);
     }
   }
 }
@@ -60,11 +86,12 @@ if (novemberImages) {
   for (const [sourceId, file] of Object.entries(novemberBuildings))
     await makeTemplate(path.join(novemberImages, file), sourceId, null);
 }
+const uniqueTemplates = [...new Map(templates.map((template) => [JSON.stringify(template), template])).values()];
 await writeFile("src/data/village-object-templates.json", JSON.stringify({
   source: "clash-of-clans-data@0.19.1",
   ...(novemberImages ? {
     additionalSource: "https://support.supercell.com/clash-of-clans/en/articles/whats-new-cc-nov26.html",
   } : {}),
-  templates,
+  templates: uniqueTemplates,
 }) + "\n");
-console.log(`Generated ${templates.length} building templates.`);
+console.log(`Generated ${uniqueTemplates.length} building templates.`);

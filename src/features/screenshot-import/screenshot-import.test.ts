@@ -1,4 +1,4 @@
-import { findVillageObjects } from "./village-object-search";
+import { findVillageObjects, villageFrameSize } from "./village-object-search";
 import { findBuildingMenuRows } from "./build-menu";
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -1253,6 +1253,12 @@ test("does not assign more visual village matches than existing instances", () =
   });
   assert.equal(detections.length, 1);
   assert.equal(detections[0].id, "cannon:1");
+});
+
+test("preserves more of the short edge of wide villages within the search size limit", () => {
+  assert.deepEqual(villageFrameSize(2560, 1180), { width: 1080, height: 498 });
+  assert.deepEqual(villageFrameSize(1024, 768), { width: 720, height: 540 });
+  assert.deepEqual(villageFrameSize(600, 280), { width: 600, height: 280 });
 });
 
 test("finds the same object at two scales and suppresses overlapping crops", () => {
