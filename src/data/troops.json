@@ -3323,7 +3323,8 @@
         "darkElixirCost": 435000,
         "hitpoints": 3300
       }
-    ]
+    ],
+    "apiName": "Ruin Witch"
   },
   {
     "id": "377f4647-d7b3-53ce-9865-f0fd62d0bb33",
@@ -3360,7 +3361,8 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Barch Squad"
   },
   {
     "id": "b502888b-040f-50c6-9fad-2aae19443581",
@@ -3397,7 +3399,8 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Giant Wizard Squad"
   },
   {
     "id": "7363664d-7ff7-51b9-9172-b933246fc2d6",
@@ -3434,7 +3437,8 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Wall Breaker Squad"
   },
   {
     "id": "36e094a4-ca94-5a82-9eb5-0b780bd8eb38",
@@ -3471,7 +3475,8 @@
         "darkElixirCost": 465000,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Minion Squad"
   },
   {
     "id": "90b265b0-a0ba-5ad4-9464-9747ec725907",
@@ -3508,7 +3513,8 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Balloon Squad"
   },
   {
     "id": "feed88c7-ef04-57fd-97d6-8f81196ecfcf",
@@ -3545,7 +3551,8 @@
         "darkElixirCost": 500000,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Golem Witch Squad"
   },
   {
     "id": "565c6c78-cf1f-5d24-87c1-0186cf953668",
@@ -3582,7 +3589,8 @@
         "darkElixirCost": 480000,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Hog Rider Squad"
   },
   {
     "id": "a5458ebf-da09-5816-9374-786e5f77ba68",
@@ -3619,7 +3627,8 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Miner Squad"
   },
   {
     "id": "90d61d8d-dfab-5ea9-865b-c956e3fd9450",
@@ -3656,7 +3665,8 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Healer Squad"
   },
   {
     "id": "9f2eb515-23c6-5330-8672-d7a16d5cd036",
@@ -3693,7 +3703,8 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "P.E.K.K.A Titan Squad"
   },
   {
     "id": "775a20f1-20c6-5613-aea2-5b6b343600a9",
@@ -3730,7 +3741,8 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Dragons Squad"
   },
   {
     "id": "4f19c029-e33f-50ed-a493-0c0f4b116c9f",
@@ -3767,6 +3779,7 @@
         "darkElixirCost": 0,
         "hitpoints": 0
       }
-    ]
+    ],
+    "apiName": "Baby Dragon Squad"
   }
 ]
