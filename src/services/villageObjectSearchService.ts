@@ -3,7 +3,10 @@ import {
   type VillageObjectCandidate,
 } from "@/features/screenshot-import/village-object-search";
 
-export function searchVillageBitmap(bitmap: ImageBitmap): Promise<VillageObjectCandidate[]> {
+export function searchVillageBitmap(
+  bitmap: ImageBitmap,
+  buildingCounts?: Record<string, number>,
+): Promise<VillageObjectCandidate[]> {
   const canvas = document.createElement("canvas");
   const { width, height } = villageFrameSize(bitmap.width, bitmap.height);
   canvas.width = width;
@@ -30,6 +33,6 @@ export function searchVillageBitmap(bitmap: ImageBitmap): Promise<VillageObjectC
       finish();
       reject(new Error("Die Dorfansicht konnte nicht ausgewertet werden."));
     };
-    worker.postMessage({ data, width, height }, [data.buffer]);
+    worker.postMessage({ data, width, height, buildingCounts }, [data.buffer]);
   });
 }

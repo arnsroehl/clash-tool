@@ -3,7 +3,21 @@ import path from "node:path";
 import sharp from "sharp";
 
 const imageRoot = path.join(process.env.COC_DATA_ROOT || "node_modules/clash-of-clans-data", "images/home");
-const categories = ["town-hall", "defenses", "army-buildings", "resource-buildings"];
+const categories = ["town-hall", "defenses", "army-buildings", "resource-buildings", "other"];
+const variants = {
+  "archer-tower": ["geared-up-fast-attack", "geared-up-normal"],
+  "builders-hut": ["active"],
+  cannon: ["geared-up-normal", "geared-up-burst"],
+  "eagle-artillery": ["head-down", "unloaded"],
+  "helper-hut": ["active"],
+  "hero-hall": ["active"],
+  "inferno-tower": ["single-target-depleted", "multi-target-depleted", "multi-target"],
+  mortar: ["geared-up-normal", "geared-up-burst"],
+  "multi-gear-tower": ["fast-attack"],
+  "revenge-tower": ["stage-1", "stage-2", "stage-3"],
+  scattershot: ["depleted"],
+  "spell-tower": ["invisibility", "poison", "earthquake"],
+};
 const grid = 16;
 const templates = [];
 
@@ -63,11 +77,15 @@ async function addLevels(directory, sourceId, stationaryBaseOnly = false) {
 
 for (const category of categories) {
   const folder = path.join(imageRoot, category);
-  const entries = category === "town-hall" ? ["town-hall"] : (await readdir(folder)).sort();
+  const entries = category === "town-hall" ? ["town-hall"]
+    : category === "other" ? ["bobs-hut", "helper-hut"] : (await readdir(folder)).sort();
   for (const sourceId of entries) {
     if (sourceId === "wall") continue;
     const directory = path.join(folder, ...(category === "town-hall" ? [] : [sourceId]));
     await addLevels(path.join(directory, "normal"), sourceId);
+    for (const variant of variants[sourceId] || []) {
+      await addLevels(path.join(directory, variant), sourceId);
+    }
     if (sourceId === "x-bow") {
       // The rotating bow can face a different direction from its reference image.
       for (const variant of ["normal", "air-and-ground", "ground-depleted", "air-and-ground-depleted"])

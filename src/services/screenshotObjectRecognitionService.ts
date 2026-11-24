@@ -207,6 +207,7 @@ export async function recognizeScreenshotObjects(params: {
   file: File;
   lines: ScreenshotRecognitionResult["lines"];
   screenType: ScreenshotScreenType;
+  villageBuildingCounts?: Record<string, number>;
   laboratoryGridCells?: LaboratoryGridCellRecognition[];
 }): Promise<ScreenshotObjectMatch[]> {
   const types = allowedTypes(params.screenType);
@@ -216,7 +217,7 @@ export async function recognizeScreenshotObjects(params: {
   const bitmap = await createImageBitmap(params.file, { imageOrientation: "from-image" });
   if (params.screenType === "village") {
     try {
-      const matches = await searchVillageBitmap(bitmap);
+      const matches = await searchVillageBitmap(bitmap, params.villageBuildingCounts);
       return matches.map((match) => ({
         sourceId: match.sourceId,
         entityType: "building",

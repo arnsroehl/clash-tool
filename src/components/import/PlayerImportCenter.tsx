@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { ScreenshotImportWizard } from "@/components/import/ScreenshotImportWizard";
+import { VillageBuildingExport } from "@/components/import/VillageBuildingExport";
 import {
   getMagicItemScreenshotAliases,
   getScreenshotAliases,
@@ -24,7 +25,7 @@ import {
   type PlayerImportPreview,
 } from "@/services/playerImportService";
 import type { ClashAccount } from "@/types/account";
-import type { Building, BuildingInstanceLevelMap } from "@/types/building";
+import type { Building, BuildingInstanceLevelMap, BuildingLevel } from "@/types/building";
 import type { Hero } from "@/types/hero";
 import type { SiegeMachine, Spell, Troop } from "@/types/laboratory";
 import type { ScreenshotProgressLevel, ScreenshotUpgradeSlot, ScreenshotWallLevel } from "@/types/screenshotProgress";
@@ -34,6 +35,8 @@ type Props = {
   officialApiEnabled?: boolean;
   account: ClashAccount | null;
   buildings: Building[];
+  buildingCatalog: Building[];
+  buildingCatalogLevels: BuildingLevel[];
   buildingInstanceLevels: BuildingInstanceLevelMap;
   heroes: Hero[];
   heroLevels: Record<string, number>;
@@ -82,6 +85,7 @@ export function PlayerImportCenter(props: Props) {
       ...props.buildings.flatMap((item) =>
         Array.from({ length: item.countAfterMerges || 1 }, (_, index) => ({
           id: `${item.id}:${index + 1}`,
+          sourceId: item.sourceId,
           name: `${item.name} ${index + 1}`,
           aliases: screenshotAliases(item.name, item.sourceId, item.sourceId ? `${item.sourceId}-${index + 1}` : null),
           category: item.category,
@@ -318,6 +322,14 @@ export function PlayerImportCenter(props: Props) {
             officialApiEnabled ? "lg:grid-cols-3" : "lg:grid-cols-2"
           }`}
         >
+          <VillageBuildingExport
+            key={props.account.id}
+            account={props.account}
+            catalog={props.buildingCatalog}
+            catalogLevels={props.buildingCatalogLevels}
+            currentLevels={props.buildingInstanceLevels}
+            language={en ? "en" : "de"}
+          />
           {officialApiEnabled ? (
             <div className="rounded-2xl bg-slate-900 p-5">
               <h3 className="font-bold">

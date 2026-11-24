@@ -909,6 +909,13 @@ export function ScreenshotImportWizard({
             lines: recognition.lines,
             laboratoryGridCells: recognition.laboratoryGridCells,
             screenType: effectiveScreenType,
+            villageBuildingCounts: effectiveScreenType === "village"
+              ? entities.reduce<Record<string, number>>((counts, entity) => {
+                  if (entity.type === "building" && entity.sourceId && entity.sourceId !== "wall")
+                    counts[entity.sourceId] = (counts[entity.sourceId] || 0) + 1;
+                  return counts;
+                }, {})
+              : undefined,
           });
           await updateAnalysisJob({
             jobId: activeJobId,

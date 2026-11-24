@@ -1346,6 +1346,8 @@ export default function Home() {
             officialApiEnabled={officialClashApiEnabled}
             account={selectedAccount}
             buildings={availableBuildings}
+            buildingCatalog={buildings}
+            buildingCatalogLevels={buildingMaxLevels}
             buildingInstanceLevels={buildingInstanceLevels}
             heroes={availableHeroes}
             heroLevels={heroLevels}

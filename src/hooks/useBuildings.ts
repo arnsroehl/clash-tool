@@ -174,6 +174,8 @@ export function useBuildings({
       : 0;
     return buildings
       .filter((building) => building.unlockTownHallLevel <= selectedAccount.townHallLevel)
+      .filter((building) => building.sourceId !== "bobs-hut" || selectedAccount.builderCount >= 6
+        || (buildingInstanceLevels[building.id]?.[0] || 0) > 0)
       .flatMap((building) => {
         const availability = availabilityByBuilding.get(building.id);
         const needsFirecrackerMerge = building.sourceId === "archer-tower" || building.sourceId === "scattershot";
