@@ -1,5 +1,8 @@
 import { findVillageObjects, villageFrameSize } from "./village-object-search";
 import { findBuildingMenuRows } from "./build-menu";
+import { buildVillageExportPreview, changedVillageExportGroups } from "./village-export";
+import buildingCatalog from "@/data/buildings.json";
+import villageGameIds from "@/data/village-export-building-ids.json";
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
@@ -641,7 +644,7 @@ test("ships every Home Village trap with TH18 levels and instance counts", () =>
     trapCatalog.map((trap) =>
       trap.availability.find((availability) => availability.townHallLevel === 18)?.count,
     ),
-    [7, 8, 8, 1, 9, 4, 9, 1],
+    [8, 8, 8, 1, 9, 4, 9, 1],
   );
 });
 
@@ -1288,6 +1291,11 @@ test("finds the same object at two scales and suppresses overlapping crops", () 
   assert.ok(matches.some(({ boundingBox }) => Math.abs(boundingBox.x * width - 87) <= 2));
   assert.ok(matches.some(({ boundingBox }) => Math.abs(boundingBox.x * width - 225) <= 2));
   assert.ok(matches.every((match) => match.level === null));
+  const limited = findVillageObjects({ width, height, data, buildingCounts: { fixture: 1 } }, [
+    { sourceId: "fixture", level: 3, aspect: 1, samples },
+    { sourceId: "outside-catalog", level: 3, aspect: 1, samples },
+  ]);
+  assert.deepEqual(limited.map(({ sourceId }) => sourceId), ["fixture"]);
 });
 
 test("stores correction feedback only with explicit improvement consent", () => {
@@ -1543,4 +1551,63 @@ test("recognizes the new Buildings and Heroes menu and isolates level badges fro
   }).map(({ id, detectedLevel }) => [id, detectedLevel]), [
     ["spell-tower:1", 4], ["spell-tower:2", 4], ["town-hall:1", 19],
   ]);
+});
+
+function sampleVillageExport() {
+  return {
+    tag: "#P0YLQR",
+    timestamp: 1_770_000_000,
+    buildings: [
+      { data: 1000001, lvl: 19 },
+      { data: 1000000, lvl: 14, cnt: 4 },
+      { data: 1000010, lvl: 19, cnt: 200 },
+      { data: 1000010, lvl: 20, cnt: 150 },
+      { data: 1000021, lvl: 13, timer: 3456 },
+      { data: 1000021, lvl: 14 },
+      { data: 1000097, types: [] },
+      { data: 1000108, lvl: 0, timer: 9876 },
+    ],
+    traps: [{ data: 12000005, lvl: 13, cnt: 8 }],
+    buildings2: [{ data: 1000021, lvl: 999 }],
+  };
+}
+
+const exportCatalog = [...buildingCatalog, ...trapCatalog].map(({ unlockTownHall, levels, ...building }) => ({
+  ...building, unlockTownHallLevel: unlockTownHall, maxLevel: Math.max(...levels.map((entry) => entry.level)),
+}));
+const exportLevels = [...buildingCatalog, ...trapCatalog].flatMap((building) =>
+  building.levels.map(({ townHall, ...level }) => ({
+    ...level, buildingId: building.id, townHallLevel: townHall,
+  })),
+);
+
+test("reads every catalog building ID and preserves grouped copies, wall levels and in-progress construction", () => {
+  assert.equal(Object.keys(villageGameIds).length, exportCatalog.length);
+  assert.equal(new Set(Object.values(villageGameIds)).size, exportCatalog.length);
+  const xbow = exportCatalog.find(({ sourceId }) => sourceId === "x-bow")!;
+  const exportResult = buildVillageExportPreview(
+    JSON.stringify(sampleVillageExport()), exportCatalog, exportLevels,
+    { [xbow.id]: [13, 12] }, { playerTag: "#P0YLQR", townHallLevel: 18 },
+  );
+  assert.equal(exportResult.townHall, 19);
+  assert.equal(exportResult.wallCount, 350);
+  assert.equal(exportResult.buildingCount, 17);
+  assert.deepEqual(exportResult.unknownIds, []);
+  assert.deepEqual(exportResult.groups.find((group) => group.sourceId === "x-bow")?.levels, [13, 14]);
+  assert.deepEqual(exportResult.groups.find((group) => group.sourceId === "firecracker-tower")?.levels, [0]);
+  assert.deepEqual(exportResult.groups.find((group) => group.sourceId === "crafting-station")?.levels, [1]);
+  assert.equal(changedVillageExportGroups(exportResult).some((group) => group.sourceId === "wall"), true);
+});
+
+test("rejects a different account and an impossible wall count before the import can be confirmed", () => {
+  const data = sampleVillageExport();
+  assert.throws(() => buildVillageExportPreview(
+    JSON.stringify(data), exportCatalog, exportLevels, {},
+    { playerTag: "#LQGRJ", townHallLevel: 18 },
+  ), /passenden Account/);
+  data.buildings[3].cnt = 151;
+  assert.throws(() => buildVillageExportPreview(
+    JSON.stringify(data), exportCatalog, exportLevels, {},
+    { playerTag: "#P0YLQR", townHallLevel: 18 },
+  ), /150 Mauern/);
 });

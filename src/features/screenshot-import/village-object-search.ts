@@ -21,6 +21,10 @@ export type VillagePixels = {
   height: number;
 };
 
+export type VillageSearchInput = VillagePixels & {
+  buildingCounts?: Record<string, number>;
+};
+
 const GRID = 16;
 const COARSE_ERROR_LIMIT = 35;
 const STRUCTURE_ERROR_LIMIT = 0.66;
@@ -164,26 +168,32 @@ export function villageFrameSize(width: number, height: number) {
 }
 
 export function findVillageObjects(
-  image: VillagePixels,
+  image: VillageSearchInput,
   templates: readonly VillageTemplate[],
-  limit = 40,
 ): VillageObjectCandidate[] {
-  const hits = templates.flatMap((template) =>
-    SEARCH_FRACTIONS.flatMap((scale) => searchTemplate(image, template, scale)),
-  ).sort((a, b) => a.error - b.error);
+  const { buildingCounts } = image;
+  const hits = templates
+    .filter((template) => !buildingCounts || buildingCounts[template.sourceId] > 0)
+    .flatMap((template) => SEARCH_FRACTIONS.flatMap((scale) => searchTemplate(image, template, scale)))
+    .sort((a, b) => a.error - b.error);
   const selected: Hit[] = [];
   const results: VillageObjectCandidate[] = [];
+  const counts = new Map<string, number>();
   for (const hit of hits) {
-    if (results.length >= limit) break;
+    const sourceId = hit.template.sourceId;
+    const seen = counts.get(sourceId) || 0;
+    if (results.length >= 160) break;
+    if (buildingCounts && seen >= buildingCounts[sourceId]) continue;
     if (selected.some((other) => sameObject(hit, other))) continue;
     selected.push(hit);
     const overlaps = hits.filter((other) => other !== hit && sameObject(other, hit));
     const competingType = overlaps.find((other) => other.template.sourceId !== hit.template.sourceId);
     if (competingType && competingType.error - hit.error < 0.09) continue;
+    counts.set(sourceId, seen + 1);
     const competingLevel = overlaps.find((other) => other.template.sourceId === hit.template.sourceId
       && other.template.level !== hit.template.level);
     results.push({
-      sourceId: hit.template.sourceId,
+      sourceId,
       level: !hit.template.stationaryBaseOnly && hit.error <= 0.4
         && competingLevel && competingLevel.error - hit.error >= 0.13
         ? hit.template.level

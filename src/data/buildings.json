@@ -5038,5 +5038,43 @@
         "hitpoints": 6700
       }
     ]
+  },
+  {
+    "id": "578058de-8dce-5b2b-939b-0966351beb11",
+    "sourceId": "bobs-hut",
+    "name": "B.O.B.s Hütte",
+    "category": "Armee",
+    "unlockTownHall": 10,
+    "sortOrder": 560,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 10,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 0,
+        "darkElixirCost": 0,
+        "hitpoints": 250
+      }
+    ]
+  },
+  {
+    "id": "ca5802a6-7441-53e0-bd84-5a97e2f752af",
+    "sourceId": "helper-hut",
+    "name": "Helferhütte",
+    "category": "Armee",
+    "unlockTownHall": 9,
+    "sortOrder": 570,
+    "levels": [
+      {
+        "level": 1,
+        "townHall": 9,
+        "upgradeTimeHours": 0,
+        "goldCost": 0,
+        "elixirCost": 1000000,
+        "darkElixirCost": 0,
+        "hitpoints": 500
+      }
+    ]
   }
 ]

@@ -10,6 +10,7 @@ export type ScreenshotEntityType =
 
 export type ScreenshotEntity = {
   id: string;
+  sourceId?: string;
   name: string;
   aliases?: string[];
   category?: string;
